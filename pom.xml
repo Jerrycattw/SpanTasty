@@ -75,8 +75,13 @@
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
 		
-		
-		
+		<!-- 09.28 chenru新增-->
+		<dependency>
+    		<groupId>com.auth0</groupId>
+    		<artifactId>java-jwt</artifactId>
+   			<version>4.4.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
