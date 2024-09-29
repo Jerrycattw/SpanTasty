@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>環保用具庫存</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+<div th:replace="~{display/navbar}" ></div>
+<div class="content" id="content">
+    <h2>庫 存 管 理 系 統</h2>
+    <table class="table table-warning table-striped" id="table">
+    <th:block th:each=" stock : ${tablewareStocks}">
+        <tr>
+            <th>用具編號</th>
+            <th>餐廳編號</th>
+            <th>用具庫存</th>
+        </tr>
+        <tr>
+            <td th:text="${stock.tablewareId}"></td>
+            <td th:text="${stock.restaurantId}"></td>
+            <td th:text="${stock.stock}"></td>
+        </tr>
+    </th:block>
+    </table>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}" ></script>
+<script th:src="@{/js/jquery-3.7.1.min.js}" ></script>
+<script th:src="@{/js/axios.min.js}" ></script>
+</body>
+</html>

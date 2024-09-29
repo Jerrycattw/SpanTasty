@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增環保用具</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <div class="container" id="container">
+        <h2>請 輸 入 想 搜 尋 關 鍵 字</h2>
+        <form method="get" class="btn btn-outline-warning btn-sm" action="/SpanTasty/rent/showAll">
+			<input type="submit" value="返回">
+		</form>
+        <table class="table table-warning table-striped" id="table">
+            <tr>
+                <td>訂單編號:
+				<select id="rentId" name="rentId">
+					<option value="" selected disabled>請選擇訂單編號</option>
+					<c:forEach items="${rentIds}" var="rentId">
+						<option value="${rentId}">${rentId}</option>
+					</c:forEach>
+				</select>
+                </td>
+            </tr>
+			<tr>
+				<td>租借會員:
+				<select id="member_id" name="member_id" >
+					<option value="" selected disabled>請選擇會員編號</option>
+					
+				</select>
+				</td>
+			</tr>
+			<tr>
+				<td>租借餐廳: 
+				<select name="restaurantName" id="restaurantName">
+					<option value="" selected disabled>請選擇歸還餐廳</option>
+					<c:if test="${not empty param.restaurantName}">
+						<!-- 顯示 URL 中的餐廳名稱 -->
+						<option value="${param.restaurantName}" selected>${param.restaurantName}</option>
+					</c:if>
+					<c:forEach items="${restaurantNames}" var="restaurantName">
+						<option value="${restaurantName}">${restaurantName}</option>
+					</c:forEach>
+				</select>
+				</td>
+			</tr>
+			<tr>
+				<td>租借狀態: 
+					<input type="radio" name="rent_status" value="1" id="status_1" />1:出租中 
+					<input type="radio" name="rent_status" value="2" id="status_2" />2:已歸還
+				</td>
+			</tr>
+			<tr>
+				<td>查找日期: 
+					開始<input type="date" name="rent_date_start" /> 
+					結束<input type="date" name="rent_date_end" />
+				</td>
+			</tr>
+		</table>
+		<input type="submit" value="確定" />
+    </div>
+   
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+
+</html>
