@@ -97,6 +97,38 @@ public class MemberService {
         return true; // 密碼更新成功
     }
 
+	public boolean updateMemberAvatar(Integer memberId, byte[] avatarBytes) {
+
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+        if (!optionalMember.isPresent()) {
+            return false; // 會員不存在，更新失敗
+        }
+
+
+        Member member = optionalMember.get();
+        member.setAvatar(avatarBytes);
+
+
+        memberRepository.save(member);
+
+        return true; 
+		
+	}
+
+    // 獲取會員頭像數據
+    public byte[] getMemberAvatar(Integer memberId) {
+        // 查詢會員資料
+        Optional<Member> optionalMember = memberRepository.findById(memberId);
+
+        // 如果會員存在且有頭像，回傳頭像的 byte[] 數據
+        if (optionalMember.isPresent()) {
+            Member member = optionalMember.get();
+            return member.getAvatar();
+        }
+
+        return null;
+    }
+
 }
     
 
