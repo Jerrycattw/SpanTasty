@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增訂單</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <div class="container" id="container">
+        <h2>輸 入 租 借 訂 單 資 料</h2>
+        <table class="table table-warning table-striped" id="table">
+            <tr>
+                <td>
+                    租借押金:<input type="text" name="rent_deposit" id="rent_deposit" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    租借餐廳:
+                    <select name="restaurantName" id="restaurantName">
+                        <option value="" selected disabled>請選擇租借餐廳</option>
+                        
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    租借會員:
+                    <select name="member_id" id="member_id">
+                        <option value="" selected disabled>請選擇會員編號</option>
+
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div id="rentItemsContainer">
+            <h2>輸 入 租 借 訂 單 細 項</h2>
+            <div class="rent-item">
+                <table class="table table-warning table-striped">
+                    <tr>
+                        <td>
+                            餐具編號:
+                            <select name="tablewareId0" id="tablewareId0">
+                                <option value="" selected disabled>請選擇餐具編號</option>
+
+                            </select>
+                        </td>
+                        <td>
+                            數量:<input type="number" name="rentItemQuantity0" min="1" />
+                        </td>
+                        <td>
+                            押金:<input type="number" name="rentItemDeposit0" min="0" />
+                        </td>
+                        <td>
+                            <button type="button" onclick="removeRentItem(this)">移除</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <button type="button" onclick="addRentItem()">新增訂單明細</button>
+    </div>
+    <script>
+        let rentItemIndex = 1;
+
+        function addRentItem() {
+            const container = document.getElementById('rentItemsContainer');
+            const newItem = document.createElement('div');
+            newItem.classList.add('rent-item');
+            newItem.innerHTML = `
+        <table>
+            <tr>
+                <td>餐具編號:
+                    <select name="tablewareId${rentItemIndex}" id="tablewareId${rentItemIndex}">
+                    <option value="" selected disabled>請選擇餐具編號</option>
+                    
+                    </select>
+                </td>
+                <td>數量:<input type="number" name="rentItemQuantity${rentItemIndex}" min="1" /></td>
+                <td>押金:<input type="number" name="rentItemDeposit${rentItemIndex}" min="0" /></td>
+                <td><button type="button" onclick="removeRentItem(this)">移除</button></td>
+            </tr>
+        </table>
+    `;
+            container.appendChild(newItem);
+            rentItemIndex++;
+        }
+
+        // 删除订单明细
+        function removeRentItem(button) {
+            const rentItem = button.closest('.rent-item');
+            rentItem.remove();
+        }
+    </script>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+
+</html>

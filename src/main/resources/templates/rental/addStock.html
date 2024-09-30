@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增環保用具庫存</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <div class="container" id="container">
+        <h2>輸 入 環 保 用 具 庫 存 資 料</h2>
+        <table class="table table-warning table-striped" id="table">
+            <tr>
+                <td>
+                    用具名稱: 
+                    <select name="tablewareId" id="tablewareId">
+						<option value="" selected disabled>請選擇餐具編號</option>
+					</select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    餐廳名稱:
+                    <select name="restaurantName" id="restaurantName">
+						<option value="" selected disabled>請選擇餐廳名稱</option>
+					</select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                   用具庫存 <input type="number" name="stock" id="stock" />
+                </td>
+            </tr>
+        </table>
+        <input type="submit" value="確定" />
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+
+</html>

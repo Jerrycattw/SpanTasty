@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增環保用具</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <div class="container" id="container">
+        <h2>輸 入 環 保 用 具 資 料</h2>
+        <table class="table table-warning table-striped" id="table">
+            <tr>
+                <td>
+                    用具名稱: <input type="text" name="tableware_name" id="tableware_name" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    押金金額: <input type="text" name="tableware_deposit" id="tableware_deposit" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                   用具圖片: <input type="file" name="tableware_image" id="tableware_image" />
+                </td>
+            </tr>
+            <tr>
+				<td>用具描述: <input type="text" name="tableware_description" id="tableware_description" />
+			</td>
+        </table>
+        <div id="stock-container">
+            <h2>輸 入 租 借 訂 單 細 項</h2>
+            <div class="stock-entry">
+                <table class="table table-warning table-striped">
+					<tr>
+						<td>餐廳名稱: <select name="restaurantName0" id="restaurantName0">
+								<option value="" selected disabled>請選擇餐廳名稱</option>
+						</select>
+						</td>
+						<td>用具庫存: <input type="text" name="stock0" /></td>
+						<td><button type="button" onclick="removeStockEntry(this)">刪除</button></td>
+					</tr>
+				</table>
+            </div>
+        </div>
+        <button type="button" onclick="addStockEntry()">添加庫存</button>
+		<input type="submit" value="確定" />
+    </div>
+    <script>
+        let stockIndex = 1; // 庫存條目的索引
+
+		function addStockEntry() {
+		    const container = document.getElementById('stock-container');
+		    const newEntry = document.createElement('div');
+		    newEntry.classList.add('stock-entry');
+		    newEntry.innerHTML = `
+		        <table>
+		            <tr>
+		                <td>餐廳名稱: 
+		                	<select name="restaurantName${stockIndex}" id="restaurantName${stockIndex}">
+									<option value="" selected disabled>請選擇餐廳名稱</option>
+							</select>
+		                </td>
+		                <td>用具庫存: <input type="text" name="stock${stockIndex}" /></td>
+		                <td><button type="button" onclick="removeStockEntry(this)">刪除</button></td>
+		            </tr>
+		        </table>
+		    `;
+		    container.appendChild(newEntry);
+		    stockIndex++;
+		}
+		
+		function removeStockEntry(button) {
+		    const entry = button.closest('.stock-entry');
+		    if (entry) {
+		        entry.remove();
+		    }
+		}
+    </script>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+
+</html>
