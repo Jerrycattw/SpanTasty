@@ -1,5 +1,6 @@
 package com.eatspan.SpanTasty.entity.order;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "food_kind")
-public class FoodKindEntity {
+public class FoodKindEntity implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	@Id @Column(name = "food_kind_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer foodKindId;
@@ -33,7 +36,7 @@ public class FoodKindEntity {
 	private String foodKindName;
 	
 	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "foodKind", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "foodKind")
 	private List<MenuEntity> foods = new ArrayList<MenuEntity>();
 	
 }
