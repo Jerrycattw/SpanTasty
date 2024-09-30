@@ -1,4 +1,4 @@
-package com.eatspan.SpanTasty.controller.order;
+package com.eatspan.SpanTasty.controller.store;
 
 import java.util.List;
 
