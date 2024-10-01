@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
@@ -55,19 +56,21 @@ public class Reserve {
 	private Integer reserveStatus;
 	
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "table_type_id", insertable = false, updatable = false)
+	@ManyToOne //預設(fetch = FetchType.EAGER)
+	@JoinColumn(name = "table_type_id")
+	//@JoinColumn(name = "table_type_id", insertable = false, updatable = false)
 	private TableType tableType;
 	
 	
 	@ManyToOne //預設(fetch = FetchType.EAGER)
     @JoinColumn(name = "restaurant_id")
+	//@JoinColumn(name = "restaurant_id", insertable = false, updatable = false)
     private Restaurant restaurant; // 與 Restaurant 的關聯
 	
-//	@JoinColumn(name = "restaurant_id", insertable = false, updatable = false)
-//	  @ManyToOne //預設(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "member_id", insertable = false, updatable = false)
-//    private Member member; // 與 Restaurant 的關聯	
+	@ManyToOne //預設(fetch = FetchType.EAGER)
+    @JoinColumn(name = "member_id")
+	//@JoinColumn(name = "member_id", insertable = false, updatable = false)
+    private Member member; // 與 Member 的關聯	
 	
 	
 	

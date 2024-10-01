@@ -32,22 +32,26 @@ public class RestaurantTableId implements Serializable {
         this.restaurantId = restaurantId;
         this.tableTypeId = tableTypeId;
     }
-	
-    
-    // hashCode 和 equals 方法（用於確保複合鍵的唯一性）
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RestaurantTableId that = (RestaurantTableId) o;
-        return Objects.equals(restaurantId, that.restaurantId) && 
-               Objects.equals(tableTypeId, that.tableTypeId);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(restaurantId, tableTypeId);
-    }
+    
+    
+	@Override
+	public int hashCode() {
+		return Objects.hash(restaurantId, tableTypeId);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RestaurantTableId other = (RestaurantTableId) obj;
+		return Objects.equals(restaurantId, other.restaurantId) && Objects.equals(tableTypeId, other.tableTypeId);
+	}
+	
     
 	
 }
