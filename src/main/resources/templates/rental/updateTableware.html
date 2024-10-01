@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增環保用具庫存</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <div class="container" id="container">
+        <h2>輸 入 環 保 用 具 資 料</h2>
+        <form th:action="@{/tableware/update}" th:method="put" th:object="${tableware}">
+        <table class="table table-warning table-striped" id="table">
+            <tr>
+                <td>
+                    用具編號: 
+                    <input type="text" name="tableware_id" th:field="*{tablewareId}" readonly/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    用具名稱: 
+                    <input type="text" name="tableware_name" id="tableware_name" th:field="*{tablewareName}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    用具押金: 
+                    <input type="text" name="tableware_deposit" id="tableware_deposit" th:field="*{tablewareDeposit}"/>
+                </td>
+            </tr>
+			<tr>
+				<td>用具圖片: 
+					<input type="text" name="tableware_image_path" disabled th:field="*{tablewareImage}" /> 
+					<input type="hidden" name="original_tableware_image" th:field="*{tablewareImage}" /> 
+					<input type="file" name="tableware_image" th:field="*{tablewareImage}" />
+				</td>
+			</tr>
+			<tr>
+                <td>
+                   用具描述:
+                   <input type="text" name="tableware_description" id="tableware_description" th:field="*{tablewareDescription}"/>
+                </td>
+            </tr>
+			<tr>
+				<td>用具狀態: 
+					<input type="radio" name="tableware_status" value="1" th:checked="${tableware.tablewareStatus == 1}">1:上架 
+					<input type="radio" name="tableware_status" value="2" th:checked="${tableware.tablewareStatus == 2}">2:未上架
+				</td>
+			</tr>
+        </table>
+        <input type="submit" id="submitBtn" value="確定更改">
+        </form>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+
+</html>

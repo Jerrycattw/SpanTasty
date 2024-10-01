@@ -12,48 +12,49 @@
     <div th:replace="~{display/navbar}"></div>
     <div class="container" id="container">
         <h2>輸 入 租 借 訂 單 資 料</h2>
+        <form th:action="@{/rent/add}" th:object="${rent}" method="post">
         <table class="table table-warning table-striped" id="table">
             <tr>
                 <td>
-                    租借押金:<input type="text" name="rent_deposit" id="rent_deposit" />
+                    租借押金:<input type="text" th:field="*{rentDeposit}" />
                 </td>
             </tr>
             <tr>
                 <td>
                     租借餐廳:
-                    <select name="restaurantName" id="restaurantName">
+                    <select th:field="*{restaurantId}">
                         <option value="" selected disabled>請選擇租借餐廳</option>
-                        
+                        <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
                     </select>
                 </td>
             </tr>
             <tr>
                 <td>
                     租借會員:
-                    <select name="member_id" id="member_id">
+                    <select th:field="*{memberId}">
                         <option value="" selected disabled>請選擇會員編號</option>
-
+						<option th:each="member : ${members}" th:value="${member.memberId}" th:text="${member.account}"></option>
                     </select>
                 </td>
             </tr>
         </table>
         <div id="rentItemsContainer">
             <h2>輸 入 租 借 訂 單 細 項</h2>
-            <div class="rent-item">
+            <div class="rent-item" th:each="rentItem, no : *{rentItems}">
                 <table class="table table-warning table-striped">
                     <tr>
                         <td>
                             餐具編號:
-                            <select name="tablewareId0" id="tablewareId0">
+                            <select th:field="*{rentItems[${no.index}].tablewareId}" onchange="updateDeposit(this)">
                                 <option value="" selected disabled>請選擇餐具編號</option>
-
+								<option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:data-deposit="${tableware.tablewareDeposit}" th:text="${tableware.tablewareName}"></option>
                             </select>
                         </td>
                         <td>
-                            數量:<input type="number" name="rentItemQuantity0" min="1" />
+                            數量:<input type="number" th:field="*{rentItems[${no.index}].rentItemQuantity}"  min="1" />
                         </td>
                         <td>
-                            押金:<input type="number" name="rentItemDeposit0" min="0" />
+                            押金:<input type="number" th:field="*{rentItems[${no.index}].rentItemDeposit}" name="rentItems[${no.index}].rentItemDeposit" />
                         </td>
                         <td>
                             <button type="button" onclick="removeRentItem(this)">移除</button>
@@ -62,6 +63,8 @@
                 </table>
             </div>
         </div>
+        <button type="submit">新增訂單</button>
+        </form>
         <button type="button" onclick="addRentItem()">新增訂單明細</button>
     </div>
     <script>
@@ -75,13 +78,13 @@
         <table>
             <tr>
                 <td>餐具編號:
-                    <select name="tablewareId${rentItemIndex}" id="tablewareId${rentItemIndex}">
-                    <option value="" selected disabled>請選擇餐具編號</option>
-                    
+                    <select name="rentItems[${rentItemIndex}].tablewareId" onchange="updateDeposit(this)">
+	                    <option value="" selected disabled>請選擇餐具編號</option>
+	                    <option th:each="tableware : ${tablewares}" value="${tableware.tablewareId}" data-deposit="${tableware.tablewareDeposit}" th:text="${tableware.tablewareName}"></option>
                     </select>
                 </td>
-                <td>數量:<input type="number" name="rentItemQuantity${rentItemIndex}" min="1" /></td>
-                <td>押金:<input type="number" name="rentItemDeposit${rentItemIndex}" min="0" /></td>
+                <td>數量:<input type="number" name="rentItems[${rentItemIndex}].rentItemQuantity" min="1" /></td>
+                <td>押金:<input type="number" name="rentItems[${rentItemIndex}].rentItemDeposit" /></td>
                 <td><button type="button" onclick="removeRentItem(this)">移除</button></td>
             </tr>
         </table>
@@ -96,6 +99,23 @@
             rentItem.remove();
         }
     </script>
+    <script>
+    // 更新押金值
+    function updateDeposit(selectElement) {
+        // 獲取所選擇 option 的 data-deposit 屬性值
+        const selectedOption = selectElement.selectedOptions[0];
+        const depositValue = selectedOption.getAttribute('data-deposit');
+        
+        // 找到對應的押金輸入框
+        const rentItemDiv = selectElement.closest('.rent-item');
+        const depositInput = rentItemDiv.querySelector('input[name$=".rentItemDeposit"]');
+        
+        // 設置押金值
+        if (depositValue) {
+            depositInput.value = depositValue;
+        }
+    }
+</script>
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/js/axios.min.js}"></script>

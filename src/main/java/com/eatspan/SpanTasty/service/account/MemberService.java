@@ -2,6 +2,7 @@ package com.eatspan.SpanTasty.service.account;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,6 +130,10 @@ public class MemberService {
         return null;
     }
 
+    // 獲取所有會員(Rental使用 謝謝陳儒!)
+    public List<Member> findAllMembers(){
+    	return memberRepository.findAll();
+    }
 }
     
 
