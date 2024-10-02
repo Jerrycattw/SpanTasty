@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .first, .second {
+            border-bottom: 2px solid gray;
+            padding: 15px 0;
+        }
+        .do {
+            display: flex;
+        }
+        form {
+            margin: 2px;  
+        }
+        button {
+            padding: 5px 10px;
+            margin: 2px;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+		.button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .first-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+	<div class="content" id="content">
+		<div class="container">
+			<div class="first">
+				<div class="first-section">
+					<div>
+						<h1>會員點數</h1>
+						<h4 th:text="'會員編號 : '+${pointMember.memberId}"></h4>
+						<h4 th:text="'會員姓名 : '+${pointMember.memberName}"></h4>
+					</div>
+					<div>
+						<button th:onclick="|window.location.href='@{/point/member/{memberId}/point(memberId=${pointMember.memberId})}'|">新增點數</button>
+					</div>
+				</div>
+			</div>
+			<div class="second">
+				<h4 th:text="'現有點數 : '+${pointMember.totalPointBalance}"></h4>
+				<h4 th:text="${pointMember.expiringPoints}+' 點 將於 '+${pointMember.expiryDate}+' 到期'"></h4>
+			</div>
+			<div class="second">
+				<h4>活動紀錄</h4>
+				<div class="table-container">
+					<table>
+						<thead>
+							<tr>
+								<th>點數紀錄</th>
+								<th>會員</th>
+								<th>變動點數</th>
+								<th>創建日期</th>
+								<th>到期日</th>
+								<th>是否到期</th>
+								<th>剩餘點數</th>
+								<th>交易來源</th>
+								<th>交易類型</th>
+								<th>動作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="point : ${pointsById}" class="point_tr">
+								<td th:text="${point.pointId}"></td>
+								<td th:text="${point.memberId}"></td>
+								<td th:text="${point.pointChange}"></td>
+								<td th:text="${#dates.format(point.createDate, 'yyyy-MM-dd')}"></td>
+								<td th:text="${#dates.format(point.expiryDate, 'yyyy-MM-dd')}" id="expiryDate"></td>
+								<td id="expiry_td"></td>
+								<td th:text="${point.pointUsage}"></td>
+								<td th:text="${point.transactionId}"></td>
+								<td th:text="${point.transactionType}"></td>
+								<td>
+									<button th:onclick="|window.location.href='@{/point/member/{memberId}/point/{pointId}(memberId=${pointMember.memberId},pointId=${point.pointId})}'|">編輯</button>
+									<button th:onclick="'deletePoint(' + ${memberId} + ', ' + ${point.pointId} + ')'" class="btn btn-link">删除</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="button-container">
+				<button onclick="window.location.href='/SpanTasty/point'">返回查詢點數</button>
+			</div>
+		</div>
+	</div>
+	    <script th:inline="javascript">
+			function deletePoint(memberId, pointId) {
+				console.log('touch')
+			    if (confirm('確定要刪除嗎，刪除後無法復原?')) {
+			        fetch(`/SpanTasty/point/member/${memberId}/point/${pointId}`, {
+			            method: 'DELETE',
+			        })
+			        .then(response => {
+			        	console.log(response)
+			            if (response.ok) {
+			              	return response.text();
+			            } else {
+			                throw new Error('刪除失敗');
+			            }
+		            })
+		            .then(message=>{	            	
+		            	alert(message);
+		            	window.location.reload(); 
+			        })
+			        .catch(err=>{
+			        	alert('刪除失敗，請聯繫IT部門');
+			    	})
+			    }	
+			}
+		</script>
+		<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			const trs = document.getElementsByClassName('point_tr');
+			
+			Array.from(trs).forEach(tr => {
+				const expiryDateElem = tr.querySelector('#expiryDate').textContent;
+				const expiryTdElem = tr.querySelector('#expiry_td');
+				
+				if (expiryDateElem && expiryTdElem) {
+					const now = new Date();
+					const expiryDate = new Date(expiryDateElem);
+					console.log(expiryDate);
+					
+					
+					if (expiryDate > now) {
+						expiryTdElem.innerHTML = '尚未過期';
+					} else {
+						expiryTdElem.innerHTML = '過期';
+					}
+				}
+			});
+		});
+		</script>
+</body>
+</html>
