@@ -7,7 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eatspan.SpanTasty.entity.order.TogoEntity;
@@ -51,8 +55,29 @@ public class TogoController {
 		return ResponseEntity.ok(togoService.getTogoById(togoId));
 	}
 	
+	@PostMapping("/togo")
+	public ResponseEntity<List<TogoEntity>> addTogo(@RequestParam TogoEntity newTogo) {
+		togoService.addTogo(newTogo);
+		return ResponseEntity.ok(togoService.getAllTogo());
+	}
+	
+	//有updateTogo:更新訂單資訊，無updateTogo:刪除，更改togoStatus=3
+	@PutMapping("/togo/{togoId}")
+	public ResponseEntity<TogoEntity> updateTogoById(@PathVariable Integer togoId, @RequestBody TogoEntity updateTogo) {
+		TogoEntity togo = togoService.getTogoById(togoId);
+		if (togo == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} else {
+			if (updateTogo.getTogoId() != null) {
+				return ResponseEntity.ok(togoService.updateTogoById(togoId, updateTogo));
+			}
+			return ResponseEntity.ok(togoService.deleteTogoById(togoId));
+		}
+	}
 	
 }
+
+
 
 
 
