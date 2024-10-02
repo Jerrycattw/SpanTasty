@@ -33,7 +33,10 @@ public class RestaurantTableService {
 	// 更新餐廳桌位
 	public RestaurantTable updateRestaurantTable(RestaurantTable restaurantTable) {
 		Optional<RestaurantTable> optional = restaurantTableRepository.findById(restaurantTable.getId());
+		System.out.println(666);
 		if(optional.isPresent()) {
+			System.out.println(000000);
+			System.out.println("test here");
 			return restaurantTableRepository.save(restaurantTable);
 		}
 		return null;
@@ -46,9 +49,9 @@ public class RestaurantTableService {
 	}
 
 	
-	// 查詢所有餐廳
-	public List<RestaurantTable> findAllRestaurantTable() {
-		return restaurantTableRepository.findAll();
+	// 查詢餐廳(id)所有桌位
+	public List<RestaurantTable> findAllRestaurantTable(Integer restaurantId) {
+		return restaurantTableRepository.findRestaurantTableByRestaurantId(restaurantId);
 	}
 	
 	

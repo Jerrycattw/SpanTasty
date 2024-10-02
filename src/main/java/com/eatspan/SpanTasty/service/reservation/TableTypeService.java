@@ -25,7 +25,7 @@ public class TableTypeService {
 	
 	
 	// 刪除桌位種類
-	public void deleteRestaurantTable(String tableTypeId) {
+	public void deleteTableType(String tableTypeId) {
 		tableTypeRepository.deleteById(tableTypeId);
 	}
 	
