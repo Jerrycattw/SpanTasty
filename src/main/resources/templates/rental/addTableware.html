@@ -1,89 +1,150 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增環保用具</title>
-    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新增環保用具</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<style>
+#card-warning {
+	background-color: #ffd966;
+}
+
+.h {
+	text-align: center;
+}
+
+form {
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background-color: #ffd966;
+}
+.tableware-input{
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 20px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+.stock-entry {
+	display: flex;
+	align-items: center;
+	margin-bottom: 0px;
+	
+}
+.restaurant-select, .stock-input {
+    width: 200px; /* 根據需要調整寬度 */
+    margin-left: 0px;
+    padding: 0px;
+    height: 30px;
+    width: 100%;
+}
+.stock-column{
+	width: 220px;
+	margin-left: 10px;
+	padding: 0px;
+}
+.delete-button{
+	background-color: #fff;
+    border: 2px solid #000;
+    padding: 0px 10px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 讓文字在按鈕內居中 */
+    height: 30px;
+}
+
+
+</style>
 </head>
-
 <body>
-    <div th:replace="~{display/navbar}"></div>
-    <div class="container" id="container">
-        <h2>輸 入 環 保 用 具 資 料</h2>
-        <table class="table table-warning table-striped" id="table">
-            <tr>
-                <td>
-                    用具名稱: <input type="text" name="tableware_name" id="tableware_name" />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    押金金額: <input type="text" name="tableware_deposit" id="tableware_deposit" />
-                </td>
-            </tr>
-            <tr>
-                <td>
-                   用具圖片: <input type="file" name="tableware_image" id="tableware_image" />
-                </td>
-            </tr>
-            <tr>
-				<td>用具描述: <input type="text" name="tableware_description" id="tableware_description" />
-			</td>
-        </table>
-        <div id="stock-container">
-            <h2>輸 入 租 借 訂 單 細 項</h2>
-            <div class="stock-entry">
-                <table class="table table-warning table-striped">
-					<tr>
-						<td>餐廳名稱: <select name="restaurantName0" id="restaurantName0">
-								<option value="" selected disabled>請選擇餐廳名稱</option>
-						</select>
-						</td>
-						<td>用具庫存: <input type="text" name="stock0" /></td>
-						<td><button type="button" onclick="removeStockEntry(this)">刪除</button></td>
-					</tr>
-				</table>
-            </div>
-        </div>
-        <button type="button" onclick="addStockEntry()">添加庫存</button>
-		<input type="submit" value="確定" />
-    </div>
+<div th:replace="~{display/navbar}" ></div>
+
+<div class="content" id="container">
+
+        <h3 class="h">輸入環保用具資料</h3>
+        <div>
+	        <form method="post" th:action="@{/tableware/addPost}" enctype="multipart/form-data">
+	        <table class="table table-warning w-100 table-striped" id="table">
+	            <tr><td>用具名稱: <br/><input class="tableware-input" type="text" name="tablewareName" /></td></tr>
+	            <tr><td>押金金額: <br/><input class="tableware-input" type="text" name="tablewareDeposit" /></td></tr>
+	            <tr><td>用具圖片: <br/><input class="tableware-input" type="file" name="timg" /></td></tr>
+	            <tr><td>用具描述: <br/><textarea class="tableware-input" name="tablewareDescription"></textarea></td></tr>
+	        </table>
+	        
+	        <div id="stock-container">
+	            <h4 class="h">輸入餐廳庫存資料</h4>
+	            <div class="stock-entry">
+			    <table class="table table-warning table-striped">
+			        <tr>
+			            <td class="stock-column">餐廳名稱:
+			                <select name="stocks[0].restaurantId" class="restaurant-select">
+			                    <option value="" selected disabled>請選擇租借餐廳</option>
+			                    <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+			                </select>
+			            </td>
+			            <td class="stock-column">用具庫存: <input type="number" name="stocks[0].stock" class="stock-input" /></td>
+			            <td class="stock-column"><br/><button type="button" class="delete-button" onclick="removeStockEntry(this)">刪除</button></td>
+			        </tr>
+			    </table>
+				</div>
+			</div>
+			
+			<button type="button" id="add-stock-button" onclick="addStockEntry()">添加庫存</button>
+			<button type="button">確定</button>
+			</form>
+		</div>
+</div>
+
     <script>
-        let stockIndex = 1; // 庫存條目的索引
+		document.addEventListener("DOMContentLoaded", function() {
+			showSidebar('rental');
+		});
+	</script>
+    <script>
+let stockIndex = 0; // 初始化庫存索引
 
-		function addStockEntry() {
-		    const container = document.getElementById('stock-container');
-		    const newEntry = document.createElement('div');
-		    newEntry.classList.add('stock-entry');
-		    newEntry.innerHTML = `
-		        <table>
-		            <tr>
-		                <td>餐廳名稱: 
-		                	<select name="restaurantName${stockIndex}" id="restaurantName${stockIndex}">
-									<option value="" selected disabled>請選擇餐廳名稱</option>
-							</select>
-		                </td>
-		                <td>用具庫存: <input type="text" name="stock${stockIndex}" /></td>
-		                <td><button type="button" onclick="removeStockEntry(this)">刪除</button></td>
-		            </tr>
-		        </table>
-		    `;
-		    container.appendChild(newEntry);
-		    stockIndex++;
-		}
-		
-		function removeStockEntry(button) {
-		    const entry = button.closest('.stock-entry');
-		    if (entry) {
-		        entry.remove();
-		    }
-		}
-    </script>
-    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-    <script th:src="@{/js/axios.min.js}"></script>
+// 監聽「添加庫存」按鈕
+document.getElementById('add-stock-button').addEventListener('click', function() {
+    stockIndex++; // 增加索引
+
+    // 新的庫存輸入框 HTML 結構
+    const stockEntryHtml = `
+        <div class="stock-entry">
+            <table class="table table-warning table-striped">
+                <tr>
+                    <td class="stock-column">餐廳名稱:
+                        <select name="stocks[${stockIndex}].restaurantId" class="restaurant-select">
+                            <option value="" selected disabled>請選擇租借餐廳</option>
+                            <!-- 手動填充選項，或後端渲染 使用thymlea無法插入-->
+                            <option value="1">餐廳A</option>
+                            <option value="2">餐廳B</option>
+                        </select>
+                    </td>
+                    <td class="stock-column">用具庫存: <input type="number" name="stocks[${stockIndex}].stock" class="stock-input" /></td>
+                    <td class="stock-column"><br/><button type="button" class="delete-button" onclick="removeStockEntry(this)">刪除</button></td>
+                </tr>
+            </table>
+        </div>
+    `;
+
+    // 在 stock-container 下方插入新的 div
+    document.getElementById('stock-container').innerHTML += stockEntryHtml;
+});
+
+// 刪除庫存行
+function removeStockEntry(button) {
+    button.closest('.stock-entry').remove();
+}
+</script>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/js/axios.min.js}"></script>
 </body>
-
 </html>
