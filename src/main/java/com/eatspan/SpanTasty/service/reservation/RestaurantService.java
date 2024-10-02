@@ -51,7 +51,13 @@ public class RestaurantService {
 
 	
 	// 查詢所有餐廳
-	public Page<Restaurant> findAllRestaurants(Integer pageNumber) {
+	public List<Restaurant> findAllRestaurants() {
+		return restaurantRepository.findAll();
+	}
+	
+	
+	// 查詢所有餐廳(Page)
+	public Page<Restaurant> findAllRestaurantsPage(Integer pageNumber) {
 		Pageable pageAble = PageRequest.of(pageNumber-1, 10, Sort.Direction.DESC, "restaurantId");
 		return restaurantRepository.findAll(pageAble);
 	}
