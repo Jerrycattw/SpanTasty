@@ -8,92 +8,87 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
+import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.service.rental.TablewareService;
 import com.eatspan.SpanTasty.service.rental.TablewareStockService;
+import com.eatspan.SpanTasty.service.reservation.RestaurantService;
 
 @Controller
-@RequestMapping("/tablewareStock/*")
+@RequestMapping("/stock")
 public class TablewareStockController {
 	@Autowired
 	private TablewareStockService tablewareStockService;
 	@Autowired
 	private TablewareService tablewareService;
+	@Autowired
+	private RestaurantService restaurantService;
 	
-	@GetMapping("showAll")
+	@GetMapping("/getAll")
 	public String showAllTablewareStocks(Model model) {
-		List<TablewareStock> tablewareStocks = tablewareStockService.findAllTablewareStocks();
-		model.addAttribute("tablewareStocks",tablewareStocks);
-		return "rental/ShowAllTablewareStocks";
+		List<TablewareStock> stocks = tablewareStockService.findAllStocks();
+		model.addAttribute("stocks",stocks);
+		return "rental/showAllStocks";
 	}
 	
-	@GetMapping("option")
+	@GetMapping("/selectTR")
 	public String findSelectOption(@RequestParam("action") String action, Model model) {
-		List<Integer> tablewareIds = tablewareService.findTablewareIds();
-//		List<String> restaurantNames = restaurantService.getAllRestaurantName();
-		model.addAttribute("tablewareIds",tablewareIds);
-//		model.addAttribute("restaurantNames",restaurantNames);
+		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+		model.addAttribute("tablewares",tablewares);
+		model.addAttribute("restaurants",restaurants);
 		if ("insert".equals(action)) {
-			return "rental/AddTablewareStock";
+			return "rental/addStock";
 	    } else if ("search".equals(action)) {
-	    	return "rental/SearchTablewareStock";
+	    	return "rental/searchStocks";
 	    }
 		return null;
 	}
 	
-	@PostMapping("insert")
-	protected String addStock(
-			@RequestParam("tablewareId") Integer tablewareId,
-			@RequestParam("restaurantName") String restaurantName,
-			@RequestParam("stock") Integer stock,
-			Model model) {
-//		Integer restaurantId = restaurantService.getRestaurantId(restaurantName);
-		Integer restaurantId = null;
-		TablewareStock tablewareStock = new TablewareStock();
-		tablewareStock.setTablewareId(tablewareId);
-		tablewareStock.setRestaurantId(restaurantId);
-		tablewareStock.setStock(stock);
-		tablewareStockService.saveTablewareStock(tablewareStock);
-		model.addAttribute("tableware_stock", tablewareStock);
+	@PostMapping("/add")
+	protected String addStock(@ModelAttribute TablewareStock stock, Model model) {
+		tablewareStockService.addStock(stock);
 		return "redirect:/tablewareStock/showAll";
 	}
 
-	@PutMapping("update")
+	@PutMapping("/set")
 	protected String update(
 			@RequestParam("tableware_id") Integer tablewareId,
 			@RequestParam("restaurant_id") Integer restaurantId,
 			@RequestParam("stock") Integer stock,
 			Model model) {
-		TablewareStock tablewareStock = tablewareStockService.findTablewareStockByStockId(tablewareId, restaurantId);
+		TablewareStock tablewareStock = tablewareStockService.findStockById(tablewareId, restaurantId);
 		tablewareStock.setStock(stock);
-		tablewareStockService.saveTablewareStock(tablewareStock);
+		tablewareStockService.addStock(tablewareStock);
 		model.addAttribute("stock", tablewareStock);
 		return "redirect:/tablewareStock/showAll";
 	}
 
-	@GetMapping("search")
+	@GetMapping("/search")
 	protected String search(
 			@RequestParam(value = "tablewareId", required = false) Integer tablewareId,
 			@RequestParam(value = "restaurantName", required = false) String restaurantName,
 			Model model) {
 //		Integer restaurantId = restaurantService.getRestaurantId(restaurantName);
 		Integer restaurantId = null;
-		List<TablewareStock> tablewareStocks = tablewareStockService.findTablewareStocksByCriteria(tablewareId, restaurantId);
+		List<TablewareStock> tablewareStocks = tablewareStockService.findStocksByCriteria(tablewareId, restaurantId);
 		model.addAttribute("stock", tablewareStocks);
 		return "rental/ShowAllTablewareStocks";
 	}
 	
-	@GetMapping("getById")
+	@GetMapping("/get")
 	protected String findTablewareStockByStockId(
 			@RequestParam("tableware_id") Integer tablewareId,
 			@RequestParam("restaurant_id") Integer restaurantId,
 			Model model) {
-		TablewareStock tablewareStock = tablewareStockService.findTablewareStockByStockId(tablewareId, restaurantId);
+		TablewareStock tablewareStock = tablewareStockService.findStockById(tablewareId, restaurantId);
 		model.addAttribute("stock", tablewareStock);
 		return "rental/UpdateStock";
 	}

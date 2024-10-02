@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,48 +23,48 @@ import com.eatspan.SpanTasty.service.rental.TablewareService;
 import com.eatspan.SpanTasty.service.rental.TablewareStockService;
 
 @Controller
-@RequestMapping("/tableware/*")
+@RequestMapping("/tableware")
 public class TablewareController {
 	@Autowired
 	private TablewareService tablewareService;
 	@Autowired
 	private TablewareStockService tablewareStockService;
 	
-	@GetMapping("showAll")
+	@GetMapping("/getAll")
 	public String showAllTablewares(Model model) {
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
 		model.addAttribute("tablewares",tablewares);
 		return "rental/ShowAllTablewares";
 	}
 	
-	@GetMapping("search")
+	@GetMapping("/get")
 	public String findTablewaresBySearch(@RequestParam("keyword") String keyword, Model model) throws IOException {
 		List<Tableware> tablewares = tablewareService.findTablewaresByKeywords(keyword);
 		model.addAttribute("tablewares", tablewares);
 		return "rental/ShowAllTablewares";
 	}
 	
-	@GetMapping("find")
-	public String findTablewareById(@RequestParam("tableware_id") Integer tablewareId, Model model) {
+	@GetMapping("/get/{id}")
+	public String findTablewareById(@PathVariable("id") Integer tablewareId, Model model) {
 		Tableware tableware = tablewareService.findTablewareById(tablewareId);
 		model.addAttribute("tableware", tableware);
 		return "rental/UpdateTableware";
 	}
 	
-//	@GetMapping("option")
+//	@GetMapping("/option")
 //	public String findSelectOption(Model model) {
 //		List<String> restaurantNames = restaurantService.getAllRestaurantName();
 //		model.addAttribute("restaurantNames", restaurantNames);
 //		return "rental/SaveTableware";
 //	}
 	
-	@PutMapping("status")
+	@PutMapping("/setStatus")
 	public String updateStatus(@RequestParam("tableware_id") Integer tablewareId, Model model) throws IOException {
 		Tableware tableware = tablewareService.updateTablewareStatus(tablewareId);
 		return "redirect:/tableware/showAll";
 	}
 
-	@PutMapping("update")
+	@PutMapping("/set")
 	protected String updateTableware(
 			@RequestParam("tableware_id") Integer tablewareId, 
 			@RequestParam("tableware_name") String tablewareName, 
@@ -100,11 +101,11 @@ public class TablewareController {
 	        	tableware.setTablewareImage(tableware.getTablewareImage());
 	        }
 	    }
-	    tablewareService.saveTableware(tableware);
+	    tablewareService.addTableware(tableware);
 	    return "redirect:/Tableware/getAll";
 	}
 	
-	@PostMapping("save")
+	@PostMapping("/add")
 	protected String addTablewareAndStocks(
 			@RequestParam("tableware_name") String tablewareName, 
 			@RequestParam("tableware_deposit") Integer tablewareDeposit, 
@@ -132,7 +133,7 @@ public class TablewareController {
 			timg.transferTo(filePart);
 			tableware.setTablewareImage("/EEIT187-6/tablewareIMG/" + newFileName);
 		}
-		tablewareService.saveTableware(tableware);
+		tablewareService.addTableware(tableware);
 		
 		int tablewareId = tableware.getTablewareId();
 		
@@ -166,7 +167,7 @@ public class TablewareController {
 		}
 		// 批量插入库存记录
 		for (TablewareStock tablewareStock : tablewareStocks) {
-			tablewareStockService.saveTablewareStock(tablewareStock);
+			tablewareStockService.addStock(tablewareStock);
 		}
 		return "redirect:/Tableware/showAll";
 	}

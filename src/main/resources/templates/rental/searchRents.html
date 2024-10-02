@@ -15,53 +15,49 @@
         <form method="get" class="btn btn-outline-warning btn-sm" action="/SpanTasty/rent/showAll">
 			<input type="submit" value="返回">
 		</form>
+        <form th:action="@{/rent/search}" th:object="${rent}" method="get">
         <table class="table table-warning table-striped" id="table">
             <tr>
                 <td>訂單編號:
-				<select id="rentId" name="rentId">
+				<select th:field="*{rentId}">
 					<option value="" selected disabled>請選擇訂單編號</option>
-					<c:forEach items="${rentIds}" var="rentId">
-						<option value="${rentId}">${rentId}</option>
-					</c:forEach>
+					<option th:each="rent : ${rents}" th:value="${rent.rentId}" th:text="${rent.rentId}"></option>
 				</select>
                 </td>
             </tr>
 			<tr>
-				<td>租借會員:
-				<select id="member_id" name="member_id" >
-					<option value="" selected disabled>請選擇會員編號</option>
-					
-				</select>
+				<td>
+				租借會員:
+				<select th:field="*{memberId}">
+	                <option value="" selected disabled>請選擇會員編號</option>
+					<option th:each="member : ${members}" th:value="${member.memberId}" th:text="${member.account}"></option>
+                </select>
 				</td>
 			</tr>
 			<tr>
-				<td>租借餐廳: 
-				<select name="restaurantName" id="restaurantName">
-					<option value="" selected disabled>請選擇歸還餐廳</option>
-					<c:if test="${not empty param.restaurantName}">
-						<!-- 顯示 URL 中的餐廳名稱 -->
-						<option value="${param.restaurantName}" selected>${param.restaurantName}</option>
-					</c:if>
-					<c:forEach items="${restaurantNames}" var="restaurantName">
-						<option value="${restaurantName}">${restaurantName}</option>
-					</c:forEach>
-				</select>
+				<td>
+				租借餐廳: 
+				<select th:field="*{restaurantId}">
+	                <option value="" selected disabled>請選擇租借餐廳</option>
+	                <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+                </select>
 				</td>
 			</tr>
 			<tr>
 				<td>租借狀態: 
-					<input type="radio" name="rent_status" value="1" id="status_1" />1:出租中 
-					<input type="radio" name="rent_status" value="2" id="status_2" />2:已歸還
+					<input type="radio" th:field="*{rentStatus}" value="1" id="status_1" />1:出租中 
+					<input type="radio" th:field="*{rentStatus}" value="2" id="status_2" />2:已歸還
 				</td>
 			</tr>
 			<tr>
 				<td>查找日期: 
-					開始<input type="date" name="rent_date_start" /> 
-					結束<input type="date" name="rent_date_end" />
+					開始<input type="date" name="rentDateStart" /> 
+					結束<input type="date" name="rentDateEnd" />
 				</td>
 			</tr>
 		</table>
 		<input type="submit" value="確定" />
+		</form>
     </div>
    
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>

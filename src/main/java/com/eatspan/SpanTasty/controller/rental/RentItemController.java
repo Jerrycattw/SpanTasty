@@ -12,46 +12,49 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.eatspan.SpanTasty.entity.rental.Rent;
 import com.eatspan.SpanTasty.entity.rental.RentItem;
 import com.eatspan.SpanTasty.service.rental.RentItemService;
 import com.eatspan.SpanTasty.service.rental.RentService;
 
 @Controller
-@RequestMapping("/rentItem/*")
+@RequestMapping("/rentItem")
 public class RentItemController {
+	
+	
 	@Autowired
 	private RentItemService rentItemService;
 	@Autowired
 	private RentService rentService;
 	
-	@GetMapping("showAll")
-	public String showAllRentItems(Model model) {
+	@GetMapping("/getAll")
+	public String getAllRentItems(Model model) {
 		List<RentItem> rentItems = rentItemService.findAllRentItems();
 		model.addAttribute("rentItems",rentItems);
 		return "rental/ShowAllRentItems";
 	}
 	
-	@GetMapping("search")
-	protected String showRentItemsBySearch(@RequestParam("rentId") Integer rentId, Model model) {
+	@GetMapping("/search")
+	protected String getRentItemsBySearch(@RequestParam("rentId") Integer rentId, Model model) {
 		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
 		model.addAttribute("rentItems", rentItems);
 		return "rental/ShowAllRentItems";
 	}
 	
-	@GetMapping("option")
-	public String findSelectOption(Model model) {
-		List<Integer> rentIds = rentService.findRentIds();
-		model.addAttribute("rentIds",rentIds);
+	@GetMapping("/selectR")
+	public String getRentIdOption(Model model) {
+		List<Rent> rents = rentService.findAllRents();
+		model.addAttribute("rents",rents);
 		return "rental/FindRentItemsBySearch";
 	}
 	
-	@GetMapping("find")
-	protected String findById(
+	@GetMapping("/get")
+	protected String getById(
 			@RequestParam("rent_id") Integer rentId,
 			@RequestParam("tableware_id") Integer tablewareId, 
 			@RequestParam("action") String action, 
 			Model model) {
-		RentItem rentItem = rentItemService.findRentItemByRentItemId(rentId, tablewareId);
+		RentItem rentItem = rentItemService.findRentItemById(rentId, tablewareId);
 		model.addAttribute("rentItem", rentItem);
 		if ("update".equals(action)) {
 			return "rental/UpdateRentItem";
@@ -61,8 +64,12 @@ public class RentItemController {
 		return null;
 	}
 	
-	@PutMapping("update")
-	protected String update(
+	
+	
+	
+	//網頁寫在Rent的某個頁面(1.訂單頁面可查詢單筆訂單的所有明細,點進去可修改(批次更新?))
+	@PutMapping("/update")
+	protected String updateRentItem(
 			@RequestParam("rent_id") Integer rentId, 
 			@RequestParam("tableware_id") Integer tablewareId,
 			@RequestParam("rent_item_quantity") Integer rentItemQuantity,
@@ -70,28 +77,29 @@ public class RentItemController {
 			@RequestParam("return_memo") String returnMemo,
 			@RequestParam("return_status") Integer returnStatus,
 			Model model) {
-		RentItem rentItem = rentItemService.findRentItemByRentItemId(rentId, tablewareId);
+		RentItem rentItem = rentItemService.findRentItemById(rentId, tablewareId);
 		rentItem.setRentId(rentId);
 		rentItem.setTablewareId(tablewareId);
 		rentItem.setRentItemQuantity(rentItemQuantity);
 		rentItem.setRentItemDeposit(rentItemDeposit);
 		rentItem.setReturnMemo(returnMemo);
 		rentItem.setReturnStatus(returnStatus);
-		rentItemService.saveRentItem(rentItem);
+		rentItemService.addRentItem(rentItem);
 		return "redirect:/rentItem/showAll";
 	}
 	
-	@GetMapping("return")
+	//網頁寫在Rent的歸還頁面(歸還可選擇歸還狀態 根據情況再加庫存)
+	@PutMapping("/return")
 	protected String returnRentItem(
 			@RequestParam("rent_id") Integer rentId, 
 			@RequestParam("tableware_id") Integer tablewareId,
 			@RequestParam("return_memo") String returnMemo,
 			@RequestParam("return_status") Integer returnStatus,
 			Model model) {
-		RentItem rentItem = rentItemService.findRentItemByRentItemId(rentId, tablewareId);
+		RentItem rentItem = rentItemService.findRentItemById(rentId, tablewareId);
 		rentItem.setReturnMemo(returnMemo);
 		rentItem.setReturnStatus(returnStatus);
-		rentItemService.saveRentItem(rentItem);
+		rentItemService.addRentItem(rentItem);
 		return "redirect:/rentItem/showAll";
 	}
 }

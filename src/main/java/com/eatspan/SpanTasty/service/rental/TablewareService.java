@@ -11,38 +11,30 @@ import com.eatspan.SpanTasty.repository.rental.TablewareRepository;
 
 @Service
 public class TablewareService {
+	
+	
 	@Autowired
 	private TablewareRepository tablewareRepository;
 	
-	public Tableware saveTableware(Tableware tableware) {
+	
+	//新增餐具
+	public Tableware addTableware(Tableware tableware) {
 		return tablewareRepository.save(tableware);
 	}
 	
-	public Tableware findTablewareById(Integer tablewareId) {
-		Optional<Tableware> optional = tablewareRepository.findById(tablewareId);
+	
+	//更新餐具
+	public Tableware updateTableware(Tableware tableware) {
+		Optional<Tableware> optional = tablewareRepository.findById(tableware.getTablewareId());
 		if(optional.isPresent()) {
-			return optional.get();
+			return tablewareRepository.save(tableware);
 		}
 		return null;
 	}
+
 	
-	public List<Tableware> findAllTablewares() {
-		return tablewareRepository.findAll();
-	}
-	
-	public Tableware updateTablewareStatus(Integer tablewareId) {
-		Optional<Tableware> optional = tablewareRepository.findById(tablewareId);
-		if(optional.isPresent()) {
-			Tableware tableware = optional.get();
-			int currentStatus = tableware.getTablewareStatus();
-			int newStatus = (currentStatus == 1) ? 2 : 1;
-			tableware.setTablewareStatus(newStatus);
-			return tableware;
-		}
-		return null;
-	}
-	
-	public Tableware updateTablewareById(Integer tablewareId, String tablewareName, Integer tablewareDeposit, String tablewareImage, String tablewareDescription, Integer tablewareStatus) {
+	//更新餐具
+	public Tableware updateTableware(Integer tablewareId, String tablewareName, Integer tablewareDeposit, String tablewareImage, String tablewareDescription, Integer tablewareStatus) {
 		Optional<Tableware> optional = tablewareRepository.findById(tablewareId);
 		if(optional.isPresent()) {
 			Tableware tableware = optional.get();
@@ -56,11 +48,45 @@ public class TablewareService {
 		return null;
 	}
 	
-	public List<Integer> findTablewareIds() {
-		return tablewareRepository.findTablwareIds();
+	
+	//更改餐具狀態
+	public Tableware updateTablewareStatus(Integer tablewareId) {
+		Optional<Tableware> optional = tablewareRepository.findById(tablewareId);
+		if(optional.isPresent()) {
+			Tableware tableware = optional.get();
+			int currentStatus = tableware.getTablewareStatus();
+			int newStatus = (currentStatus == 1) ? 2 : 1;
+			tableware.setTablewareStatus(newStatus);
+			return tableware;
+		}
+		return null;
 	}
 	
-	public List<Tableware> findTablewaresByKeywords(String keyword) {
-		return tablewareRepository.findTablewaresByKeywords(keyword);
+	
+	//查詢餐具(By餐具編號)
+	public Tableware findTablewareById(Integer tablewareId) {
+		Optional<Tableware> optional = tablewareRepository.findById(tablewareId);
+		if(optional.isPresent()) {
+			return optional.get();
+		}
+		return null;
 	}
+	
+	
+	//查詢所有餐具
+	public List<Tableware> findAllTablewares() {
+		return tablewareRepository.findAll();
+	}
+	
+
+	//查詢餐具(By餐具名 描述)
+	public List<Tableware> findTablewaresByKeywords(String keyword) {
+		return tablewareRepository.findByKeyword(keyword);
+	}
+	
+	
+//查詢餐具編號
+//	public List<Integer> findTablewareIds() {
+//		return tablewareRepository.findTablwareIds();
+//	}
 }

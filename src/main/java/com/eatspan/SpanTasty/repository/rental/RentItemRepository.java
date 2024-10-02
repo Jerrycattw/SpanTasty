@@ -12,11 +12,15 @@ import com.eatspan.SpanTasty.entity.rental.RentItem.RentItemId;
 @Repository
 public interface RentItemRepository extends JpaRepository<RentItem, RentItemId> {
 	
+	
 	@Query(value = "from RentItem where rentId = :rentId")
-	List<RentItem> findRentItemsByRentId(Integer rentId);
+	List<RentItem> findByRentId(Integer rentId);
+	
 	
 	@Query(value = "from RentItem where rentId = :rentId and tablewareId = :tablewareId")
-	RentItem findRentItemByRentItemId(Integer rentId, Integer tablewareId);
+	RentItem findById(Integer rentId, Integer tablewareId);
 	
 	
+	@Query(value = "DELETE FROM rent_item WHERE rent_id = :rentId", nativeQuery = true)
+	int deleteByRentId(Integer rentId);
 }
