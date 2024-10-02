@@ -1,5 +1,8 @@
 package com.eatspan.SpanTasty.entity.order;
 
+import java.io.Serializable;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,8 +22,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "menu")
-public class MenuEntity {
+public class MenuEntity implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	@Id @Column(name = "food_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer foodId;
@@ -34,7 +39,7 @@ public class MenuEntity {
 	@Column(name = "food_price")
 	private Integer foodPrice;
 	
-	@Column(name = "food_kind_id")
+	@Column(name = "food_kind_id" , insertable = false, updatable = false)
 	private Integer foodKindId;
 	
 	@Column(name = "food_stock")
@@ -45,8 +50,8 @@ public class MenuEntity {
 	
 	@Column(name = "food_status")
 	private Integer foodStatus;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "food_kind_id", insertable = false, updatable = false)
+
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@JoinColumn(name = "food_kind_id")
 	private FoodKindEntity foodKind;
 }

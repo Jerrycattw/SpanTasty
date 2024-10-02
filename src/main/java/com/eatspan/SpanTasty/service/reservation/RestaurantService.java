@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
@@ -17,6 +21,9 @@ public class RestaurantService {
 	
 	// 新增餐廳
 	public Restaurant addRestaurant(Restaurant restaurant) {
+		if(restaurant.getRestaurantStatus()==null) {
+			restaurant.setRestaurantStatus(1);
+		}
 		return restaurantRepository.save(restaurant);
 	}
 	
@@ -44,8 +51,9 @@ public class RestaurantService {
 
 	
 	// 查詢所有餐廳
-	public List<Restaurant> findAllRestaurants() {
-		return restaurantRepository.findAll();
+	public Page<Restaurant> findAllRestaurants(Integer pageNumber) {
+		Pageable pageAble = PageRequest.of(pageNumber-1, 10, Sort.Direction.DESC, "restaurantId");
+		return restaurantRepository.findAll(pageAble);
 	}
 	
 

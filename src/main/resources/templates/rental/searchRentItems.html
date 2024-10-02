@@ -17,7 +17,8 @@
 		</form>
         <table class="table table-warning table-striped" id="table">
             <tr>
-				<td>訂單編號: <select id="rentId" name="rentId">
+				<td>訂單編號: 
+				<select id="rentId" name="rentId">
 					<option value="" selected disabled>請選擇想搜尋訂單編號</option>
 					<c:forEach items="${rentIds}" var="rentId">
 						<option value="${rentId}">${rentId}</option>

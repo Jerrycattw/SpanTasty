@@ -12,7 +12,7 @@
     <div th:replace="~{display/navbar}"></div>
     <div class="container" id="container">
         <h2>輸 入 環 保 用 具 庫 存 資 料</h2>
-        <form th:action="@{/tablewareStock/update}" th:method="put" th:object="${tablewareStock}">
+        <form th:action="@{/stock/update}" th:method="put" th:object="${tablewareStock}">
         <table class="table table-warning table-striped" id="table">
             <tr>
                 <td>
@@ -32,7 +32,7 @@
                 </td>
             </tr>
         </table>
-        <input type="submit" value="確定" />
+        <input type="submit" id="submitBtn" value="確定更改">
         </form>
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>

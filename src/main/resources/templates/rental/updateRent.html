@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增環保用具庫存</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <div class="container" id="container">
+        <h2>輸 入 環 保 用 具 庫 存 資 料</h2>
+        <form th:action="@{/rent/update}" th:object="${rent}" method="post">
+    	<input type="hidden" name="_method" value="put"/>
+        <table class="table table-warning table-striped" id="table">
+            <tr>
+                <td>
+                    訂單編號:
+					<input type="text" disabled th:field="*{rentId}">
+					<input type="hidden" th:field="*{rentId}">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    租借押金:
+                    <input type="text" id="rent_deposit" th:field="*{rentDeposit}">
+                </td>
+            </tr>
+            <tr>
+                <td>
+	                租借日期:
+	                <input type="date" id="rent_date" th:field="*{rentDate}">
+                </td>
+            </tr>
+            
+            <tr>
+				<td>
+					租借餐廳:
+					<select th:field="*{restaurantId}" id="restaurant_id">
+                        <option value="" selected disabled>請選擇租借餐廳</option>
+                        <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+                    </select>
+				</td>
+			</tr>
+            <tr>
+				<td>
+					會員編號:
+					<select th:field="*{memberId}" id="member_id">
+                        <option value="" selected disabled>請選擇會員編號</option>
+						<option th:each="member : ${members}" th:value="${member.memberId}" th:text="${member.account}"></option>
+                    </select>
+				</td>
+			</tr>
+            <tr>
+                <td>
+                  預定歸還:
+                  <input type="date" id="due_date" th:field="*{dueDate}">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                  實際歸還:
+                  <input type="date" id="return_date" required th:field="*{returnDate}">
+                </td>
+            </tr>
+            <tr>
+	            <td>
+		            租借狀態: 
+					<input type="radio" id="rent_status" value="1" th:field="*{rentStatus}"/>1:未歸還 
+					<input type="radio" id="rent_status" value="2" th:field="*{rentStatus}"/>2:歸還
+	            </td>
+            </tr>
+            <tr>
+	            <td>
+		            訂單備註:
+		            <input type="text" id="rent_memo" th:field="*{rentMemo}"/>
+	            </td>
+            </tr>
+            <tr>
+				<td>
+					歸還餐廳:
+					<select th:field="*{returnRestaurantId}" id="return_restaurant_id">
+                        <option value="" selected disabled>請選擇租借餐廳</option>
+                        <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+                    </select>
+					<p id="disabledMsg" style="color: red; display: none;">訂單已完全歸還，無法再更改。</p>
+				</td>
+			</tr>
+        </table>
+        <input type="submit" id="submitBtn" value="確定更改">
+        </form>
+    </div>
+    <script>
+    	window.onload = function() {
+		    const rentStatusElement = document.querySelector('input[name="rent_status"]:checked');
+		    if (rentStatusElement) {
+		        const rentStatus = rentStatusElement.value;
+		        if (rentStatus === '2') {
+		            document.getElementById('submitBtn').disabled = true;
+		            document.getElementById('return_date').disabled = true;
+		            document.getElementById('return_restaurant_id').disabled = true;
+		            document.getElementById('restaurant_id').disabled = true;
+		            document.getElementById('rent_deposit').disabled = true;
+		            document.getElementById('member_id').disabled = true;
+		            document.getElementById('rent_date').disabled = true;
+		            document.getElementById('due_date').disabled = true;
+		            document.getElementById('rent_memo').disabled = true;
+		            document.getElementById('rent_status').disabled = true;
+		            document.getElementById('disabledMsg').style.display = 'block';
+		        }
+		    }
+		};
+    </script>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+
+</html>

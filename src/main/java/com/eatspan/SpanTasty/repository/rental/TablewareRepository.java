@@ -12,9 +12,11 @@ import com.eatspan.SpanTasty.entity.rental.Tableware;
 @Repository
 public interface TablewareRepository extends JpaRepository<Tableware, Integer> {
 	
+	
 	@Query(value = "SELECT tableware_id FROM tableware", nativeQuery = true)
 	List<Integer> findTablwareIds();
 	
+	
 	@Query(value = "FROM Tableware WHERE tablewareName LIKE %:keyword% OR tablewareDescription LIKE %:keyword%")
-	List<Tableware> findTablewaresByKeywords(@Param("keyword") String keyword);
+	List<Tableware> findByKeyword(@Param("keyword") String keyword);
 }

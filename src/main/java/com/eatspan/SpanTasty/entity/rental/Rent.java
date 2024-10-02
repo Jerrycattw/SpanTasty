@@ -48,7 +48,7 @@ public class Rent implements Serializable {
 	@Temporal(TemporalType.DATE)
 	private Date returnDate;
 	@Column(name = "rent_status")
-	private int rentStatus;
+	private Integer rentStatus;
 	@Column(name = "rent_memo")
 	private String rentMemo;
 	@Column(name = "return_restaurant_id")

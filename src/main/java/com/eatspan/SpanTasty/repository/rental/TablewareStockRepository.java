@@ -14,14 +14,16 @@ import com.eatspan.SpanTasty.entity.rental.TablewareStock.TablewareStockId;
 @Repository
 public interface TablewareStockRepository extends JpaRepository<TablewareStock, TablewareStockId> {
 	
+	
 	@Query(value = "from TablewareStock where"
             + "(:tablewareId IS NULL OR tablewareId = :tablewareId) AND "
             + "(:restaurantId IS NULL OR restaurantId = :restaurantId)")
-	List<TablewareStock> findTablewareStocksByCriteria(
+	List<TablewareStock> findByCriteria(
 	        @Param("tablewareId") Integer tablewareId,
 	        @Param("restaurantId") Integer restaurantId);
 	
+	
 	@Query(value = "from TablewareStock where tablewareId = :tablewareId AND restaurantId = :restaurantId")
-	TablewareStock findTablewareStocksByStockId(@Param("tablewareId") Integer tablewareId, @Param("restaurantId") Integer restaurantId);
+	TablewareStock findById(@Param("tablewareId") Integer tablewareId, @Param("restaurantId") Integer restaurantId);
 	
 }

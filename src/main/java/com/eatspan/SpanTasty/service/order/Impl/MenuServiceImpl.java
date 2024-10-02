@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eatspan.SpanTasty.entity.order.FoodKindEntity;
 import com.eatspan.SpanTasty.entity.order.MenuEntity;
+import com.eatspan.SpanTasty.repository.order.FoodKindRepository;
 import com.eatspan.SpanTasty.repository.order.MenuRepository;
 import com.eatspan.SpanTasty.service.order.MenuService;
 
@@ -16,6 +18,9 @@ public class MenuServiceImpl implements MenuService {
 	
 	@Autowired
 	private MenuRepository menuRepository;
+	
+	@Autowired
+	private FoodKindRepository foodKindRepository;
 	
 //	@Override
 //	public List<MenuDTO> getAllFoods() {
@@ -57,9 +62,23 @@ public class MenuServiceImpl implements MenuService {
 
 	@Override
 	public MenuEntity addFood(MenuEntity newFood) {
+		String newFoodKindName = newFood.getFoodKind().getFoodKindName();
+		if (newFoodKindName != null) {
+	        // 依照種類名稱尋找
+	        List<FoodKindEntity> optional = foodKindRepository.findByFoodKindName(newFoodKindName);
+	        if (optional.isEmpty()) {
+	            // 不存在，加入新的FoodKind
+	            FoodKindEntity foodKind = new FoodKindEntity();
+	            foodKind.setFoodKindName(newFoodKindName);
+	            newFood.setFoodKind(foodKind); // 直接加入 newFood，cascade.persist
+	        } else {
+	            // 已存在，直接加入已存在的FoodKind
+	            newFood.setFoodKind(optional.get(0));
+	        }
+	    }
 		try {
-			MenuEntity savedMenu = menuRepository.save(newFood);
-			return savedMenu;
+			MenuEntity savedFood = menuRepository.save(newFood);
+			return savedFood;
 		}catch (Exception e) {
 			throw new RuntimeException(e);
 		}

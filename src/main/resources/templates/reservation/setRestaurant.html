@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>Restaurant</title>
+<style>
+.restaurant-img img {
+    height: 330px; /* 或其他需要的高度 */
+    object-fit: cover; /* 或使用 contain */
+}
+</style>
+
+</head>
+<body>
+<div th:replace="~{display/navbar}" ></div>
+<!-- 主要內容區域 -->
+<div class="content">
+
+    <h2 class="text-center text-warning-emphasis">餐 廳 資 料</h2>
+
+    <form th:method="PUT" th:action="@{/restaurant/setPut}" enctype="multipart/form-data">
+    <div class="row justify-content-center restaurant-info">
+        <div class="col-md-10">
+            <div class="card bg-dark text-white rounded-3 d-flex flex-row align-items-center">
+                <div class="restaurant-img flex-shrink-0">
+                    <img th:src="${restaurant.restaurantImg}" alt="Restaurant Image" class="img-fluid rounded-3 m-3">
+					<div class="mt-2 d-flex align-items-center">
+					    <label class="mb-0 ms-3 col-3">更新餐廳照片 :</label>
+					    <input type="file" name="rimg" class="form-control me-3" />
+					</div>
+                </div>
+                <div class="restaurant-details flex-grow-1 p-3">
+                      <input name="restaurantId" type="hidden" th:value="${restaurant.restaurantId}">
+                      
+                      <label class="form-label mb-0">餐廳名稱 :</label>
+                      <input name="restaurantName" type="text" class="form-control text-dark mb-1" th:value="${restaurant.restaurantName}">
+
+                      <label class="form-label mb-0">餐廳地址 :</label>
+                      <input name="restaurantAddress" type="text" class="form-control text-dark mb-1" th:value="${restaurant.restaurantAddress}">
+
+                      <label class="form-label mb-0">餐廳電話 :</label>
+                      <input name="restaurantPhone" type="text" class="form-control text-dark mb-1" th:value="${restaurant.restaurantPhone}">
+
+                      <label class="form-label mb-0">開店時間 :</label>
+                      <input name="restaurantOpentime" type="text" class="form-control text-dark mb-1" th:value="${restaurant.restaurantOpentime}">
+
+                      <label class="form-label mb-0">打烊時間 :</label>
+                      <input name="restaurantClosetime" type="text" class="form-control text-dark mb-1" th:value="${restaurant.restaurantClosetime}">
+
+                      <label class="form-label mb-0">用餐時間限制 :</label>
+                      <input name="eattime" type="text" class="form-control text-dark mb-1" th:value="${restaurant.eattime}">
+
+                      <label class="form-label mb-0">餐廳描述 :</label>
+                      <textarea name="restaurantDesc" class="form-control text-dark mb-1" th:text="${restaurant.restaurantDesc}"></textarea>
+					  
+					  
+					  <label>餐廳狀態 :</label>
+					   <input type="radio" name="restaurantStatus" value="1" th:checked="${restaurant.restaurantStatus == 1}"> 營業中
+					   <input type="radio" name="restaurantStatus" value="2" th:checked="${restaurant.restaurantStatus == 2}"> 已歇業
+					   <input type="radio" name="restaurantStatus" value="3" th:checked="${restaurant.restaurantStatus == 3}"> 籌備中
+					   <br>
+					  
+					  <div class="d-flex justify-content-end mt-3">
+					      <input type="submit" value="確定修改" class="btn btn-warning" />
+					  </div>
+               </div>
+           </div>
+       </div>
+   </div>
+   </form>
+  
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        showSidebar('reservation');
+    });
+</script>
+</body>
+</html>
