@@ -2,12 +2,19 @@ package com.eatspan.SpanTasty.entity.order;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,6 +65,11 @@ public class TogoEntity implements Serializable {
 	
 	@Column(name = "final_total")
 	private Integer finalTotal;   //discount
+	
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "togo", cascade = CascadeType.ALL)
+	private List<TogoItemEntity> togoItems = new ArrayList<TogoItemEntity>();
+	
 	
 }
 
