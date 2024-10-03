@@ -100,7 +100,8 @@ public class RentController {
 	//查詢下拉式選單
 	@GetMapping("option")
 	public String getRentOption(@RequestParam(name = "action") String action , Model model) {
-		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+		//暫時修改
+		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants(1);
 		List<Member> members = memberService.findAllMembers();
 		model.addAttribute("restaurants" ,restaurants);
 		model.addAttribute("members" ,members);
@@ -120,7 +121,8 @@ public class RentController {
 	//查詢訂單(By訂單編號)
 	@GetMapping("/get/{id}")
 	public String getById(@PathVariable("id") Integer rentId, @RequestParam("action") String action, Model model) {
-		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+		//暫時修改
+		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants(1);
 		model.addAttribute("restaurants" ,restaurants);
 		Rent rent = rentService.findRentById(rentId);
 		model.addAttribute("rent", rent);

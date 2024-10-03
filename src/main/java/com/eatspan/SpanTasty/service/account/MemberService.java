@@ -2,10 +2,14 @@ package com.eatspan.SpanTasty.service.account;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -97,7 +101,8 @@ public class MemberService {
         memberRepository.save(member); // 保存更新的會員信息
         return true; // 密碼更新成功
     }
-
+    
+    //更新會員頭像
 	public boolean updateMemberAvatar(Integer memberId, byte[] avatarBytes) {
 
         Optional<Member> optionalMember = memberRepository.findById(memberId);
@@ -133,6 +138,52 @@ public class MemberService {
     // 獲取所有會員(Rental使用 謝謝陳儒!)
     public List<Member> findAllMembers(){
     	return memberRepository.findAll();
+    }
+    
+    // 分頁查詢所有會員
+    public Page<Member> findAllMembers(Pageable pageable) {
+        return memberRepository.findAll(pageable);
+    }
+    
+    // 分頁查詢所有會員，根據帳號
+    public Page<Member> findByMemberNameContainingOrAccountContaining(String memberName, String account, Pageable pageable) {
+        return memberRepository.findByMemberNameContainingOrAccountContaining(memberName, account, pageable);
+    }
+
+    
+
+    // 更新會員狀態的邏輯
+    public boolean updateMemberStatus(Integer memberId, char status, String reason, String suspendedUntil) {
+        // 找到對應的會員
+        Member member = memberRepository.findById(memberId).orElse(null);
+        if (member == null) {
+            return false;  // 找不到會員，返回 false
+        }
+
+        // 設置新的狀態和原因
+        member.setStatus(status);
+        member.setReason(reason);
+
+
+        // 如果狀態是暫停（status == 'S'），且有停權日期，則設置停權日期
+        if (status == 'S' && suspendedUntil != null && !suspendedUntil.isEmpty()) {
+            try {
+                // 使用 LocalDate 解析，只需日期部分
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate suspendedDate = LocalDate.parse(suspendedUntil, formatter);
+                member.setSuspendedUntil(suspendedDate.atStartOfDay());  // 將 LocalDate 轉換為 LocalDateTime 的午夜時間
+            } catch (DateTimeParseException e) {
+                e.printStackTrace();
+                return false;  // 日期解析失敗
+            }
+        } else {
+            // 如果狀態不是暫停，清空停權日期
+            member.setSuspendedUntil(null);
+        }
+
+        // 保存會員變更
+        memberRepository.save(member);
+        return true;  // 更新成功
     }
 }
     

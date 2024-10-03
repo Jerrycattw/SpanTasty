@@ -41,7 +41,8 @@ public class TablewareStockController {
 	@GetMapping("/selectTR")
 	public String findSelectOption(@RequestParam("action") String action, Model model) {
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
-		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+		//暫時修改
+		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants(1);
 		model.addAttribute("tablewares",tablewares);
 		model.addAttribute("restaurants",restaurants);
 		if ("insert".equals(action)) {
