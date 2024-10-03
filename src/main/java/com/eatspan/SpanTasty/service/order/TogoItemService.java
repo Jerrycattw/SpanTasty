@@ -12,9 +12,9 @@ public interface TogoItemService {
 	public TogoItemEntity getTogoItemByTogoIdFoodId(TogoItemId togoItemId);
 	//新增
 	public List<TogoItemEntity> addTogoItems(Integer togoId, List<TogoItemEntity> newTogoItems);
-	//更新
-	public TogoItemEntity updateTogoItem(TogoItemId togoItemId);
+	//更新:只能更新數量
+	public TogoItemEntity updateTogoItemById(TogoItemId togoItemId, Integer amount);
 	//刪除
-	public void deleteTogoItem(TogoItemId togoItemId);
+	public void deleteTogoItemById(TogoItemId togoItemId);
 	
 }
