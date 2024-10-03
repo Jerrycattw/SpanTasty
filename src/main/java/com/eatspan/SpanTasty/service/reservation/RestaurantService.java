@@ -62,5 +62,10 @@ public class RestaurantService {
 		return restaurantRepository.findAll(pageAble);
 	}
 	
+	
+	// 查詢所有餐廳(Rental使用)
+	public List<Restaurant> findAllRestaurants(){
+		return restaurantRepository.findAll();
+	}
 
 }

@@ -21,35 +21,33 @@ import com.eatspan.SpanTasty.service.rental.RentService;
 @RequestMapping("/rentItem")
 public class RentItemController {
 	
-	
 	@Autowired
 	private RentItemService rentItemService;
 	@Autowired
 	private RentService rentService;
 	
-	@GetMapping("/getAll")
-	public String getAllRentItems(Model model) {
-		List<RentItem> rentItems = rentItemService.findAllRentItems();
-		model.addAttribute("rentItems",rentItems);
-		return "rental/ShowAllRentItems";
-	}
 	
-	@GetMapping("/search")
-	protected String getRentItemsBySearch(@RequestParam("rentId") Integer rentId, Model model) {
-		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
-		model.addAttribute("rentItems", rentItems);
-		return "rental/ShowAllRentItems";
-	}
-	
-	@GetMapping("/selectR")
+	//導向查詢頁面
+	@GetMapping("/toGet")
 	public String getRentIdOption(Model model) {
 		List<Rent> rents = rentService.findAllRents();
 		model.addAttribute("rents",rents);
-		return "rental/FindRentItemsBySearch";
+		return "rental/getRentItemsBySearch";
 	}
 	
+	
+	//查詢訂單明細
 	@GetMapping("/get")
-	protected String getById(
+	protected String getRentItemsBySearch(@RequestParam("rentId") Integer rentId, Model model) {
+		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+		model.addAttribute("rentItems", rentItems);
+		return "rental/getAllRentItems";
+	}
+
+	
+	//導向update的頁面
+	@GetMapping("/set")
+	protected String toSetRentItem(
 			@RequestParam("rent_id") Integer rentId,
 			@RequestParam("tableware_id") Integer tablewareId, 
 			@RequestParam("action") String action, 
@@ -57,18 +55,16 @@ public class RentItemController {
 		RentItem rentItem = rentItemService.findRentItemById(rentId, tablewareId);
 		model.addAttribute("rentItem", rentItem);
 		if ("update".equals(action)) {
-			return "rental/UpdateRentItem";
+			return "rental/updateRentItem";
 		} else if ("return".equals(action)) {
-			return "rental/ReturnRentItem";
+			return "rental/returnRentItem";
 		}
 		return null;
 	}
 	
 	
-	
-	
 	//網頁寫在Rent的某個頁面(1.訂單頁面可查詢單筆訂單的所有明細,點進去可修改(批次更新?))
-	@PutMapping("/update")
+	@PutMapping("/setPut1")
 	protected String updateRentItem(
 			@RequestParam("rent_id") Integer rentId, 
 			@RequestParam("tableware_id") Integer tablewareId,
@@ -88,8 +84,9 @@ public class RentItemController {
 		return "redirect:/rentItem/showAll";
 	}
 	
+	
 	//網頁寫在Rent的歸還頁面(歸還可選擇歸還狀態 根據情況再加庫存)
-	@PutMapping("/return")
+	@PutMapping("/setPut2")
 	protected String returnRentItem(
 			@RequestParam("rent_id") Integer rentId, 
 			@RequestParam("tableware_id") Integer tablewareId,
@@ -102,4 +99,13 @@ public class RentItemController {
 		rentItemService.addRentItem(rentItem);
 		return "redirect:/rentItem/showAll";
 	}
+	
+	
+//	查詢所有訂單明細
+//	@GetMapping("/getAll")
+//	public String getAllRentItems(Model model) {
+//		List<RentItem> rentItems = rentItemService.findAllRentItems();
+//		model.addAttribute("rentItems",rentItems);
+//		return "rental/ShowAllRentItems";
+//	}
 }

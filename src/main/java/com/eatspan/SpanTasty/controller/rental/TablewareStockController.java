@@ -24,6 +24,7 @@ import com.eatspan.SpanTasty.service.reservation.RestaurantService;
 @Controller
 @RequestMapping("/stock")
 public class TablewareStockController {
+	
 	@Autowired
 	private TablewareStockService tablewareStockService;
 	@Autowired
@@ -31,15 +32,10 @@ public class TablewareStockController {
 	@Autowired
 	private RestaurantService restaurantService;
 	
-	@GetMapping("/getAll")
-	public String showAllTablewareStocks(Model model) {
-		List<TablewareStock> stocks = tablewareStockService.findAllStocks();
-		model.addAttribute("stocks",stocks);
-		return "rental/showAllStocks";
-	}
 	
-	@GetMapping("/selectTR")
-	public String findSelectOption(@RequestParam("action") String action, Model model) {
+	// 導向頁面(新增 搜尋)
+	@GetMapping("/add")
+	public String toAddAndSearch(@RequestParam("action") String action, Model model) {
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		model.addAttribute("tablewares",tablewares);
@@ -47,49 +43,59 @@ public class TablewareStockController {
 		if ("insert".equals(action)) {
 			return "rental/addStock";
 	    } else if ("search".equals(action)) {
-	    	return "rental/searchStocks";
+	    	return "rental/getStocks";
 	    }
 		return null;
 	}
 	
-	@PostMapping("/add")
+	
+	// 新增庫存
+	@PostMapping("/addstock")
 	protected String addStock(@ModelAttribute TablewareStock stock, Model model) {
 		tablewareStockService.addStock(stock);
-		return "redirect:/tablewareStock/showAll";
+		return "redirect:/stock/getAll";
 	}
 
-	@PutMapping("/set")
-	protected String update(
+	
+	// 導向更新頁面
+	@GetMapping("/set")
+	protected String toSetStock(
 			@RequestParam("tableware_id") Integer tablewareId,
 			@RequestParam("restaurant_id") Integer restaurantId,
-			@RequestParam("stock") Integer stock,
 			Model model) {
-		TablewareStock tablewareStock = tablewareStockService.findStockById(tablewareId, restaurantId);
-		tablewareStock.setStock(stock);
-		tablewareStockService.addStock(tablewareStock);
-		model.addAttribute("stock", tablewareStock);
-		return "redirect:/tablewareStock/showAll";
-	}
-
-	@GetMapping("/search")
-	protected String search(
-			@RequestParam(value = "tablewareId", required = false) Integer tablewareId,
-			@RequestParam(value = "restaurantName", required = false) String restaurantName,
-			Model model) {
-//		Integer restaurantId = restaurantService.getRestaurantId(restaurantName);
-		Integer restaurantId = null;
-		List<TablewareStock> tablewareStocks = tablewareStockService.findStocksByCriteria(tablewareId, restaurantId);
-		model.addAttribute("stock", tablewareStocks);
-		return "rental/ShowAllTablewareStocks";
+		TablewareStock stock = tablewareStockService.findStockById(tablewareId, restaurantId);
+		model.addAttribute("stock", stock);
+		return "rental/updateStock";
 	}
 	
-	@GetMapping("/get")
-	protected String findTablewareStockByStockId(
-			@RequestParam("tableware_id") Integer tablewareId,
-			@RequestParam("restaurant_id") Integer restaurantId,
+	
+	// 更新庫存
+	@PutMapping("/setPut")
+	protected String update(
+			@ModelAttribute TablewareStock stock,
 			Model model) {
-		TablewareStock tablewareStock = tablewareStockService.findStockById(tablewareId, restaurantId);
-		model.addAttribute("stock", tablewareStock);
-		return "rental/UpdateStock";
+		tablewareStockService.addStock(stock);
+		return "redirect:/stock/getAll";
+	}
+
+	
+	// 查詢庫存
+	@GetMapping("/get")
+	protected String getStocks(
+			@RequestParam(value = "tablewareId", required = false) Integer tablewareId,
+			@RequestParam(value = "restaurantId", required = false) Integer restaurantId,
+			Model model) {
+		List<TablewareStock> stocks = tablewareStockService.findStocksByCriteria(tablewareId, restaurantId);
+		model.addAttribute("stocks", stocks);
+		return "rental/getAllStocks";
+	}
+	
+	
+	// 查詢所有庫存
+	@GetMapping("/getAll")
+	public String getAllStocks(Model model) {
+		List<TablewareStock> stocks = tablewareStockService.findAllStocks();
+		model.addAttribute("stocks",stocks);
+		return "rental/getAllStocks";
 	}
 }
