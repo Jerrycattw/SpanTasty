@@ -3,11 +3,14 @@ package com.eatspan.SpanTasty.service.rental;
 import java.util.List;
 
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.repository.rental.TablewareStockRepository;
+//import com.eatspan.SpanTasty.repository.rental.TablewareRepository;
+//import com.eatspan.SpanTasty.repository.reservation.RestaurantRepository;
 
 
 @Service
@@ -16,21 +19,15 @@ public class TablewareStockService {
 	
 	@Autowired
 	private TablewareStockRepository tablewareStockRepository;
+//	@Autowired
+//	private TablewareRepository tablewareRepository;
+//	@Autowired
+//	private RestaurantRepository restaurantRepository;
 	
 	
 	//新增餐具庫存
 	public TablewareStock addStock(TablewareStock tablewareStock) {
 		return tablewareStockRepository.save(tablewareStock);
-	}
-	
-	
-	//更改庫存
-	public TablewareStock updateStock(TablewareStock stock) {
-		TablewareStock tablewareStock = tablewareStockRepository.findById(stock.getTablewareId(), stock.getRestaurantId());
-		if(tablewareStock != null) {
-			return tablewareStockRepository.save(tablewareStock);
-		}
-		return null;
 	}
 
 	

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>租借訂單</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<style>
+	#card-warning {
+	  background-color: #ffd966; 
+	}
+	#btn-yellow{
+		background-color: #f9e79f;
+		border: 1px solid black;
+	}
+	#btn-orange{
+		background-color: #f7d6a3;
+	}
+</style>
+</head>
+<body>
+<div th:replace="~{display/navbar}" ></div>
+<div class="content" id="content">
+ <div class="container mt-5">
+  <div class="row justify-content-center">
+   <div class="col-15 text-align" style="font-size:15px">
+    <div class="card shadow" id="card-warning" >
+	<div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+    <h2 class="mb-0">租借訂單系統</h2>
+    <form method="get" class="btn" action="/SpanTasty/rent/add">
+		<button type="submit" class="btn btn-sm" id="btn-yellow" name="action" value="search">搜尋訂單</button>
+		<button type="submit" class="btn btn-sm" id="btn-yellow" name="action" value="add">新增訂單</button>
+	</form>
+	</div>
+	<div class="table-responsive">
+    <table class="table table-warning table-striped text-center" id="table">
+    <thead>
+        <tr>
+            <th>訂單編號</th>
+            <th>租借押金</th>
+            <th>租借日期</th>
+            <th>租借餐廳</th>
+            <th>租借會員</th>
+            <th>預定歸還</th>
+            <th>實際歸還</th>
+            <th>租借狀態</th>
+            <th>訂單備註</th>
+            <th>歸還餐廳</th>
+            <th>刪除訂單</th>
+        </tr>
+        </thead>
+        <tbody>
+    	<th:block th:each=" rent : ${rents}">
+        <tr>
+            <td th:text="${rent.rentId}">訂單編號</td>
+            <td th:text="${rent.rentDeposit}">租借押金</td>
+            <td th:text="${#dates.format(rent.rentDate, 'yyyy年MM月dd日')}">租借日期</td>
+            <td th:text="${rent.restaurantId}">租借餐廳</td>
+            <td th:text="${rent.memberId}">租借會員</td>
+            <td th:text="${#dates.format(rent.dueDate, 'yyyy年MM月dd日')}">預定歸還</td>
+            <td th:text="${#dates.format(rent.returnDate, 'yyyy年MM月dd日')}">實際歸還</td>
+            <td class="align-middle">
+				<span th:switch="${rent.rentStatus}">
+				  <span th:case="1" class="badge bg-danger text-white">出租中</span>
+				  <span th:case="2" class="badge bg-success text-white">已歸還</span>
+				</span>
+			</td>
+            <td th:text="${rent.rentMemo}">訂單備註</td>
+            <td th:text="${rent.returnRestaurantId}">歸還餐廳</td>
+            <td class="align-middle">
+				<form th:action="@{/rent/del/{id}(id=${rent.rentId})}" th:method="delete">
+               		<input type="submit" th:value="刪除訂單" class="btn bg-danger text-white btn-sm">
+               	</form>
+			</td>
+        </tr>
+    </th:block>
+    </tbody>
+    </table>
+</div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		showSidebar('rental');
+	});
+</script>
+<script th:src="@{/js/bootstrap.bundle.min.js}" ></script>
+<script th:src="@{/js/jquery-3.7.1.min.js}" ></script>
+<script th:src="@{/js/axios.min.js}" ></script>
+</body>
+</html>

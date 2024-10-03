@@ -32,27 +32,37 @@ public class Rent implements Serializable {
 	@Id@Column(name = "rent_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer rentId;
+	
 	@Column(name = "rent_deposit")
 	private Integer rentDeposit;
+	
 	@Column(name = "rent_date")
 	@Temporal(TemporalType.DATE)
 	private Date rentDate;
+	
 	@Column(name = "restaurant_id")
 	private Integer restaurantId;
+	
 	@Column(name = "member_id")
 	private Integer memberId;
+	
 	@Column(name = "due_date")
 	@Temporal(TemporalType.DATE)
 	private Date dueDate;
+	
 	@Column(name = "return_date")
 	@Temporal(TemporalType.DATE)
 	private Date returnDate;
+	
 	@Column(name = "rent_status")
 	private Integer rentStatus;
+	
 	@Column(name = "rent_memo")
 	private String rentMemo;
+	
 	@Column(name = "return_restaurant_id")
 	private Integer returnRestaurantId;
+	
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "rent")
 	private List<RentItem> rentItems = new ArrayList<RentItem>();

@@ -2,8 +2,12 @@ package com.eatspan.SpanTasty.controller.rental;
 
 import java.io.File;
 
+
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +57,11 @@ public class TablewareController {
 	
 	//新增資料
 	@PostMapping("/addPost")
-	protected String addTablewareAndStocks(@ModelAttribute Tableware tableware, @RequestParam("timg") MultipartFile timg, Model model) throws IOException {
+	protected String addTablewareAndStocks(
+			@ModelAttribute Tableware tableware, 
+			@RequestParam("timg") MultipartFile timg,
+			@RequestParam Map<String, String> allParams,
+			Model model) throws IOException {
 		tableware.setTablewareStatus(1);
 		
 		File uploadDir = new File(uploadPath);
@@ -67,17 +75,40 @@ public class TablewareController {
 			File filePart = new File(uploadPath + File.separator + newFileName);
 			timg.transferTo(filePart);
 			tableware.setTablewareImage("/SpanTasty/upload/rental/" + newFileName);
-			
-			System.out.println("File uploaded: " + newFileName);
-			System.out.println("File path: " + uploadPath + File.separator + newFileName);
 		}
 		tablewareService.addTableware(tableware);
+		int tablewareId = tableware.getTablewareId();
 		
+		List<String> restaurantIdParams = new ArrayList<>();
+		List<String> stockParams = new ArrayList<>();
 		
-//		for (TablewareStock stock : tableware.getTablewareStocks()) {
-//	        stock.setTablewareId(tableware.getTablewareId()); // 設定關聯的 tablewareId
-//	        tablewareStockService.addStock(stock);
-//	    }
+		for (Map.Entry<String, String> entry : allParams.entrySet()) {
+			if (entry.getKey().startsWith("restaurantId")) {
+				restaurantIdParams.add(entry.getValue());
+			} else if (entry.getKey().startsWith("stock")) {
+				stockParams.add(entry.getValue());
+			}
+		}
+		List<TablewareStock> tablewareStocks = new ArrayList<>();
+		for (int i = 0; i < restaurantIdParams.size(); i++) {
+			String restaurantIdParam = restaurantIdParams.get(i);
+			String stockParam = stockParams.get(i);
+			System.out.println(restaurantIdParam);
+			if (restaurantIdParam != null && !restaurantIdParam.isEmpty() && stockParam != null && !stockParam.isEmpty()) {
+				Integer restaurantId = Integer.parseInt(restaurantIdParam);
+				Integer stock = Integer.parseInt(stockParam);
+				
+				TablewareStock tablewareStock = new TablewareStock();
+				tablewareStock.setRestaurantId(restaurantId);
+				tablewareStock.setTablewareId(tablewareId);
+				tablewareStock.setStock(stock);
+				tablewareStocks.add(tablewareStock);
+			}
+		}
+		// 批量插入库存记录
+		for (TablewareStock tablewareStock : tablewareStocks) {
+			tablewareStockService.addStock(tablewareStock);
+		}
 		return "redirect:/tableware/getAll";
 	}
 

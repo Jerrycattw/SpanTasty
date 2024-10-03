@@ -1,10 +1,11 @@
 package com.eatspan.SpanTasty.controller.rental;
 
 import java.text.SimpleDateFormat;
-
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -67,7 +68,10 @@ public class RentController {
 	
 	//新增訂單 訂單明細
 	@PostMapping("/addPost")
-	public String addRentAndRentItems(@ModelAttribute Rent rent, Model model) {
+	public String addRentAndRentItems(
+			@ModelAttribute Rent rent,
+			@RequestParam Map<String, String> allParams, 
+			Model model) {
 		Date rentDate = new Date();
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(rentDate);
@@ -78,11 +82,39 @@ public class RentController {
 		rent.setRentStatus(1);
 		rent.setRentMemo("未歸還");
 		rentService.addRent(rent);
-	    // 保存 RentItem 列表資料
-	    for (RentItem rentItem : rent.getRentItems()) {
-	        rentItem.setRentId(rent.getRentId()); 
+		
+		int rentId = rent.getRentId();
+		// 保存 RentItem 資料
+		List<String> tablewareIds = new ArrayList<>();
+		List<String> rentItemQuantities = new ArrayList<>();
+		List<String> rentItemDeposits = new ArrayList<>();
+		
+		for (Map.Entry<String, String> entry : allParams.entrySet()) {
+	        if (entry.getKey().startsWith("tablewareId")) {
+	            tablewareIds.add(entry.getValue());
+	        } else if (entry.getKey().startsWith("rentItemQuantity")) {
+	            rentItemQuantities.add(entry.getValue());
+	        } else if (entry.getKey().startsWith("rentItemDeposit")) {
+	            rentItemDeposits.add(entry.getValue());
+	        }
+	    }
+		List<RentItem> rentItems = new ArrayList<>();
+		
+		for (int i = 0; i < tablewareIds.size(); i++) {
+	        Integer tablewareId = Integer.parseInt(tablewareIds.get(i));
+	        Integer rentItemQuantity = Integer.parseInt(rentItemQuantities.get(i));
+	        Integer rentItemDeposit = Integer.parseInt(rentItemDeposits.get(i));
+	        
+	        RentItem rentItem = new RentItem();
+	        rentItem.setRentId(rentId);
+	        rentItem.setTablewareId(tablewareId);
+	        rentItem.setRentItemQuantity(rentItemQuantity);
+	        rentItem.setRentItemDeposit(rentItemDeposit);
 	        rentItem.setReturnMemo("未歸還");
 	        rentItem.setReturnStatus(1);
+	        rentItems.add(rentItem);
+	    }
+		for (RentItem rentItem : rentItems) {
 	        rentItemService.addRentItem(rentItem);
 	    }
 		return "redirect:/rent/getAll";

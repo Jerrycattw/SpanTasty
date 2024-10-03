@@ -27,18 +27,24 @@ public class Tableware implements Serializable {
 	
 	@Id@Column(name = "tableware_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int tablewareId; 
+	private Integer tablewareId; 
+	
 	@Column(name = "tableware_name")
 	private String tablewareName; 
+	
 	@Column(name = "tableware_deposit")
-	private int tablewareDeposit;
+	private Integer tablewareDeposit;
+	
 	@Column(name = "tableware_image")
 	private String tablewareImage; 
+	
 	@Column(name = "tableware_description")
 	private String tablewareDescription;
+	
 	@Column(name = "tableware_status")
-	private int tablewareStatus;
+	private Integer tablewareStatus;
+	
 	
 	@OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "tableware")
-	private List<TablewareStock> tablewareStocks = new ArrayList<TablewareStock>();
+	private List<TablewareStock> stocks = new ArrayList<TablewareStock>();
 }

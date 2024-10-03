@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增訂單</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<style>
+.h {
+	text-align: center;
+}
+form {
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background-color: #ffd966;
+}
+.rent-input{
+	width: 86%;
+	padding: 5px;
+	margin-bottom: 0px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+.item-entry {
+	display: flex;
+	align-items: center;
+	margin-bottom: 0px;
+}
+.item-input {
+    width: 200px; /* 根據需要調整寬度 */
+    margin-left: 0px;
+    padding: 0px;
+    height: 30px;
+    width: 100%;
+}
+.item-column{
+	width: 220px;
+	margin-left: 10px;
+	padding: 0px;
+}
+.delete-button{
+	background-color: #fff;
+    border: 2px solid #000;
+    padding: 0px 10px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 讓文字在按鈕內居中 */
+    height: 30px;
+}
+</style>
+</head>
+
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    
+    <div class="content" id="container">
+        <h3 class="h">輸入租借訂單資料</h3>
+        <form th:action="@{/rent/addPost}" method="post">
+        <table class="table table-warning w-100 table-striped" id="table">
+            <tr><td>租借押金: <input type="text" class="rent-input" name="rentDeposit"/></td></tr>
+            <tr><td>租借餐廳:
+	            <select name="restaurantId" class="rent-input">
+		            <option value="" selected disabled>請選擇租借餐廳</option>
+		            <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+	            </select>
+		    </td></tr>
+            <tr><td>租借會員:
+                <select name="memberId" class="rent-input">
+	                <option value="" selected disabled>請選擇會員編號</option>
+					<option th:each="member : ${members}" th:value="${member.memberId}" th:text="${member.account}"></option>
+                </select>
+            </td></tr>
+        </table>
+        
+        <div id="rentItemsContainer">
+            <h4 class="h">輸入租借訂單項目</h4>
+            <div class="item-entry">
+                <table class="table table-warning table-striped">
+                    <tr>
+                        <td class="item-column">
+                            餐具編號:
+                            <select name="tablewareId" class="item-input" onchange="updateDeposit(this)">
+                                <option value="" selected disabled>請選擇餐具編號</option>
+								<option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:data-deposit="${tableware.tablewareDeposit}" th:text="${tableware.tablewareName}"></option>
+                            </select>
+                        </td>
+                        <td class="item-column">
+                            租借數量:<input type="number" class="item-input" name="rentItemQuantity"  min="1" />
+                        </td>
+                        <td class="item-column">
+                            租借押金:<input type="number" class="item-input" name="rentItemDeposit" />
+                        </td>
+                        <td class="item-column">
+                            <br/><button class="delete-button" type="button" onclick="removeRentItem(this)">刪除</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <button type="button" id="add-item-button">新增訂單明細</button>
+        <button type="submit">新增訂單</button>
+        </form>
+    </div>
+    <script>
+		document.addEventListener("DOMContentLoaded", function() {
+			showSidebar('rental');
+		});
+	</script>
+	<script type="text/template" id="tableware-options-template">
+        <option value="" selected disabled>請選擇餐具編號</option>
+        <option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:data-deposit="${tableware.tablewareDeposit}" th:text="${tableware.tablewareName}"></option>
+    </script>
+    <script>
+    let rentItemIndex = 0;
+	
+	
+    
+    document.getElementById('add-item-button').addEventListener('click', function() {
+        rentItemIndex++;
+        const optionsTemplate = document.getElementById('tableware-options-template').innerHTML;
+        const itemEntryHTML = `
+            <div class="item-entry">
+                <table class="table table-warning table-striped">
+                    <tr>
+                        <td class="item-column">
+                            餐具編號:
+                            <select name="tablewareId[${rentItemIndex}]" class="item-input" onchange="updateDeposit(this)">
+                                ${optionsTemplate}
+                            </select>
+                        </td>
+                        <td class="item-column">
+                            租借數量:<input type="number" class="item-input" name="rentItemQuantity[${rentItemIndex}]"  min="1" />
+                        </td>
+                        <td class="item-column">
+                            租借押金:<input type="number" class="item-input" name="rentItemDeposit[${rentItemIndex}]" />
+                        </td>
+                        <td class="item-column">
+                            <br/><button class="delete-button" type="button" onclick="removeRentItem(this)">刪除</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        `;
+        
+        document.getElementById('rentItemsContainer').insertAdjacentHTML('beforeend', itemEntryHTML);
+    });
+
+        // 删除订单明细
+        function removeRentItem(button) {
+            const rentItem = button.closest('.item-entry');
+            rentItem.remove();
+        }
+    </script>
+    <script>
+    // 更新押金值
+    function updateDeposit(selectElement) {
+	    const selectedOption = selectElement.options[selectElement.selectedIndex];
+	    const deposit = selectedOption.getAttribute('data-deposit');
+	    const rentItemDepositInput = selectElement.closest('.item-entry').querySelector('input[name^="rentItemDeposit"]');
+	    
+	    if (deposit && rentItemDepositInput) {
+	        rentItemDepositInput.value = deposit;
+	    }
+	}
+</script>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+
+</html>

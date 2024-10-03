@@ -61,11 +61,6 @@ public class RestaurantService {
 		Pageable pageAble = PageRequest.of(pageNumber-1, 10, Sort.Direction.DESC, "restaurantId");
 		return restaurantRepository.findAll(pageAble);
 	}
-	
-	
-	// 查詢所有餐廳(Rental使用)
-	public List<Restaurant> findAllRestaurants(){
-		return restaurantRepository.findAll();
-	}
+ 
 
 }
