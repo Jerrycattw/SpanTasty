@@ -41,20 +41,33 @@ public class ShoppingOrderService {
 		return (totalAmount != null) ? totalAmount : 0;
 	}
 
+	
 	@Transactional
-	public ShoppingOrder addShoppingOrder(Integer memberId, String shoppingMemo) {
-		ShoppingOrder shoppingOrder = new ShoppingOrder();
-
+	public ShoppingOrder addShoppingOrder(ShoppingOrder shoppingOrder) {
 		shoppingOrder.setShoppingDate(LocalDateTime.now());
-		shoppingOrder.setMemberId(memberId);
 		shoppingOrder.setShoppingStatus(1);
-		shoppingOrder.setShoppingMemo(shoppingMemo);
-
 		ShoppingOrder savedOrder = shoppingOrderRepo.save(shoppingOrder);
 		savedOrder.setShoppingTotal(0); 
-
 		return shoppingOrderRepo.save(shoppingOrder);
 	}
+	
+	
+	
+	
+//	@Transactional
+//	public ShoppingOrder addShoppingOrder(Integer memberId, String shoppingMemo) {
+//		ShoppingOrder shoppingOrder = new ShoppingOrder();
+//
+//		shoppingOrder.setShoppingDate(LocalDateTime.now());
+//		shoppingOrder.setMemberId(memberId);
+//		shoppingOrder.setShoppingStatus(1);
+//		shoppingOrder.setShoppingMemo(shoppingMemo);
+//
+//		ShoppingOrder savedOrder = shoppingOrderRepo.save(shoppingOrder);
+//		savedOrder.setShoppingTotal(0); 
+//
+//		return shoppingOrderRepo.save(shoppingOrder);
+//	}
 
 	@Transactional
 	public void deleteShoppingOrder(Integer shoppingId) {
@@ -63,25 +76,47 @@ public class ShoppingOrderService {
 	}
 
 	@Transactional
-	public ShoppingOrder updateShoppingOrder(Integer shoppingId, String shoppingMemo, Integer shoppingStatus) {
-	    Optional<ShoppingOrder> optionalOrder = shoppingOrderRepo.findById(shoppingId);
+	public ShoppingOrder updateShoppingOrder(ShoppingOrder shoppingOrder) {
+		Optional<ShoppingOrder> optional = shoppingOrderRepo.findById(shoppingOrder.getShoppingId());
+		 if (optional.isPresent()) {
+		        ShoppingOrder existingshoppingOrder = optional.get();
+		        
+		        if (shoppingOrder.getShoppingMemo() != null) {
+		            existingshoppingOrder.setShoppingMemo(shoppingOrder.getShoppingMemo());
+		        }
+		        if (shoppingOrder.getShoppingStatus() != null) {
+		            existingshoppingOrder.setShoppingStatus(shoppingOrder.getShoppingStatus());
+		        }
+	
+		        existingshoppingOrder.setShoppingTotal(calculateTotalAmount(shoppingOrder.getShoppingId()));
+	
+		        return shoppingOrderRepo.save(existingshoppingOrder);
+		    }
+		    return null; 
+		}
 
-	    if (optionalOrder.isPresent()) {
-	        ShoppingOrder shoppingOrder = optionalOrder.get();
-	        
-	        if (shoppingMemo != null) {
-	            shoppingOrder.setShoppingMemo(shoppingMemo);
-	        }
-	        if (shoppingStatus != null) {
-	            shoppingOrder.setShoppingStatus(shoppingStatus);
-	        }
-
-	        shoppingOrder.setShoppingTotal(calculateTotalAmount(shoppingId));
-
-	        return shoppingOrderRepo.save(shoppingOrder);
-	    }
-	    return null; 
-	}
+	
+	
+//	@Transactional
+//	public ShoppingOrder updateShoppingOrder(Integer shoppingId, String shoppingMemo, Integer shoppingStatus) {
+//	    Optional<ShoppingOrder> optionalOrder = shoppingOrderRepo.findById(shoppingId);
+//
+//	    if (optionalOrder.isPresent()) {
+//	        ShoppingOrder shoppingOrder = optionalOrder.get();
+//	        
+//	        if (shoppingMemo != null) {
+//	            shoppingOrder.setShoppingMemo(shoppingMemo);
+//	        }
+//	        if (shoppingStatus != null) {
+//	            shoppingOrder.setShoppingStatus(shoppingStatus);
+//	        }
+//
+//	        shoppingOrder.setShoppingTotal(calculateTotalAmount(shoppingId));
+//
+//	        return shoppingOrderRepo.save(shoppingOrder);
+//	    }
+//	    return null; 
+//	}
 
 	
 	public ShoppingOrder findShoppingOrderById(Integer id) {

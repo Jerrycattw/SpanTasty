@@ -43,4 +43,12 @@ public class ShoppingItem {
 	@JoinColumn(name = "shopping_id", insertable = false, updatable = false)
 	private ShoppingOrder shoppingOrder;
 
+	 // 提供對複合主鍵的 getter 方法
+	public Integer getProductId() {
+        return id.getProductId(); // 透過複合主鍵獲取產品 ID
+    }
+
+    public Integer getShoppingId() {
+        return id.getShoppingId(); // 透過複合主鍵獲取購物 ID
+    }
 }

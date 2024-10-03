@@ -1,10 +1,12 @@
 package com.eatspan.SpanTasty.entity.store;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
@@ -39,7 +41,7 @@ public class ShoppingOrder {
 
 //	@Temporal(TemporalType.TIMESTAMP) LocalDateTime有就不要了
 	@Column(name = "shopping_date")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss EEEE",timezone = "UTC+8")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "UTC+8")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") // 檢查進來的時間，並做格式化
     private LocalDateTime shoppingDate;
 	
@@ -55,10 +57,15 @@ public class ShoppingOrder {
 	@Column(name = "shopping_memo")
     private String shoppingMemo;
 	
-//	@ManyToOne 
-//    @JoinColumn(name = "member_id", referencedColumnName = "member_id", insertable = false, updatable = false)
-//    private Member member;
+	@ManyToOne 
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id", insertable = false, updatable = false)
+    private Member member;
 	
 	@OneToMany(mappedBy = "shoppingOrder")
     private List<ShoppingItem> items;
+	
+	public String getFormattedShoppingDate() {
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	    return shoppingDate != null ? shoppingDate.format(formatter) : null;
+	}
 }
