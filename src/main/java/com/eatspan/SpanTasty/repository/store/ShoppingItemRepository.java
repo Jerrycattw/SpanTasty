@@ -1,5 +1,7 @@
 package com.eatspan.SpanTasty.repository.store;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,5 +17,5 @@ public interface ShoppingItemRepository extends JpaRepository<ShoppingItem, Shop
     @Query("DELETE FROM ShoppingItem si WHERE si.shoppingOrder.id = :shoppingId")
     void deleteAllByShoppingOrderId(@Param("shoppingId") int shoppingId);
 	
-	
+	List<ShoppingItem> findByShoppingOrderShoppingId(Integer shoppingId);
 }

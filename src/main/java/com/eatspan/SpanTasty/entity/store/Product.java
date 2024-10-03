@@ -35,10 +35,6 @@ public class Product {
 		@Column(name = "product_name")
 		private String productName;
 		
-		@ManyToOne(fetch= FetchType.LAZY)
-		@JoinColumn(name="product_type_id")
-		private ProductType productType;
-		
 		@Column(name = "product_price")
 		private Integer productPrice;
 		
@@ -54,6 +50,11 @@ public class Product {
 		@Column(name = "product_description")
 		private String productDescription;
 		
+		
+		
+		@ManyToOne
+		@JoinColumn(name="product_type_id")
+		private ProductType productType;
 		
 	    @OneToMany(fetch= FetchType.LAZY, cascade=CascadeType.ALL, mappedBy = "product")
 	    private List<ShoppingItem> items;

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>員工資料</title>
+<style>
+table {
+    width: 50%;
+    border-collapse: collapse;
+    margin-top: 20px; /* 讓出空間給上方按鈕 */
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center; /* 文字置中 */
+}
+th {
+    background-color: #f2f2f2;
+}
+</style>
+</head>
+<body >
+<div class="content" id="content">
+<div>
+<h2>更新點數資料</h2>
+<form th:method="put" th:action="@{/point/member/{memberId}/point/{pointId}(memberId=${point.memberId},pointId=${point.pointId})}">
+<table>
+    <tr>
+        <td>點數紀錄</td>
+        <td>
+            <input type="text" disabled th:value="${point.pointId}">
+            <input type="hidden" name="pointId" th:value="${point.pointId}">
+        </td>
+    </tr>
+    <tr>
+        <td>會員</td>
+        <td>
+            <input type="text" disabled name="memberId" th:value="${point.memberId}">
+            <input type="hidden" name="memberId" th:value="${point.memberId}">
+        </td>
+    </tr>
+    <tr>
+        <td>變動點數</td>
+        <td>
+            <input type="text" name="pointChange" th:value="${point.pointChange}">
+        </td>
+    </tr>
+    <tr>
+        <td>創建日期</td>
+        <td>
+            <input type="text" name="createDate" th:value="${#dates.format(point.createDate, 'yyyy-MM-dd')}">
+        </td>
+    </tr>
+    <tr>
+        <td>到期日</td>
+        <td>
+            <input type="text" name="expiryDate" th:value="${#dates.format(point.expiryDate, 'yyyy-MM-dd')}">
+        </td>
+    </tr>
+    <tr>
+        <td>剩餘點數</td>
+        <td>
+            <input type="text" name="pointUsage" th:value="${point.pointUsage}">
+        </td>
+    </tr>
+    <tr>
+        <td>交易來源</td>
+        <td>
+            <input type="text" name="transactionId" th:value="${point.transactionId}">
+        </td>
+    </tr>
+    <tr>
+        <td>交易類型</td>
+        <td>
+            <input type="text" name="transactionType" th:value="${point.transactionType}">
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td align="center">
+            <input type="submit" value="確定" />
+        </td>
+    </tr>
+</table>
+</form>
+</div>
+</div>
+
+</body>
+</html>

@@ -39,17 +39,9 @@ public class RestaurantController {
 	private String uploadPath;
 	
 	
-//    // 查詢所有餐廳
-//    @GetMapping("/getAll")
-//    public String getAllRestaurants(Model model) {
-//        Page<Restaurant> restaurantsPage = restaurantService.findAllRestaurants(1);
-//        model.addAttribute("restaurantsPage", restaurantsPage);
-//        return "reservation/getAllRestaurant";
-//    }
-	
     @GetMapping("/getAll")
-    public String getAllRestaurants(Model model, @RequestParam(defaultValue = "0") int page) {
-        Page<Restaurant> restaurantsPage = restaurantService.findAllRestaurants(page+1);
+    public String getAllRestaurants(Model model, @RequestParam(defaultValue = "0") Integer page) {
+        Page<Restaurant> restaurantsPage = restaurantService.findAllRestaurantsPage(page+1);
         model.addAttribute("restaurantsPage", restaurantsPage);
         return "reservation/getAllRestaurant";
     }
