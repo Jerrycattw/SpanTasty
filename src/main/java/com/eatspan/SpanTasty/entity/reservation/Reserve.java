@@ -79,6 +79,9 @@ public class Reserve {
 		if(reserveCreateTime == null) {
 			reserveCreateTime = LocalDateTime.now(); // 使用 LocalDateTime.now() 設置當前時間
 		}
+		if(reserveStatus == null) {
+			reserveStatus = 1; // 1=未完成, 2=已完成ㄝ, 3=已取消
+		}
 	}
 	
 	
