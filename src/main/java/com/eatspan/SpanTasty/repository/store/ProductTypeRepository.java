@@ -12,5 +12,9 @@ public interface ProductTypeRepository extends JpaRepository<ProductType, Intege
 
 	 @Query("SELECT pt FROM ProductType pt WHERE pt.productTypeName LIKE %:name%")
 	    List<ProductType> findByProductTypeName(@Param("name") String name);
+	 
+	 //Coupon使用 取得productType選項
+	 @Query("SELECT pt.productTypeName FROM ProductType pt ")
+	 	List<String> findProductTypeName();
 	
 }

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../template/template.css">
+    <script src="../template/template.js"></script>
+</head>
+<style>
+        table {
+            width: 80%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        td .togo{
+        	background-color: lightblue;
+        }
+        td .product{
+        	background-color: lightgreen;
+        }
+        
+    </style>
+<body>
+	<div class="top-menu">
+        <a href="#" onclick="showSidebar('member')">會員管理</a>
+        <a href="#" onclick="showSidebar('store')">商城管理</a>
+        <a href="#" onclick="showSidebar('order')">訂餐管理</a>
+        <a href="#" onclick="showSidebar('rental')">租借用具管理</a>
+        <a href="#" onclick="showSidebar('reservation')">餐廳訂位管理</a>
+        <a href="#" onclick="showSidebar('points')">會員積分優惠券管理</a>
+    </div>
+    <div class="sidebar" id="sidebar"></div>
+    <div class="content" id="content">
+	<h1>新增優惠券</h1>
+	<form id="couponForm" action="/SpanTasty/coupon/add" method="post" >
+    <table id="couponsTable">
+        <tbody>
+            <!-- Dynamic rows will be inserted here -->
+        </tbody>						
+    </table>
+        <button type="submit" id="btn">送出</button>
+	</form>
+	</div>
+	<script>
+	    fetch(`/SpanTasty/coupon/preAdd`,{
+	    	method: 'POST'
+	    })
+	    .then(response => response.json())
+	    .then(data => {
+	        console.log(data);
+	        // 在這裡處理或展示接收到的優惠券資料
+			generateInput(data)
+	        
+	    })
+	    .catch(error => {
+	        console.error('Error:', error);
+	    });
+	</script>
+    <script>
+    	function generateInput(data) {
+			const tableBody = document.querySelector('#couponsTable tbody');
+      	    tableBody.innerHTML = '';
+      	    
+			const labelMap = new Map([
+			     ['couponId', '優惠券編號'],
+			     ['couponCode', '優惠券代碼'],
+			     ['couponDescription', '優惠券名稱'],
+			     ['couponStartDate', '使用開始日期'],
+			     ['couponEndDate', '使用結束日期'],
+			     ['maxCoupon', '優惠券最大數量'],
+			     ['perMaxCoupon', '每人限領數量'],
+			     ['couponStatus', '狀態'],
+			     ['rulesDescription', '優惠限制描述'],
+			     ['discountType', '折扣種類(固定、百分比)'],
+			     ['discount', '金額(百分比8折請填80)'],
+			     ['minOrderDiscount', '滿額多少才能使用'],
+			     ['maxDiscount', '最多可折扣多少金額'],
+			 ]);
+			
+			Object.keys(data.coupon).forEach(key => {
+				if(key != 'tags'&& key != 'receivedAmount'){
+					const row = document.createElement('tr');
+					const cell = document.createElement('td');
+				
+					const label = labelMap.get(key) || key;
+					if(key != 'discountType' && key != 'couponStatus'){   //tag跟ra以外，也不是dt跟cs 執行這個
+						const value = data.coupon[key] === null ? '' : data.coupon[key];
+						cell.innerHTML=`${label} : <input type="text" name=${key} value=${value}>`
+						row.appendChild(cell);            				
+					}else if(key === 'discountType'){   //dt執行這個
+						cell.innerHTML=`${label} : <select name=${key} value=${data.coupon[key]}>
+													<option ${data.coupon[key] === '固定金額' ? 'selected' : ''}>固定金額</option>
+													<option ${data.coupon[key] === '百分比' ? 'selected' : ''}>百分比</option>
+													</select>`
+						row.appendChild(cell);   		
+					}else if(key === 'couponStatus'){   //cs執行這個
+						cell.innerHTML=`${label} : <select name=${key} value=${data.coupon[key]}>
+							<option ${data.coupon[key] === '下架' ? 'selected' : ''}>下架</option>
+							<option ${data.coupon[key] === '上架' ? 'selected' : ''}>上架</option>
+							</select>`
+						row.appendChild(cell);
+					}
+					tableBody.appendChild(row)           		
+					
+				}
+			})	 
+			generateCheckBox(data.tagOptions);
+			setInput();
+            	
+    	}
+    	function generateCheckBox(tagOptions){
+    		const tableBody = document.querySelector('#couponsTable tbody');    		
+			
+    	    // Create a row for Product tags
+    	    const productRow = document.createElement('tr');
+    	    const productCell = document.createElement('td');
+    	    productCell.innerHTML = '綁定標籤(商城) :'; 	    
+    	    tagOptions.product.forEach(tag => {    	  
+    	        productCell.innerHTML += `<label><input type="checkbox" name="product" value="${tag}" > ${tag}</label>`;
+    	    });
+    	    
+    	    productRow.appendChild(productCell);
+    	    tableBody.appendChild(productRow);
+
+    	    // Create a row for Togo tags
+    	    const togoRow = document.createElement('tr');
+    	    const togoCell = document.createElement('td');
+    	    togoCell.innerHTML = '綁定標籤(外帶) :';
+    	    tagOptions.togo.forEach(tag => {  
+    	        togoCell.innerHTML += `<label><input type="checkbox" name="togo" value="${tag}" }> ${tag}</label>`;
+    	    });
+
+    	    togoRow.appendChild(togoCell);
+    	    tableBody.appendChild(togoRow);
+    	}
+    	
+    	//修改CSS
+    	function setInput(){
+    		 const inputId=document.querySelector('[name="couponId"]')
+    	     inputId.setAttribute('disabled',true)
+    	     
+    	     const InputStartDate=document.querySelector('[name="couponStartDate"]')
+   	    	InputStartDate.setAttribute('type','date')
+   	    	
+   	    	const InputEndDate=document.querySelector('[name="couponEndDate"]')
+   	    	InputEndDate.setAttribute('type','date')
+    	     
+    	     const inputs=document.querySelectorAll('input')
+   	    	inputs.forEach(input => {  
+	   	        if (input.type !== 'checkbox') {  
+	   	        	input.style.width = '250px';
+	   	        }
+   	    	})
+    	}
+    	
+    	//
+    	document.getElementById("btn").addEventListener('click',function(){
+    		event.preventDefault(); 
+    		document.getElementById("couponForm").submit();
+    	})
+    </script>
+
+</body>
+</html>

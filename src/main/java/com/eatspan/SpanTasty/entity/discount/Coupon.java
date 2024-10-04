@@ -2,14 +2,24 @@ package com.eatspan.SpanTasty.entity.discount;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.Getter;
@@ -44,10 +54,10 @@ public class Coupon implements Serializable {
 	private LocalDate couponEndDate;
 
 	@Column(name = "max_coupon")
-	private int maxCoupon;
+	private Integer maxCoupon;
 
 	@Column(name = "per_max_coupon")
-	private int perMaxCoupon;
+	private Integer perMaxCoupon;
 
 	@Column(name = "coupon_status")
 	private String couponStatus;
@@ -59,14 +69,20 @@ public class Coupon implements Serializable {
 	private String discountType;
 
 	@Column(name = "discount")
-	private int discount;
+	private Integer discount;
 
 	@Column(name = "min_order_amount")
-	private int minOrderDiscount;
+	private Integer minOrderDiscount;
 
 	@Column(name = "max_discount")
-	private int maxDiscount;
+	private Integer maxDiscount;
 
 	@Transient
-	private int receivedAmount;
+	private Integer receivedAmount;
+	
+	@OneToMany(fetch = FetchType.LAZY,cascade=CascadeType.ALL,mappedBy = "coupon",orphanRemoval=true)
+	private List<Tag> tags=new ArrayList<Tag>();	
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "coupon")
+	private Set<CouponMember> couponMember = new HashSet<CouponMember>();
 }
