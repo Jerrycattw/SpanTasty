@@ -100,7 +100,7 @@ public interface PointRepository extends JpaRepository<Point, Integer> {
 	        FROM point_summary ps 
 	        LEFT JOIN expiry_points ep ON ps.member_id = ep.member_id
 	        LEFT JOIN members m ON ps.member_id = m.member_id
-	        WHERE ep.rank = 1 AND (m.phone LIKE CONCAT('%', :keyWord, '%') OR m.member_id LIKE CONCAT('%', :keyWord, '%') OR m.member_name LIKE CONCAT('%', :keyWord, '%'))
+	        WHERE ep.rank = 1 AND (m.phone LIKE %:keyWord% OR m.member_id LIKE %:keyWord% OR m.member_name LIKE %:keyWord%)
 	        """,nativeQuery = true)
 	List<PointMemberProjection> searchPointMembers(@Param(value = "keyWord") String keyWord);
 	

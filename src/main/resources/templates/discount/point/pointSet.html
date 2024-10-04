@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>點數設定</title>
-    <link rel="stylesheet" href="../template/template.css">
     
     <style>
         .container article {
@@ -34,9 +33,9 @@
         }
     </style>
     
-    <script src="../template/template.js"></script>
 </head>
 <body>
+<div th:replace="~{/display/navbar}"></div>
 <div class="content" id="content">
 <form th:action="@{/point/pointSet/post}" th:method="PUT" enctype="multipart/form-data">
     <div class="container">

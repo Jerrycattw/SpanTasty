@@ -56,7 +56,7 @@ public class ProductController {
 	// 新增
 	@PostMapping("/addPost")
 	public String addProduct(@ModelAttribute Product addProduct, @RequestParam MultipartFile file,
-			@RequestParam("productTypeId") Integer productTypeId) throws IllegalStateException, IOException {
+			@RequestParam Integer productTypeId) throws IllegalStateException, IOException {
 
 		ProductType productType = productTypeService.findProductTypeById(productTypeId);
 		addProduct.setProductType(productType);

@@ -9,7 +9,9 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.eatspan.SpanTasty.entity.store.Product;
 import com.eatspan.SpanTasty.entity.store.ShoppingItem;
+import com.eatspan.SpanTasty.entity.store.ShoppingItemId;
 import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
 import com.eatspan.SpanTasty.repository.store.ShoppingItemRepository;
 import com.eatspan.SpanTasty.repository.store.ShoppingOrderRepository;
@@ -27,47 +29,77 @@ public class ShoppingOrderService {
 
 	@Autowired
 	private ShoppingItemService shoppingItemService;
+	
+	@Autowired ShoppingItemRepository shoppingItemRepo;
+	
+	@Autowired
+	private ProductService productService;
 
 	@PersistenceContext
 	private EntityManager entityManager;
 
 	public Integer calculateTotalAmount(Integer shoppingId) {
-		String hql = "SELECT SUM(i.shoppingItemPrice * i.shoppingItemQuantity) "
-				+ "FROM ShoppingItem i WHERE i.shoppingOrder.shoppingId = :shoppingId";
-		TypedQuery<Integer> query = entityManager.createQuery(hql, Integer.class);
-		query.setParameter("shoppingId", shoppingId);
+	    String hql = "SELECT SUM(i.shoppingItemPrice * i.shoppingItemQuantity) "
+	            + "FROM ShoppingItem i WHERE i.shoppingOrder.shoppingId = :shoppingId";
+	    TypedQuery<Long> query = entityManager.createQuery(hql, Long.class);
+	    query.setParameter("shoppingId", shoppingId);
 
-		Integer totalAmount = query.getSingleResult();
-		return (totalAmount != null) ? totalAmount : 0;
+	    Long totalAmount = query.getSingleResult();
+	    return (totalAmount != null) ? totalAmount.intValue() : 0; // 轉換為 Integer
 	}
-
+	
 	
 	@Transactional
-	public ShoppingOrder addShoppingOrder(ShoppingOrder shoppingOrder) {
-		shoppingOrder.setShoppingDate(LocalDateTime.now());
-		shoppingOrder.setShoppingStatus(1);
-		ShoppingOrder savedOrder = shoppingOrderRepo.save(shoppingOrder);
-		savedOrder.setShoppingTotal(0); 
-		return shoppingOrderRepo.save(shoppingOrder);
+	public ShoppingOrder addShoppingOrder(Integer memberId, Integer productId, Integer shoppingItemQuantity) {
+	    
+	    ShoppingOrder shoppingOrder = new ShoppingOrder();
+	    shoppingOrder.setMemberId(memberId);
+	    shoppingOrder.setShoppingDate(LocalDateTime.now());
+	    shoppingOrder.setShoppingStatus(1);
+	    shoppingOrder.setShoppingTotal(0); 
+
+	    ShoppingOrder savedOrder = shoppingOrderRepo.save(shoppingOrder);
+
+	    Optional<Product> productOpt = productService.findProductByIdS(productId);
+	    if (!productOpt.isPresent()) {
+	        throw new RuntimeException("Product not found with ID: " + productId);
+	    }
+	    
+	    Product product = productOpt.get();
+	    Integer price = product.getProductPrice(); 
+	    
+	    // 創建複合主鍵
+	    ShoppingItemId itemId = new ShoppingItemId(savedOrder.getShoppingId(), productId); // 使用已保存的訂單 ID
+
+	    ShoppingItem shoppingItem = new ShoppingItem(itemId, shoppingItemQuantity, price);
+
+	    shoppingItem.setShoppingOrder(savedOrder);
+	    
+	    shoppingItemRepo.save(shoppingItem); 
+
+	    shoppingOrder.setShoppingTotal(shoppingOrder.getShoppingTotal() + (price * shoppingItemQuantity));
+	    shoppingOrderRepo.save(shoppingOrder);
+
+	    return savedOrder; 
+	}
+
+
+
+	
+	
+	@Transactional
+	public ShoppingOrder createNewShoppingOrder(Integer memberId) {
+	    ShoppingOrder shoppingOrder = new ShoppingOrder();
+	    shoppingOrder.setMemberId(memberId);
+	    shoppingOrder.setShoppingDate(LocalDateTime.now());
+	    shoppingOrder.setShoppingStatus(1);
+	    shoppingOrder.setShoppingMemo(""); // 可以根據需要設置默認備註
+	    shoppingOrder.setShoppingTotal(0); // 初始金額
+
+	    ShoppingOrder savedOrder = shoppingOrderRepo.save(shoppingOrder);
+	    return savedOrder;
 	}
 	
-	
-	
-	
-//	@Transactional
-//	public ShoppingOrder addShoppingOrder(Integer memberId, String shoppingMemo) {
-//		ShoppingOrder shoppingOrder = new ShoppingOrder();
-//
-//		shoppingOrder.setShoppingDate(LocalDateTime.now());
-//		shoppingOrder.setMemberId(memberId);
-//		shoppingOrder.setShoppingStatus(1);
-//		shoppingOrder.setShoppingMemo(shoppingMemo);
-//
-//		ShoppingOrder savedOrder = shoppingOrderRepo.save(shoppingOrder);
-//		savedOrder.setShoppingTotal(0); 
-//
-//		return shoppingOrderRepo.save(shoppingOrder);
-//	}
 
 	@Transactional
 	public void deleteShoppingOrder(Integer shoppingId) {

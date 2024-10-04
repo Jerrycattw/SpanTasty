@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>搜尋管理員</title>
+</head>
+<body>
+<div th:replace="~{display/navbar}" ></div>
+    <!-- 主要內容區域 -->
+    <div class="content">
+        <h1>管理員列表</h1>
+
+        <!-- 搜索管理員 -->
+        <div>
+            <input type="text" id="searchAdminName" placeholder="輸入管理員名稱" />
+            <button id="searchBtn">搜尋</button>
+        </div>
+
+        <!-- 顯示管理員列表的表格 -->
+        <table id="admin-table" border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>管理員名稱</th>
+                    <th>帳號</th>
+                    <th>狀態</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 管理員資料將由 JavaScript 動態加載到這裡 -->
+            </tbody>
+        </table>
+
+        <!-- 分頁控制 -->
+        <div id="pagination">
+            <button id="prevPage">上一頁</button>
+            <button id="nextPage">下一頁</button>
+        </div>
+    </div>
+
+    <!-- JavaScript 部分：使用 Axios 請求數據 -->
+    <script type="text/javascript">
+        var currentPage = 0;
+        var totalPages = 0;
+
+        // 函數來動態加載管理員資料
+        function loadAdmins(page, adminName) {
+            let url = '/SpanTasty/admin/findAllAdmins'; // 默認查詢所有管理員的URL
+            if (adminName) {
+                url = '/SpanTasty/admin/searchAdmins'; // 如果有adminName，進行模糊查詢
+            }
+
+            axios.get(url, {
+                params: {
+                    page: page,
+                    size: 10,
+                    adminName: adminName || ''
+                }
+            })
+            .then(function (response) {
+                // 清空當前的表格資料
+                document.querySelector('#admin-table tbody').innerHTML = '';
+
+                // 獲取管理員數據並追加到表格中
+                var admins = response.data.data.admins;
+                admins.forEach(function(admin) {
+                    var row = '<tr>' +
+                        '<td>' + admin.adminId + '</td>' +
+                        '<td>' + admin.adminName + '</td>' +
+                        '<td>' + admin.account + '</td>' +
+                        '<td>' + admin.status + '</td>' +
+                        '</tr>';
+                    document.querySelector('#admin-table tbody').innerHTML += row;
+                });
+
+                // 更新分頁信息
+                currentPage = response.data.data.currentPage;
+                totalPages = response.data.data.totalPages;
+
+                // 控制上一頁和下一頁按鈕的可見性
+                document.querySelector('#prevPage').disabled = currentPage === 0;
+                document.querySelector('#nextPage').disabled = currentPage === totalPages - 1;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        }
+
+        // 點擊上一頁按鈕事件
+        document.querySelector('#prevPage').addEventListener('click', function() {
+            if (currentPage > 0) {
+                loadAdmins(currentPage - 1, document.querySelector('#searchAdminName').value);
+            }
+        });
+
+        // 點擊下一頁按鈕事件
+        document.querySelector('#nextPage').addEventListener('click', function() {
+            if (currentPage < totalPages - 1) {
+                loadAdmins(currentPage + 1, document.querySelector('#searchAdminName').value);
+            }
+        });
+
+        // 點擊搜索按鈕事件
+        document.querySelector('#searchBtn').addEventListener('click', function() {
+            const adminName = document.querySelector('#searchAdminName').value;
+            loadAdmins(0, adminName); // 從第 0 頁開始查詢
+        });
+
+        // 首次加載時調用
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAdmins(0); // 預設加載第 0 頁
+        });
+    </script>
+
+</body>
+</html>

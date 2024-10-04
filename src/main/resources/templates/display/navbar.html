@@ -1,96 +1,113 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpanTasty Home</title>
-    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpanTasty Home</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #f8f9fa;
+}
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-        .top-menu {
-            background-color: #343a40;
-            overflow: hidden;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-        .top-menu a {
-            float: left;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-            font-size: 17px;
-        }
-        .top-menu a:hover {
-            background-color: #495057;
-        }
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: #343a40;
-            position: fixed;
-            top: 56px;
-            padding-top: 20px;
-            z-index: 500;
-        }
-        .sidebar a {
-            padding: 10px 15px;
-            text-decoration: none;
-            font-size: 18px;
-            color: #ddd;
-            display: block;
-        }
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            padding-top: 80px;
-        }
-        .user-profile {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            color: #fff;
-        }
-        .user-profile img {
-            border-radius: 50%;
-            width: 50px;
-            margin-right: 15px;
-        }
-        .user-profile div {
-            font-size: 16px;
-        }
-        .footer {
-            text-align: center;
-            padding: 10px;
-            background-color: #343a40;
-            color: #fff;
-            position: absolute;
-            bottom: 0;
-            width: calc(100% - 250px);
-            margin-left: 250px;
-        }
-    </style>
-    <script>
+.top-menu {
+	background-color: #343a40;
+	overflow: hidden;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 1000;
+}
+
+.top-menu a {
+	float: left;
+	color: white;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+	font-size: 17px;
+}
+
+.top-menu a:hover {
+	background-color: #495057;
+}
+
+.sidebar {
+	width: 250px;
+	height: 100vh;
+	background-color: #343a40;
+	position: fixed;
+	top: 56px;
+	padding-top: 20px;
+	z-index: 500;
+}
+
+.sidebar a {
+	padding: 10px 15px;
+	text-decoration: none;
+	font-size: 18px;
+	color: #ddd;
+	display: block;
+}
+
+.sidebar a:hover {
+	background-color: #495057;
+}
+
+.content {
+	margin-left: 250px;
+	padding: 20px;
+	padding-top: 80px;
+}
+
+.user-profile {
+	display: flex;
+	align-items: center;
+	padding: 15px;
+	color: #fff;
+}
+
+.user-profile img {
+	border-radius: 50%;
+	width: 50px;
+	margin-right: 15px;
+}
+
+.user-profile div {
+	font-size: 16px;
+}
+
+.footer {
+	text-align: center;
+	padding: 10px;
+	background-color: #343a40;
+	color: #fff;
+	position: absolute;
+	bottom: 0;
+	width: calc(100% - 250px);
+	margin-left: 250px;
+}
+</style>
+<script>
         function showSidebar(menu) {
             const sidebar = document.getElementById('sidebar');
             let menuItems = '';
             switch (menu) {
-                case 'member':
+            	case 'admin':
                     menuItems = `
                         <a href="/EEIT187-6/admin/addAdmin">新增管理員</a>
-                        <a href="/EEIT187-6/admin/findAllAdmins">查詢管理員</a>
-                        <a href="/EEIT187-6/admin/searchMembers">查詢會員資料</a>
+                        <a href="/SpanTasty/admin/admin-list">查詢管理員</a>
+                    `;
+                    break;
+            
+                case 'member':
+                    menuItems = `
+        				<a href="/SpanTasty/admin/member-list">查詢會員資料</a>
                     `;
                     break;
                 case 'store':
@@ -99,11 +116,12 @@
                         <a href="/SpanTasty/product/findAll">查詢所有商品</a>
                         <a href="/SpanTasty/shoppingOrder/add">新增訂單</a>
                         <a href="/SpanTasty/shoppingOrder/findAll">查詢所有訂單</a>
+                        <a href="/SpanTasty/shoppingCart/addShoppingCart">購物車</a>
                     `;
                     break;
                 case 'order':
                     menuItems = `
-                        <a href="/EEIT187-6/MenuController/getAll">菜單管理</a>
+                        <a href="/SpanTasty/order/MenuManagement.html">菜單管理</a>
                         <a href="/EEIT187-6/togo/GetMenu.html">菜單查詢</a>
                         <a href="/EEIT187-6/TogoController/getAll">訂單管理</a>
                         <a href="/EEIT187-6/togo/GetTogo.html">訂單查詢</a>
@@ -125,9 +143,9 @@
                     break;
                 case 'points':
                     menuItems = `
-                        <a href="/EEIT187-6/Point/GetPointSet">點數設定</a>
-                        <a href="/EEIT187-6/Point/GetAllPoints">點數管理</a>
-                        <a href="/EEIT187-6/coupon/Home.html">優惠券管理</a>
+                        <a href="/SpanTasty/point/pointSet">點數設定</a>
+                        <a href="/SpanTasty/point">點數管理</a>
+                        <a href="/SpanTasty/coupon">優惠券管理</a>
                     `;
                     break;
                 default:
@@ -141,27 +159,30 @@
     </script>
 </head>
 <body>
-    <!-- 上方選單 -->
-    <div class="top-menu d-flex justify-content-start">
-        <a href="#" onclick="showSidebar('member')">會員管理</a>
-        <a href="#" onclick="showSidebar('store')">線上商城管理</a>
-        <a href="#" onclick="showSidebar('order')">外帶訂餐管理</a>
-        <a href="#" onclick="showSidebar('reservation')">餐廳及訂位管理</a>
-        <a href="#" onclick="showSidebar('rental')">租借訂單管理</a>
-        <a href="#" onclick="showSidebar('points')">會員積分與優惠券管理</a>
-    </div>
+	<!-- 上方選單 -->
+	<div class="top-menu d-flex justify-content-start">
+		<a href="#" onclick="showSidebar('admin')">管理員管理</a> <a href="#"
+			onclick="showSidebar('member')">會員管理</a> <a href="#"
+			onclick="showSidebar('store')">線上商城管理</a> <a href="#"
+			onclick="showSidebar('order')">外帶訂餐管理</a> <a href="#"
+			onclick="showSidebar('reservation')">餐廳及訂位管理</a> <a href="#"
+			onclick="showSidebar('rental')">租借訂單管理</a> <a href="#"
+			onclick="showSidebar('points')">會員積分與優惠券管理</a>
+	</div>
 
-    <!-- 側邊欄 -->
-    <div class="sidebar">
-        <div class="user-profile">
-            <img src="https://via.placeholder.com/50" alt="User">
-            <div>
-                <span>會員名稱</span><br>
-                <small>一般小會員</small>
-            </div>
-        </div>
-        <div id="sidebar"></div>
-    </div>
+	<!-- 側邊欄 -->
+	<div class="sidebar">
+		<div class="user-profile">
+			<img id="adminAvatar" src="https://via.placeholder.com/50"
+				alt="Admin Avatar" style="cursor: pointer;"> <input
+				type="file" id="avatarUpload" style="display: none;"
+				accept="image/*">
+			<div class="ml-auto">
+				<span id="adminName">管理員名稱</span>
+			</div>
+		</div>
+		<div id="sidebar"></div>
+	</div>
 	<!-- 
 
     <div class="content">
@@ -170,9 +191,85 @@
     </div>
 	 -->
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const adminNameElement = document.getElementById('adminName');
+        const adminAvatarElement = document.getElementById('adminAvatar');
+        const avatarUploadInput = document.getElementById('avatarUpload');
+        const defaultAvatar = 'https://via.placeholder.com/50'; // 預設圖片
 
-<script th:src="@{/js/bootstrap.bundle.min.js}" ></script>
-<script th:src="@{/js/jquery-3.7.1.min.js}" ></script>
-<script th:src="@{/js/axios.min.js}" ></script>
+        // 請求管理員資訊並顯示名稱
+        axios.get('/SpanTasty/admin/info')
+        .then(function(response) {
+            if (response.data.success) {
+                const adminName = response.data.data.adminName;
+                adminNameElement.textContent = adminName;
+            } else {
+                adminNameElement.textContent = '未登入';
+            }
+        })
+        .catch(function(error) {
+            console.error("無法加載管理員資訊", error);
+            adminNameElement.textContent = '錯誤';
+        });
+        
+        // 請求頭像並顯示
+        axios.get('/SpanTasty/admin/getAvatar')
+        .then(function(response) {
+            if (response.data.success && response.data.data) {
+                const base64Avatar = response.data.data;
+                adminAvatarElement.src = 'data:image/jpeg;base64,' + base64Avatar;
+            } else {
+                adminAvatarElement.src = defaultAvatar;
+            }
+        })
+        .catch(function(error) {
+            console.error("無法加載頭像", error);
+            adminAvatarElement.src = defaultAvatar;
+        });
+
+        // 點擊頭像時觸發文件選擇器
+        adminAvatarElement.addEventListener('click', function() {
+            avatarUploadInput.click();
+        });
+
+        // 當選擇新頭像後，將圖片上傳到後端
+        avatarUploadInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            
+            if (file) {
+                const formData = new FormData();
+                formData.append('avatar', file);
+
+                // 發送請求上傳頭像
+                axios.post('/SpanTasty/admin/updateAvatar', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then(function(response) {
+                    if (response.data.success) {
+                        // 成功後顯示新頭像
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            adminAvatarElement.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                        alert('頭像更新成功');
+                    } else {
+                        alert('頭像更新失敗');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('頭像上傳失敗', error);
+                    alert('頭像上傳失敗，請稍後重試');
+                });
+            }
+        });
+    });
+</script>
+	<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+	<script th:src="@{/js/axios.min.js}"></script>
 </body>
 </html>

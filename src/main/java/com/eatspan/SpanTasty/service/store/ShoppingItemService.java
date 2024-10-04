@@ -10,12 +10,10 @@ import com.eatspan.SpanTasty.entity.store.Product;
 import com.eatspan.SpanTasty.entity.store.ShoppingItem;
 import com.eatspan.SpanTasty.entity.store.ShoppingItemId;
 import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
-import com.eatspan.SpanTasty.entity.store.ShoppingItem;
 import com.eatspan.SpanTasty.repository.store.ProductRepository;
 import com.eatspan.SpanTasty.repository.store.ShoppingItemRepository;
 import com.eatspan.SpanTasty.repository.store.ShoppingOrderRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ShoppingItemService {
@@ -29,52 +27,60 @@ public class ShoppingItemService {
 	@Autowired
 	private ProductRepository productRepo;
 	
+	
 	public Integer getProductPriceById(Integer productId) {
 	    Optional<Product> productOpt = productRepo.findById(productId);
 	    return productOpt.map(Product::getProductPrice).orElse(null); 
 	}
 
+	
 	public ShoppingItem addShoppingItem(ShoppingItem shoppingItem) {
-	    // 獲取產品
-	    Product product = productRepo.findById(shoppingItem.getProductId())
-	                                  .orElse(null);
-	    if (product != null) {
-	        shoppingItem.setProduct(product);
-	    }
-
-	    // 獲取產品價格
-	    Integer productPrice = product != null ? product.getProductPrice() : null;
-	    Integer totalPrice = productPrice != null ? productPrice * shoppingItem.getShoppingItemQuantity() : 0;
-	    shoppingItem.setShoppingItemPrice(totalPrice);
-
-	    // 確保購物訂單已設置
-	    ShoppingOrder shoppingOrder = shoppingItem.getShoppingOrder();
-	    if (shoppingOrder != null && shoppingOrder.getShoppingId() != null) {
-	        shoppingOrder = shoppingOrderRepo.findById(shoppingOrder.getShoppingId()).orElse(null);
-	        if (shoppingOrder != null) {
-	            shoppingItem.setShoppingOrder(shoppingOrder);
-	        }
-	    }
-
-	    // 先查詢是否已存在的購物項目
-	    ShoppingItem existingItem = shoppingItemRepo.findById(shoppingItem.getId()).orElse(null);
-	    if (existingItem != null) {
-	        existingItem.setShoppingItemQuantity(existingItem.getShoppingItemQuantity() + shoppingItem.getShoppingItemQuantity());
-	        return shoppingItemRepo.save(existingItem);
-	    }
-
-	    // 保存購物項目
-	    ShoppingItem savedShoppingItem = shoppingItemRepo.save(shoppingItem);
-
-	    // 更新購物訂單的總額
-	    if (shoppingOrder != null) {
-	        shoppingOrder.setShoppingTotal(shoppingOrder.getShoppingTotal() + totalPrice);
-	        shoppingOrderRepo.save(shoppingOrder); // 保存更新後的 ShoppingOrder
-	    }
-
-	    return savedShoppingItem;
+		return shoppingItemRepo.save(shoppingItem);
 	}
+	
+	
+//	public ShoppingItem addShoppingItem(ShoppingItem shoppingItem) {
+//	    // 獲取產品
+//		 Integer productId = shoppingItem.getId().getProductId(); // 從 ShoppingItemId 獲取 productId
+//		 Product product = productRepo.findById(productId).orElse(null);
+//	    if (product != null) {
+//	        shoppingItem.setProduct(product);
+//	    }
+//
+//	    // 獲取產品價格
+//	    Integer productPrice = product != null ? product.getProductPrice() : null;
+//	    Integer totalPrice = productPrice != null ? productPrice * shoppingItem.getShoppingItemQuantity() : 0;
+//	    shoppingItem.setShoppingItemPrice(totalPrice);
+//
+//	    // 確保購物訂單已設置
+//	    ShoppingOrder shoppingOrder = shoppingItem.getShoppingOrder();
+//	    if (shoppingOrder != null && shoppingOrder.getShoppingId() != null) {
+//	        shoppingOrder = shoppingOrderRepo.findById(shoppingOrder.getShoppingId()).orElse(null);
+//	        if (shoppingOrder != null) {
+//	            shoppingItem.setShoppingOrder(shoppingOrder);
+//	        }
+//	    }
+//
+//	    // 先查詢是否已存在的購物項目
+//	    ShoppingItem existingItem = shoppingItemRepo.findById(shoppingItem.getId()).orElse(null);
+//	    if (existingItem != null) {
+//	        existingItem.setShoppingItemQuantity(existingItem.getShoppingItemQuantity() + shoppingItem.getShoppingItemQuantity());
+//	        return shoppingItemRepo.save(existingItem);
+//	    }
+//
+//	    // 保存購物項目
+//	    ShoppingItem savedShoppingItem = shoppingItemRepo.save(shoppingItem);
+//
+//	    // 更新購物訂單的總額
+//	    if (shoppingOrder != null) {
+//	        shoppingOrder.setShoppingTotal(shoppingOrder.getShoppingTotal() + totalPrice);
+//	        shoppingOrderRepo.save(shoppingOrder); // 保存更新後的 ShoppingOrder
+//	    }
+//
+//	    return savedShoppingItem;
+//	}
 
+	
 	
 //	public ShoppingItem addShoppingItem(ShoppingItem shoppingItem) {
 //	    Integer productPrice = getProductPriceById(shoppingItem.getId().getProductId());
@@ -153,6 +159,10 @@ public class ShoppingItemService {
         return shoppingItemRepo.findByShoppingOrderShoppingId(shoppingId);
     }
     
+    public ShoppingItem findShoppingItemById(ShoppingItemId shoppingItemId) {
+        Optional<ShoppingItem> optional = shoppingItemRepo.findById(shoppingItemId);
+        return optional.orElse(null); // 如果找不到則返回 null
+    }
 //    public ShoppingItem findShoppingItemById(ShoppingItemId shoppingItemId) {
 //        Optional<ShoppingItem> optional = shoppingItemRepo.findById(shoppingItemId);
 //        

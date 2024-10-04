@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>搜尋全部會員</title>
+</head>
+<body>
+	<div th:replace="~{display/navbar}"></div>
+
+	<!-- 主要內容區域 -->
+<div class="content">
+    <h1 class="display-6">🥪 SpanTasty Restaurant Management System 🥞</h1>
+    <p>選擇上方功能以管理各項內容</p>
+
+    <!-- 搜索框 -->
+    <div>
+        <input type="text" id="searchInput" placeholder="輸入會員名稱或帳號進行搜尋">
+        <button onclick="searchMembers()">搜尋</button>
+    </div>
+
+    <!-- 顯示會員列表的表格 -->
+    <table id="members-table" border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>會員名稱</th>
+                <th>帳號</th>
+                <th>狀態</th>
+                <th>頭像</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 會員資料將由 JavaScript 動態加載到這裡 -->
+        </tbody>
+    </table>
+
+    <!-- 分頁控制 -->
+    <div id="pagination">
+        <button id="prevPage">上一頁</button>
+        <button id="nextPage">下一頁</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var currentPage = 0;
+    var totalPages = 0;
+    var selectedMemberId = null;
+    var selectedStatus = null;
+    var searchQuery = '';  // 新增一個變數用於保存搜索條件
+
+    // 狀態對應的中文值映射
+    var statusMap = {
+        'A': '啟用',
+        'S': '暫停',
+        'I': '禁用'
+    };
+
+    // 搜索會員函數
+    function searchMembers() {
+        searchQuery = document.getElementById('searchInput').value;  // 獲取搜索條件
+        loadMembers(0);  // 從第一頁開始顯示搜索結果
+    }
+
+    // 函數來動態加載會員資料
+    function loadMembers(page) {
+        axios.get('/SpanTasty/admin/findMembers', {
+            params: {
+                page: page,
+                size: 10,
+                search: searchQuery  // 傳遞搜索條件到後端
+            }
+        })
+        .then(function (response) {
+            document.querySelector('#members-table tbody').innerHTML = ''; // 清空當前的表格資料
+            var members = response.data.data.members;
+
+            members.forEach(function(member) {
+                var avatarHtml = member.avatar 
+                    ? '<img src="' + member.avatar + '" alt="Avatar" style="width:50px; height:50px;"/>'
+                    : '<i class="fa-regular fa-user" style="font-size:50px;"></i>';
+
+                var statusSelect = '<select onchange="handleStatusChange(this, ' + member.memberId + ')">';
+                statusSelect += '<option value="A"' + (member.status === 'A' ? ' selected' : '') + '>啟用</option>';
+                statusSelect += '<option value="S"' + (member.status === 'S' ? ' selected' : '') + '>暫停</option>';
+                statusSelect += '<option value="I"' + (member.status === 'I' ? ' selected' : '') + '>禁用</option>';
+                statusSelect += '</select>';
+
+                var row = '<tr>' +
+                    '<td>' + member.memberId + '</td>' +
+                    '<td>' + member.memberName + '</td>' +
+                    '<td>' + member.account + '</td>' +
+                    '<td>' + statusSelect + '</td>' +
+                    '<td>' + avatarHtml + '</td>' +
+                    '</tr>';
+                document.querySelector('#members-table tbody').innerHTML += row;
+            });
+
+            currentPage = response.data.data.currentPage;
+            totalPages = response.data.data.totalPages;
+            document.querySelector('#prevPage').disabled = currentPage === 0;
+            document.querySelector('#nextPage').disabled = currentPage === totalPages - 1;
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    }
+
+    // 點擊上一頁按鈕事件
+    document.querySelector('#prevPage').addEventListener('click', function() {
+        if (currentPage > 0) {
+            loadMembers(currentPage - 1);
+        }
+    });
+
+    // 點擊下一頁按鈕事件
+    document.querySelector('#nextPage').addEventListener('click', function() {
+        if (currentPage < totalPages - 1) {
+            loadMembers(currentPage + 1);
+        }
+    });
+
+    // 初次加載時調用
+    document.addEventListener('DOMContentLoaded', function() {
+        loadMembers(0);
+    });
+</script>
+</body>
+</html>

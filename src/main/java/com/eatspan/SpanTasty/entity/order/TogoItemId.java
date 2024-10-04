@@ -1,6 +1,7 @@
 package com.eatspan.SpanTasty.entity.order;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -26,6 +27,24 @@ public class TogoItemId implements Serializable {
 		this.togoId = togoId;
 		this.foodId = foodId;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(foodId, togoId);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TogoItemId other = (TogoItemId) obj;
+		return Objects.equals(foodId, other.foodId) && Objects.equals(togoId, other.togoId);
+	}
+	
 	
 	
 }

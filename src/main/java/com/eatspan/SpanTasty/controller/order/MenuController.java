@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException.BadRequest;
@@ -25,6 +26,12 @@ public class MenuController {
 	@Autowired
 	private MenuService menuService;
 	
+	
+//	@GetMapping("/SpanTasty/order/MenuManagement")
+//	public String getMenuPage() {
+//		return "order/MenuManagement";
+//	}
+//	
 	// 有參數：模糊查詢，無參數：查詢全部
 	@GetMapping("/menu")
 	public ResponseEntity<List<MenuEntity>> getFoods(@RequestParam(required = false) String foodName){

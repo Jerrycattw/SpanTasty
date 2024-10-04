@@ -1,7 +1,8 @@
 package com.eatspan.SpanTasty.repository.account;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.eatspan.SpanTasty.entity.account.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Integer> {
@@ -14,5 +15,9 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 	
 	//根據帳號尋找會員
 	Member findByAccount(String account);
+	
+	// 尋找會員
+    Page<Member> findByMemberNameContainingOrAccountContaining(String memberName, String account, Pageable pageable);
+
 
 }

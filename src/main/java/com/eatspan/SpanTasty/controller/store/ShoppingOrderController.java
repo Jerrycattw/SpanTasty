@@ -47,7 +47,6 @@ public class ShoppingOrderController {
 	@Autowired
 	private MemberService memberService;
 	
-	
 	// 導向新增訂單頁面
     @GetMapping("/add")
     public String toAddShoppingOrder(Model model) {
@@ -58,67 +57,65 @@ public class ShoppingOrderController {
         return "store/shopping/addShoppingOrder"; // 返回新增訂單的視圖
     }
 	
+	
     @PostMapping("/addPost")
-    public String addShoppingOrder(@ModelAttribute ShoppingOrder addShoppingOrder,
-                                    @RequestParam("memberId") Integer memberId,
-                                    @RequestParam("productId") Integer productId,
-                                    @RequestParam("shoppingItemQuantity") Integer quantity) {
-
-        // 设置当前日期
-        addShoppingOrder.setShoppingDate(LocalDateTime.now());
+    public String addOrder(@RequestParam Integer memberId,
+                           @RequestParam Integer productId,
+                           @RequestParam Integer shoppingItemQuantity,
+                           Model model) {
         
-        // 假设1为有效状态
-        addShoppingOrder.setShoppingStatus(1); 
+        ShoppingOrder order = shoppingOrderService.addShoppingOrder(memberId, productId, shoppingItemQuantity);
 
-        // 获取商品信息
-        Product product = productService.findProductById(productId);
-        
-        // 设置订单总金额
-        addShoppingOrder.setShoppingTotal(product.getProductPrice() * quantity);
-
-        // 首先保存订单以获取生成的 shoppingId
-        shoppingOrderService.addShoppingOrder(addShoppingOrder);
-
-        // 创建购物项
-        ShoppingItem shoppingItem = new ShoppingItem();
-        ShoppingItemId itemId = new ShoppingItemId();
-        itemId.setProductId(productId);
-        itemId.setShoppingId(addShoppingOrder.getShoppingId()); // 使用刚刚生成的 shoppingId
-        shoppingItem.setId(itemId);
-        shoppingItem.setShoppingItemQuantity(quantity);
-        shoppingItem.setShoppingItemPrice(product.getProductPrice());
-
-        // 将购物项添加到订单
-        List<ShoppingItem> items = new ArrayList<>();
-        items.add(shoppingItem);
-        addShoppingOrder.setItems(items);
-
-        // 保存购物项
-        shoppingItemService.addShoppingItem(shoppingItem); // 确保你有方法来保存购物项
-
-        return "redirect:/shoppingOrder/findAll"; // 重定向到查询所有订单的页面
+        return "redirect:/shoppingOrder/findAll";
     }
 
-
-    
-    
+	
 	@DeleteMapping("/del/{id}")
-	public ResponseEntity<?> deleteShoppingOrder(@PathVariable("id") Integer shoppingOrderId){
-		if(shoppingOrderService.findShoppingOrderById(shoppingOrderId)==null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+	public String deleteShoppingOrder(@PathVariable("id") Integer shoppingOrderId){
 		shoppingOrderService.deleteShoppingOrder(shoppingOrderId);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return "redirect:/shoppingOrder/findAll";
 	}
 	
-	@PutMapping("/update")
-	public ResponseEntity<?> updateShoppingOrder(@RequestBody ShoppingOrder updateShoppingOrder){
-		ShoppingOrder shoppingOrder = shoppingOrderService.updateShoppingOrder(updateShoppingOrder);
-		if(shoppingOrder != null) {
-			return new ResponseEntity<>(shoppingOrder, HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	@GetMapping("/update/{id}")
+	 public String showUpdateForm(@PathVariable("id") Integer shoppingId, Model model) {
+        ShoppingOrder order = shoppingOrderService.findShoppingOrderById(shoppingId);
+        model.addAttribute("shoppingOrder", order);
+        return "store/shopping/updateShoppingOrder"; // 確保這是正確的模板路徑
+    }
+	
+	@PutMapping("/updatePut")
+	public String updateShoppingOrder(
+	        @RequestParam Integer shoppingId,
+	        @RequestParam Integer shoppingStatus,
+	        @RequestParam String shoppingMemo) {
+	    
+	    ShoppingOrder shoppingOrder = new ShoppingOrder();
+	    shoppingOrder.setShoppingId(shoppingId);
+	    shoppingOrder.setShoppingStatus(shoppingStatus);
+	    shoppingOrder.setShoppingMemo(shoppingMemo);
+
+	    shoppingOrderService.updateShoppingOrder(shoppingOrder);
+	    
+	    return "redirect:/shoppingOrder/findAll"; 
 	}
+	
+	
+//	 // 更新訂單
+//    @PutMapping("/{id}")
+//    public ResponseEntity<ShoppingOrder> updateOrder(@PathVariable Integer id, @RequestBody ShoppingOrder shoppingOrder) {
+//        ShoppingOrder updatedOrder = shoppingOrderService.update(id, shoppingOrder);
+//        return updatedOrder != null ? ResponseEntity.ok(updatedOrder) : ResponseEntity.notFound().build();
+//    }
+	
+	
+//	@PutMapping("/update")
+//	public ResponseEntity<?> updateShoppingOrder(@RequestBody ShoppingOrder updateShoppingOrder){
+//		ShoppingOrder shoppingOrder = shoppingOrderService.updateShoppingOrder(updateShoppingOrder);
+//		if(shoppingOrder != null) {
+//			return new ResponseEntity<>(shoppingOrder, HttpStatus.OK);
+//		}
+//		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//	}
 	
 	@GetMapping("/find/{id}")
 	public ResponseEntity<?> findByShoppingOrderId(@PathVariable("id") Integer shoppingOrderId){
