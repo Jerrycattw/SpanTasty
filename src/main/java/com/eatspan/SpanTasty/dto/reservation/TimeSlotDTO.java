@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class TimeSlot {
+public class TimeSlotDTO {
 	
 	private LocalTime slotStar;
 	private LocalTime slotEnd;

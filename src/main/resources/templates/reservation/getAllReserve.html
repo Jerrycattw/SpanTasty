@@ -99,7 +99,7 @@
                     
                         <div class="mb-3">
                             <label for="memberId" class="form-label mb-0">請輸入會員編號:</label>
-                            <input type="number" class="form-control" name="memberId" required />
+                            <input type="number" class="form-control" name="memberId" id="addMemberId" required />
                         </div>
                         
                         <div class="mb-3">
@@ -177,17 +177,20 @@
     });
 
 
-
+    // Ajax查詢可訂位時間
     function getReserveTime() {
         const restaurantId = document.getElementById('addRestaurantId').value;
         const reserveSeat = document.getElementById('addReserveSeat').value;
         const checkDate = document.getElementById('addCheckDate').value;
+        const memberId = document.getElementById('addMemberId').value;
 
         const params = new URLSearchParams({
             restaurantId: restaurantId,
             reserveSeat: reserveSeat,
             checkDate: checkDate
         }).toString();
+
+
 
         axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveCheck?${params}`)
             .then(function (response) {
@@ -214,8 +217,28 @@
 
                         // 按鈕的事件處理（例如，處理點擊事件）
                         button.onclick = function () {
-                            // 這裡放新增訂位函式
+
+                            // 這裡放新增訂位 ajax 函式
                             console.log(`Selected time: ${checkReserve.startTime}`);
+
+                            // 合併時間方法
+                            //const dateStr = "2024-10-03"; // 日期格式 YYYY-MM-DD
+                            //const timeStr = "14:30"; // 時間格式 HH:MM
+                            
+                            // 直接使用 Date 的構造函數
+                            //const dateTime = new Date(dateStr + ' ' + timeStr);
+                            //console.log(dateTime); // 輸出合併後的 Date 對象
+                            const reserveTime = new Date(checkDate + ' ' + checkReserve.startTime);
+
+                            let addReserveDTO = {
+                                reserveSeat: reserveSeat,
+                                reserveTime: reserveTime,
+                                restaurantId: restaurantId,
+                                memberId: memberId
+                            }
+
+                            addReservation(addReserveDTO);
+
                         };
 
 
@@ -252,6 +275,7 @@
             reserveTimeStart: reserveTimeStart ? reserveTimeStart : null,
             reserveTimeEnd: reserveTimeEnd ? reserveTimeEnd : null
         };
+
 
         // 發送查詢訂位訂單的 AJAX 請求
         axios.get('http://localhost:8080/SpanTasty/reserve/getList', { params })
@@ -302,28 +326,22 @@
     }
 
     // 新增訂位的AJAX函數
-    function addReservation() {
-    
+    function addReservation(addReserveDTO) {
         
-        axios.post(`http://localhost:8080/SpanTasty/reserve/add`,params)
+        axios.post(`http://localhost:8080/SpanTasty/reserve/add`, addReserveDTO)
         .then(res => {
-            console.log(res)
+            console.log(res.data)
+            // 插入訂位成功視窗
         })
         .catch(err => {
             console.error(err); 
+            // 插入訂位失敗視窗
         })
 
     }
 	
 	
-	// 合併時間方法
-	//const dateStr = "2024-10-03"; // 日期格式 YYYY-MM-DD
-	//const timeStr = "14:30"; // 時間格式 HH:MM
-	
-	// 直接使用 Date 的構造函數
-	//const dateTime = new Date(dateStr + ' ' + timeStr);
-	
-	//console.log(dateTime); // 輸出合併後的 Date 對象
+
 
 
 
