@@ -177,6 +177,9 @@ public class ProductService {
 		return null;
 	}
 	
+	public Integer findProductPriceByProductId(Integer productId) {
+	    return productRepo.findProductPriceByProductId(productId);
+	}
 	
 	public Optional<Product> findProductByIdS(Integer id) {
 	    return productRepo.findById(id);

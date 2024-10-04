@@ -3,13 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>SearchAllProducts</title>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet"
-          href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script
-            src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <style>
         .custom-button {
             background: none;
@@ -17,45 +14,43 @@
             cursor: pointer;
             color: #9d80f4;
         }
-
         .custom-button-delete {
             color: #6140c4;
         }
-
         h2 {
             font-weight: 900;
             text-align: center;
             font-family: Arial, sans-serif;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             font-family: Arial, sans-serif;
         }
-
         th, td {
             border: 1px solid #dddddd;
             text-align: left;
             padding: 8px;
+            text-align:center ;
         }
-
         th {
             background-color: #f2f2f2;
             font-weight: bold;
+            white-space: nowrap;
+            text-align:center ;
         }
-
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-
         tr:hover {
             background-color: #e2e2e2;
         }
-
         h3 {
             text-align: right;
             font-family: Arial, sans-serif;
+        }
+        .hidden-column {
+            display: none; /* 隱藏類別編號 */
         }
     </style>
 </head>
@@ -66,58 +61,55 @@
         <h2>所有商品資料</h2>
         <table id="productsTable" class="display" border="1">
             <thead>
-            <tr style="background-color: #9D9D9D">
-                <th>商品編號</th>
-                <th>商品名稱</th>
-                <th>商品金額</th>
-                <th>商品照片</th>
-                <th>商品庫存</th>
-                <th>商品狀態</th>
-                <th>商品描述</th>
-                <th>商品類別編號</th>
-                <th>商品類別名稱</th>
-                <th>商品修改</th>
-                <th>商品刪除</th>
-            </tr>
+                <tr style="background-color: #9D9D9D">
+                    <th style=text-align:center>商品編號</th>
+                    <th style=text-align:center>商品名稱</th>
+                    <th style=text-align:center>商品金額</th>
+                    <th style=text-align:center>商品照片</th>
+                    <th style=text-align:center>商品庫存</th>
+                    <th style=text-align:center>商品狀態</th>
+                    <th style=text-align:center>商品描述</th>
+                    <th style=text-align:center class="hidden-column">商品類別編號</th> <!-- 隱藏的列 -->
+                    <th style=text-align:center>商品類別</th>
+                    <th style=text-align:center>商品修改</th>
+                    <th style=text-align:center>商品刪除</th>
+                </tr>
             </thead>
             <tbody>
-            <th:block th:each="product : ${products}">
-                <tr>
-                    <td th:text="${product.productId}"></td>
-                    <td th:text="${product.productName}"></td>
-                    <td th:text="${product.productPrice}"></td>
-                    <td><img th:src="${product.productPicture}" alt="No Image" width="100" height="100"/></td>
-                    <td th:text="${product.productStock}"></td>
-                    <td>
-                        <span th:if="${product.productStatus == 1}">已上架</span>
-                        <span th:if="${product.productStatus == 2}">已停售</span>
-                    </td>
-                    <td th:text="${product.productDescription}"></td>
-                    <td>
-                        <span th:if="${product.productType != null}" th:text="${product.productType.productTypeId}"></span>
-                        <span th:if="${product.productType == null}">無類別</span>
-                    </td>
-                    <td>
-                        <span th:if="${product.productType != null}" th:text="${product.productType.productTypeName}"></span>
-                        <span th:if="${product.productType == null}">無類別</span>
-                    </td>
-                    <td>
-                        <form th:action="@{/product/update/{id}(id=${product.productId})}" method="get">
-                            <button type="submit" class="custom-button">
-                                <i class="fa-regular fa-pen-to-square fa-xl"></i>
-                            </button>
-                        </form>
-                    </td>
-                    <td>
-                        <form th:action="@{/product/del/{id}(id=${product.productId})}" method="post">
-                            <input type="hidden" name="_method" value="delete"/>
-                            <button type="submit" class="custom-button custom-button-delete">
-                                <i class="fa-solid fa-trash-arrow-up fa-xl"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            </th:block>
+                <th:block th:each="product : ${products}">
+                    <tr>
+                        <td th:text="${product.productId}"></td>
+                        <td th:text="${product.productName}"></td>
+                        <td th:text="${product.productPrice}"></td>
+                        <td><img th:src="${product.productPicture}" alt="No Image" width="100" height="100"/></td>
+                        <td th:text="${product.productStock}"></td>
+                        <td>
+                            <span th:if="${product.productStatus == 1}">已上架</span>
+                            <span th:if="${product.productStatus == 2}">已停售</span>
+                        </td>
+                        <td th:text="${product.productDescription}"></td>
+                        <td class="hidden-column" th:text="${product.productType.productTypeId}"></td> <!-- 隱藏的類別編號資料 -->
+                        <td>
+                            <span th:if="${product.productType != null}" th:text="${product.productType.productTypeName}"></span>
+                            <span th:if="${product.productType == null}">無類別</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/product/update/{id}(id=${product.productId})}" method="get">
+                                <button type="submit" class="custom-button">
+                                    <i class="fa-regular fa-pen-to-square fa-xl"></i>
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <form th:action="@{/product/del/{id}(id=${product.productId})}" method="post">
+                                <input type="hidden" name="_method" value="delete"/>
+                                <button type="submit" class="custom-button custom-button-delete" onclick="return confirm('確定要刪除這筆商品嗎？');">
+                                    <i class="fa-solid fa-trash-arrow-up fa-xl"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </th:block>
             </tbody>
         </table>
         <h3>
@@ -127,13 +119,17 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#productsTable').DataTable({
             "paging": true,
             "searching": true,
             "ordering": true,
             "info": true
         });
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        showSidebar('store');
     });
 </script>
 </body>
