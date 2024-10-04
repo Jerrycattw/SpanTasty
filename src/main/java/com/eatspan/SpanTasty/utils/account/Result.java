@@ -5,7 +5,6 @@ public class Result<T> {
 	private String message;
 	private T data;
 
-	// Constructors
 	public Result() {
 	}
 
@@ -15,7 +14,6 @@ public class Result<T> {
 		this.data = data;
 	}
 
-	// Getters and Setters
 	public boolean isSuccess() {
 		return success;
 	}

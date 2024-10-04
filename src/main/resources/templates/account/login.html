@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>搜尋管理員</title>
+<style>
+body {
+	background-color: #1c1c1c;
+	color: #f0f0f0;
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+header h1 {
+	color: #f0f0f0;
+	text-align: center;
+	font-size: 2rem;
+}
+
+main {
+	background-color: #333;
+	padding: 2rem;
+	border-radius: 8px;
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+	width: 300px;
+	text-align: center;
+}
+
+h2 {
+	margin-bottom: 1.5rem;
+	color: #f0f0f0;
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+label {
+	margin-bottom: 0.5rem;
+	color: #b0b0b0;
+}
+
+input {
+	width: 100%;
+	padding: 0.5rem;
+	margin-bottom: 1rem;
+	background-color: #444;
+	border: none;
+	border-radius: 4px;
+	color: #f0f0f0;
+}
+
+input:focus {
+	outline: none;
+	border: 1px solid #888;
+}
+
+button {
+	width: 100%;
+	padding: 0.75rem;
+	background-color: #555;
+	border: none;
+	border-radius: 4px;
+	color: #f0f0f0;
+	font-size: 1rem;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: #666;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+	<main id="contentArea">
+		<header>
+			<h1>登入頁面</h1>
+		</header>
+
+		<h2>請登入</h2>
+		<div>
+			<form id="loginForm">
+				<label for="account">帳號:</label> <input type="text" id="account"
+					name="account" required> <br> <label for="password">密碼:</label>
+				<input type="password" id="password" name="password" required>
+				<br>
+				<button type="submit">登入</button>
+			</form>
+			<div id="errorMessage" class="error-message"></div>
+		</div>
+	</main>
+
+	<script>
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();  // 防止表單的默認提交行為
+
+    // 獲取帳號和密碼
+    const account = document.getElementById('account').value;
+    const password = document.getElementById('password').value;
+
+    // 發送登入請求
+    axios.post('/SpanTasty/admin/login', {
+        account: account,
+        password: password
+    })
+    .then(function (response) {
+        // 檢查回應的 success 狀態
+        if (response.data.success) {
+            // 成功後跳轉
+            window.location.href = "http://localhost:8080/SpanTasty/";
+        } else {
+            // 顯示錯誤訊息
+            document.getElementById('errorMessage').innerText = response.data.message;
+        }
+    })
+    .catch(function (error) {
+        console.error("登入失敗", error);
+        document.getElementById('errorMessage').innerText = '登入失敗，請稍後重試。';
+    });
+});
+    </script>
+</body>
+</html>

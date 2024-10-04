@@ -64,6 +64,9 @@ public class Member {
 
     @Column(name = "status", length = 1)
     private char status;
+    
+    @Column(name = "reason")
+    private String reason;
 
     @Column(name = "login_date")
     private LocalDateTime loginDate;
