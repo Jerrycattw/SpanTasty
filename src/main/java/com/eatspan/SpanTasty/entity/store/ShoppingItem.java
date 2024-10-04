@@ -33,14 +33,35 @@ public class ShoppingItem {
 	@Column(name = "shopping_item_price")
 	private Integer shoppingItemPrice;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@MapsId("productId") // 映射主鍵的 productId避免重複列名
+	@ManyToOne//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", insertable = false, updatable = false)
 	private Product product;
 
 	@ManyToOne
-	@MapsId("shoppingId") // 映射主鍵的 shoppingId避免重複列名
 	@JoinColumn(name = "shopping_id", insertable = false, updatable = false)
 	private ShoppingOrder shoppingOrder;
+
+
+	public ShoppingItem(ShoppingItemId id) {
+		this.id = id;
+	}
+
+	public ShoppingItem(ShoppingItemId id, Integer shoppingItemQuantity) {
+		this.id = id;
+		this.shoppingItemQuantity = shoppingItemQuantity;
+	}
+
+	public ShoppingItem(ShoppingItemId itemId, Integer shoppingItemQuantity2, Integer productPrice,
+			ShoppingOrder savedOrder) {
+	}
+    
+	public ShoppingItem(ShoppingItemId id, Integer shoppingItemQuantity, Integer shoppingItemPrice) {
+	    this.id = id;
+	    this.shoppingItemQuantity = shoppingItemQuantity;
+	    this.shoppingItemPrice = shoppingItemPrice; // 設置價格
+	}
+
+    
+    
 
 }

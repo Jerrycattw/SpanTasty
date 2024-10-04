@@ -1,15 +1,17 @@
 package com.eatspan.SpanTasty.controller.rental;
 
 import java.io.File;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,82 +21,94 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
+import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.service.rental.TablewareService;
 import com.eatspan.SpanTasty.service.rental.TablewareStockService;
+import com.eatspan.SpanTasty.service.reservation.RestaurantService;
 
 @Controller
 @RequestMapping("/tableware")
+@PropertySource("upload.properties")
 public class TablewareController {
+	
 	@Autowired
 	private TablewareService tablewareService;
 	@Autowired
 	private TablewareStockService tablewareStockService;
+	@Autowired
+	private RestaurantService restaurantService;
 	
-	@GetMapping("/getAll")
-	public String showAllTablewares(Model model) {
-		List<Tableware> tablewares = tablewareService.findAllTablewares();
-		model.addAttribute("tablewares",tablewares);
-		return "rental/ShowAllTablewares";
+	@Value("${upload.rentalPath}")
+	private String uploadPath;
+	
+	
+	//導入新增頁面
+	@GetMapping("/add")
+	public String toAddTableware(Model model) {
+		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+		model.addAttribute("restaurants", restaurants);
+		return "rental/addTableware";
 	}
 	
-	@GetMapping("/get")
-	public String findTablewaresBySearch(@RequestParam("keyword") String keyword, Model model) throws IOException {
-		List<Tableware> tablewares = tablewareService.findTablewaresByKeywords(keyword);
-		model.addAttribute("tablewares", tablewares);
-		return "rental/ShowAllTablewares";
-	}
 	
-	@GetMapping("/get/{id}")
-	public String findTablewareById(@PathVariable("id") Integer tablewareId, Model model) {
-		Tableware tableware = tablewareService.findTablewareById(tablewareId);
-		model.addAttribute("tableware", tableware);
-		return "rental/UpdateTableware";
-	}
-	
-//	@GetMapping("/option")
-//	public String findSelectOption(Model model) {
-//		List<String> restaurantNames = restaurantService.getAllRestaurantName();
-//		model.addAttribute("restaurantNames", restaurantNames);
-//		return "rental/SaveTableware";
-//	}
-	
-	@PutMapping("/setStatus")
-	public String updateStatus(@RequestParam("tableware_id") Integer tablewareId, Model model) throws IOException {
-		Tableware tableware = tablewareService.updateTablewareStatus(tablewareId);
-		return "redirect:/tableware/showAll";
+	//新增資料
+	@PostMapping("/addPost")
+	protected String addTablewareAndStocks(@ModelAttribute Tableware tableware, @RequestParam("timg") MultipartFile timg, Model model) throws IOException {
+		tableware.setTablewareStatus(1);
+		
+		File uploadDir = new File(uploadPath);
+		if (!uploadDir.exists()) {
+			uploadDir.mkdirs(); // 确保递归创建目录
+		}
+		if (timg != null && !timg.isEmpty()) {
+			String fileName = timg.getOriginalFilename();
+			String extension = fileName.substring(fileName.lastIndexOf("."));
+			String newFileName = tableware.getTablewareName() + extension;
+			File filePart = new File(uploadPath + File.separator + newFileName);
+			timg.transferTo(filePart);
+			tableware.setTablewareImage("/SpanTasty/upload/rental/" + newFileName);
+			
+			System.out.println("File uploaded: " + newFileName);
+			System.out.println("File path: " + uploadPath + File.separator + newFileName);
+		}
+		tablewareService.addTableware(tableware);
+		
+		
+//		for (TablewareStock stock : tableware.getTablewareStocks()) {
+//	        stock.setTablewareId(tableware.getTablewareId()); // 設定關聯的 tablewareId
+//	        tablewareStockService.addStock(stock);
+//	    }
+		return "redirect:/tableware/getAll";
 	}
 
-	@PutMapping("/set")
-	protected String updateTableware(
-			@RequestParam("tableware_id") Integer tablewareId, 
-			@RequestParam("tableware_name") String tablewareName, 
-			@RequestParam("tableware_deposit") Integer tablewareDeposit, 
-			@RequestParam("tableware_image") MultipartFile timg,
-			@RequestParam("tableware_description") String tablewareDescription,
-			@RequestParam("tableware_status") Integer tablewareStatus,
-			Model model) throws IOException {
+	
+	///更改頁面
+	@GetMapping("/set/{id}")
+	public String toSetTableware(@PathVariable("id") Integer tablewareId, Model model) {
 		Tableware tableware = tablewareService.findTablewareById(tablewareId);
-		tableware.setTablewareName(tablewareName);
-		tableware.setTablewareDeposit(tablewareDeposit);
-		tableware.setTablewareDescription(tablewareDescription);
-		tableware.setTablewareStatus(tablewareStatus);
-		
-        String uploadPath = "C:/upload/tablewareIMG";
+		model.addAttribute("tableware", tableware);
+		return "rental/setTableware";
+	}
+
+	
+	//更改資料
+	@PutMapping("/setPut1")
+	protected String updateTableware(
+			@ModelAttribute Tableware tableware,
+			@RequestParam("tableware_image") MultipartFile timg,
+			Model model) throws IOException {
 	    File fileSaveDir = new File(uploadPath);
 	    if (!fileSaveDir.exists()) {
 	        fileSaveDir.mkdirs();
 	    }
-
 	    if (!timg.isEmpty()) {
 	        String fileName = timg.getOriginalFilename();
 	        String extension = fileName.substring(fileName.lastIndexOf("."));
-	        String newFileName = tablewareName + "_" + System.currentTimeMillis() + extension;
-
+	        String newFileName = tableware.getTablewareName() + "_" + System.currentTimeMillis() + extension;
 	        // 將檔案寫入指定路徑
 	        File fileToSave = new File(uploadPath + File.separator + newFileName);
 	        timg.transferTo(fileToSave);
-
-	        tableware.setTablewareImage("/EEIT187-6/tablewareIMG/" + newFileName);
+	        tableware.setTablewareImage("/SpanTasty/upload/rental/" + newFileName);
 	    } else {
 	        // 如果沒有上傳新的圖片，保留現有圖片
 	        if (timg != null) {
@@ -102,73 +116,32 @@ public class TablewareController {
 	        }
 	    }
 	    tablewareService.addTableware(tableware);
-	    return "redirect:/Tableware/getAll";
+	    return "redirect:/tableware/getAll";
 	}
 	
-	@PostMapping("/add")
-	protected String addTablewareAndStocks(
-			@RequestParam("tableware_name") String tablewareName, 
-			@RequestParam("tableware_deposit") Integer tablewareDeposit, 
-			@RequestParam("tableware_image") MultipartFile timg,
-			@RequestParam("tableware_description") String tablewareDescription,
-			@RequestParam Map<String, String> allParams,
-			Model model) throws IOException {
-		
-		Tableware tableware = new Tableware();
-		tableware.setTablewareName(tablewareName);
-		tableware.setTablewareDeposit(tablewareDeposit);
-		tableware.setTablewareDescription(tablewareDescription);
-		tableware.setTablewareStatus(1);
-		
-		String uploadPath = "C:/upload/tablewareIMG";
-		File uploadDir = new File(uploadPath);
-		if (!uploadDir.exists()) {
-			uploadDir.mkdirs(); // 确保递归创建目录
-		}
-		if (!timg.isEmpty()) {
-			String fileName = timg.getOriginalFilename();
-			String extension = fileName.substring(fileName.lastIndexOf("."));
-			String newFileName = tablewareName + "_" + System.currentTimeMillis() + extension;
-			File filePart = new File(uploadPath + File.separator + newFileName);
-			timg.transferTo(filePart);
-			tableware.setTablewareImage("/EEIT187-6/tablewareIMG/" + newFileName);
-		}
-		tablewareService.addTableware(tableware);
-		
-		int tablewareId = tableware.getTablewareId();
-		
-		List<String> restaurantNameParams = new ArrayList<>();
-		List<String> stockParams = new ArrayList<>();
-		
-		for (Map.Entry<String, String> entry : allParams.entrySet()) {
-			if (entry.getKey().startsWith("restaurantName")) {
-				restaurantNameParams.add(entry.getValue());
-			} else if (entry.getKey().startsWith("stock")) {
-				stockParams.add(entry.getValue());
-			}
-		}
-		
-		List<TablewareStock> tablewareStocks = new ArrayList<>();
-		for (int i = 0; i < restaurantNameParams.size(); i++) {
-			String restaurantNameParam = restaurantNameParams.get(i);
-			String stockParam = stockParams.get(i);
-			System.out.println(restaurantNameParam);
-			if (restaurantNameParam != null && !restaurantNameParam.isEmpty() && stockParam != null && !stockParam.isEmpty()) {
-//				Integer restaurantId = restaurantService.getRestaurantId(restaurantNameParam);
-				Integer restaurantId =null;
-				Integer stock = Integer.parseInt(stockParam);
-				
-				TablewareStock tablewareStock = new TablewareStock();
-				tablewareStock.setRestaurantId(restaurantId);
-				tablewareStock.setTablewareId(tablewareId);
-				tablewareStock.setStock(stock);
-				tablewareStocks.add(tablewareStock);
-			}
-		}
-		// 批量插入库存记录
-		for (TablewareStock tablewareStock : tablewareStocks) {
-			tablewareStockService.addStock(tablewareStock);
-		}
-		return "redirect:/Tableware/showAll";
+	
+	//更改狀態
+	@PutMapping("/setPut2/{id}")
+	public String updateStatus(@PathVariable("id") Integer tablewareId, Model model) {
+		tablewareService.updateTablewareStatus(tablewareId);
+		return "redirect:/tableware/getAll";
 	}
+	
+	
+	//查詢全部
+	@GetMapping("/getAll")
+	public String getAllTablewares(Model model) {
+		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		model.addAttribute("tablewares",tablewares);
+		return "rental/getAllTablewares";
+	}
+	
+	
+//	查詢餐具(By關鍵字 Maybe use ajax)
+//	@GetMapping("/get")
+//	public String findTablewaresBySearch(@RequestParam("keyword") String keyword, Model model) throws IOException {
+//		List<Tableware> tablewares = tablewareService.findTablewaresByKeywords(keyword);
+//		model.addAttribute("tablewares", tablewares);
+//		return "rental/searchTablewares";
+//	}
 }

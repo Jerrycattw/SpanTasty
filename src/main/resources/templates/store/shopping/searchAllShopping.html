@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>SearchAllShopping</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script
+	src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<style>
+.custom-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #9d80f4;
+}
+
+.custom-button-delete {
+	color: #6140c4;
+}
+
+h2 {
+	text-align: center;
+	font-family: Arial, sans-serif;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-family: Arial, sans-serif;
+}
+
+th, td {
+	border: 1px solid #dddddd;
+	text-align: left;
+	padding: 8px;
+}
+
+th {
+	background-color: #f2f2f2;
+	font-weight: bold;
+}
+
+tr:nth-child(even) {
+	background-color: #f9f9f9;
+}
+
+tr:hover {
+	background-color: #e2e2e2;
+}
+
+h3 {
+	text-align: right;
+	font-family: Arial, sans-serif;
+}
+</style>
+</head>
+<body>
+	<div th:replace="~{display/navbar}"></div>
+	<div class="content" id="content">
+		<div align="center">
+			<h2>所有訂單資料</h2>
+			<table id="shoppingTable" class="display" border="1">
+				<thead>
+					<tr style="background-color: #9D9D9D">
+						<th>訂單編號</th>
+						<th>訂單總金額</th>
+						<th>訂單日期</th>
+						<th>會員編號</th>
+						<th>會員姓名</th>
+						<th>訂單狀態</th>
+						<th>訂單備註</th>
+						<th>訂單修改</th>
+						<th>訂單刪除</th>
+					</tr>
+				</thead>
+				<tbody>
+					<th:block th:each="shopping : ${shoppings}">
+						<tr>
+							<td><a
+								th:href="@{/shoppingItem/itemDetail/{id}(id=${shopping.shoppingId})}" 
+								th:text="${shopping.shoppingId}" ></a></td>
+							<td th:text="${shopping.shoppingTotal}"></td>
+							<td th:text="${shopping.formattedShoppingDate}"></td>
+							<td th:text="${shopping.memberId}"></td>
+							<td
+								th:text="${shopping.member != null ? shopping.member.memberName : '無會員資料'}"></td>
+							<td><span th:switch="${shopping.shoppingStatus}"> <span
+									th:case="1">待出貨</span> <span th:case="2">已出貨</span> <span
+									th:case="3">其他</span> <span th:case="*">未知狀態</span> <!-- 若有其他狀態顯示此信息 -->
+							</span></td>
+							<td th:text="${shopping.shoppingMemo}"></td>
+							<td>
+								<form
+									th:action="@{/shoppingOrder/update/{id}(id=${shopping.shoppingId})}"
+									method="get">
+									<button type="submit" class="custom-button">
+										<i class="fa-regular fa-pen-to-square fa-xl"></i>
+									</button>
+								</form>
+							</td>
+							<td>
+								<form
+									th:action="@{/shoppingOrder/del/{id}(id=${shopping.shoppingId})}"
+									method="post">
+									<input type="hidden" name="_method" value="delete" />
+									<button type="submit"
+										class="custom-button custom-button-delete"
+										onclick="return confirm('確定要刪除這筆訂單嗎？');">
+										<i class="fa-solid fa-trash-arrow-up fa-xl"></i>
+									</button>
+								</form>
+							</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<h3>
+				共<span th:text="${shoppings != null ? shoppings.size() : 0}">0</span>筆訂單資料
+			</h3>
+		</div>
+	</div>
+
+	<script>
+    $(document).ready(function() {
+        $('#shoppingTable').DataTable({
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true
+        });
+    });
+    </script>
+	<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        showSidebar('store');
+    });
+    </script>
+</body>
+</html>

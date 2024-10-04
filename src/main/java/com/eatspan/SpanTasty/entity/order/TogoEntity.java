@@ -2,12 +2,22 @@ package com.eatspan.SpanTasty.entity.order;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +48,8 @@ public class TogoEntity implements Serializable {
 	@Column(name = "total_price")
 	private Integer totalPrice;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC+8")
 	@Column(name = "togoCreateTime")
 	private LocalDateTime togoCreateTime;
 	
@@ -58,6 +70,11 @@ public class TogoEntity implements Serializable {
 	
 	@Column(name = "final_total")
 	private Integer finalTotal;   //discount
+	
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "togo", cascade = CascadeType.ALL)
+	private List<TogoItemEntity> togoItems = new ArrayList<TogoItemEntity>();
+	
 	
 }
 

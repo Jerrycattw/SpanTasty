@@ -57,6 +57,7 @@ public class TablewareService {
 			int currentStatus = tableware.getTablewareStatus();
 			int newStatus = (currentStatus == 1) ? 2 : 1;
 			tableware.setTablewareStatus(newStatus);
+			tablewareRepository.save(tableware);
 			return tableware;
 		}
 		return null;

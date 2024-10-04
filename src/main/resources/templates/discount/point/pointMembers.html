@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>員工資料</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+table {
+    width: 50%;
+    border-collapse: collapse;
+    margin-top: 20px; /* 讓出空間給上方按鈕 */
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center; /* 文字置中 */
+}
+th {
+    background-color: #f2f2f2;
+}
+
+    .top{display:flex; justify-content: space-between;}
+    .in{display:flex; justify-content: flex-end;}
+    .but{vertical-align: middle}
+    .search{height:16px;}
+    .notice{margin:0;font-size:50%;}
+</style>
+</head>
+<body >
+<div class="content" id="content">
+<div class="container" id="container">
+<div class="top">
+<input type="hidden" name="memberID" >
+<h1>查詢點數</h1>
+</div>
+<div >
+	<input type="text" class="search" name="search" id="search" placeholder="搜尋會員編號、姓名及手機等資訊" th:value="${keyWord}" }>&nbsp;&nbsp;&nbsp;&nbsp;<button id="doSearch" onclick="search()"><i class="fa-solid fa-magnifying-glass"></i></button>
+	<p class="notice"></p>	
+	  
+</div>
+<br>
+<div id="divIn"class="in"><button class="but" id="batchAdd" type="submit">批次新增</button></div>
+
+<table border="1" id="table" >
+	<tr>
+		<th><input type="checkbox" id="checkAll"></th>
+		<th>會員編號</th>
+		<th>姓名</th>
+		<th>電話</th>
+		<th>總點數</th>
+		<th>即將到期</th>
+		<th>到期日</th>
+		<th>動作</th>
+	</tr>
+<th:block th:each="pointMember : ${pointMembers}">
+	<tr >
+		<td><input type="checkbox" name="selectedMembers" th:value="${pointMember.memberId}"></td>
+            <td th:text="${pointMember.memberId}"></td>
+            <td th:text="${pointMember.memberName}"></td>
+            <td th:text="${pointMember.phone}"></td>
+            <td th:text="${pointMember.totalPointBalance}"></td>
+            <td th:text="${pointMember.expiringPoints}"></td>
+			<td th:text="${pointMember.expiryDate}"></td>
+		<td>
+			<button th:onclick="|window.location.href='@{/point/member/{id}(id=${pointMember.memberId})}'|">檢視</button>			
+		</td>
+	</tr>
+</table>
+<h3 th:text="'共 ' + ${#lists.size(pointMembers)} + ' 筆會員點數資料'"></h3>
+<th:block>
+
+</div>
+</div>
+<script>
+	document.addEventListener('DOMContentLoaded', (event) => {
+	    let checkAll = document.getElementById("checkAll");
+	    checkAll.addEventListener('change', function() {
+	        let checkboxes = document.getElementsByName("selectedMembers");
+	        for (let index = 0; index < checkboxes.length; index++) {
+	            checkboxes[index].checked = checkAll.checked;
+	        }
+	    });	    
+	});
+	//document.getElementById("doSearch").addEventListener('click',function(event){
+	//	if(document.getElementById("search").value.trim()===""){
+	//		event.preventDefault();
+	//		alert("搜尋欄位不能空白");
+	//	}
+	//)
+	
+	let w=document.getElementById("table").offsetWidth
+	document.getElementById("divIn").style.width = w + "px";
+	document.getElementById("search").style.width = w*0.8+"px" ;
+	
+</script>
+<script>
+    document.getElementById("batchAdd").addEventListener('click', function() {
+        let selectedMembers = [];
+        let checkboxes = document.getElementsByName("selectedMembers");
+
+        // 收集所有打勾的複選框
+        for (let index = 0; index < checkboxes.length; index++) {
+            if (checkboxes[index].checked) {
+                selectedMembers.push(checkboxes[index].value);
+            }
+        }
+
+        if (selectedMembers.length === 0) {
+            alert("請選擇至少一個會員");
+            return;
+        }
+
+        // 使用 fetch API 發送 AJAX 請求
+        fetch('/SpanTasty/point/batchAdd', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(selectedMembers)
+        })
+        .then(response => response.text())
+        .then(data => {console.log(data);
+            if (data==='success') {
+                // 你可以在這裡執行刷新頁面或其他操作
+                
+                window.location.href='/SpanTasty/point/batchAdd/members';
+            } else {
+                alert("新增點數失敗");
+            }
+       })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("請求失敗");
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+         showSidebar('points');
+    });
+</script>
+<script th:inline="javascript">
+function search() {
+    var searchTerm = document.getElementById('search').value;
+    var baseUrl = /*[[@{/point/search}]]*/ '/point/search';
+    window.location.href = baseUrl + '?q=' + encodeURIComponent(searchTerm);
+}
+</script>
+</body>
+</html>

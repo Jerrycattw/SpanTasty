@@ -45,8 +45,28 @@ public class RentController {
 	private MemberService memberService;
 	
 	
+	//查詢下拉式選單
+	@GetMapping("/add")
+	public String toAddAndSearch(@RequestParam(name = "action") String action , Model model) {
+		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+		List<Member> members = memberService.findAllMembers();
+		model.addAttribute("restaurants" ,restaurants);
+		model.addAttribute("members" ,members);
+		if("add".equals(action)) {
+			List<Tableware> tablewares = tablewareService.findAllTablewares();
+			model.addAttribute("tablewares" ,tablewares);
+			return "rental/addRent";
+		}else if ("search".equals(action)) {
+			List<Rent> rents = rentService.findAllRents();
+			model.addAttribute("rents" ,rents);
+			return "rental/getRents";
+		}
+		return null;
+	}
+	
+	
 	//新增訂單 訂單明細
-	@PostMapping("/add")
+	@PostMapping("/addPost")
 	public String addRentAndRentItems(@ModelAttribute Rent rent, Model model) {
 		Date rentDate = new Date();
 		Calendar calendar = Calendar.getInstance();
@@ -65,71 +85,31 @@ public class RentController {
 	        rentItem.setReturnStatus(1);
 	        rentItemService.addRentItem(rentItem);
 	    }
-		return "redirect:/rent/showAll";
+		return "redirect:/rent/getAll";
 	}
 	
 	
 	//刪除訂單 訂單明細
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/del/{id}")
 	public String deleteRentAndRentItems(@PathVariable("id") Integer rentId, Model model) {
-		if(rentService.findRentById(rentId) != null) {
-			rentItemService.deleteRentItems(rentId);
-			rentService.deleteRent(rentId);
-		}
-		return "redirect:/rent/showAll";
+		rentItemService.deleteRentItems(rentId);
+		rentService.deleteRent(rentId);
+		return "redirect:/rent/getAll";
 	}
 	
 	
-	//更改訂單
-	@PutMapping("/update")
-	protected String updateRent(@ModelAttribute Rent rent, Model model) {
-		rentService.addRent(rent);
-		return "redirect:/rent/showAll";
-	}
 
-	
-	//查詢所有訂單
-	@GetMapping("showAll")
-	public String getAllRents(Model model) {
-		List<Rent> rents = rentService.findAllRents();
-		model.addAttribute("rents",rents);
-		return "rental/ShowAllRents";
-	}
-	
-	
-	//查詢下拉式選單
-	@GetMapping("option")
-	public String getRentOption(@RequestParam(name = "action") String action , Model model) {
-		//暫時修改
-		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants(1);
-		List<Member> members = memberService.findAllMembers();
-		model.addAttribute("restaurants" ,restaurants);
-		model.addAttribute("members" ,members);
-		if("add".equals(action)) {
-			List<Tableware> tablewares = tablewareService.findAllTablewares();
-			model.addAttribute("tablewares" ,tablewares);
-			return "rental/addRent";
-		}else if ("search".equals(action)) {
-			List<Rent> rents = rentService.findAllRents();
-			model.addAttribute("rents" ,rents);
-			return "rental/searchRents";
-		}
-		return null;
-	}
-
-	
 	//查詢訂單(By訂單編號)
-	@GetMapping("/get/{id}")
-	public String getById(@PathVariable("id") Integer rentId, @RequestParam("action") String action, Model model) {
-		//暫時修改
-		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants(1);
+	@GetMapping("/set/{id}")
+	public String toSetRent(@PathVariable("id") Integer rentId, @RequestParam("action") String action, Model model) {
+		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		model.addAttribute("restaurants" ,restaurants);
 		Rent rent = rentService.findRentById(rentId);
 		model.addAttribute("rent", rent);
 		if ("update".equals(action)) {
 			List<Member> members = memberService.findAllMembers();
 			model.addAttribute("members" ,members);
-			return "rental/updateRent";
+			return "rental/setRent";
 		} else if ("return".equals(action)) {
 			Date returnDate = new Date();
 			Calendar calendar = Calendar.getInstance();
@@ -140,9 +120,43 @@ public class RentController {
 	}
 	
 	
+	//更改訂單
+	@PutMapping("/setPut1")
+	protected String updateRent(@ModelAttribute Rent rent, Model model) {
+		rentService.addRent(rent);
+		return "redirect:/rent/getAll";
+	}
+	
+	
+	//歸還訂單
+	@PutMapping("/setPut2")
+	public String returnRent(@ModelAttribute Rent rent, Model model) {
+		try {
+			Date returnDate = new Date();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(returnDate);
+			rent.setReturnDate(returnDate);
+			rentService.addRent(rent);
+			return "redirect:/rent/getAll";
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	
+	//查詢所有訂單
+	@GetMapping("getAll")
+	public String getAllRents(Model model) {
+		List<Rent> rents = rentService.findAllRents();
+		model.addAttribute("rents",rents);
+		return "rental/getAllRents";
+	}
+	
+	
 	//查詢訂單(By多個條件)
-	@GetMapping("/search")
-	public String findRentsBySearch(
+	@GetMapping("/get")
+	public String getRentsBySearch(
 			@ModelAttribute Rent rent,
 			@RequestParam(value = "rentDateStart", required = false) String rentDateStartStr,
 	        @RequestParam(value = "rentDateEnd", required = false) String rentDateEndStr,
@@ -157,7 +171,7 @@ public class RentController {
 	        
 			List<Rent> rents = rentService.findRentsByCriteria(rentId, memberId, restaurantId, rentStatus, rentDateStart, rentDateEnd);
 			model.addAttribute("rents", rents);
-			return "rental/ShowAllRents";
+			return "rental/getAllRents";
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -167,36 +181,9 @@ public class RentController {
 	
 	//查詢訂單(By過期未歸還)
 	@GetMapping("/overtime")
-	public String findOvertimeRents(Model model) {
+	public String getOvertimeRents(Model model) {
 		List<Rent> rents = rentService.findOvertimeRents();
 		model.addAttribute("rents", rents);
-		return "rental/ShowAllRents";
+		return "rental/getAllRents";
 	}
-	
-	
-	
-	@PutMapping("/return")
-	public String returnRent(
-			@RequestParam("rent_id") Integer rentId,
-//			@RequestParam("restaurantName") String restaurantName, 
-			Model model) {
-		try {
-			Date returnDate = new Date();
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(returnDate);
-//			Integer returnRestaurantId = restaurantService.getRestaurantId(restaurantName);
-			Integer returnRestaurantId = null;
-			Rent rent = rentService.findRentById(rentId);
-			rent.setReturnDate(returnDate);
-			rent.setReturnRestaurantId(returnRestaurantId);
-			rentService.addRent(rent);
-			return "redirect:/rent/showAll";
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	
-	
 }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>環保用具</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<style>
+	#card-warning {
+	  background-color: #ffd966; 
+	}
+	#btn-yellow{
+		background-color: #f9e79f;
+	}
+	#btn-orange{
+		background-color: #f7d6a3;
+	}
+	
+</style>
+</head>
+<body>
+<div th:replace="~{display/navbar}" ></div>
+
+<div class="content" id="content">
+ <div class="container mt-5">
+  <div class="row justify-content-center">
+   <div class="col-11">
+    <div class="card shadow" id="card-warning" >
+	<div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+		<h2 class="mb-0">環保餐具系統</h2>
+		<a th:href="@{/tableware/add}" class="btn btn-sm" id="btn-yellow">新增餐具</a>
+	</div>
+	<div class="table-responsive">
+		<table class="table table-warning table-striped text-center" id="table">
+		<thead>
+		<tr>
+			<th>用具編號</th>
+			<th>用具名稱</th>
+			<th>押金金額</th>
+			<th>用具圖片</th>
+			<th>用具描述</th>
+			<th>用具狀態</th>
+			<th>更改狀態</th>
+		</tr>
+		</thead>
+		
+		<tbody>
+		<th:block th:each=" tableware : ${tablewares}">
+		<tr>
+			<td th:text="${tableware.tablewareId}">用具編號</td>
+			<td th:text="${tableware.tablewareName}">用具名稱</td>
+			<td th:text="${tableware.tablewareDeposit}">押金金額</td>
+			<td th:text="${tableware.tablewareImage}">用具圖片</td>
+			<td th:text="${tableware.tablewareDescription}">用具描述</td>
+			<td class="align-middle">
+				<span th:switch="${tableware.tablewareStatus}">
+				  <span th:case="1" class="badge bg-success text-white">上架中</span>
+				  <span th:case="2" class="badge bg-danger text-white">下架中</span>
+				</span>
+			</td>
+			<td class="align-middle">
+				<form th:action="@{/tableware/setPut2/{id}(id=${tableware.tablewareId})}" th:method="post">
+               		<input type="hidden" name="_method" value="put"/>
+               		<input type="submit" th:value="更改狀態" class="btn btn-sm" id="btn-orange">
+               	</form>
+			</td>
+		</tr>
+		</th:block>
+		</tbody>
+		</table>
+	</div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		showSidebar('rental');
+	});
+</script>
+<script th:src="@{/js/bootstrap.bundle.min.js}" ></script>
+<script th:src="@{/js/jquery-3.7.1.min.js}" ></script>
+<script th:src="@{/js/axios.min.js}" ></script>
+</body>
+</html>

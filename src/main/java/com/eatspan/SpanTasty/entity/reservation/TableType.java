@@ -27,13 +27,18 @@ public class TableType {
 	private String tableTypeId;
 	
 	@Column(name = "table_type_name")
-	private String tableTypeName;
+	private Integer tableTypeName;
 	
 	
 	// mapped=> RestaurantTable 下 private TableType tableType;
 	@JsonIgnore //該屬性不要做JSON序列化避免無線迴圈 //預設lazy
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "tableType", cascade = CascadeType.ALL)
 	private List<RestaurantTable> restaurantTables = new ArrayList<RestaurantTable>();
+	
+	
+	@JsonIgnore //該屬性不要做JSON序列化避免無線迴圈 //預設lazy
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "tableType", cascade = CascadeType.ALL)
+	private List<Reserve> reserves = new ArrayList<Reserve>();
 	
 
 }

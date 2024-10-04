@@ -112,15 +112,16 @@ body {
                     break;
                 case 'store':
                     menuItems = `
-                        <a href="/EEIT187-6/Product/AddProduct">新增商品</a>
-                        <a href="/EEIT187-6/ProductController/searchAllProduct">查詢所有商品</a>
-                        <a href="/EEIT187-6/ShoppingController/showAddOrder">新增訂單</a>
-                        <a href="/EEIT187-6/ShoppingController/searchAllShopping">查詢所有訂單</a>
+                        <a href="/SpanTasty/product/add">新增商品</a>
+                        <a href="/SpanTasty/product/findAll">查詢所有商品</a>
+                        <a href="/SpanTasty/shoppingOrder/add">新增訂單</a>
+                        <a href="/SpanTasty/shoppingOrder/findAll">查詢所有訂單</a>
+                        <a href="/SpanTasty/shoppingCart/addShoppingCart">購物車</a>
                     `;
                     break;
                 case 'order':
                     menuItems = `
-                        <a href="/EEIT187-6/MenuController/getAll">菜單管理</a>
+                        <a href="/SpanTasty/order/MenuManagement.html">菜單管理</a>
                         <a href="/EEIT187-6/togo/GetMenu.html">菜單查詢</a>
                         <a href="/EEIT187-6/TogoController/getAll">訂單管理</a>
                         <a href="/EEIT187-6/togo/GetTogo.html">訂單查詢</a>
@@ -128,19 +129,16 @@ body {
                     break;
                 case 'rental':
                     menuItems = `
-                        <a href="/SpanTasty/tableware/showAll">環保用具管理</a>
-                        <a href="/SpanTasty/tablewareStock/showAll">環保用具庫存管理</a>
-                        <a href="/SpanTasty/rent/showAll">租借訂單管理</a>
-                        <a href="/SpanTasty/rentItem/showAll">租借訂單項目管理</a>
+                        <a href="/SpanTasty/tableware/getAll">餐具管理</a>
+                        <a href="/SpanTasty/stock/getAll">餐具庫存管理</a>
+                        <a href="/SpanTasty/rent/getAll">租借訂單管理</a>
                     `;
                     break;
                 case 'reservation':
                     menuItems = `
                         <a href="/SpanTasty/restaurant/getAll">餐廳管理</a>
-                        <a href="">桌位種類管理</a>
-                        <a href="">新增訂位</a>
-                        <a href="">查詢訂位</a>
-                        <a href="">查詢所有訂位</a>
+                        <a href="/SpanTasty/tabletype/getAll">桌位種類管理</a>
+                        <a href="/SpanTasty/reserve/getAll">訂位管理</a>
                     `;
                     break;
                 case 'points':
