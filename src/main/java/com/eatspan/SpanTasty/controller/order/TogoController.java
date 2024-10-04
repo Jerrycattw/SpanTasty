@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eatspan.SpanTasty.entity.order.TogoEntity;
@@ -50,7 +49,7 @@ public class TogoController {
 		return ResponseEntity.ok(togoService.getAllTogo());
 	}
 	
-	@GetMapping("/togo/{foodId}")
+	@GetMapping("/togo/{togoId}")
 	public ResponseEntity<TogoEntity> getTogoById(@PathVariable Integer togoId) {
 		return ResponseEntity.ok(togoService.getTogoById(togoId));
 	}

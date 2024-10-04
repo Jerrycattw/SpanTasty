@@ -61,7 +61,7 @@ public class MenuEntity implements Serializable {
 	private FoodKindEntity foodKind;
 	
 	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "menu", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "menu")
 	private List<TogoItemEntity> togoItem = new ArrayList<TogoItemEntity>();
 
 
