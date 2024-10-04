@@ -28,7 +28,7 @@
 	<div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
     <h2 class="mb-0">租借訂單系統</h2>
     <form method="get" class="btn" action="/SpanTasty/rent/add">
-		<button type="submit" class="btn btn-sm" id="btn-yellow" name="action" value="search">搜尋訂單</button>
+		<button type="submit" class="btn btn-sm" id="btn-yellow" name="action" value="get">搜尋訂單</button>
 		<button type="submit" class="btn btn-sm" id="btn-yellow" name="action" value="add">新增訂單</button>
 	</form>
 	</div>
@@ -46,7 +46,7 @@
             <th>租借狀態</th>
             <th>訂單備註</th>
             <th>歸還餐廳</th>
-            <th>刪除訂單</th>
+            <th>查看訂單</th>
         </tr>
         </thead>
         <tbody>
@@ -68,9 +68,14 @@
             <td th:text="${rent.rentMemo}">訂單備註</td>
             <td th:text="${rent.returnRestaurantId}">歸還餐廳</td>
             <td class="align-middle">
+				<form th:action="@{/rent/set/{id}(id=${rent.rentId})}" th:method="get">
+					<button type="submit" class="btn bg-success text-white btn-sm" name="action" value="get">查看</button>
+               	</form>
+				<!--
 				<form th:action="@{/rent/del/{id}(id=${rent.rentId})}" th:method="delete">
                		<input type="submit" th:value="刪除訂單" class="btn bg-danger text-white btn-sm">
                	</form>
+               	  -->
 			</td>
         </tr>
     </th:block>

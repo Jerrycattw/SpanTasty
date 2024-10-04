@@ -57,7 +57,8 @@ public class RentController {
 			List<Tableware> tablewares = tablewareService.findAllTablewares();
 			model.addAttribute("tablewares" ,tablewares);
 			return "rental/addRent";
-		}else if ("search".equals(action)) {
+			
+		}else if ("get".equals(action)) {
 			List<Rent> rents = rentService.findAllRents();
 			model.addAttribute("rents" ,rents);
 			return "rental/getRents";
@@ -133,19 +134,27 @@ public class RentController {
 	//查詢訂單(By訂單編號)
 	@GetMapping("/set/{id}")
 	public String toSetRent(@PathVariable("id") Integer rentId, @RequestParam("action") String action, Model model) {
-		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
-		model.addAttribute("restaurants" ,restaurants);
 		Rent rent = rentService.findRentById(rentId);
 		model.addAttribute("rent", rent);
 		if ("update".equals(action)) {
+			List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+			model.addAttribute("restaurants" ,restaurants);
 			List<Member> members = memberService.findAllMembers();
 			model.addAttribute("members" ,members);
 			return "rental/setRent";
+			
 		} else if ("return".equals(action)) {
+			List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+			model.addAttribute("restaurants" ,restaurants);
 			Date returnDate = new Date();
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(returnDate);
-			return "rental/returnRent";
+			return "rental/setRentReturn";
+			
+		}else if("get".equals(action)){
+			List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+			model.addAttribute("rentItems",rentItems);
+			return "rental/getRentAndItems";
 		}
 		return null;
 	}
@@ -202,7 +211,7 @@ public class RentController {
 	        
 			List<Rent> rents = rentService.findRentsByCriteria(rentId, memberId, restaurantId, rentStatus, rentDateStart, rentDateEnd);
 			model.addAttribute("rents", rents);
-			return "rental/getAllRents";
+			return "rental/getRents";
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

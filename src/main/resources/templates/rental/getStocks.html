@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新增環保用具</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<style>
+.h {
+	text-align: center;
+}
+form {
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background-color: #ffd966;
+}
+.stock-input{
+	width: 86%;
+	padding: 5px;
+	margin-bottom: 0px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+#btn-yellow{
+		background-color: #f9e79f;
+		border: 1px solid black;
+	}
+</style>
+</head>
+<body>
+      <div th:replace="~{display/navbar}"></div>
+    <div class="content" id="container">
+        <h3 class="h">請選擇想搜尋餐廳或餐具</h3>
+		<form th:action="@{/stock/get}" method="get">
+        <a th:href="@{/stock/getAll}" class="btn btn-sm mb-1" id="btn-yellow" >返回</a>
+        <table class="table table-warning table-striped" id="table">
+            <tr><td>用具名稱: 
+                    <select name="tablewareId" class="stock-input">
+						<option value="" selected disabled>請選擇餐具編號</option>
+						<option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:text="${tableware.tablewareName}"></option>
+					</select>
+            </td></tr>
+            <tr><td>
+                    餐廳名稱:
+                    <select name="restaurantId" class="stock-input">
+						<option value="" selected disabled>請選擇餐廳名稱</option>
+						<option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+					</select>
+            </td></tr>
+        </table>
+		<input type="submit" value="確定" />
+		</form>
+    </div>
+    <script>
+		document.addEventListener("DOMContentLoaded", function() {
+			showSidebar('rental');
+		});
+	</script>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script> 
+</body>
+
+</html>
