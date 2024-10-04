@@ -3,6 +3,7 @@ package com.eatspan.SpanTasty.utils.discount;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 public class DateUtils {
@@ -15,6 +16,16 @@ public class DateUtils {
 		}
 
 	}
+	
+	public static LocalDate getLocalDateFromString(String dateStr) {
+		try {
+		    LocalDate localDate = LocalDate.parse(dateStr);
+		    return localDate;
+		} catch (DateTimeParseException e) {
+			return null;
+		}
+	}
+	
 	
 	public static String getStringFromDate(Date date) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
