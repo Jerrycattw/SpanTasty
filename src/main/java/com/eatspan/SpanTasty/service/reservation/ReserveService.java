@@ -8,11 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.eatspan.SpanTasty.dto.reservation.ReserveCheckDTO;
-import com.eatspan.SpanTasty.dto.reservation.TimeSlot;
+import com.eatspan.SpanTasty.dto.reservation.TimeSlotDTO;
 import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.entity.reservation.TableType;
@@ -32,6 +31,11 @@ public class ReserveService {
 	
 	// 新增訂位
 	public Reserve addReserve(Reserve reserve) {
+		
+		if(reserve.getFinishedTime()==null) {
+			reserve.setFinishedTime(reserve.getReserveTime().plusMinutes(reserve.getRestaurant().getEattime()));
+		}
+		
 		return reserveRepository.save(reserve);
 	}
 	
@@ -78,11 +82,11 @@ public class ReserveService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid restaurant ID"));
 
         // 根據餐廳的營業時間與每個時間段的用餐限制，計算出時間段
-        List<TimeSlot> timeSlots = generateTimeSlots(restaurant);
+        List<TimeSlotDTO> timeSlots = generateTimeSlots(restaurant);
 
         List<ReserveCheckDTO> reserveChecks = new ArrayList<>();
 
-        for (TimeSlot timeSlot : timeSlots) {
+        for (TimeSlotDTO timeSlot : timeSlots) {
             // 使用自定義的查詢方法，查詢每個時間段的預訂數量與總桌數
             Integer reservedTableCount = reserveRepository.countReservationsInTimeSlot(restaurantId, tableTypeId, checkDate, timeSlot.getSlotStar(), timeSlot.getSlotEnd());
             Integer totalTableCount = reserveRepository.countAvailableTables(restaurantId, tableTypeId);
@@ -96,14 +100,14 @@ public class ReserveService {
     
     
     // 計算餐廳的所有可用時段
-    private List<TimeSlot> generateTimeSlots(Restaurant restaurant) {
-        List<TimeSlot> timeSlots = new ArrayList<>();
+    private List<TimeSlotDTO> generateTimeSlots(Restaurant restaurant) {
+        List<TimeSlotDTO> timeSlots = new ArrayList<>();
         LocalTime slotStart = restaurant.getRestaurantOpentime();
         LocalTime slotEnd;
 
         while (slotStart.isBefore(restaurant.getRestaurantClosetime())) {
             slotEnd = slotStart.plusMinutes(restaurant.getEattime());
-            timeSlots.add(new TimeSlot(slotStart, slotEnd));
+            timeSlots.add(new TimeSlotDTO(slotStart, slotEnd));
             slotStart = slotStart.plusMinutes(30);  // 每30分鐘一個時間段
         }
 

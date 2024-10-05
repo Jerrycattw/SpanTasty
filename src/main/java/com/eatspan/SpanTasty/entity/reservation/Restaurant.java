@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -78,4 +79,7 @@ public class Restaurant {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL)
 	private List<Reserve> reserves = new ArrayList<Reserve>();
 
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL) // 'restaurant' 是 `TablewareStock` 中的字段名
+    private List<TablewareStock> stocks = new ArrayList<>();
 }

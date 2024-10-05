@@ -18,11 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eatspan.SpanTasty.dto.reservation.ReserveCheckDTO;
+import com.eatspan.SpanTasty.dto.reservation.ReserveDTO;
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.entity.reservation.RestaurantTable;
 import com.eatspan.SpanTasty.entity.reservation.RestaurantTableId;
 import com.eatspan.SpanTasty.entity.reservation.TableType;
+import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.service.reservation.ReserveService;
 import com.eatspan.SpanTasty.service.reservation.RestaurantService;
 import com.eatspan.SpanTasty.service.reservation.RestaurantTableService;
@@ -41,6 +44,8 @@ public class ReserveController {
 	private RestaurantService restaurantService;
 	@Autowired
 	private TableTypeService tableTypeService;
+	@Autowired
+	private MemberService memberService;
 	
 	
 	
@@ -100,8 +105,41 @@ public class ReserveController {
 	// 新增訂位的ajax
 	@PostMapping("/add")
 	@ResponseBody
-	public String addReserve(@RequestBody Reserve reserve) {
-		return null;
+	public String addReserve(@RequestBody ReserveDTO reserveDTO) {
+		
+	    Reserve reserve = new Reserve();
+	    
+	    reserve.setReserveSeat(reserveDTO.getReserveSeat());
+	    reserve.setReserveTime(reserveDTO.getReserveTime());
+	    
+	    // 設定member外鍵關聯
+	    Member member = memberService.findMemberById(reserveDTO.getMemberId())
+	        .orElseThrow(() -> new RuntimeException("Member not found"));
+	    reserve.setMember(member);
+	    
+	    
+	    // 設定restaurant外鍵關聯
+	    Restaurant restaurant = restaurantService.findRestaurantById(reserveDTO.getRestaurantId());
+		if (restaurant == null) {
+		    throw new RuntimeException("Restaurant not found");
+		}
+	    reserve.setRestaurant(restaurant);
+	    
+	    
+	    // 根據reserveSeat取得訂位桌子種類
+	    String tableTypeId = reserveService.getTableTypeIdByReserveSeat(reserve.getReserveSeat());
+	    // 設定tableType外鍵關聯
+	    TableType tableType = tableTypeService.findTableTypeById(tableTypeId);
+	    if (tableType == null) {
+	    	throw new RuntimeException("TableType not found");
+	    }
+	    reserve.setTableType(tableType);
+	    
+	    
+	    // 保存訂位
+	    reserveService.addReserve(reserve);
+		
+		return "Reserve add ok";
 	}
 	
 	
