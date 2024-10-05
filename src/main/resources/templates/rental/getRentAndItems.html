@@ -20,6 +20,9 @@
     <div class="card shadow" id="card-warning" >
 	<div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
     <h2 class="mb-0">租借訂單</h2>
+	<form th:action="@{/rent/del/{id}(id=${rent.rentId})}" th:method="delete">
+   		<input type="submit" th:value="刪除訂單" class="btn bg-danger text-white btn-sm">
+   	</form>
     </div>
     <h5>訂單編號: #<span th:text="${rent.rentId}"></span></h5>   
     <h6>租借日期: <span th:text="${#dates.format(rent.rentDate, 'yyyy年MM月dd日')}"></span></h6>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新增環保用具</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<style>
+.h {
+	text-align: center;
+}
+form {
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background-color: #ffd966;
+}
+</style>
+</head>
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <div class="content" id="container">
+        <h2>請輸入關鍵字</h2>
+        <table class="table table-warning table-striped" id="table">
+        <form method="get" class="btn btn-sm" action="/SpanTasty/tableware/getAll">
+			<input type="submit" value="返回">
+		</form>
+            <tr><td>環保用具名或特徵: <input type="text" name="keyword" /></td></tr>
+        </table>
+		<input type="submit" value="確定" />
+    </div>
+   
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+
+</html>

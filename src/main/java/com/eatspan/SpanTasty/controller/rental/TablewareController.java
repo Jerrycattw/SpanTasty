@@ -12,6 +12,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -126,7 +127,7 @@ public class TablewareController {
 	@PutMapping("/setPut1")
 	protected String updateTableware(
 			@ModelAttribute Tableware tableware,
-			@RequestParam("tableware_image") MultipartFile timg,
+			@RequestParam("timg") MultipartFile timg,
 			Model model) throws IOException {
 	    File fileSaveDir = new File(uploadPath);
 	    if (!fileSaveDir.exists()) {
@@ -140,11 +141,6 @@ public class TablewareController {
 	        File fileToSave = new File(uploadPath + File.separator + newFileName);
 	        timg.transferTo(fileToSave);
 	        tableware.setTablewareImage("/SpanTasty/upload/rental/" + newFileName);
-	    } else {
-	        // 如果沒有上傳新的圖片，保留現有圖片
-	        if (timg != null) {
-	        	tableware.setTablewareImage(tableware.getTablewareImage());
-	        }
 	    }
 	    tablewareService.addTableware(tableware);
 	    return "redirect:/tableware/getAll";
@@ -161,18 +157,25 @@ public class TablewareController {
 	
 	//查詢全部
 	@GetMapping("/getAll")
-	public String getAllTablewares(Model model) {
-		List<Tableware> tablewares = tablewareService.findAllTablewares();
-		model.addAttribute("tablewares",tablewares);
+	public String getAllTablewares(Model model, @RequestParam(value="p", defaultValue = "1") Integer page) {
+		Page<Tableware> tablewarePages = tablewareService.findAllTablewarePages(page);
+		model.addAttribute("tablewarePages",tablewarePages);
 		return "rental/getAllTablewares";
 	}
 	
 	
-//	查詢餐具(By關鍵字 Maybe use ajax)
-//	@GetMapping("/get")
-//	public String findTablewaresBySearch(@RequestParam("keyword") String keyword, Model model) throws IOException {
-//		List<Tableware> tablewares = tablewareService.findTablewaresByKeywords(keyword);
-//		model.addAttribute("tablewares", tablewares);
-//		return "rental/searchTablewares";
-//	}
+	//導向搜尋葉面
+	@GetMapping("/toGet")
+	public String toGetTableware() {
+		return "rental/getTablewares";
+	}
+	
+	
+	//	查詢餐具(By關鍵字 Maybe use ajax)
+	@GetMapping("/get")
+	public String findTablewaresBySearch(@RequestParam("keyword") String keyword, Model model) throws IOException {
+		List<Tableware> tablewares = tablewareService.findTablewaresByKeywords(keyword);
+		model.addAttribute("tablewares", tablewares);
+		return "rental/getTablewares";
+	}
 }
