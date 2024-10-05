@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eatspan.SpanTasty.dto.reservation.ReserveCheckDTO;
 import com.eatspan.SpanTasty.dto.reservation.TimeSlotDTO;
@@ -32,9 +33,7 @@ public class ReserveService {
 	// 新增訂位
 	public Reserve addReserve(Reserve reserve) {
 		
-		if(reserve.getFinishedTime()==null) {
-			reserve.setFinishedTime(reserve.getReserveTime().plusMinutes(reserve.getRestaurant().getEattime()));
-		}
+		reserve.setFinishedTime(reserve.getReserveTime().plusMinutes(reserve.getRestaurant().getEattime()));
 		
 		return reserveRepository.save(reserve);
 	}
@@ -47,9 +46,11 @@ public class ReserveService {
 	
 	
 	// 更新訂位
+	@Transactional
 	public Reserve updateReserve(Reserve reserve) {
 		Optional<Reserve> optional = reserveRepository.findById(reserve.getReserveId());
 		if(optional.isPresent()) {
+			reserve.setFinishedTime(reserve.getReserveTime().plusMinutes(reserve.getRestaurant().getEattime()));
 			return reserveRepository.save(reserve);
 		}
 		return null;
@@ -57,13 +58,13 @@ public class ReserveService {
 	
 	
 	// 查詢訂位byId
-	public Reserve findRestaurantById(Integer reserveId) {
+	public Reserve findReserveById(Integer reserveId) {
 		return reserveRepository.findById(reserveId).orElse(null);
 	}
 
 	
 	// 查詢所有訂位
-	public List<Reserve> findAllRestaurants() {
+	public List<Reserve> findAllReserves() {
 		return reserveRepository.findAll();
 	}
 	
