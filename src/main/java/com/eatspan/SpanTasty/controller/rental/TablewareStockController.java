@@ -38,7 +38,7 @@ public class TablewareStockController {
 	public String toAddAndSearch(@RequestParam("action") String action, Model model) {
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
 		//暫時修改
-		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants(1);
+		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants();
 		model.addAttribute("tablewares",tablewares);
 		model.addAttribute("restaurants",restaurants);
 		if ("insert".equals(action)) {
