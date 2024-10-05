@@ -26,6 +26,10 @@ public class TogoServiceImpl implements TogoService {
 	public TogoEntity getTogoById(Integer togoId) {
 		Optional<TogoEntity> optional = togoRepository.findById(togoId);
 		if (optional.isPresent()) {
+//			TogoEntity togo = optional.get();
+//			if (togo.getMemberId() == null) {
+//				togo.setMemberId("");
+//			}
 			return optional.get();
 		}
 		return null;

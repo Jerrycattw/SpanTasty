@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8">
+    <title>查詢</title>
+</head>
+
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <div class="content">
+        <div class="container mt-2">
+            <h1 class="display-6">📍訂單查詢📍</h1>
+            <!-- 查詢輸入框和按鈕 -->
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <input type="text" id="idSearch" class="form-control" placeholder="請輸入訂單編號">
+                </div>
+                <div class="col-md-4">
+                    <button id="idSearchBtn" class="btn btn-primary">查詢</button>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <input type="text" id="phoneSearch" class="form-control" placeholder="請輸入訂購人電話">
+                </div>
+                <div class="col-md-4">
+                    <button id="phoneSearchBtn" class="btn btn-primary">查詢</button>
+                </div>
+            </div>
+            <div class="table-responsive mt-3">
+                <table id="demoData" class="table table-secondary table-striped table-hover text-center">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">訂單編號</th>
+                            <th scope="col">會員編號</th>
+                            <th scope="col">姓名</th>
+                            <th scope="col">電話</th>
+                            <th scope="col">訂單金額</th>
+                            <th scope="col">成立時間</th>
+                            <th scope="col">租借單號</th>
+                            <th scope="col">訂單狀態</th>
+                            <th scope="col">餐廳名稱</th>
+                            <th scope="col">訂單備註</th>
+                            <th scope="col">查看明細</th>
+                            <th scope="col">修改</th>
+                            <th scope="col">刪除</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ajax -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showSidebar('order');
+
+            document.getElementById("idSearchBtn").addEventListener("click", function (e) {
+                const togoId = document.getElementById("idSearch").value;
+
+
+                // 發送 GET 請求到 /togo/{togoId}
+                axios.get(`http://localhost:8080/SpanTasty/order/togo/${togoId}`)
+                    .then(function (response) {
+                        console.log(response.data)
+                        const togoData = response.data;
+
+                        // 清空表格內容
+                        const tbody = document.querySelector("#demoData tbody");
+                        tbody.innerHTML = "";
+						history.pushState(null, "", `http://localhost:8080/SpanTasty/orde/togo/${togoId}`);
+                        // 遍歷JSON數據，動態生成表格內容
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                    <td>${togoData.togoId}</td>
+                    <td>${togoData.memberId}</td>
+                    <td>${togoData.tgName}</td>
+                    <td>${togoData.tgPhone}</td>
+                    <td>${togoData.totalPrice}</td>
+                    <td>${togoData.formattedDate}</td>
+                    <td>${togoData.rentId}</td>
+                    <td>${togoData.togoStatus}</td>
+                    <td>${togoData.restaurantName}</td>
+                    <td>${togoData.togoMemo}</td>
+                    <td><button class="btn btn-info">查看</button></td>
+                    <td><button class="btn btn-warning">修改</button></td>
+                    <td><button class="btn btn-danger">刪除</button></td>
+                `;
+
+                        // 將生成的表格行加入到表格中
+                        tbody.appendChild(row);
+
+                    })
+                    .catch(function (error) {
+                        console.error("查詢訂單時發生錯誤：", error);
+                        alert("查詢失敗，請檢查訂單編號。");
+                    });
+            });
+
+
+        })
+
+
+
+
+    </script>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+
+</html>
