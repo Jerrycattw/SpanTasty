@@ -61,8 +61,6 @@ public class RestaurantService {
 		Pageable pageAble = PageRequest.of(pageNumber-1, 10, Sort.Direction.DESC, "restaurantId");
 		return restaurantRepository.findAll(pageAble);
 	}
-	
-	
 
 
 }
