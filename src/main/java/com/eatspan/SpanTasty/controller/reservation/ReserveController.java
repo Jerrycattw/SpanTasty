@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,8 +110,11 @@ public class ReserveController {
 		
 	    Reserve reserve = new Reserve();
 	    
+	    System.out.println(reserveDTO.getCheckDate());
+	    System.out.println(reserveDTO.getStartTime());
+	    
 	    reserve.setReserveSeat(reserveDTO.getReserveSeat());
-	    reserve.setReserveTime(reserveDTO.getReserveTime());
+	    reserve.setReserveTime(reserveDTO.getCheckDate().atTime(reserveDTO.getStartTime()));
 	    
 	    // 設定member外鍵關聯
 	    Member member = memberService.findMemberById(reserveDTO.getMemberId())
@@ -143,12 +147,57 @@ public class ReserveController {
 	}
 	
 	
+	
+    // ajax 查詢訂位訂單
+    @GetMapping("/get/{id}")
+    @ResponseBody
+    public Reserve getReserve(@PathVariable Integer id) {
+    	return reserveService.findReserveById(id);
+    }
+	
 	// 修改訂位的ajax
 	@PutMapping("/set")
 	@ResponseBody
-	public String updateReserve() {
+	public String updateReserve(@RequestBody ReserveDTO reserveDTO) {
 		
-		return null;
+		System.out.println(reserveDTO.getReserveId());
+	    Reserve reserve = reserveService.findReserveById(reserveDTO.getReserveId());
+	    
+	    System.out.println(reserveDTO.getCheckDate());
+	    System.out.println(reserveDTO.getStartTime());
+	    
+	    reserve.setReserveSeat(reserveDTO.getReserveSeat());
+	    reserve.setReserveTime(reserveDTO.getCheckDate().atTime(reserveDTO.getStartTime()));
+	    
+	    // 設定member外鍵關聯
+	    Member member = memberService.findMemberById(reserveDTO.getMemberId())
+	        .orElseThrow(() -> new RuntimeException("Member not found"));
+	    reserve.setMember(member);
+	    
+	    
+	    // 設定restaurant外鍵關聯
+	    Restaurant restaurant = restaurantService.findRestaurantById(reserveDTO.getRestaurantId());
+		if (restaurant == null) {
+		    throw new RuntimeException("Restaurant not found");
+		}
+	    reserve.setRestaurant(restaurant);
+	    
+	    
+	    // 根據reserveSeat取得訂位桌子種類
+	    String tableTypeId = reserveService.getTableTypeIdByReserveSeat(reserve.getReserveSeat());
+	    // 設定tableType外鍵關聯
+	    TableType tableType = tableTypeService.findTableTypeById(tableTypeId);
+	    if (tableType == null) {
+	    	throw new RuntimeException("TableType not found");
+	    }
+	    reserve.setTableType(tableType);
+	    
+	    
+	    // 保存訂位
+	    reserveService.updateReserve(reserve);
+		
+		return "Reserve update ok";
+		
 	}
     
     
