@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -36,6 +39,7 @@ public class Rent implements Serializable {
 	@Column(name = "rent_deposit")
 	private Integer rentDeposit;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Column(name = "rent_date")
 	@Temporal(TemporalType.DATE)
 	private Date rentDate;
@@ -46,10 +50,12 @@ public class Rent implements Serializable {
 	@Column(name = "member_id")
 	private Integer memberId;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Column(name = "due_date")
 	@Temporal(TemporalType.DATE)
 	private Date dueDate;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@Column(name = "return_date")
 	@Temporal(TemporalType.DATE)
 	private Date returnDate;
@@ -64,6 +70,7 @@ public class Rent implements Serializable {
 	private Integer returnRestaurantId;
 	
 	
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "rent")
 	private List<RentItem> rentItems = new ArrayList<RentItem>();
 }
