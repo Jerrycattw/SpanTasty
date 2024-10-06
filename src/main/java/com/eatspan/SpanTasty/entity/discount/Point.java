@@ -1,8 +1,11 @@
 package com.eatspan.SpanTasty.entity.discount;
 
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.Date;
+import java.util.Map;
 
+import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -36,12 +39,12 @@ public class Point implements Serializable {
 	private Integer pointChange;
 	
 	@Column(name = "created_date")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd",timezone = "Asia/Taipei")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date createDate;
 	
 	@Column(name = "get_expiry_date")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd",timezone = "Asia/Taipei")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date expiryDate;
 	
@@ -54,6 +57,7 @@ public class Point implements Serializable {
 	@Column(name = "transaction_type")
 	private String transactionType;
 	
+	@ColumnTransformer(write = "NULLIF(?, '')")
 	@Column(name = "transaction_description")
 	private String transactionDescription;
 	
@@ -76,6 +80,10 @@ public class Point implements Serializable {
 	}
 
 	
+	public Map.Entry<Integer, Integer> pointToMapEntry() {
+		return new AbstractMap.SimpleEntry<>(pointId, pointUsage);
+		
+	}
 	
 }	
 	
