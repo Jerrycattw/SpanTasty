@@ -2,11 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
-    <title>SearchAllProducts</title>
+    <title>所有商品類別資料</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-  
+
     <style>
         .custom-button {
             background: none;
@@ -16,6 +16,12 @@
         }
         .custom-button-delete {
             color: #6140c4;
+        }
+        .custom-button-add {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #1b2b46;
         }
         h2 {
             font-weight: 900;
@@ -31,13 +37,13 @@
             border: 1px solid #dddddd;
             text-align: left;
             padding: 8px;
-            text-align:center ;
+            text-align:center;
         }
         th {
             background-color: #f2f2f2;
             font-weight: bold;
             white-space: nowrap;
-            text-align:center ;
+            text-align:center;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
@@ -49,61 +55,44 @@
             text-align: right;
             font-family: Arial, sans-serif;
         }
-        .hidden-column {
-            display: none; /* 隱藏類別編號 */
-        }
+        
     </style>
 </head>
 <body>
 <div th:replace="~{display/navbar}"></div>
 <div class="content" id="content">
     <div align="center">
-        <h2>所有商品資料</h2>
+        <h2>所有商品類別資料</h2>
+        <form method="post" th:action="@{/productType/add}">
+            <input type="text" name="productTypeName" placeholder="請輸入欲新增的類別名稱" required>
+            <button type="submit" class="custom-button-add"><i class="fa-solid fa-folder-plus fa-xl"></i></button>
+        </form>
         <table id="productsTable" class="display" border="1">
             <thead>
                 <tr style="background-color: #9D9D9D">
-                    <th style=text-align:center>商品編號</th>
-                    <th style=text-align:center>商品名稱</th>
-                    <th style=text-align:center>商品金額</th>
-                    <th style=text-align:center>商品照片</th>
-                    <th style=text-align:center>商品庫存</th>
-                    <th style=text-align:center>商品狀態</th>
-                    <th style=text-align:center>商品描述</th>
-                    <th style=text-align:center class="hidden-column">商品類別編號</th> <!-- 隱藏的列 -->
-                    <th style=text-align:center>商品類別</th>
-                    <th style=text-align:center>商品修改</th>
-                    <th style=text-align:center>商品刪除</th>
+                    <th style="text-align:center">商品類別編號</th>
+                    <th style="text-align:center">商品名稱</th>
+                    <th style="text-align:center">商品類別修改</th>
+                    <th style="text-align:center">商品類別刪除</th>
                 </tr>
             </thead>
             <tbody>
-                <th:block th:each="product : ${products}">
+                <th:block th:each="productType : ${productTypes}">
                     <tr>
-                        <td th:text="${product.productId}"></td>
-                        <td th:text="${product.productName}"></td>
-                        <td th:text="${product.productPrice}"></td>
-                        <td><img th:src="${product.productPicture}" alt="No Image" width="100" height="100"/></td>
-                        <td th:text="${product.productStock}"></td>
+                        <td th:text="${productType.productTypeId}"></td>
+                        <td th:text="${productType.productTypeName}"></td>
                         <td>
-                            <span th:if="${product.productStatus == 1}">已上架</span>
-                            <span th:if="${product.productStatus == 2}">已停售</span>
-                        </td>
-                        <td th:text="${product.productDescription}"></td>
-                        <td class="hidden-column" th:text="${product.productType.productTypeId}"></td> <!-- 隱藏的類別編號資料 -->
-                        <td>
-                            <span th:if="${product.productType != null}" th:text="${product.productType.productTypeName}"></span>
-                            <span th:if="${product.productType == null}">無類別</span>
-                        </td>
-                        <td>
-                            <form th:action="@{/product/update/{id}(id=${product.productId})}" method="get">
+                            <form method="post" th:action="@{/productType/update/{id}(id=${productType.productTypeId})}">
+                                <input type="text" name="productTypeName" placeholder="請輸入欲更新類別名稱" required>
                                 <button type="submit" class="custom-button">
                                     <i class="fa-regular fa-pen-to-square fa-xl"></i>
                                 </button>
                             </form>
                         </td>
                         <td>
-                            <form th:action="@{/product/del/{id}(id=${product.productId})}" method="post">
+                            <form th:action="@{/productType/del/{id}(id=${productType.productTypeId})}" method="post">
                                 <input type="hidden" name="_method" value="delete"/>
-                                <button type="submit" class="custom-button custom-button-delete" onclick="return confirm('確定要刪除這筆商品嗎？');">
+                                <button type="submit" class="custom-button custom-button-delete" onclick="return confirm('確定要刪除這項商品類別嗎？');">
                                     <i class="fa-solid fa-trash-arrow-up fa-xl"></i>
                                 </button>
                             </form>
@@ -113,7 +102,7 @@
             </tbody>
         </table>
         <h3>
-            共<span th:text="${#lists.size(products)}">0</span>筆商品資料
+            共<span th:text="${#lists.size(productTypes)}">0</span>筆商品資料
         </h3>
     </div>
 </div>
@@ -132,6 +121,6 @@
         showSidebar('store');
     });
 </script>
-  <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 </body>
 </html>
