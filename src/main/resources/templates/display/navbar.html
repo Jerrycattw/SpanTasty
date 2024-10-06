@@ -1,188 +1,233 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SpanTasty Home</title>
-<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-body {
-	font-family: Arial, sans-serif;
-	margin: 0;
-	padding: 0;
-	background-color: #f8f9fa;
-}
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>SpanTasty Home</title>
+	<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+			background-color: #f8f9fa;
+		}
 
-.top-menu {
-	background-color: #343a40;
-	overflow: hidden;
-	position: fixed;
-	top: 0;
-	width: 100%;
-	z-index: 1000;
-}
+		.top-menu {
+			background-color: #343a40;
+			overflow: hidden;
+			position: fixed;
+			top: 0;
+			width: 100%;
+			z-index: 1000;
+		}
 
-.top-menu a {
-	float: left;
-	color: white;
-	text-align: center;
-	padding: 14px 16px;
-	text-decoration: none;
-	font-size: 17px;
-}
+		#authButtonContainer {
+			position: absolute;
+			top: 10px;
+			/* 調整距離上方的間距 */
+			right: 10px;
+			/* 調整距離右側的間距 */
+		}
 
-.top-menu a:hover {
-	background-color: #495057;
-}
+		.top-menu a {
+			float: left;
+			color: white;
+			text-align: center;
+			padding: 14px 16px;
+			text-decoration: none;
+			font-size: 17px;
+		}
 
-.sidebar {
-	width: 250px;
-	height: 100vh;
-	background-color: #343a40;
-	position: fixed;
-	top: 56px;
-	padding-top: 20px;
-	z-index: 500;
-}
+		.top-menu a:hover {
+			background-color: #495057;
+		}
 
-.sidebar a {
-	padding: 10px 15px;
-	text-decoration: none;
-	font-size: 18px;
-	color: #ddd;
-	display: block;
-}
+		.sidebar {
+			width: 250px;
+			height: 100vh;
+			background-color: #343a40;
+			position: fixed;
+			top: 56px;
+			padding-top: 20px;
+			z-index: 500;
+		}
 
-.sidebar a:hover {
-	background-color: #495057;
-}
+		.sidebar a {
+			padding: 10px 15px;
+			text-decoration: none;
+			font-size: 18px;
+			color: #ddd;
+			display: block;
+		}
 
-.content {
-	margin-left: 250px;
-	padding: 20px;
-	padding-top: 80px;
-}
+		.sidebar a:hover {
+			background-color: #495057;
+		}
 
-.user-profile {
-	display: flex;
-	align-items: center;
-	padding: 15px;
-	color: #fff;
-}
+		.content {
+			margin-left: 250px;
+			padding: 20px;
+			padding-top: 80px;
+		}
 
-.user-profile img {
-	border-radius: 50%;
-	width: 50px;
-	margin-right: 15px;
-}
+		.user-profile {
+			display: flex;
+			align-items: center;
+			padding: 15px;
+			color: #fff;
+		}
 
-.user-profile div {
-	font-size: 16px;
-}
+		.user-profile img {
+			border-radius: 50%;
+			width: 50px;
+			margin-right: 15px;
+		}
 
-.footer {
-	text-align: center;
-	padding: 10px;
-	background-color: #343a40;
-	color: #fff;
-	position: absolute;
-	bottom: 0;
-	width: calc(100% - 250px);
-	margin-left: 250px;
-}
-</style>
-<script>
-        function showSidebar(menu) {
-            const sidebar = document.getElementById('sidebar');
-            let menuItems = '';
-            switch (menu) {
-            	case 'admin':
-                    menuItems = `
-                        <a href="/EEIT187-6/admin/addAdmin">新增管理員</a>
+		.modal-body img {
+			max-width: 100%;
+			max-height: 300px;
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			object-fit: contain;
+		}
+
+		.user-profile div {
+			font-size: 16px;
+		}
+
+		.footer {
+			text-align: center;
+			padding: 10px;
+			background-color: #343a40;
+			color: #fff;
+			position: absolute;
+			bottom: 0;
+			width: calc(100% - 250px);
+			margin-left: 250px;
+		}
+	</style>
+	<script>
+		function showSidebar(menu) {
+			const sidebar = document.getElementById('sidebar');
+			let menuItems = '';
+			switch (menu) {
+				case 'admin':
+					menuItems = `
+                        <a href="/SpanTasty/admin/addAdminPage">新增管理員</a>
                         <a href="/SpanTasty/admin/admin-list">查詢管理員</a>
                     `;
-                    break;
-            
-                case 'member':
-                    menuItems = `
+					break;
+
+				case 'member':
+					menuItems = `
         				<a href="/SpanTasty/admin/member-list">查詢會員資料</a>
                     `;
-                    break;
-                case 'store':
-                    menuItems = `
+					break;
+				case 'store':
+					menuItems = `
                         <a href="/SpanTasty/product/add">新增商品</a>
                         <a href="/SpanTasty/product/findAll">查詢所有商品</a>
                         <a href="/SpanTasty/shoppingOrder/add">新增訂單</a>
                         <a href="/SpanTasty/shoppingOrder/findAll">查詢所有訂單</a>
                         <a href="/SpanTasty/shoppingCart/addShoppingCart">購物車</a>
                     `;
-                    break;
-                case 'order':
-                    menuItems = `
+					break;
+				case 'order':
+					menuItems = `
                         <a href="/SpanTasty/order/MenuManagement.html">菜單管理</a>
                         <a href="/EEIT187-6/togo/GetMenu.html">菜單查詢</a>
                         <a href="/EEIT187-6/TogoController/getAll">訂單管理</a>
                         <a href="/EEIT187-6/togo/GetTogo.html">訂單查詢</a>
                     `;
-                    break;
-                case 'rental':
-                    menuItems = `
+					break;
+				case 'rental':
+					menuItems = `
                         <a href="/SpanTasty/tableware/getAll">餐具管理</a>
                         <a href="/SpanTasty/stock/getAll">餐具庫存管理</a>
                         <a href="/SpanTasty/rent/getAll">租借訂單管理</a>
                     `;
-                    break;
-                case 'reservation':
-                    menuItems = `
+					break;
+				case 'reservation':
+					menuItems = `
                         <a href="/SpanTasty/restaurant/getAll">餐廳管理</a>
                         <a href="/SpanTasty/tabletype/getAll">桌位種類管理</a>
                         <a href="/SpanTasty/reserve/getAll">訂位管理</a>
                     `;
-                    break;
-                case 'points':
-                    menuItems = `
+					break;
+				case 'points':
+					menuItems = `
                         <a href="/SpanTasty/point/pointSet">點數設定</a>
                         <a href="/SpanTasty/point">點數管理</a>
                         <a href="/SpanTasty/coupon">優惠券管理</a>
                     `;
-                    break;
-                default:
-                    menuItems = `<a href="#">請選擇一個管理項目</a>`;
-            }
-            sidebar.innerHTML = menuItems;
-        }
-        document.addEventListener("DOMContentLoaded", function() {
-            showSidebar('');
-        });
-    </script>
+					break;
+				default:
+					menuItems = `<a href="#">請選擇一個管理項目</a>`;
+			}
+			sidebar.innerHTML = menuItems;
+		}
+		document.addEventListener("DOMContentLoaded", function () {
+			showSidebar('');
+		});
+	</script>
 </head>
+
 <body>
 	<!-- 上方選單 -->
 	<div class="top-menu d-flex justify-content-start">
-		<a href="#" onclick="showSidebar('admin')">管理員管理</a> <a href="#"
-			onclick="showSidebar('member')">會員管理</a> <a href="#"
-			onclick="showSidebar('store')">線上商城管理</a> <a href="#"
-			onclick="showSidebar('order')">外帶訂餐管理</a> <a href="#"
-			onclick="showSidebar('reservation')">餐廳及訂位管理</a> <a href="#"
-			onclick="showSidebar('rental')">租借訂單管理</a> <a href="#"
-			onclick="showSidebar('points')">會員積分與優惠券管理</a>
+		<a href="#" onclick="showSidebar('admin')">管理員管理</a> <a href="#" onclick="showSidebar('member')">會員管理</a> <a
+			href="#" onclick="showSidebar('store')">線上商城管理</a> <a href="#" onclick="showSidebar('order')">外帶訂餐管理</a> <a
+			href="#" onclick="showSidebar('reservation')">餐廳及訂位管理</a> <a href="#"
+			onclick="showSidebar('rental')">租借訂單管理</a> <a href="#" onclick="showSidebar('points')">會員積分與優惠券管理</a>
+
+		<div id="authButtonContainer">
+			<button id="authButton" onclick="handleAuth()">登入</button>
+		</div>
+
+
 	</div>
+
 
 	<!-- 側邊欄 -->
 	<div class="sidebar">
 		<div class="user-profile">
-			<img id="adminAvatar" src="https://via.placeholder.com/50"
-				alt="Admin Avatar" style="cursor: pointer;"> <input
-				type="file" id="avatarUpload" style="display: none;"
-				accept="image/*">
+			<img id="adminAvatar" src="https://via.placeholder.com/50" alt="Admin Avatar" style="cursor: pointer;">
+			<input type="file" id="avatarUpload" style="display: none;" accept="image/*">
 			<div class="ml-auto">
 				<span id="adminName">管理員名稱</span>
 			</div>
 		</div>
 		<div id="sidebar"></div>
 	</div>
+
+	<!-- 頭像上傳確認的彈跳窗 -->
+	<div class="modal fade" id="avatarModal" tabindex="-1" role="dialog" aria-labelledby="avatarModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="avatarModalLabel">頭像管理</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<img id="previewAvatar" src="" alt="Avatar Preview">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" id="uploadAvatarButton">上傳圖片</button>
+					<button type="button" class="btn btn-secondary" id="removeAvatar">移除頭像</button>
+					<button type="button" class="btn btn-primary" id="confirmUpload">確認更換頭像</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
 	<!-- 
 
     <div class="content">
@@ -191,85 +236,175 @@ body {
     </div>
 	 -->
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const adminNameElement = document.getElementById('adminName');
-        const adminAvatarElement = document.getElementById('adminAvatar');
-        const avatarUploadInput = document.getElementById('avatarUpload');
-        const defaultAvatar = 'https://via.placeholder.com/50'; // 預設圖片
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			const adminNameElement = document.getElementById('adminName');
+			const adminAvatarElement = document.getElementById('adminAvatar');
+			const avatarUploadInput = document.getElementById('avatarUpload');
+			const previewAvatarElement = document.getElementById('previewAvatar');
+			const confirmUploadButton = document.getElementById('confirmUpload');
+			const removeAvatarButton = document.getElementById('removeAvatar');
+			const uploadAvatarButton = document.getElementById('uploadAvatarButton'); // 新增的按鈕
+			const defaultAvatar = 'https://via.placeholder.com/50';
+			const authButton = document.getElementById('authButton');
 
-        // 請求管理員資訊並顯示名稱
-        axios.get('/SpanTasty/admin/info')
-        .then(function(response) {
-            if (response.data.success) {
-                const adminName = response.data.data.adminName;
-                adminNameElement.textContent = adminName;
-            } else {
-                adminNameElement.textContent = '未登入';
-            }
-        })
-        .catch(function(error) {
-            console.error("無法加載管理員資訊", error);
-            adminNameElement.textContent = '錯誤';
-        });
-        
-        // 請求頭像並顯示
-        axios.get('/SpanTasty/admin/getAvatar')
-        .then(function(response) {
-            if (response.data.success && response.data.data) {
-                const base64Avatar = response.data.data;
-                adminAvatarElement.src = 'data:image/jpeg;base64,' + base64Avatar;
-            } else {
-                adminAvatarElement.src = defaultAvatar;
-            }
-        })
-        .catch(function(error) {
-            console.error("無法加載頭像", error);
-            adminAvatarElement.src = defaultAvatar;
-        });
+			// 檢查當前登入狀態
+			axios.get('/SpanTasty/admin/checkLogin')
+				.then(function (response) {
+					if (response.data.success && response.data.data) {
+						authButton.textContent = '登出';
+					} else {
+						authButton.textContent = '登入';
+					}
+				})
+				.catch(function (error) {
+					console.error("無法檢查登入狀態", error);
+				});
 
-        // 點擊頭像時觸發文件選擇器
-        adminAvatarElement.addEventListener('click', function() {
-            avatarUploadInput.click();
-        });
+			// 處理登入/登出行為
+			window.handleAuth = function () {
+				if (authButton.textContent === '登出') {
+					// 如果是登出，則發送登出請求
+					axios.post('/SpanTasty/admin/logout')
+						.then(function (response) {
+							if (response.data.success) {
+								alert(response.data.message);
+								window.location.href = '/SpanTasty/admin/loginPage'
+							}
+						})
+						.catch(function (error) {
+							console.error('登出失敗', error);
+						});
+				} else {
+					// 如果是登入，跳轉到登入頁面
+					window.location.href = '/SpanTasty/admin/loginPage';
+				}
+			}
 
-        // 當選擇新頭像後，將圖片上傳到後端
-        avatarUploadInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            
-            if (file) {
-                const formData = new FormData();
-                formData.append('avatar', file);
+			// 請求管理員資訊並顯示名稱
+			axios.get('/SpanTasty/admin/info')
+				.then(function (response) {
+					if (response.data.success) {
+						const adminName = response.data.data.adminName;
+						adminNameElement.textContent = adminName;
+					} else {
+						adminNameElement.textContent = '未登入';
+					}
+				})
+				.catch(function (error) {
+					console.error("無法加載管理員資訊", error);
+					adminNameElement.textContent = '錯誤';
+				});
 
-                // 發送請求上傳頭像
-                axios.post('/SpanTasty/admin/updateAvatar', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                })
-                .then(function(response) {
-                    if (response.data.success) {
-                        // 成功後顯示新頭像
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            adminAvatarElement.src = e.target.result;
-                        };
-                        reader.readAsDataURL(file);
-                        alert('頭像更新成功');
-                    } else {
-                        alert('頭像更新失敗');
-                    }
-                })
-                .catch(function(error) {
-                    console.error('頭像上傳失敗', error);
-                    alert('頭像上傳失敗，請稍後重試');
-                });
-            }
-        });
-    });
-</script>
+			// 請求頭像並顯示
+			axios.get('/SpanTasty/admin/getAvatar')
+				.then(function (response) {
+					if (response.data.success && response.data.data) {
+						const base64Avatar = response.data.data;
+						adminAvatarElement.src = 'data:image/jpeg;base64,' + base64Avatar;
+						previewAvatarElement.src = adminAvatarElement.src; // 設定預覽圖片
+					} else {
+						adminAvatarElement.src = defaultAvatar;
+						previewAvatarElement.src = defaultAvatar;
+					}
+				})
+				.catch(function (error) {
+					console.error("無法加載頭像", error);
+					adminAvatarElement.src = defaultAvatar;
+				});
+
+			// 點擊頭像時觸發彈跳窗
+			adminAvatarElement.addEventListener('click', function () {
+				$('#avatarModal').modal('show');
+			});
+
+			// 點擊上傳圖片按鈕時觸發文件選擇器
+			uploadAvatarButton.addEventListener('click', function () {
+				avatarUploadInput.click();
+			});
+
+			// 當選擇新頭像後，顯示預覽
+			avatarUploadInput.addEventListener('change', function (event) {
+				const file = event.target.files[0];
+				if (file) {
+					const reader = new FileReader();
+					reader.onload = function (e) {
+						// 顯示預覽圖片
+						previewAvatarElement.src = e.target.result;
+						// 彈出頭像管理彈跳窗，確認是否更換頭像
+						$('#avatarModal').modal('show');
+					};
+					reader.readAsDataURL(file);
+				}
+			});
+
+			// 確認更換頭像的邏輯
+			confirmUploadButton.addEventListener('click', function () {
+				const file = avatarUploadInput.files[0];
+				if (file) {
+					const formData = new FormData();
+					formData.append('avatar', file);
+
+					// 發送請求更新頭像
+					axios.post('/SpanTasty/admin/updateAvatar', formData, {
+						headers: {
+							'Content-Type': 'multipart/form-data'
+						}
+					})
+						.then(function (response) {
+							if (response.data.success) {
+								adminAvatarElement.src = previewAvatarElement.src;
+								$('#avatarModal').modal('hide');
+								alert('頭像更新成功');
+							} else {
+								alert('頭像更新失敗');
+							}
+						})
+						.catch(function (error) {
+							console.error('頭像上傳失敗', error);
+							alert('頭像上傳失敗，請稍後重試');
+						});
+				} else {
+					alert('請先選擇一個頭像');
+				}
+			});
+
+			// 移除頭像按鈕
+			removeAvatarButton.addEventListener('click', function () {
+				// 顯示確認對話框，讓用戶確認是否要移除頭像
+				const confirmRemoval = confirm("您確定要移除頭像嗎？");
+
+				if (confirmRemoval) {
+					// 更新前端的預覽圖片為默認頭像
+					previewAvatarElement.src = defaultAvatar;
+
+					// 發送請求將頭像重置為默認
+					axios.post('/SpanTasty/admin/removeAvatar')
+						.then(function (response) {
+							if (response.data.success) {
+								// 將 adminAvatarElement 設置為默認頭像
+								adminAvatarElement.src = defaultAvatar;
+								// 隱藏彈跳窗
+								$('#avatarModal').modal('hide');
+								alert('頭像已移除');
+							} else {
+								alert('移除頭像失敗');
+							}
+						})
+						.catch(function (error) {
+							console.error('移除頭像失敗', error);
+							alert('移除頭像失敗，請稍後重試');
+						});
+				} else {
+					// 如果用戶取消操作，什麼也不做
+					console.log("用戶取消了移除頭像操作");
+				}
+			});
+		});
+	</script>
 	<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 	<script th:src="@{/js/axios.min.js}"></script>
 </body>
+
 </html>

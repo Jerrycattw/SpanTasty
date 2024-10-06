@@ -1,7 +1,11 @@
 package com.eatspan.SpanTasty.entity.account;
 
+import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -41,14 +45,19 @@ public class Admin {
     @Lob
     @Column(name = "avatar")
     private byte[] avatar;
+    
+    @Column(name = "first_login", nullable = false)
+    private Integer firstLogin;
 
-    @ManyToMany
+
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "admin_permissions",
         joinColumns = @JoinColumn(name = "admin_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<Permission> permissions;
+    @JsonIgnore
+    private Set<Permission> permissions = new HashSet<>();
 
     // Getters and Setters
 
@@ -120,5 +129,13 @@ public class Admin {
         // 假設 role = 1 表示超級管理員
         return this.role == 1;
     }
+    
+    public Integer getFirstLogin() {
+		return firstLogin;
+	}
+
+	public void setFirstLogin(Integer firstLogin) {
+		this.firstLogin = firstLogin;
+	}
 
 }
