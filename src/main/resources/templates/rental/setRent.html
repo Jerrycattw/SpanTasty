@@ -44,8 +44,8 @@ form {
             <tr><td>預定歸還:<input type="date" id="due_date" name="dueDate" th:value="${rent.dueDate}"></td></tr>
             <tr><td>實際歸還:<input type="date" id="return_date" name="returnDate" th:value="${rent.returnDate}"></td></tr>
             <tr><td>租借狀態: 
-					<input type="radio" id="rent_status" value="1" name="rentStatus" th:value="${rent.rentStatus}"/>1:未歸還 
-					<input type="radio" id="rent_status" value="2" name="rentStatus" th:value="${rent.rentStatus}"/>2:歸還
+					<input type="radio" id="rent_status" name="rentStatus" value="1" th:value="1" th:checked="${rent.rentStatus == 1}"/> 1:未歸還 
+					<input type="radio" id="rent_status" name="rentStatus" value="2" th:value="2" th:checked="${rent.rentStatus == 2}"/> 2:歸還 
 	        </td></tr>
             <tr><td>訂單備註:<input type="text" id="rent_memo" name="rentMemo" th:value="${rent.rentMemo}" /></td></tr>
             <tr><td>歸還餐廳:

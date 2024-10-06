@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -125,7 +126,10 @@ public class RentController {
 	//刪除訂單 訂單明細
 	@DeleteMapping("/del/{id}")
 	public String deleteRentAndRentItems(@PathVariable("id") Integer rentId, Model model) {
-		rentItemService.deleteRentItems(rentId);
+		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+		for(RentItem rentItem: rentItems) {
+			rentItemService.deleteRentItem(rentItem);
+		}
 		rentService.deleteRent(rentId);
 		return "redirect:/rent/getAll";
 	}
@@ -188,9 +192,9 @@ public class RentController {
 	
 	//查詢所有訂單
 	@GetMapping("getAll")
-	public String getAllRents(Model model) {
-		List<Rent> rents = rentService.findAllRents();
-		model.addAttribute("rents",rents);
+	public String getAllRents(Model model, @RequestParam(value = "p", defaultValue = "1") Integer page) {
+		Page<Rent> rentPages = rentService.findAllRentPages(page);
+		model.addAttribute("rentPages",rentPages);
 		return "rental/getAllRents";
 	}
 	
