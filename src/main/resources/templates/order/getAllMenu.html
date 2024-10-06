@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>菜單</title>
+</head>
+<body>
+<div th:replace="~{display/navbar}"></div>
+<!-- 主要內容區域 -->
+<div class="content">
+    <div class="container mt-2">
+        <h1 class="display-6">☕菜單資料☕</h1>
+        <div class="row justify-content-center">
+            <div class="col-11">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a th:href="@{/order/menu/add}" class="btn btn-primary btn-sm">新增菜單</a>
+                    <a th:href="@{/order/menu/get}" class="btn btn-primary btn-sm">查詢菜單</a>
+                </div>
+                
+                <div class="table-responsive mt-3">
+                    <table id="demoData" class="table table-secondary table-striped table-hover text-center">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">餐點編號</th>
+                                <th scope="col">餐點名稱</th>
+                                <th scope="col">餐點照片</th>
+                                <th scope="col">餐點種類</th>
+                                <th scope="col">餐點庫存</th>
+                                <th scope="col">描述</th>
+                                <th scope="col">餐點狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <th:block th:each="food : ${foodList}">
+                                <tr>
+                                    <td class="align-middle" th:text="${food.foodId}"></td>
+                                    <td class="align-middle" th:text="${food.foodName}"></td>
+                                    <td class="align-middle" th:text="${food.foodPicture}"></td>
+                                    <td class="align-middle" th:text="${food.foodKind.foodKindName}"></td>
+                                    <td class="align-middle" th:text="${food.foodStock}"></td>
+                                    <td class="align-middle" th:text="${food.foodDescription}"></td>
+                                    <td class="align-middle">
+                                        <span th:switch="${food.foodStatus}">
+                                            <span th:case="1" class="badge bg-success">正常供應</span>
+                                            <span th:case="2" class="badge bg-warning">停售</span>
+                                        </span>
+                                    </td>
+
+                                </tr>
+                            </th:block>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showSidebar('order');
+
+          //  const getTogoBtn = document.getElementById('getAllTogo')
+          //  getTogoBtn.addEventListener('click', function (e) {
+          //      const table = document.getElementById('demoData');
+          //      table.style.removeProperty('display');
+           // })
+        })
+
+
+
+
+    </script>
+    
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/js/axios.min.js}"></script>
+
+
+</body>
+</html>

@@ -62,20 +62,23 @@ public class MenuServiceImpl implements MenuService {
 
 	@Override
 	public MenuEntity addFood(MenuEntity newFood) {
-		String newFoodKindName = newFood.getFoodKind().getFoodKindName();
-		if (newFoodKindName != null) {
-	        // 依照種類名稱尋找
-	        List<FoodKindEntity> optional = foodKindRepository.findByFoodKindName(newFoodKindName);
-	        if (optional.isEmpty()) {
-	            // 不存在，加入新的FoodKind
-	            FoodKindEntity foodKind = new FoodKindEntity();
-	            foodKind.setFoodKindName(newFoodKindName);
-	            newFood.setFoodKind(foodKind); // 直接加入 newFood，cascade.persist
-	        } else {
-	            // 已存在，直接加入已存在的FoodKind
-	            newFood.setFoodKind(optional.get(0));
-	        }
-	    }
+//		System.out.println(newFood.getFoodKindId());
+//		System.out.println(newFood.getFoodKind());
+//		String newFoodKindName = newFood.getFoodKind().getFoodKindName();
+//		System.out.println(newFoodKindName);
+//		if (newFoodKindName != null) {
+//	        // 依照種類名稱尋找
+//	        List<FoodKindEntity> optional = foodKindRepository.findByFoodKindName(newFoodKindName);
+//	        if (optional.isEmpty()) {
+//	            // 不存在，加入新的FoodKind
+//	            FoodKindEntity foodKind = new FoodKindEntity();
+//	            foodKind.setFoodKindName(newFoodKindName);
+//	            newFood.setFoodKind(foodKind); // 直接加入 newFood，cascade.persist
+//	        } else {
+//	            // 已存在，直接加入已存在的FoodKind
+//	            newFood.setFoodKind(optional.get(0));
+//	        }
+//	    }
 		try {
 			MenuEntity savedFood = menuRepository.save(newFood);
 			return savedFood;
