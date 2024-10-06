@@ -27,11 +27,6 @@ public class MenuController {
 	private MenuService menuService;
 	
 	
-//	@GetMapping("/SpanTasty/order/MenuManagement")
-//	public String getMenuPage() {
-//		return "order/MenuManagement";
-//	}
-//	
 	// 有參數：模糊查詢，無參數：查詢全部
 	@GetMapping("/menu")
 	public ResponseEntity<List<MenuEntity>> getFoods(@RequestParam(required = false) String foodName){
