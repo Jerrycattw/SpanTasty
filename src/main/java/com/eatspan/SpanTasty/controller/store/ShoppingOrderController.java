@@ -80,7 +80,7 @@ public class ShoppingOrderController {
 	 public String showUpdateForm(@PathVariable("id") Integer shoppingId, Model model) {
         ShoppingOrder order = shoppingOrderService.findShoppingOrderById(shoppingId);
         model.addAttribute("shoppingOrder", order);
-        return "store/shopping/updateShoppingOrder"; // 確保這是正確的模板路徑
+        return "store/shopping/updateShoppingOrder"; 
     }
 	
 	@PutMapping("/updatePut")

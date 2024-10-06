@@ -39,7 +39,7 @@ public class ShoppingOrderService {
 	private EntityManager entityManager;
 
 	public Integer calculateTotalAmount(Integer shoppingId) {
-	    String hql = "SELECT SUM(i.shoppingItemPrice * i.shoppingItemQuantity) "
+	    String hql = "SELECT SUM(i.product.productPrice * i.shoppingItemQuantity) "
 	            + "FROM ShoppingItem i WHERE i.shoppingOrder.shoppingId = :shoppingId";
 	    TypedQuery<Long> query = entityManager.createQuery(hql, Long.class);
 	    query.setParameter("shoppingId", shoppingId);
