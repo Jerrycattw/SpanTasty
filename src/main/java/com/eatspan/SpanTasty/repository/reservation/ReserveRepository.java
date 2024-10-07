@@ -33,7 +33,7 @@ public interface ReserveRepository extends JpaRepository<Reserve, Integer> {
 	
 	
 
-    // 查詢某個時間段內的預訂數量
+    // 查詢餐廳某個時間段內的預訂數量
     @Query("SELECT COUNT(r) FROM Reserve r WHERE r.restaurant.id = :restaurantId "
             + "AND r.tableType.id = :tableTypeId "
             + "AND CAST(r.reserveTime AS DATE) = CAST(:checkDate AS DATE) "
@@ -44,6 +44,14 @@ public interface ReserveRepository extends JpaRepository<Reserve, Integer> {
                                         @Param("checkDate") LocalDate checkDate,
                                         @Param("slotStart") LocalTime slotStart,
                                         @Param("slotEnd") LocalTime slotEnd);
+    
+    // 查詢餐廳某個日期時間段內的預訂數量
+    @Query("SELECT COUNT(r) FROM Reserve r WHERE r.restaurant.id = :restaurantId "
+    		+ "AND CAST(r.reserveTime AS DATE) <= CAST(:slotEndDate AS DATE)"
+    		+ "AND CAST(r.finishedTime AS DATE) >= CAST(:slotStartDate AS DATE)")
+    Integer countReservationsInDateSlot(@Param("restaurantId") Integer restaurantId,
+							    		@Param("slotEndDate") LocalDate slotEndDate,
+							    		@Param("slotStartDate") LocalDate slotStartDate);
 
     // 查詢該餐廳和桌型下的總桌數
     @Query("SELECT COUNT(rt) FROM RestaurantTable rt WHERE rt.restaurant.id = :restaurantId "
