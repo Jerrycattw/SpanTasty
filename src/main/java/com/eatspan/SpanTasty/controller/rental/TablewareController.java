@@ -177,13 +177,6 @@ public class TablewareController {
 	}
 	
 	
-	//導向查詢頁面
-	@GetMapping("/toGet")
-	public String toGetTablewares() {
-		return "rental/getTablewares";
-	}
-	
-	
 	//	查詢餐具(By關鍵字)
 	@ResponseBody
 	@PostMapping("/get")
