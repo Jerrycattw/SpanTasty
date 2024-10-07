@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Restaurant</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 </head>
 <body>
 <div th:replace="~{display/navbar}" ></div>
@@ -60,10 +63,8 @@
                     <a th:href="@{/restaurant/set/{id}(id=${restaurant.restaurantId})}" class="btn btn-warning btn-sm">修改</a>
                   </td>
                   <td id="delRestaurantBtn_td" class="align-middle">
-                  	<form th:action="@{/restaurant/del/{id}(id=${restaurant.restaurantId})}" th:method="delete">
-                  		<input type="submit" th:value="刪除" class="btn btn-danger btn-sm"/>
-                  	</form>
-                  </td>
+				      <button th:onclick="confirmDelete([[${restaurant.restaurantId}]])" class="btn btn-danger btn-sm">刪除</button>
+				  </td>
                 </tr>
               </tbody>
             </table>
@@ -103,65 +104,43 @@
      document.addEventListener("DOMContentLoaded", function() {
          showSidebar('reservation');
      });
-    
-  //   // 綁定事件到所有刪除btn
-  //   $('#delRestaurantBtn_td').on('click','a',function(e){
-  //     e.preventDefault();
-  //     let id = this.getAttribute('data-restaurantid');
-  //     delrestaurant(id);
-  //   })
-
-    
-  //   // 刪除餐廳ajax
-  //   let delrestaurant = function(id){
-  //       axios.delete(`http://localhost:8080/SpanTasty/restaurant/del/${id}`)
-  //       .then(res => {
-  //         console.log(res.data)
-  //         htmlMaker(res.data)
-  //       })
-  //       .catch(err => {
-  //         console.error(err); 
-  //       })
-  //     }
-
-  //   let htmlMaker = function(data) {
-  //   // 取得table的body部分
-  //   const tbody = document.querySelector('tbody');
-  //   tbody.innerHTML = ''; // 清空目前的表格資料
-  //   // 動態生成新表格內容
-  //   data.content.forEach(restaurant => {
-  //       let row = `
-  //           <tr>
-  //               <th scope="row" class="align-middle">
-  //                   <div class="media align-items-center">
-  //                       <div class="media-body">
-  //                           <span>${restaurant.restaurantName}</span>
-  //                       </div>
-  //                   </div>
-  //               </th>
-  //               <td class="align-middle">${restaurant.restaurantAddress}</td>
-  //               <td class="align-middle">${restaurant.restaurantPhone}</td>
-  //               <td class="align-middle">${restaurant.restaurantOpentime} ~ ${restaurant.restaurantClosetime}</td>
-  //               <td class="align-middle">
-  //                   <span class="${restaurant.restaurantStatus == 1 ? 'badge bg-success text-white' : restaurant.restaurantStatus == 2 ? 'badge bg-danger text-white' : 'badge bg-warning text-dark'}">
-  //                       ${restaurant.restaurantStatus == 1 ? '營業中' : restaurant.restaurantStatus == 2 ? '已歇業' : '籌備中'}
-  //                   </span>
-  //               </td>
-  //               <td class="align-middle">
-  //                   <a href="/restaurant/get/${restaurant.restaurantId}" class="btn btn-info btn-sm">檢視</a>
-  //               </td>
-  //               <td class="align-middle">
-  //                   <a href="/restaurant/set/${restaurant.restaurantId}" class="btn btn-warning btn-sm">修改</a>
-  //               </td>
-  //               <td class="align-middle">
-  //                   <a data-restaurantid="${restaurant.restaurantId}" class="btn btn-danger btn-sm delRestaurantBtn">刪除</a>
-  //               </td>
-  //           </tr>
-  //       `;
-  //       tbody.innerHTML += row;
-  //   });
-
-  // }
+     
+     console.log(swal);
+     
+	function confirmDelete(id) {
+	    Swal.fire({
+	        title: "確定刪除？",
+	        text: "一旦刪除，將無法恢復！",
+	        icon: "warning",
+	        showCancelButton: true,
+	        confirmButtonText: "刪除",
+	        cancelButtonText: "取消",
+	    }).then((result) => {
+	        if (result.isConfirmed) {
+	            // 使用 axios 發送 DELETE 請求
+	            axios.delete(`/SpanTasty/restaurant/del/${id}`)
+	                .then(response => {
+	                    if (response.status === 200) {
+						    Swal.fire("刪除成功！", "", "success").then(() => {
+						        location.reload(); // 立即重新加載頁面
+						    });
+	
+	                        // 延遲 3 秒後重新加載頁面
+	                        setTimeout(() => {
+	                            location.reload(); // 重新加載頁面
+	                        }, 3000);
+	                    }
+	                })
+	                .catch(error => {
+	                    Swal.fire("發生錯誤！", "請稍後再試。", "error");
+	                    console.error('刪除失敗：', error);
+	                });
+	        } else {
+	            Swal.fire("您的資料未被刪除！");
+	        }
+	    });
+	}
+     
 
 </script>
 </body>

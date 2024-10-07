@@ -141,7 +141,10 @@ public class RestaurantController {
             File fileToSave = new File(uploadPath + File.separator + newFileName);
             file.transferTo(fileToSave);
             setRestaurant.setRestaurantImg("/SpanTasty/upload/reservation/" + newFileName);
-        }
+        } else {
+        	String restaurantImg = restaurantService.findRestaurantById(setRestaurant.getRestaurantId()).getRestaurantImg();
+			setRestaurant.setRestaurantImg(restaurantImg);
+		}
 
         restaurantService.updateRestaurant(setRestaurant);
         
@@ -154,9 +157,9 @@ public class RestaurantController {
     
     // 刪除餐廳
     @DeleteMapping("/del/{id}")
-    public String deleteRestaurant(@PathVariable("id") Integer restaurantId) {
+    public ResponseEntity<?> deleteRestaurant(@PathVariable("id") Integer restaurantId) {
         restaurantService.deleteRestaurant(restaurantId);
-        return "redirect:/restaurant/getAll";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
     
 

@@ -99,6 +99,10 @@ public class Restaurant {
 	
 	@PrePersist //當物件轉換成persist時先做該方法
 	public void onCreate() {
+		
+		if(this.restaurantStatus == null) {
+			this.restaurantStatus = 3; // 餐廳開放訂位的比例
+		}
 		if(this.reservePercent == null) {
 			this.reservePercent = 100; // 餐廳開放訂位的比例
 		}

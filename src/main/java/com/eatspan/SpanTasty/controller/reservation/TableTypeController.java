@@ -3,6 +3,8 @@ package com.eatspan.SpanTasty.controller.reservation;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,9 +42,9 @@ public class TableTypeController {
 	
 	
 	@DeleteMapping("/del")
-	public String delTableType(@RequestParam("id") String tableTypeId) {
+	public ResponseEntity<?> delTableType(@RequestParam String tableTypeId) {
 		tableTypeService.deleteTableType(tableTypeId);
-		return "redirect:/tabletype/getAll";
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	
