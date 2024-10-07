@@ -107,23 +107,36 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     const password = document.getElementById('password').value;
 
     // 發送登入請求
-    axios.post('/SpanTasty/admin/login', {
-        account: account,
-        password: password
+    fetch('/SpanTasty/admin/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            account: account,
+            password: password
+        })
     })
-    .then(function (response) {
-        // 檢查回應的 success 狀態
-        if (response.data.success) {
-            // 成功後跳轉
-            window.location.href = "http://localhost:8080/SpanTasty/";
+    .then(response => response.json())
+    .then(data => {
+        const errorMessage = document.getElementById('errorMessage');
+        if (data.success) {
+            if (data.data) {  // 檢查 data 中是否有重定向 URL
+                // 如果需要跳轉到修改資料頁面
+                window.location.href = data.data;
+            } else {
+                // 正常登入的情況
+                window.location.href = '/SpanTasty';
+            }
         } else {
-            // 顯示錯誤訊息
-            document.getElementById('errorMessage').innerText = response.data.message;
+            // 顯示錯誤訊息在頁面上
+            errorMessage.textContent = data.message;
+            errorMessage.style.color = 'red';
         }
     })
-    .catch(function (error) {
-        console.error("登入失敗", error);
-        document.getElementById('errorMessage').innerText = '登入失敗，請稍後重試。';
+    .catch(error => {
+        console.error('登入請求失敗:', error);
+        alert('登入失敗，請稍後再試');
     });
 });
     </script>
