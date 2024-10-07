@@ -85,30 +85,12 @@ public class ProductController {
 		return "redirect:/product/findAll";
 	}
 
-//	@PostMapping("/add")
-//	public ResponseEntity<?> addProduct(@RequestBody Product addProduct){
-//		Product product = productService.addProduct(addProduct);
-//		if(product != null) {
-//			return new ResponseEntity<>(product, HttpStatus.CREATED);
-//		}
-//		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//	}
-
 	 @DeleteMapping("/del/{id}")
 	    public String deleteProduct(@PathVariable("id") Integer productId) {
 	        productService.deleteProduct(productId);
 	        return "redirect:/product/findAll";
 	    }
 	
-	
-//	@DeleteMapping("/del/{id}")
-//	public ResponseEntity<?> deleteProduct(@PathVariable("id") Integer productId) {
-//		if (productService.findProductById(productId) == null) {
-//			return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 不存在，返回404
-//		}
-//		productService.deleteProduct(productId);
-//		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//	}
 
 	// 導向更新商品頁面
 	@GetMapping("/update/{id}")
@@ -120,37 +102,6 @@ public class ProductController {
 		return "store/product/updateProduct";
 	}
 	
-//	@PutMapping("/updatePut")
-//	public String updateProduct(@ModelAttribute Product updateProduct, 
-//	                            @RequestParam Integer productTypeId,
-//	                            @RequestParam MultipartFile file) throws IllegalStateException, IOException {
-//
-//	    // 獲取產品類型
-//	    ProductType productType = productTypeService.findProductTypeById(productTypeId);
-//	    updateProduct.setProductType(productType);
-//
-//	    // 建立圖片保存的目錄
-//	    File fileSaveDirectory = new File(uploadPath);
-//	    if (!fileSaveDirectory.exists()) {
-//	        fileSaveDirectory.mkdirs();
-//	    }
-//
-//	    // 檢查文件是否不為空，並處理上傳
-//	    if (!file.isEmpty()) {
-//	        String fileName = file.getOriginalFilename();
-//	        String extension = fileName.substring(fileName.lastIndexOf("."));
-//	        String newFileName = updateProduct.getProductName() + extension;
-//
-//	        // 保存檔案到指定路徑
-//	        File fileToSave = new File(uploadPath + File.separator + newFileName);
-//	        file.transferTo(fileToSave);
-//	        updateProduct.setProductPicture("/SpanTasty/upload/store/" + newFileName);
-//	    }
-//
-//	    productService.updateProduct(updateProduct);
-//
-//	    return "redirect:/product/findAll";
-//	}
 
 	
 	@PutMapping("/updatePut")
@@ -161,15 +112,6 @@ public class ProductController {
 
 
 		System.out.println(productTypeId+"ok");
-		
-//		ProductType productType = productTypeService.findProductTypeById(productTypeId);
-//		System.out.println(productType+"productType");
-		
-		
-//		System.out.println(updateProduct.getProductType().getProductTypeId());
-//		System.out.println(updateProduct.getProductType().getProductTypeName());
-//		updateProduct.setProductType(productType);
-
 		
 		// 建立圖片保存的目錄
 		File fileSaveDirectory = new File(uploadPath);
@@ -188,20 +130,11 @@ public class ProductController {
 			file.transferTo(fileToSave);
 			updateProduct.setProductPicture("/SpanTasty/upload/store/" + newFileName);
 		}
-//		updateProduct.setProductType(productTypeService.findProductTypeById(productTypeId));
 		productService.updateProduct(updateProduct);
 
 		return "redirect:/product/findAll";
 	}
 
-//	@PutMapping("/updatePost")
-//	public ResponseEntity<?> updateProduct(@RequestBody Product updateProduct){
-//		Product product = productService.updateProduct(updateProduct);
-//		if(product != null) {
-//			return new ResponseEntity<>(product, HttpStatus.OK);
-//		}
-//		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//	}
 
 	@GetMapping("/find/{id}")
 	public ResponseEntity<?> findProductById(@PathVariable("id") Integer productId) {
@@ -221,9 +154,4 @@ public class ProductController {
 		return "store/product/searchAllProduct";
 	}
 
-//	@GetMapping("/findAll")
-//	public ResponseEntity<List<Product>> finaAllProduct(){
-//		List<Product> products = productService.findAllProduct();
-//		return new ResponseEntity<>(products, HttpStatus.OK);
-//	}
 }
