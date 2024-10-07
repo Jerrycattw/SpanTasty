@@ -62,24 +62,16 @@ public class MenuServiceImpl implements MenuService {
 
 	@Override
 	public MenuEntity addFood(MenuEntity newFood) {
-//		System.out.println(newFood.getFoodKindId());
-//		System.out.println(newFood.getFoodKind());
-//		String newFoodKindName = newFood.getFoodKind().getFoodKindName();
-//		System.out.println(newFoodKindName);
-//		if (newFoodKindName != null) {
-//	        // 依照種類名稱尋找
-//	        List<FoodKindEntity> optional = foodKindRepository.findByFoodKindName(newFoodKindName);
-//	        if (optional.isEmpty()) {
-//	            // 不存在，加入新的FoodKind
-//	            FoodKindEntity foodKind = new FoodKindEntity();
-//	            foodKind.setFoodKindName(newFoodKindName);
-//	            newFood.setFoodKind(foodKind); // 直接加入 newFood，cascade.persist
-//	        } else {
-//	            // 已存在，直接加入已存在的FoodKind
-//	            newFood.setFoodKind(optional.get(0));
-//	        }
-//	    }
 		try {
+			Optional<FoodKindEntity> foodKindOptional = foodKindRepository.findById(newFood.getFoodKindId());
+			if (foodKindOptional.isPresent()) {
+				Integer inputFoodKindId = foodKindOptional.get().getFoodKindId();
+				newFood.setFoodKind(foodKindRepository.findById(inputFoodKindId).get());
+			} else {
+				FoodKindEntity newFoodKind = new FoodKindEntity();
+				newFoodKind.setFoodKindId(newFood.getFoodKindId());
+				newFood.setFoodKind(newFoodKind);
+			}
 			MenuEntity savedFood = menuRepository.save(newFood);
 			return savedFood;
 		}catch (Exception e) {
