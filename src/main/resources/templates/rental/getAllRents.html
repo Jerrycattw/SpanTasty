@@ -22,7 +22,7 @@
 <div class="content" id="content">
  <div class="container mt-5">
   <div class="row justify-content-center">
-   <div class="col-15 text-align" style="font-size:15px">
+   <div class="col-15 text-align" style="font-size:14px">
     <div class="card shadow" id="card-warning" >
 	<div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
     <h2 class="mb-0">租借訂單系統</h2>
@@ -46,6 +46,7 @@
             <th>訂單備註</th>
             <th>歸還餐廳</th>
             <th>查看訂單</th>
+            <th>歸還訂單</th>
         </tr>
         </thead>
         <tbody>
@@ -69,6 +70,11 @@
             <td class="align-middle">
 				<form th:action="@{/rent/set/{id}(id=${rent.rentId})}" th:method="get">
 					<button type="submit" class="btn bg-success text-white btn-sm" name="action" value="get">查看</button>
+               	</form>
+			</td>
+            <td class="align-middle">
+				<form th:action="@{/rent/set/{id}(id=${rent.rentId})}" th:method="get">
+					<button type="submit" class="btn bg-success text-white btn-sm" name="action" value="return">歸還</button>
                	</form>
 			</td>
         </tr>

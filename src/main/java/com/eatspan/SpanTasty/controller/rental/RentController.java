@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,9 +19,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eatspan.SpanTasty.dto.rental.RentKeywordDTO;
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.rental.Rent;
 import com.eatspan.SpanTasty.entity.rental.RentItem;
@@ -134,7 +139,6 @@ public class RentController {
 		return "redirect:/rent/getAll";
 	}
 	
-	
 
 	//查詢訂單(By訂單編號)
 	@GetMapping("/set/{id}")
@@ -152,8 +156,8 @@ public class RentController {
 			List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 			model.addAttribute("restaurants" ,restaurants);
 			Date returnDate = new Date();
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(returnDate);
+			rent.setReturnDate(returnDate);
+			model.addAttribute("rent", rent);
 			return "rental/setRentReturn";
 			
 		}else if("get".equals(action)){
@@ -200,27 +204,23 @@ public class RentController {
 	
 	
 	//查詢訂單(By多個條件)
-	@GetMapping("/get")
-	public String getRentsBySearch(
-			@ModelAttribute Rent rent,
-			@RequestParam(value = "rentDateStart", required = false) String rentDateStartStr,
-	        @RequestParam(value = "rentDateEnd", required = false) String rentDateEndStr,
-			Model model) {
+	@ResponseBody
+	@PostMapping("/get")
+	public ResponseEntity<List<Rent>> getRents(@RequestBody RentKeywordDTO rentKeywordDTO) {
 		try {
-			Integer rentId = rent.getRentId() != null ? rent.getRentId() : null;
-			Integer memberId = rent.getMemberId() != null ? rent.getMemberId() : null;
-			Integer restaurantId = rent.getRestaurantId() != null ? rent.getRestaurantId() : null;
-			Integer rentStatus = rent.getRentStatus() != null ? rent.getRentStatus() : null;
-	        Date rentDateStart = (rentDateStartStr != null && !rentDateStartStr.isEmpty()) ? new SimpleDateFormat("yyyy-MM-dd").parse(rentDateStartStr) : null;
-	        Date rentDateEnd = (rentDateEndStr != null && !rentDateEndStr.isEmpty()) ? new SimpleDateFormat("yyyy-MM-dd").parse(rentDateEndStr) : null;
+			Integer rentId = (rentKeywordDTO.getRentId() != null && rentKeywordDTO.getRentId() != 0) ? rentKeywordDTO.getRentId() : null;
+	        Integer memberId = (rentKeywordDTO.getMemberId() != null && rentKeywordDTO.getMemberId() != 0) ? rentKeywordDTO.getMemberId() : null;
+	        Integer restaurantId = (rentKeywordDTO.getRestaurantId() != null && rentKeywordDTO.getRestaurantId() != 0) ? rentKeywordDTO.getRestaurantId() : null;
+	        Integer rentStatus = (rentKeywordDTO.getRentStatus() != null && rentKeywordDTO.getRentStatus() != 0) ? rentKeywordDTO.getRentStatus() : null;
+	        Date rentDateStart = (rentKeywordDTO.getRentDateStart() != null && !rentKeywordDTO.getRentDateStart().trim().isEmpty()) ? new SimpleDateFormat("yyyy-MM-dd").parse(rentKeywordDTO.getRentDateStart()) : null;
+	        Date rentDateEnd = (rentKeywordDTO.getRentDateEnd() != null && !rentKeywordDTO.getRentDateEnd().trim().isEmpty()) ? new SimpleDateFormat("yyyy-MM-dd").parse(rentKeywordDTO.getRentDateEnd()) : null;
 	        
 			List<Rent> rents = rentService.findRentsByCriteria(rentId, memberId, restaurantId, rentStatus, rentDateStart, rentDateEnd);
-			model.addAttribute("rents", rents);
-			return "rental/getRents";
+			return ResponseEntity.ok(rents);
 		} catch (Exception e) {
 			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
-		return null;
 	}
 	
 	

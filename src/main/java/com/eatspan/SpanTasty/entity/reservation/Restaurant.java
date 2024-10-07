@@ -80,7 +80,7 @@ public class Restaurant {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL)
 	private List<Reserve> reserves = new ArrayList<Reserve>();
 
-	@JsonIgnore
+	@JsonIgnore //該屬性不要做JSON序列化避免無線迴圈 //預設lazy
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL) // 'restaurant' 是 `TablewareStock` 中的字段名
     private List<TablewareStock> stocks = new ArrayList<>();
 	
