@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,18 +29,25 @@ public class Tableware implements Serializable {
 	
 	@Id@Column(name = "tableware_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int tablewareId; 
+	private Integer tablewareId; 
+	
 	@Column(name = "tableware_name")
 	private String tablewareName; 
+	
 	@Column(name = "tableware_deposit")
-	private int tablewareDeposit;
+	private Integer tablewareDeposit;
+	
 	@Column(name = "tableware_image")
 	private String tablewareImage; 
+	
 	@Column(name = "tableware_description")
 	private String tablewareDescription;
-	@Column(name = "tableware_status")
-	private int tablewareStatus;
 	
+	@Column(name = "tableware_status")
+	private Integer tablewareStatus;
+	
+	
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL, mappedBy = "tableware")
-	private List<TablewareStock> tablewareStocks = new ArrayList<TablewareStock>();
+	private List<TablewareStock> stocks = new ArrayList<TablewareStock>();
 }

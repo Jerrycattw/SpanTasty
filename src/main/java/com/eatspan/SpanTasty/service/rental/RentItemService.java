@@ -26,6 +26,12 @@ public class RentItemService {
 	public void deleteRentItems(Integer rentId) {
 		rentItemRepository.deleteByRentId(rentId);
 	}
+	
+	
+	//刪除訂單明細
+	public void deleteRentItem(RentItem rentItem) {
+		rentItemRepository.delete(rentItem);
+	}
 
 	
 	//更改訂單明細

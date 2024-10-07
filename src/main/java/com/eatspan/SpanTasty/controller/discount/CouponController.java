@@ -77,16 +77,22 @@ public class CouponController {
  		return "discount/coupon/insertCoupon";
  	}
  	
- 	@PostMapping("/coupon/preAdd")//生成空input
+// 	@PostMapping("/coupon/preAdd")//生成空input
+// 	@ResponseBody
+// 	public Map<String, Object> getDefaultCouponWithTags(){
+// 		CouponDTO couponDTO=new CouponDTO();
+// 		Map<String, List<String>> tagOptions = couponService.getTagOptions();
+// 		
+// 		Map<String, Object> data = new HashMap<String, Object>();
+// 		data.put("coupon", couponDTO);
+// 		data.put("tagOptions", tagOptions);
+// 		return data;
+// 	}
+ 	
+ 	@GetMapping("/coupon/api/preadd")
  	@ResponseBody
- 	public Map<String, Object> getDefaultCouponWithTags(){
- 		CouponDTO couponDTO=new CouponDTO();
- 		Map<String, List<String>> tagOptions = couponService.getTagOptions();
- 		
- 		Map<String, Object> data = new HashMap<String, Object>();
- 		data.put("coupon", couponDTO);
- 		data.put("tagOptions", tagOptions);
- 		return data;
+ 	public Map<String, List<String>> getDefaultCouponWithTagsApi() {
+ 		return couponService.getTagOptions();
  	}
  	
  	@PostMapping("/coupon/add")

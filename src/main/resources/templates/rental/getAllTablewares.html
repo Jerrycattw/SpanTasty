@@ -12,10 +12,12 @@
 	#btn-yellow{
 		background-color: #f9e79f;
 	}
-	#btn-orange{
-		background-color: #f7d6a3;
+	#btn-lightgreen{
+		background-color:	#CCFF80;
 	}
-	
+	#btn-lightblue{
+		background-color:	rgb(255, 255, 128);
+	}
 </style>
 </head>
 <body>
@@ -28,7 +30,10 @@
     <div class="card shadow" id="card-warning" >
 	<div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
 		<h2 class="mb-0">環保餐具系統</h2>
+		<div class="d-grid gap-2 d-md-block">
+		<a th:href="@{/tableware/toGet}" class="btn btn-sm" id="btn-yellow">搜尋餐具</a>
 		<a th:href="@{/tableware/add}" class="btn btn-sm" id="btn-yellow">新增餐具</a>
+		</div>
 	</div>
 	<div class="table-responsive">
 		<table class="table table-warning table-striped text-center" id="table">
@@ -41,16 +46,17 @@
 			<th>用具描述</th>
 			<th>用具狀態</th>
 			<th>更改狀態</th>
+			<th>修改資料</th>
 		</tr>
 		</thead>
 		
 		<tbody>
-		<th:block th:each=" tableware : ${tablewares}">
+		<th:block th:each=" tableware : ${tablewarePages.content}">
 		<tr>
 			<td th:text="${tableware.tablewareId}">用具編號</td>
 			<td th:text="${tableware.tablewareName}">用具名稱</td>
 			<td th:text="${tableware.tablewareDeposit}">押金金額</td>
-			<td th:text="${tableware.tablewareImage}">用具圖片</td>
+			<td><img width="50px" th:src="${tableware.tablewareImage}" /></td>
 			<td th:text="${tableware.tablewareDescription}">用具描述</td>
 			<td class="align-middle">
 				<span th:switch="${tableware.tablewareStatus}">
@@ -61,15 +67,46 @@
 			<td class="align-middle">
 				<form th:action="@{/tableware/setPut2/{id}(id=${tableware.tablewareId})}" th:method="post">
                		<input type="hidden" name="_method" value="put"/>
-               		<input type="submit" th:value="更改狀態" class="btn btn-sm" id="btn-orange">
+               		<input type="submit" th:value="更改狀態" class="btn btn-sm" id="btn-lightgreen">
+               	</form>
+			</td>
+			<td class="align-middle">
+				<form th:action="@{/tableware/set/{id}(id=${tableware.tablewareId})}" th:method="get">
+               		<input type="submit" th:value="資料更新" class="btn  btn-sm" id="btn-lightblue" >
                	</form>
 			</td>
 		</tr>
 		</th:block>
 		</tbody>
 		</table>
-	</div>
+	 </div>
     </div>
+    <div>
+      <ul th:if="${tablewarePages.totalPages != 0}" class="pagination">
+  
+  <!-- 上一頁 -->
+	  <th:block th:switch="${tablewarePages.number + 1 == 1}">
+	      <li th:case="${false}" class="page-item"><a class="page-link" th:href="@{/tableware/getAll(p=${ tablewarePages.number })}" th:text="上一頁"></a></li>
+	      <li th:case="${true}" class="page-item disabled"><a class="page-link" th:href="@{/tableware/getAll(p=${ tablewarePages.number })}" th:text="已經第一頁了"></a></li>
+	  </th:block>
+  
+  <!-- 頁數 -->
+	  <th:block th:each=" aNumber : ${#numbers.sequence(1, tablewarePages.totalPages)}">
+	    <th:block th:switch="${tablewarePages.number + 1 == aNumber}">
+	      <li th:case="${true}" class="page-item active"><a class="page-link"><span th:text="${aNumber}"></span></a></li>
+	      <li th:case="${false}" class="page-item"><a class="page-link"  th:href="@{/tableware/getAll(p=${aNumber})}" th:text="${aNumber}"></a></li>
+	    </th:block> 
+	  </th:block>
+  
+  <!-- 下一頁 -->
+	  <th:block th:switch="${tablewarePages.number + 1 == tablewarePages.totalPages}">
+	     <li th:case="${true}" class="page-item disabled"><a class="page-link" th:href="@{/tableware/getAll(p=${ tablewarePages.number + 2 })}" th:text="已經最後了"></a></li>
+	     <li th:case="${false}" class="page-item"><a class="page-link" th:href="@{/tableware/getAll(p=${ tablewarePages.number + 2 })}" th:text="下一頁"></a></li>
+	  </th:block>
+  </ul>
+  
+  <div>總共有 <span th:text="${tablewarePages.totalElements}"></span> 筆</div>
+  </div>
    </div>
   </div>
  </div>

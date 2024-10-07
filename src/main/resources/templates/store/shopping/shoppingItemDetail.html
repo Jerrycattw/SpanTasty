@@ -22,13 +22,13 @@
         }
         th, td {
             border: 1px solid #dddddd;
-            text-align: left; /* 預設左對齊 */
+            text-align: left;
             padding: 8px;
         }
         th {
             background-color: #f2f2f2;
             font-weight: bold;
-            text-align: center; /* 置中對齊 */
+            text-align: center;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
@@ -36,6 +36,7 @@
         tr:hover {
             background-color: #e2e2e2;
         }
+       
     </style>
 </head>
 <body>
@@ -43,20 +44,20 @@
 <div class="content" id="content">
     <div align="center">
         <h2>訂單明細</h2>
-        <form method="post" action="@{/shoppingItem/showUpdateItem}">
+        <form method="post" th:action="@{/shoppingItem/addItem}">
             <input type="hidden" name="shoppingId" th:value="${shopping.shoppingId}">
-            <select name="productId" id="productId">
+            <select name="productId" id="productId" required>
                 <option value="">請選擇商品</option>
                 <th:block th:each="product : ${productList}">
                     <option th:value="${product.productId}" th:text="${product.productId} + '. ' + ${product.productName}"></option>
                 </th:block>
             </select>
-            <input type="text" name="shoppingItemQuantity" id="shoppingItemQuantity" placeholder="請輸入加購商品數量"> 
-            <button id="add"><i class="fa-solid fa-cart-plus fa-xl" style="color: #223658;"></i></button>
+            <input type="number" name="shoppingItemQuantity" id="shoppingItemQuantity" placeholder="請輸入加購商品數量" required> 
+            <button id="add"><i class="fa-solid fa-cart-plus fa-xxl" style="color: #223658;"></i></button>
         </form>
 
         <th:block th:if="${items != null}">
-            <br><input type="hidden" id="shoppingId" th:value="${shopping.shoppingId}">
+            <br>
             <table id="items_table" border="1">
                 <thead>
                     <tr style="background-color:#9D9D9D">
@@ -66,7 +67,7 @@
                         <th>產品項目數量</th>
                         <th>產品價格</th>
                         <th>產品項目金額</th>
-                        <th>修改項目</th>
+                        <th>修改產品項目數量</th>
                         <th>刪除項目</th>
                     </tr>
                 </thead>
@@ -80,9 +81,11 @@
                             <td th:text="${item.product.productPrice}"></td>
                             <td th:text="${item.shoppingItemQuantity * item.product.productPrice}"></td>
                             <td>
-                                <form method="post" th:action="@{/shoppingItem/showUpdateItem}">
+                                <form method="post" th:action="@{/shoppingItem/updateItem}">
                                     <input type="hidden" name="shoppingId" th:value="${item.id.shoppingId}">
                                     <input type="hidden" name="productId" th:value="${item.id.productId}">
+                                    <input type="number" name="shoppingItemQuantity" id="shoppingItemQuantity" 
+                                     th:value="${item.shoppingItemQuantity}" min="1" placeholder="請輸入加購商品數量" required> 
                                     <button type="submit" style="background: none; border: none; cursor: pointer; color: #9d80f4;">
                                         <i class="fa-regular fa-pen-to-square fa-xl" style="color: #9d80f4;"></i>
                                     </button>
@@ -101,7 +104,9 @@
                     </th:block>
                 </tbody>
             </table>
-            <h4>訂單總金額: <span th:text="${shopping.shoppingTotal}"></span></h4>
+            <div style="text-align: right;font-weight: bold; "><p>
+            <h5>訂單總金額: <span th:text="${shopping.shoppingTotal}"></span></h5>
+            </div>
         </th:block>
         
         <th:block th:if="${items == null}">

@@ -131,17 +131,17 @@
 					menuItems = `
                         <a href="/SpanTasty/product/add">新增商品</a>
                         <a href="/SpanTasty/product/findAll">查詢所有商品</a>
+                        <a href="/SpanTasty/productType/findAll">查詢所有商品類別</a>
                         <a href="/SpanTasty/shoppingOrder/add">新增訂單</a>
                         <a href="/SpanTasty/shoppingOrder/findAll">查詢所有訂單</a>
-                        <a href="/SpanTasty/shoppingCart/addShoppingCart">購物車</a>
+                        <!--<a href="/SpanTasty/shoppingCart/addShoppingCart">購物車</a>-->
                     `;
-					break;
-				case 'order':
-					menuItems = `
-                        <a href="/SpanTasty/order/MenuManagement.html">菜單管理</a>
-                        <a href="/EEIT187-6/togo/GetMenu.html">菜單查詢</a>
-                        <a href="/EEIT187-6/TogoController/getAll">訂單管理</a>
-                        <a href="/EEIT187-6/togo/GetTogo.html">訂單查詢</a>
+
+                    break;
+                case 'order':
+                    menuItems = `
+                        <a href="/SpanTasty/order/menu">菜單管理</a>
+                        <a href="/SpanTasty/order/togo">訂單管理</a>
                     `;
 					break;
 				case 'rental':
@@ -157,11 +157,11 @@
                         <a href="/SpanTasty/tabletype/getAll">桌位種類管理</a>
                         <a href="/SpanTasty/reserve/getAll">訂位管理</a>
                     `;
-					break;
-				case 'points':
-					menuItems = `
-                        <a href="/SpanTasty/point/pointSet">點數設定</a>
-                        <a href="/SpanTasty/point">點數管理</a>
+
+                    break;
+                case 'points':
+                    menuItems = `
+                        <a href="/SpanTasty/point/pointCenter">點數中心</a>
                         <a href="/SpanTasty/coupon">優惠券管理</a>
                     `;
 					break;

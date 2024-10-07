@@ -1,172 +1,336 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            width: 100%;
-            max-width: 1200px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-            font-size: 14px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .first, .second {
-            border-bottom: 2px solid gray;
-            padding: 15px 0;
-        }
-        .do {
-            display: flex;
-        }
-        form {
-            margin: 2px;  
-        }
-        button {
-            padding: 5px 10px;
-            margin: 2px;
-        }
-        .table-container {
-            overflow-x: auto;
-        }
-		.button-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-        }
-        .first-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-    </style>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 <div th:replace="~{/display/navbar}"></div>
-	<div class="content" id="content">
-		<div class="container">
-			<div class="first">
-				<div class="first-section">
-					<div>
-						<h1>會員點數</h1>
-						<h4 th:text="'會員編號 : '+${pointMember.memberId}"></h4>
-						<h4 th:text="'會員姓名 : '+${pointMember.memberName}"></h4>
-					</div>
-					<div>
-						<button th:onclick="|window.location.href='@{/point/member/{memberId}/point(memberId=${pointMember.memberId})}'|">新增點數</button>
-					</div>
-				</div>
-			</div>
-			<div class="second">
-				<h4 th:text="'現有點數 : '+${pointMember.totalPointBalance}"></h4>
-				<h4 th:text="${pointMember.expiringPoints}+' 點 將於 '+${pointMember.expiryDate}+' 到期'"></h4>
-			</div>
-			<div class="second">
-				<h4>活動紀錄</h4>
-				<div class="table-container">
-					<table>
-						<thead>
-							<tr>
-								<th>點數紀錄</th>
-								<th>會員</th>
-								<th>變動點數</th>
-								<th>創建日期</th>
-								<th>到期日</th>
-								<th>是否到期</th>
-								<th>剩餘點數</th>
-								<th>交易來源</th>
-								<th>交易類型</th>
-								<th>動作</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="point : ${pointsById}" class="point_tr">
-								<td th:text="${point.pointId}"></td>
-								<td th:text="${point.memberId}"></td>
-								<td th:text="${point.pointChange}"></td>
-								<td th:text="${#dates.format(point.createDate, 'yyyy-MM-dd')}"></td>
-								<td th:text="${#dates.format(point.expiryDate, 'yyyy-MM-dd')}" id="expiryDate"></td>
-								<td id="expiry_td"></td>
-								<td th:text="${point.pointUsage}"></td>
-								<td th:text="${point.transactionId}"></td>
-								<td th:text="${point.transactionType}"></td>
-								<td>
-									<button th:onclick="|window.location.href='@{/point/member/{memberId}/point/{pointId}(memberId=${pointMember.memberId},pointId=${point.pointId})}'|">編輯</button>
-									<button th:onclick="'deletePoint(' + ${memberId} + ', ' + ${point.pointId} + ')'" class="btn btn-link">删除</button>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-			<div class="button-container">
-				<button onclick="window.location.href='/SpanTasty/point'">返回查詢點數</button>
-			</div>
-		</div>
-	</div>
-	    <script th:inline="javascript">
-			function deletePoint(memberId, pointId) {
-				console.log('touch')
-			    if (confirm('確定要刪除嗎，刪除後無法復原?')) {
-			        fetch(`/SpanTasty/point/member/${memberId}/point/${pointId}`, {
-			            method: 'DELETE',
-			        })
-			        .then(response => {
-			        	console.log(response)
-			            if (response.ok) {
-			              	return response.text();
-			            } else {
-			                throw new Error('刪除失敗');
-			            }
-		            })
-		            .then(message=>{	            	
-		            	alert(message);
-		            	window.location.reload(); 
-			        })
-			        .catch(err=>{
-			        	alert('刪除失敗，請聯繫IT部門');
-			    	})
-			    }	
-			}
-		</script>
-		<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			const trs = document.getElementsByClassName('point_tr');
-			
-			Array.from(trs).forEach(tr => {
-				const expiryDateElem = tr.querySelector('#expiryDate').textContent;
-				const expiryTdElem = tr.querySelector('#expiry_td');
-				
-				if (expiryDateElem && expiryTdElem) {
-					const now = new Date();
-					const expiryDate = new Date(expiryDateElem);
-					console.log(expiryDate);
-					
-					
-					if (expiryDate > now) {
-						expiryTdElem.innerHTML = '尚未過期';
-					} else {
-						expiryTdElem.innerHTML = '過期';
-					}
-				}
-			});
+<div class="content">
+    <div class="container mt-4">
+        <div class="card">
+          <div class="card-body">
+            <h3 class="card-title"><i class="fa-solid fa-circle-user me-2"></i>會員點數</h3>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <p class="mb-0" th:text="'會員編號 : '+${pointMember.memberId}"></p>
+                <p class="mb-0" th:text="'會員姓名 : '+${pointMember.memberName}"></p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm me-3 " data-bs-toggle="modal" data-bs-target="#staticBackdrop" >新增點數</button>
+            </div>
+            <hr>
+            <p class="mb-1" th:text="'現有點數 : '+${pointMember.totalPointBalance}"></p>
+            <p class="mb-3" th:text="${pointMember.expiringPoints}+' 點 將於 '+${pointMember.expiryDate}+' 到期'"></p>
+            <h6>活動紀錄</h6>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>點數紀錄</th>
+                    <th>會員</th>
+                    <th>變動點數</th>
+                    <th>創建日期</th>
+                    <th>到期日</th>
+                    <th>處理狀態</th>
+                    <th>剩餘點數</th>
+                    <th>交易來源</th>
+                    <th>交易類型</th>
+                    <th>
+                      <div data-bs-toggle="tooltip" data-bs-placement="top" th:data-bs-title="懸停在圖示上可查看修改原因。" >
+                        調整<i class="fa-regular fa-circle-question fa-sm ms-1"></i></th>
+                      </div>
+                    <th>#</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="point : ${pointsById}" class="point_tr">
+                    <td th:text="${point.pointId}"></td>
+                    <td th:text="${point.memberId}"></td>
+                    <td th:text="${point.pointChange}"></td>
+                    <td th:text="${#dates.format(point.createDate, 'yyyy-MM-dd')}"></td>
+                    <td th:text="${#dates.format(point.expiryDate, 'yyyy-MM-dd')}" id="expiryDate"></td>
+                    <td id="expiry_td"></td>
+                    <td th:text="${point.pointUsage}"></td>
+                    <td th:text="${point.transactionId}"></td>
+                    <td th:text="${point.transactionType}"></td>
+                    <td>
+                      <i th:if="${point.transactionDescription}" class="fa-solid fa-user-pen fa-lg"   data-bs-toggle="tooltip" data-bs-placement="top" th:data-bs-title="${point.transactionDescription}" ></i>
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary edditBtn" th:data-pointId="${point.pointId}" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">編輯</button>
+                      <!-- th:onclick="|window.location.href='@{/point/member/{memberId}/point/{pointId}(memberId=${pointMember.memberId},pointId=${point.pointId})}'|" -->
+                      <button th:onclick="'deletePoint(' + ${memberId} + ', ' + ${point.pointId} + ')'" class="btn btn-sm btn-outline-danger">删除</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer text-body-secondary text-end">
+            <button class="btn btn-secondary" onclick="window.location.href='/SpanTasty/point/pointCenter'">返回點數中心</button>
+          </div>
+        </div>
+      </div>
+      <!-------------------------- Modal 新增點數---------------------------->
+      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">新增點數紀錄</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!--------- 內容 --------->  
+              <form th:method="post" th:action="@{/point/member/{memberId}/point(memberId=${memberId})}" > 
+                <!-- 1 -->
+                <div class="row">
+                  <div class="col-4">調整方式</div>  
+                  <div class="col-8">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="plusOrMinus" id="inlineRadio1" value="plus" required>
+                      <label class="form-check-label" for="inlineRadio1">新增點數</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="plusOrMinus" id="inlineRadio2" value="minus" required>
+                      <label class="form-check-label" for="inlineRadio2">扣除點數</label>
+                    </div>
+                  </div>  
+                </div>
+                <!-- 2 -->
+                <div class="row mt-2 align-items-center">
+                  <div class="col-4">點數數量</div>
+                  <div class="col-8"><input type="text" name="pointChange" class="form-control"></div>
+                </div>
+                <!-- 3 -->
+                <div class="row mt-2">
+                  <div class="col-4 align-items-center">開始日</div>
+                  <div class="col-8"><input type="date" name="createDate" class="form-control"></div>
+                </div>
+                <!-- 4 -->
+                <div class="row mt-2">
+                  <div class="col-4 align-items-center">到期日*</div>
+                  <div class="col-8"><input type="text" name="pointUsage" class="form-control" disabled placeholder="系統自動產生"></div>
+                </div>
+                <!-- 5 -->
+                <div class="row mt-2">
+                  <div class="col-4 align-items-center">交易來源*</div>
+                  <div class="col-8"><input type="text" name="transactionId" class="form-control" placeholder="訂單訂餐編號、其他原因" required></div>
+                </div>
+                <!-- 6 -->
+                <div class="row mt-2">
+                  <div class="col-4 align-items-center">交易類型</div>
+                  <div class="col-8">
+                    <select class="form-select" name="transactionType">
+                      <option value="商城">商城</option>
+                      <option value="訂餐">訂餐</option>
+                      <option value="系統" selected>系統</option>
+                    </select>
+                  </div>
+                </div>
+                <!-- 7 -->
+                <div class="row mt-2">
+                  <div class="col align-items-center">人工調整原因*</div>
+                </div>
+                <div class="row mt-1">
+                  <div class="col"><input type="text" name="transactionDescription" class="form-control " placeholder="只會顯示在管理後台"></div>
+                </div>
+                <!--------- 內容 End--------->
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-primary">確定</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!---------------------------- Modal End------------------------------>
+
+      <!-------------------------- Modal 編輯點數---------------------------->
+      <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">人工調整</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!--------- 內容 --------->  
+              <form id="edditForm" th:method="put" th:action="@{#}">
+                <!-- 1 -->
+                <div class="row">
+                  <div class="col-4">調整方式</div>  
+                  <div class="col-8">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="plusOrMinus" id="eddit_radioPlus" value="plus">
+                      <label class="form-check-label" for="inlineRadio1">新增點數</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="plusOrMinus" id="eddit_radioMinus" value="minus">
+                      <label class="form-check-label" for="inlineRadio2">扣除點數</label>
+                    </div>
+                  </div>  
+                </div>
+                <!-- 2 -->
+                <div class="row mt-2 align-items-center">
+                  <div class="col-4 align-items-center">點數數量</div>
+                  <div class="col-8"><input id="eddit_pointChange" type="text" name="pointChange" class="form-control"></div>
+                </div>
+                <!-- 3 -->
+                <div class="row mt-2 align-items-center">
+                  <div class="col-4 align-items-center">開始日</div>
+                  <div class="col-8"><input id="eddit_createDate" type="date" name="createDate" class="form-control"></div>
+                </div>
+                <!-- 4 -->
+                <div class="row mt-2 align-items-center">
+                  <div class="col-4 align-items-center">到期日*</div>
+                  <div class="col-8"><input type="date" id="eddit_expiryDate" name="expiryDate" class="form-control" ></div>
+                </div>
+                <!-- 5 -->
+                <div class="row mt-2 align-items-center">
+                  <div class="col-4 align-items-center">剩餘數量</div>
+                  <div class="col-8"><input type="text" id="eddit_pointUsage" name="pointUsage" class="form-control"></div>
+                </div>
+                <!-- 6 -->
+                <div class="row mt-2 align-items-center">
+                  <div class="col-4 align-items-center">交易來源*</div>
+                  <div class="col-8"><input type="text" id="eddit_transactionId" name="transactionId" class="form-control" placeholder="訂單訂餐編號、其他原因" required></div>
+                </div>
+                <!-- 7 -->
+                <div class="row mt-2">
+                  <div class="col-4 align-items-center">交易類型</div>
+                  <div class="col-8">
+                    <select class="form-select" id="eddit_transactionType" name="transactionType">
+                      <option value="商城">商城</option>
+                      <option value="訂餐">訂餐</option>
+                      <option value="系統" selected>系統</option>
+                    </select>
+                  </div>
+                </div>
+                <!-- 7 -->
+                <div class="row mt-2">
+                  <div class="col align-items-center">人工調整原因*</div>
+                </div>
+                <div class="row mt-1">
+                  <div class="col"><input type="text" id="eddit_transactionDescription" name="transactionDescription" class="form-control " placeholder="只會顯示在管理後台" required></div>
+                </div>
+                <!--------- 內容 End--------->
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button id="eddit_submit" type="submit" class="btn btn-primary">確定</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>      
+      <!-------------------------- Modal End---------------------------->
+      <script th:inline="javascript">
+        function deletePoint(memberId, pointId) {
+          console.log('touch')
+            if (confirm('確定要刪除嗎，刪除後無法復原?')) {
+                fetch(`/SpanTasty/point/member/${memberId}/point/${pointId}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                  console.log(response)
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        throw new Error('刪除失敗');
+                    }
+                  })
+                  .then(message=>{	            	
+                    alert(message);
+                    window.location.reload(); 
+                })
+                .catch(err=>{
+                  alert('刪除失敗，請聯繫IT部門');
+              })
+            }	
+        }
+      </script>
+      <script th:inline="javascript">
+        //變量
+        let edditPointId;
+
+        //過期/未過期欄位增加
+        document.addEventListener("DOMContentLoaded", function() {
+          const trs = document.getElementsByClassName('point_tr');
+          
+          Array.from(trs).forEach(tr => {
+            const expiryDateElem = tr.querySelector('#expiryDate').textContent;
+            const expiryTdElem = tr.querySelector('#expiry_td');
+            
+            if (expiryDateElem && expiryTdElem) {
+              const now = new Date();
+              const expiryDate = new Date(expiryDateElem);
+              console.log(expiryDate);
+              
+              
+              if (expiryDate > now) {
+                expiryTdElem.innerHTML = '尚未過期';
+              } else {
+                expiryTdElem.innerHTML = '過期';
+              }
+            }
+          });
+        
+        //編輯id="eddit_"
+
+        const btns = document.getElementsByClassName('edditBtn')
+        Array.from(btns).forEach(btn=>{
+          btn.addEventListener('click',()=>{
+            const pointId = btn.getAttribute('data-pointId');
+
+            axios.get(`/SpanTasty/point/api/member/[[${pointMember.memberId}]]/point/${pointId}`)
+              .then(res=>{
+                console.log(res.data)
+                if(res.data.pointChange>0){
+                  document.getElementById('eddit_radioPlus').checked=true
+                  document.getElementById('eddit_pointChange').value=res.data.pointChange
+                }else{
+                  document.getElementById('eddit_radioMinus').checked=true
+                  document.getElementById('eddit_pointChange').value=res.data.pointChange*-1
+                }
+                document.getElementById('eddit_createDate').value=res.data.createDate
+                document.getElementById('eddit_expiryDate').value=res.data.expiryDate
+                document.getElementById('eddit_pointUsage').value=res.data.pointUsage
+                document.getElementById('eddit_transactionId').value=res.data.transactionId
+                document.getElementById('eddit_transactionType').innerHTML=`
+                                  <option value="商城" ${res.data.transactionType === '商城' ? 'selected' : ''}>商城</option>
+                                  <option value="訂餐" ${res.data.transactionType === '訂餐' ? 'selected' : ''}>訂餐</option>
+                                  <option value="系統" ${res.data.transactionType === '系統' ? 'selected' : ''}>系統</option>
+                                  `
+                document.getElementById('eddit_transactionDescription').value=res.data.transactionDescription
+                
+              })
+              document.getElementById('edditForm').action=`/SpanTasty/point/member/[[${pointMember.memberId}]]/point/${pointId}`
+              console.log(document.getElementById('edditForm').action);
+              
+          })
+        })
+
+      });
+	
+      document.addEventListener("DOMContentLoaded", function() {
+   	  showSidebar('points');
+
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+
 		});
-		</script>
+
+      </script>
+
+      <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+      <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+      <script th:src="@{/js/axios.min.js}"></script>
+      
 </body>
 </html>

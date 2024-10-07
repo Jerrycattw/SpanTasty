@@ -5,15 +5,20 @@ import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eatspan.SpanTasty.dto.rental.StockKeywordDTO;
 import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
@@ -35,23 +40,24 @@ public class TablewareStockController {
 	
 	// 導向頁面(新增 搜尋)
 	@GetMapping("/add")
-	public String toAddAndSearch(@RequestParam("action") String action, Model model) {
+	public String toAddAndSearch(@RequestParam(name= "action") String action, Model model) {
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
 		//暫時修改
 		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants();
 		model.addAttribute("tablewares",tablewares);
 		model.addAttribute("restaurants",restaurants);
-		if ("insert".equals(action)) {
+		if ("add".equals(action)) {
 			return "rental/addStock";
-	    } else if ("search".equals(action)) {
+	    } else if ("get".equals(action)) {
 	    	return "rental/getStocks";
 	    }
+		
 		return null;
 	}
 	
 	
 	// 新增庫存
-	@PostMapping("/addstock")
+	@PostMapping("/addPost")
 	protected String addStock(@ModelAttribute TablewareStock stock, Model model) {
 		tablewareStockService.addStock(stock);
 		return "redirect:/stock/getAll";
@@ -59,20 +65,20 @@ public class TablewareStockController {
 
 	
 	// 導向更新頁面
-	@GetMapping("/set")
+	@GetMapping("/set/{tid}/{rid}")
 	protected String toSetStock(
-			@RequestParam("tableware_id") Integer tablewareId,
-			@RequestParam("restaurant_id") Integer restaurantId,
+			@PathVariable("tid") Integer tablewareId,
+			@PathVariable("rid") Integer restaurantId,
 			Model model) {
 		TablewareStock stock = tablewareStockService.findStockById(tablewareId, restaurantId);
 		model.addAttribute("stock", stock);
-		return "rental/updateStock";
+		return "rental/setStock";
 	}
 	
 	
 	// 更新庫存
 	@PutMapping("/setPut")
-	protected String update(
+	protected String updateStock(
 			@ModelAttribute TablewareStock stock,
 			Model model) {
 		tablewareStockService.addStock(stock);
@@ -81,14 +87,19 @@ public class TablewareStockController {
 
 	
 	// 查詢庫存
-	@GetMapping("/get")
-	protected String getStocks(
-			@RequestParam(value = "tablewareId", required = false) Integer tablewareId,
-			@RequestParam(value = "restaurantId", required = false) Integer restaurantId,
-			Model model) {
+	@ResponseBody
+	@PostMapping("/get")
+	protected ResponseEntity<List<TablewareStock>> getStocks(@RequestBody StockKeywordDTO stockKeywordDTO) {
+		Integer tablewareId = stockKeywordDTO.getTablewareId();
+		Integer restaurantId = stockKeywordDTO.getRestaurantId();
+		if (tablewareId != null && (tablewareId == 0 || tablewareId.toString().trim().isEmpty())) {
+	        tablewareId = null;
+	    }
+	    if (restaurantId != null && (restaurantId == 0 || restaurantId.toString().trim().isEmpty())) {
+	        restaurantId = null;
+	    }
 		List<TablewareStock> stocks = tablewareStockService.findStocksByCriteria(tablewareId, restaurantId);
-		model.addAttribute("stocks", stocks);
-		return "rental/getAllStocks";
+		return ResponseEntity.ok(stocks);
 	}
 	
 	

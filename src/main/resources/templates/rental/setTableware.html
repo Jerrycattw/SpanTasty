@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新增環保用具庫存</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<style>
+.h {
+	text-align: center;
+}
+form {
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background-color: #ffd966;
+}
+</style>
+</head>
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <div class="content" id="container">
+        <h3 class="h">修改環保用具資料</h3>
+        <form th:action="@{/tableware/setPut1}" th:method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="put"/> 
+        <table class="table table-warning table-striped" id="table">
+            <tr><td>用具編號:<input type="text" name="tablewareId" th:value="${tableware.tablewareId}" readonly/></td></tr>
+            <tr><td>用具名稱:<input type="text" name="tablewareName" th:value="${tableware.tablewareName}" /></td></tr>
+            <tr><td>用具押金:<input type="text" name="tablewareDeposit" th:value="${tableware.tablewareDeposit}" /></td></tr>
+			<tr><td>用具圖片: 
+					<img width="50px" th:src="${tableware.tablewareImage}" /> 
+					<input type="hidden" name="tablewareImage" th:value="${tableware.tablewareImage}"/>
+					<input type="file" name="timg" />
+			</td></tr>
+			<tr><td>用具描述:<input type="text" name="tablewareDescription" th:value="${tableware.tablewareDescription}"/></td></tr>
+			<tr><td>用具狀態: 
+				<input type="radio" name="tablewareStatus" value="1" th:value="1" th:checked="${tableware.tablewareStatus == 1}"/> 1:上架 
+        		<input type="radio" name="tablewareStatus" value="2" th:value="2" th:checked="${tableware.tablewareStatus == 2}"/> 2:未上架
+			</td></tr>
+        </table>
+        <input type="submit" id="submitBtn" value="確定更改">
+        </form>
+    </div>
+    <script>
+		document.addEventListener("DOMContentLoaded", function() {
+			showSidebar('rental');
+		});
+	</script>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>餐具庫存</title>
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<style>
+	#card-warning {
+	  background-color: #ffd966; 
+	}
+	#btn-yellow{
+		background-color: #f9e79f;
+	}
+</style>
+</head>
+<body>
+<div th:replace="~{display/navbar}" ></div>
+<div class="content" id="content">
+ <div class="container mt-5">
+  <div class="row justify-content-center">
+   <div class="col-11">
+    <div class="card shadow" id="card-warning" >
+	<div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+    <h2 class="mb-0">庫存管理系統</h2>
+    <form method="get" class="btn" th:action="@{/stock/add}">
+		<button type="submit" class="btn btn-sm" id="btn-yellow" name="action" value="get">搜尋庫存</button>
+		<button type="submit" class="btn btn-sm" id="btn-yellow" name="action" value="add">新增庫存</button>
+	</form>
+	</div>
+	<div class="table-responsive">
+    <table class="table table-warning table-striped" id="table">
+    <thead>
+        <tr>
+            <th>用具編號</th>
+            <th>餐廳編號</th>
+            <th>用具庫存</th>
+            <th>庫存調整</th>
+        </tr>
+    </thead>
+    <tbody>
+    <th:block th:each=" stock : ${stocks}">
+        <tr>
+            <td th:text="${stock.tablewareId}">用具編號</td>
+            <td th:text="${stock.restaurantId}">餐廳編號</td>
+            <td th:text="${stock.stock}">用具庫存</td>
+            <td class="align-middle">
+           	<form th:action="@{/stock/set/{tid}/{rid}(tid=${stock.tablewareId}, rid=${stock.restaurantId})}" th:method="get">
+           		<input type="submit" th:value="盤盈虧" class="btn bg-success text-white btn-sm">
+           	</form>
+            </td>
+        </tr>
+    </th:block>
+    </tbody>
+    </table>
+</div>
+   </div>
+   </div>
+  </div>
+ </div>
+ </div>
+ 
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		showSidebar('rental');
+	});
+</script>
+<script th:src="@{/js/bootstrap.bundle.min.js}" ></script>
+<script th:src="@{/js/jquery-3.7.1.min.js}" ></script>
+<script th:src="@{/js/axios.min.js}" ></script>
+</body>
+</html>

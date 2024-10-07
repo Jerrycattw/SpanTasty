@@ -9,11 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eatspan.SpanTasty.entity.order.MenuEntity;
+import com.eatspan.SpanTasty.entity.order.TogoEntity;
 import com.eatspan.SpanTasty.entity.order.TogoItemEntity;
 import com.eatspan.SpanTasty.entity.order.TogoItemId;
 import com.eatspan.SpanTasty.repository.order.MenuRepository;
 import com.eatspan.SpanTasty.repository.order.TogoItemRepository;
+import com.eatspan.SpanTasty.repository.order.TogoRepository;
 import com.eatspan.SpanTasty.service.order.TogoItemService;
+import com.eatspan.SpanTasty.utils.order.TogoCalculateUtils;
 
 @Service
 public class TogoItemServiceImpl implements TogoItemService {
@@ -23,6 +26,9 @@ public class TogoItemServiceImpl implements TogoItemService {
 	
 	@Autowired
 	private MenuRepository menuRepository;
+	
+	@Autowired
+	private TogoRepository togoRepository;
 	
 	@Override
 	public List<TogoItemEntity> getAllTogoItemByTogoId(Integer togoId) {
@@ -61,9 +67,19 @@ public class TogoItemServiceImpl implements TogoItemService {
                 Integer amount = item.getAmount();
                 item.setTogoItemPrice(foodPrice*amount);
             }
-			
 		}
-		return togoItemRepository.saveAll(savedTogoItems);
+		List<TogoItemEntity> newTogoItemList = togoItemRepository.saveAll(savedTogoItems);
+		 // 計算新的總金額
+		TogoCalculateUtils calculateUtils = new TogoCalculateUtils();
+		Integer newTotalPrice = calculateUtils.sumOfTotalPrice(togoId);
+		Optional<TogoEntity> togoOptional = togoRepository.findById(togoId);
+	    if (togoOptional.isPresent()) {
+	        TogoEntity togo = togoOptional.get();
+	        togo.setTotalPrice(newTotalPrice);
+	        togoRepository.save(togo); // 保存更新的訂單
+	    }
+		
+		return newTogoItemList;
 	}
 	
 	@Transactional
@@ -75,6 +91,17 @@ public class TogoItemServiceImpl implements TogoItemService {
 			togoItem.setAmount(amount);
 			Integer foodPrice = togoItem.getMenu().getFoodPrice();
 			togoItem.setTogoItemPrice(amount*foodPrice);
+			
+			// 更新訂單總金額
+			TogoCalculateUtils calculateUtils = new TogoCalculateUtils();
+			Integer newTotalPrice = calculateUtils.sumOfTotalPrice(togoItemId.getTogoId());
+			Optional<TogoEntity> togoOptional = togoRepository.findById(togoItemId.getTogoId());
+		    if (togoOptional.isPresent()) {
+		        TogoEntity togo = togoOptional.get();
+		        togo.setTotalPrice(newTotalPrice);
+		        togoRepository.save(togo); // 保存更新的訂單
+		    }
+			
 			return togoItem;
 		}
 		return null;
@@ -83,6 +110,16 @@ public class TogoItemServiceImpl implements TogoItemService {
 	@Override
 	public void deleteTogoItemById(TogoItemId togoItemId) {
 		togoItemRepository.deleteById(togoItemId);
+		// 更新訂單總金額
+		TogoCalculateUtils calculateUtils = new TogoCalculateUtils();
+		Integer newTotalPrice = calculateUtils.sumOfTotalPrice(togoItemId.getTogoId());
+		Optional<TogoEntity> togoOptional = togoRepository.findById(togoItemId.getTogoId());
+	    if (togoOptional.isPresent()) {
+	        TogoEntity togo = togoOptional.get();
+	        togo.setTotalPrice(newTotalPrice);
+	        togoRepository.save(togo); // 保存更新的訂單
+	    }
+		
 	}
-
+	
 }

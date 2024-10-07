@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,8 +94,9 @@ public class RentService {
 	}
 
 	
-//查詢訂單編號
-//	public List<Integer> findRentIds(){
-//		return rentRepository.findRentIds();
-//	}
+	//查詢所有訂單(Page)
+	public Page<Rent> findAllRentPages(Integer page){
+		Pageable pageable = PageRequest.of(page-1, 10, Sort.Direction.ASC, "rentId");
+		return rentRepository.findAll(pageable);
+	}
 }
