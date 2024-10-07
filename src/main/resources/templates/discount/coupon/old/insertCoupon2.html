@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+   <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div th:replace="~{/display/navbar}"></div>
+<div class="content">
+    <div class="container">
+        <div class="h1">新增優惠券</div>
+        <div class="card">
+            <div class="card-header">
+                <div data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="無設定條件請留空">
+                    優惠券<i class="fa-regular fa-circle-question ms-2"></i>
+                </div>
+            </div>
+            <div class="card-body">
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3 align-items-center">
+                        優惠券編號
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="text" placeholder="系統自動產生" aria-label="default input example" disabled>
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3 align-items-center">
+                        優惠券代碼
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="text" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        優惠券名稱
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="text" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        使用開始日期
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="date" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        使用結束日期
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="date" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        優惠券數量
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="text" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        每人限領數量
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="text" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        狀態
+                    </div>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example">
+                            <option value="上架">上架</option>
+                            <option value="下架">下架</option>
+                          </select>
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        優惠描述
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="text" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        折扣種類
+                    </div>
+                    <div class="col-9">
+                        <select class="form-select" aria-label="Default select example">
+                            <option value="固定金額">固定金額</option>
+                            <option value="百分比">百分比</option>
+                          </select>       
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        <div data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="百分比8折請填80">
+                        折扣金額<i class="fa-regular fa-circle-question ms-2"></i>
+                      </div>
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="text" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        <div data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="消費滿額才能使用">                           
+                            最低消費金額<i class="fa-regular fa-circle-question ms-2"></i>
+                        </div>
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="text" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3">
+                        <div data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="單筆消費最大折扣金額">
+                        最大折扣金額<i class="fa-regular fa-circle-question ms-2"></i>
+                        </div>
+                    </div>
+                    <div class="col-9">
+                        <input class="form-control" type="text" placeholder="" aria-label="default input example">
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row"><div class="col">綁定標籤 :</div></div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3 d-flex justify-content-end"><label>( 商城 )</label></div>
+                    <div class="col" id="productTags">
+                        <!-- <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                            <label class="form-check-label" for="inlineCheckbox1">1</label>
+                        </div>-->
+                    </div>
+                </div>
+                <!--  -->
+                <div class="row mb-3 me-auto">
+                    <div class="col-3 d-flex justify-content-end"><label>( 訂餐 )</label></div>
+                    <div class="col" id="togoTags">                        
+                        <!-- <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                            <label class="form-check-label" for="inlineCheckbox1">1</label>
+                        </div> -->
+                    </div>
+                </div>
+                <!--  -->
+                
+            </div>
+            <div class="card-footer d-flex justify-content-end">
+                <div class="">
+                    <button type="button" class="btn btn-outline-secondary me-2">返回</button>
+                    <button type="button" class="btn btn-outline-primary me-2">新增</button>
+                </div>
+            </div>
+          </div>
+    </div>
+</div>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+	<script th:src="@{/js/axios.min.js}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            //載入tagoption
+            axios.get('/SpanTasty/coupon/api/preadd')
+            .then(res=>{
+
+                res.data.product.forEach(element => {
+                    document.getElementById('productTags').innerHTML+=`
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="${element}" value="${element}" name="product">
+                            <label class="form-check-label" for="${element}">${element}</label>
+                        </div>`
+                });
+                res.data.togo.forEach(element => {
+                    document.getElementById('togoTags').innerHTML+=`
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="${element}" value="${element}" name="togo">
+                            <label class="form-check-label" for="${element}">${element}</label>
+                        </div>`
+                });
+            })
+            .catch(err=>{
+                console.log("err: "+err)
+            })
+
+            //載入bootstrap
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+        })       
+    </script>          
+</body>
+</html>

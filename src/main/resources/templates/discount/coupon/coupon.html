@@ -1,90 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <script src="js/axios.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js" ></script>
-	<script src="js/jquery-3.7.1.min.js" ></script>
-    <title>Dynamic Table</title>
+    <title>優惠券管理</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-        .top-menu {
-            background-color: #343a40;
-            overflow: hidden;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-        .top-menu a {
-            float: left;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-            font-size: 17px;
-        }
-        .top-menu a:hover {
-            background-color: #495057;
-        }
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: #343a40;
-            position: fixed;
-            top: 56px;
-            padding-top: 20px;
-            z-index: 500;
-        }
-        .sidebar a {
-            padding: 10px 15px;
-            text-decoration: none;
-            font-size: 18px;
-            color: #ddd;
-            display: block;
-        }
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-            padding-top: 80px;
-        }
-        .user-profile {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            color: #fff;
-        }
-        .user-profile img {
-            border-radius: 50%;
-            width: 50px;
-            margin-right: 15px;
-        }
-        .user-profile div {
-            font-size: 16px;
-        }
-        .footer {
-            text-align: center;
-            padding: 10px;
-            background-color: #343a40;
-            color: #fff;
-            position: absolute;
-            bottom: 0;
-            width: calc(100% - 250px);
-            margin-left: 250px;
-        }
-    </style>
-    <style>
+    	.content {
+		  transform: scale(0.7); /* 縮小到 80% */
+		  transform-origin: top left; /* 從左上角開始縮放 */
+		  width: 135%; /* 100% / 0.8 */
+		  height: 135%; /* 調整高度以補償縮放 */
+		}
+		
         table {
             width: 80%;
             border-collapse: collapse;
@@ -201,31 +130,13 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>    <!--  EXCEL CDN -->
 </head>
 <body>
-	<div class="top-menu d-flex justify-content-start">
-        <a href="#" onclick="showSidebar('member')">會員管理</a>
-        <a href="#" onclick="showSidebar('store')">線上商城管理</a>
-        <a href="#" onclick="showSidebar('order')">外帶訂餐管理</a>
-        <a href="#" onclick="showSidebar('reservation')">餐廳及訂位管理</a>
-        <a href="#" onclick="showSidebar('rental')">租借訂單管理</a>
-        <a href="#" onclick="showSidebar('points')">會員積分與優惠券管理</a>
-    </div>
-
-    <!-- 側邊欄 -->
-    <div class="sidebar">
-        <div class="user-profile">
-            <img src="https://via.placeholder.com/50" alt="User">
-            <div>
-                <span>會員名稱</span><br>
-                <small>一般小會員</small>
-            </div>
-        </div>
-        <div id="sidebar"></div>
-    </div>
-    <div class="content" id="content">
+<div th:replace="~{/display/navbar}"></div>
+<div class="content" id="content">
     <h1>優惠券查詢</h1>
     <input type="text" id="searchInput" placeholder="搜尋優惠券編號、代碼、名稱、使用開始及結束日期等"><button id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></button>
     <div id="divAdd" >
-    	<button id="distrubute"><i class="fa-solid fa-arrow-up-from-bracket"></i>&nbsp;發送優惠券</button><button id="add"><i class="fa-solid fa-plus"></i>&nbsp;新增優惠券</button>
+    	<button id="distrubute"><i class="fa-solid fa-arrow-up-from-bracket"></i>&nbsp;發送優惠券</button>
+        <button id="add"><i class="fa-solid fa-plus"></i>&nbsp;新增優惠券</button>
 	</div>
     <table id="couponsTable">
         <thead>
@@ -259,7 +170,7 @@
         <input type="text" id="member">
         <p>優惠券將發送給 <label id="memberAmount"></label> 位顧客</p>
     
-        <input type="text" name="couponInput" list="coupon_list" id="couponInput" placeholder="搜尋優惠券編號、代碼、名稱、">
+        <input type="text" name="couponInput" list="coupon_list" id="couponInput" placeholder="優惠券編號、代碼、名稱">
         <datalist id="coupon_list">
         </datalist>
     
@@ -285,7 +196,7 @@
             <p>共<label id="distribute"></label>筆（成功<label id="success"></label>筆／失敗<label id="fail"></label>筆）<a href="#" id="print"><i class="fa-solid fa-print"></i>下載結果</a></p>
         </div>
         <div class="button-group">
-       	<button id="btn">確認</button><button id="btnCancel">離開</button > 
+       	<button id="btnCancel">離開</button ><button id="btn">確認</button> 
         </div>	
     </div>
 
@@ -555,63 +466,12 @@
     </script>
     
    <script>
-        function showSidebar(menu) {
-            const sidebar = document.getElementById('sidebar');
-            let menuItems = '';
-            switch (menu) {
-                case 'member':
-                    menuItems = `
-                        <a href="/EEIT187-6/admin/addAdmin">新增管理員</a>
-                        <a href="/EEIT187-6/admin/findAllAdmins">查詢管理員</a>
-                        <a href="/EEIT187-6/admin/searchMembers">查詢會員資料</a>
-                    `;
-                    break;
-                case 'store':
-                    menuItems = `
-                        <a href="/SpanTasty/product/add">新增商品</a>
-                        <a href="/SpanTasty/product/findAll">查詢所有商品</a>
-                        <a href="/SpanTasty/shoppingOrder/add">新增訂單</a>
-                        <a href="/SpanTasty/shoppingOrder/findAll">查詢所有訂單</a>
-                    `;
-                    break;
-                case 'order':
-                    menuItems = `
-                        <a href="/EEIT187-6/MenuController/getAll">菜單管理</a>
-                        <a href="/EEIT187-6/togo/GetMenu.html">菜單查詢</a>
-                        <a href="/EEIT187-6/TogoController/getAll">訂單管理</a>
-                        <a href="/EEIT187-6/togo/GetTogo.html">訂單查詢</a>
-                    `;
-                    break;
-                case 'rental':
-                    menuItems = `
-                        <a href="/SpanTasty/tableware/getAll">餐具管理</a>
-                        <a href="/SpanTasty/stock/getAll">餐具庫存管理</a>
-                        <a href="/SpanTasty/rent/getAll">租借訂單管理</a>
-                    `;
-                    break;
-                case 'reservation':
-                    menuItems = `
-                        <a href="/SpanTasty/restaurant/getAll">餐廳管理</a>
-                        <a href="/SpanTasty/tabletype/getAll">桌位種類管理</a>
-                        <a href="/SpanTasty/reserve/getAll">訂位管理</a>
-                    `;
-                    break;
-                case 'points':
-                    menuItems = `
-                       <a href="/SpanTasty/point/pointSet">點數設定</a>
-                       <a href="/SpanTasty/point">點數管理</a>
-                       <a href="/SpanTasty/coupon">優惠券管理</a>
-                    `;
-                    break;
-                default:
-                    menuItems = `<a href="#">請選擇一個管理項目</a>`;
-            }
-            sidebar.innerHTML = menuItems;
-        }
         document.addEventListener("DOMContentLoaded", function() {
             showSidebar('points');
         });
     </script>
-   
+    <script src="js/axios.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js" ></script>
+    <script src="js/jquery-3.7.1.min.js" ></script>
 </body>
 </html>

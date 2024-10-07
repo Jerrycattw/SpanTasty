@@ -1,5 +1,6 @@
 package com.eatspan.SpanTasty.dto.reservation;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -17,6 +18,7 @@ public class ReserveDTO {
 	private Integer memberId;
 	private Integer restaurantId;
 	private Integer reserveSeat;
-	private LocalDateTime reserveTime;
+	private LocalDate checkDate;
+	private LocalTime startTime;
 	
 }

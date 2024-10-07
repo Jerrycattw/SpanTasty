@@ -3,8 +3,11 @@ package com.eatspan.SpanTasty.repository.account;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import com.eatspan.SpanTasty.entity.account.Member;
 
+@Repository
 public interface MemberRepository extends JpaRepository<Member, Integer> {
 	
 	//帳號是否存在

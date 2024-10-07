@@ -20,5 +20,14 @@ public class AdminPageController {
     public String showAdminloginPage() {
         return "/account/login"; 
     }
-
+    
+    @GetMapping("/admin/addAdminPage")
+    public String showAddAdminPage() {
+        return "/account/addAdmin"; 
+    }
+    
+    @GetMapping("/admin/updateAdminInfoPage")
+    public String showUpdateAdminInfoPage() {
+        return "/account/updateAdminInfo"; 
+    }
 }

@@ -27,7 +27,7 @@ form {
 	    <input type="hidden" name="_method" value="put" />
 	   	<table class="table table-warning table-striped" id="table">
         <tr><td>訂單編號: <input type="text" name="rentId" th:value="${rent.rentId}" readonly></td></tr>
-        <tr><td>歸還日期: <input type="date" name="returnDate" th:value="${rent.returnDate}" readonly /></td></tr>
+        <tr><td>歸還日期: <input type="date" name="returnDate" th:value="${#dates.format(rent.returnDate, 'yyyy-MM-dd')}" readonly /></td></tr>
         <tr><td>歸還餐廳:
            <select name="returnRestaurantId" id="return_restaurant_id">
                <option value="" selected disabled>請選擇租借餐廳</option>
@@ -37,6 +37,13 @@ form {
         </td></tr>
     	</table>
 	    <input type="submit" id="submitBtn" value="確定歸還"/>
+	    <input type="hidden" name="rentDeposit" th:value="${rent.rentDeposit}"/>
+	    <input type="hidden" name="rentDate" th:value="${rent.rentDate}">
+	    <input type="hidden" name="restaurantId" th:value="${rent.restaurantId}">
+	    <input type="hidden" name="memberId" th:value="${rent.memberId}">
+	    <input type="hidden" name="dueDate" th:value="${rent.dueDate}">
+	    <input type="hidden" name="rentStatus" th:value="${rent.rentStatus}">
+	    <input type="hidden" name="rentMemo" th:value="${rent.rentMemo}"/>
 		</form>
     </div>
     <script>

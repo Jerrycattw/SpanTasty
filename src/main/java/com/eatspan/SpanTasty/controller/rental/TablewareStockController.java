@@ -5,6 +5,7 @@ import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +13,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eatspan.SpanTasty.dto.rental.StockKeywordDTO;
 import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
@@ -43,7 +46,6 @@ public class TablewareStockController {
 		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants();
 		model.addAttribute("tablewares",tablewares);
 		model.addAttribute("restaurants",restaurants);
-		System.out.println(action);
 		if ("add".equals(action)) {
 			return "rental/addStock";
 	    } else if ("get".equals(action)) {
@@ -85,14 +87,19 @@ public class TablewareStockController {
 
 	
 	// 查詢庫存
-	@GetMapping("/get")
-	protected String getStocks(
-			@RequestParam(value = "tablewareId", required = false) Integer tablewareId,
-			@RequestParam(value = "restaurantId", required = false) Integer restaurantId,
-			Model model) {
+	@ResponseBody
+	@PostMapping("/get")
+	protected ResponseEntity<List<TablewareStock>> getStocks(@RequestBody StockKeywordDTO stockKeywordDTO) {
+		Integer tablewareId = stockKeywordDTO.getTablewareId();
+		Integer restaurantId = stockKeywordDTO.getRestaurantId();
+		if (tablewareId != null && (tablewareId == 0 || tablewareId.toString().trim().isEmpty())) {
+	        tablewareId = null;
+	    }
+	    if (restaurantId != null && (restaurantId == 0 || restaurantId.toString().trim().isEmpty())) {
+	        restaurantId = null;
+	    }
 		List<TablewareStock> stocks = tablewareStockService.findStocksByCriteria(tablewareId, restaurantId);
-		model.addAttribute("stocks", stocks);
-		return "rental/getStocks";
+		return ResponseEntity.ok(stocks);
 	}
 	
 	

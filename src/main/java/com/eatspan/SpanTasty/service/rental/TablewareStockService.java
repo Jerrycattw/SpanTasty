@@ -5,12 +5,14 @@ import java.util.List;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.repository.rental.TablewareStockRepository;
-//import com.eatspan.SpanTasty.repository.rental.TablewareRepository;
-//import com.eatspan.SpanTasty.repository.reservation.RestaurantRepository;
 
 
 @Service
@@ -19,11 +21,7 @@ public class TablewareStockService {
 	
 	@Autowired
 	private TablewareStockRepository tablewareStockRepository;
-//	@Autowired
-//	private TablewareRepository tablewareRepository;
-//	@Autowired
-//	private RestaurantRepository restaurantRepository;
-	
+
 	
 	//新增餐具庫存
 	public TablewareStock addStock(TablewareStock tablewareStock) {
@@ -48,13 +46,13 @@ public class TablewareStockService {
 	}
 	
 	
-	//查詢所有餐具
+	//查詢所有庫存
 	public List<TablewareStock> findAllStocks(){
 		return tablewareStockRepository.findAll();
 	}
 	
 	
-	//查詢餐具
+	//查詢庫存
 	public TablewareStock findStockById(Integer tablewareId, Integer restaurantId) {
 		TablewareStock tablewareStock = tablewareStockRepository.findById(tablewareId, restaurantId);
 		if(tablewareStock != null) {
@@ -62,4 +60,11 @@ public class TablewareStockService {
 		}
 		return null;
 	}
+	
+	
+//	查詢所有庫存(Page)
+//	public Page<TablewareStock> findAllStocksPage(Integer page){
+//		Pageable pageable = PageRequest.of(page-1, 10, Sort.Direction.ASC, "restaurantId");
+//		return tablewareStockRepository.findAll(pageable);
+//	}
 }

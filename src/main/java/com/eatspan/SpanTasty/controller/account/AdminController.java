@@ -42,11 +42,18 @@ public class AdminController {
     public Result<String> login(@RequestBody Map<String, String> loginData, HttpSession session) {
         String account = loginData.get("account");
         String password = loginData.get("password");
-        
+
         Admin admin = adminService.login(account, password);
-        
+
         // 如果登入成功
         if (admin != null) {
+            // 檢查是否首次登入
+            if (admin.getFirstLogin() == 1) {
+                // 保存管理員的資訊到 Session 中
+                session.setAttribute("admin", admin);
+                return Result.success("首次登入，請修改個人資料", "/SpanTasty/admin/updateAdminInfoPage");
+            }
+
             // 保存管理員的資訊到 Session 中
             session.setAttribute("admin", admin);
             session.setAttribute("permissions", admin.getPermissions());
@@ -57,11 +64,11 @@ public class AdminController {
         }
     }
     
-    // 登出
-    @GetMapping("/logout")
-    public Result<String> logout(HttpSession session) {
-        session.invalidate(); // 使 session 無效
-        return Result.success("登出成功");
+    //檢查登入狀態
+    @GetMapping("/checkLogin")
+    public Result<Boolean> checkLogin(HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("admin");
+        return admin != null ? Result.success(true) : Result.success(false);
     }
     
     //登入信息
@@ -75,6 +82,82 @@ public class AdminController {
             return Result.success(data);
         } else {
             return Result.failure("未登入");
+        }
+    }
+    
+    // 登出
+    @PostMapping("/logout")
+    public Result<String> logout(HttpSession session) {
+        session.invalidate(); // 使 session 無效
+        return Result.success("登出成功");
+    }
+    
+    // 新增管理員
+    @PostMapping("/addAdmin")
+    public Result<String> addAdmin(@RequestBody Map<String, Object> adminData) {
+        List<String> permissions = (List<String>) adminData.get("permissions"); // 獲取權限列表
+        System.out.println(permissions);
+        // 創建新的 Admin 物件
+        Admin admin = new Admin();
+        int nextId = adminService.getNextAdminId();
+        admin.setAdminName("Admin" + nextId);
+        String account = "admin" + nextId;
+        admin.setAccount(account);
+        admin.setPassword(account); // 密碼與帳號相同
+        admin.setStatus('A');
+        admin.setRole(0);
+        admin.setFirstLogin(1);
+
+        // 調用 Service 層來保存管理員
+        boolean isSuccess = adminService.addAdmin(admin);
+
+        // 為新增的管理員設置權限
+        if (isSuccess && permissions != null) {
+            adminService.updateAdminPermissions(admin.getAdminId(), permissions);
+        }
+
+        if (isSuccess) {
+            return Result.success("管理員新增成功，帳號為: " + account);
+        } else {
+            return Result.failure("管理員新增失敗");
+        }
+    }
+    
+    //更新管理員資訊
+    @PostMapping("/updateAdminProfile")
+    public Result<String> updateProfile(@RequestBody Map<String, String> updateData, HttpSession session) {
+        try {
+            // 從 Session 中獲取當前管理員資訊
+            Admin admin = (Admin) session.getAttribute("admin");
+            if (admin == null) {
+                return Result.failure("未登入或會話已過期，請重新登入");
+            }
+
+            // 更新管理員名稱與密碼
+            String newAdminName = updateData.get("newAdminName");
+            String newPassword = updateData.get("newPassword");
+            String confirmPassword = updateData.get("confirmPassword");
+            System.out.println(updateData);
+            // 驗證新密碼和確認密碼是否一致
+            if (newPassword != null && !newPassword.trim().isEmpty()) {
+                if (!newPassword.equals(confirmPassword)) {
+                    return Result.failure("新密碼與確認密碼不一致，請重新輸入");
+                }
+            }
+
+            // 調用服務層方法更新管理員資料
+            boolean updateSuccess = adminService.updateAdminProfile(admin, newAdminName, newPassword);
+
+            if (!updateSuccess) {
+                return Result.failure("管理員資料更新失敗，請稍後再試");
+            }
+
+            // 更新 Session 中的管理員資訊
+            session.setAttribute("admin", admin);
+
+            return Result.success("管理員資料更新成功");
+        } catch (Exception e) {
+            return Result.failure("管理員資料更新失敗，請稍後再試");
         }
     }
     
@@ -96,7 +179,8 @@ public class AdminController {
 
             // 如果更新成功，將頭像保存到 session
             if (isSuccess) {
-                session.setAttribute("adminAvatar", avatarBytes);
+                admin.setAvatar(avatarBytes); // 同步更新 session 中的管理員資料
+                session.setAttribute("admin", admin); // 更新 session
                 return Result.success("頭像更新成功");
             } else {
                 return Result.failure("頭像更新失敗");
@@ -104,6 +188,27 @@ public class AdminController {
         } catch (IOException e) {
             e.printStackTrace();
             return Result.failure("頭像更新失敗，IO錯誤");
+        }
+    }
+    
+    // 移除管理員頭像
+    @PostMapping("/removeAvatar")
+    public Result<String> removeAvatar(HttpSession session) {
+        Admin admin = (Admin) session.getAttribute("admin");
+        
+        if (admin == null) {
+            return Result.failure("未登入或會話已過期");
+        }
+
+        boolean isRemoved = adminService.removeAdminAvatar(admin.getAdminId());
+
+        if (isRemoved) {
+            // 清空 session 中的頭像資料
+            admin.setAvatar(null);
+            session.setAttribute("admin", admin); 
+            return Result.success("頭像已成功移除");
+        } else {
+            return Result.failure("移除頭像失敗，請稍後再試");
         }
     }
     
@@ -117,7 +222,7 @@ public class AdminController {
         }
 
         // 從 session 獲取頭像數據
-        byte[] avatarBytes = (byte[]) session.getAttribute("adminAvatar");
+        byte[] avatarBytes = admin.getAvatar();
 
         // 如果頭像為 null，返回默認圖片的訊息
         if (avatarBytes == null) {
@@ -128,9 +233,7 @@ public class AdminController {
         String base64Avatar = Base64.getEncoder().encodeToString(avatarBytes);
         return Result.success("頭像取得成功", base64Avatar);
     }
-
-
-    
+ 
     //搜索全部會員 
     @GetMapping("/findMembers")
     public Result<Map<String, Object>> getAllMembers(
@@ -152,7 +255,6 @@ public class AdminController {
         Map<String, Object> data = new HashMap<>();
         List<Map<String, Object>> membersList = new ArrayList<>();
 
-        // 將每個會員的資料和照片轉換為 Base64 格式
         for (Member member : memberPage) {
             Map<String, Object> memberData = new HashMap<>();
             memberData.put("memberId", member.getMemberId());
@@ -176,10 +278,8 @@ public class AdminController {
 
         return Result.success(data);
     }
-
-	
-    
-    // 分頁查詢所有管理員
+  
+ // 分頁查詢所有管理員
     @GetMapping("/findAllAdmins")
     public Result<Map<String, Object>> getAllAdmins(
             @RequestParam(defaultValue = "0") int page,
@@ -191,14 +291,32 @@ public class AdminController {
 
         // 將結果封裝到 Map 中
         Map<String, Object> data = new HashMap<>();
-        data.put("admins", adminPage.getContent());
+        List<Map<String, Object>> adminsList = new ArrayList<>();
+
+        for (Admin admin : adminPage) {
+            Map<String, Object> adminData = new HashMap<>();
+            adminData.put("adminId", admin.getAdminId());
+            adminData.put("adminName", admin.getAdminName());
+            adminData.put("account", admin.getAccount());
+            adminData.put("status", admin.getStatus());
+
+            // 將 byte[] 照片數據轉換為 Base64 字串
+            String avatarBase64 = admin.getAvatar() != null 
+                ? "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(admin.getAvatar())
+                : null;  // 如果沒有圖片，返回 null
+            adminData.put("avatar", avatarBase64);
+
+            adminsList.add(adminData);
+        }
+
+        data.put("admins", adminsList);
         data.put("currentPage", adminPage.getNumber());
         data.put("totalItems", adminPage.getTotalElements());
         data.put("totalPages", adminPage.getTotalPages());
 
         return Result.success(data);
     }
-    
+
     // 根據名稱模糊查詢管理員
     @GetMapping("/searchAdmins")
     public Result<Map<String, Object>> searchAdmins(
@@ -212,7 +330,25 @@ public class AdminController {
 
         // 將結果封裝到 Map 中
         Map<String, Object> data = new HashMap<>();
-        data.put("admins", adminPage.getContent());
+        List<Map<String, Object>> adminsList = new ArrayList<>();
+
+        for (Admin admin : adminPage) {
+            Map<String, Object> adminData = new HashMap<>();
+            adminData.put("adminId", admin.getAdminId());
+            adminData.put("adminName", admin.getAdminName());
+            adminData.put("account", admin.getAccount());
+            adminData.put("status", admin.getStatus());
+
+            // 將 byte[] 照片數據轉換為 Base64 字串
+            String avatarBase64 = admin.getAvatar() != null 
+                ? "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(admin.getAvatar())
+                : null;  // 如果沒有圖片，返回 null
+            adminData.put("avatar", avatarBase64);
+
+            adminsList.add(adminData);
+        }
+
+        data.put("admins", adminsList);
         data.put("currentPage", adminPage.getNumber());
         data.put("totalItems", adminPage.getTotalElements());
         data.put("totalPages", adminPage.getTotalPages());
@@ -231,8 +367,8 @@ public class AdminController {
         char status = statusStr != null && !statusStr.isEmpty() ? statusStr.charAt(0) : 'A';  // 默認 'A'
         String reason = (String) requestData.get("reason");
         String suspendedUntil = (String) requestData.get("suspendedUntil");  // 可能為 null
-//        System.out.println("停權日期" + suspendedUntil);
-//        System.out.println("狀態" + status);
+        System.out.println("停權日期" + suspendedUntil);
+        System.out.println("狀態" + status);
 
         // 調用 Service 層來更新會員狀態
         boolean isUpdated = memberService.updateMemberStatus(memberId, status, reason, suspendedUntil);

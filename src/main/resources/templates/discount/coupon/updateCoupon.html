@@ -1,200 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org/">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <!-- <link rel="stylesheet" href="../template/template.css"> -->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>編輯優惠券</title>
+	<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<style>
-        table {
-            width: 80%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        td .togo{
-        	background-color: lightblue;
-        }
-        td .product{
-        	background-color: lightgreen;
-        }
-        
-    </style>
-    <!-- <script src="../template/template.js"></script> -->
+
 <body>
-<!-- 	<div class="top-menu">
-        <a href="#" onclick="showSidebar('member')">會員管理</a>
-        <a href="#" onclick="showSidebar('store')">商城管理</a>
-        <a href="#" onclick="showSidebar('order')">訂餐管理</a>
-        <a href="#" onclick="showSidebar('rental')">租借用具管理</a>
-        <a href="#" onclick="showSidebar('reservation')">餐廳訂位管理</a>
-        <a href="#" onclick="showSidebar('points')">會員積分優惠券管理</a>
-    </div>
-    <div class="sidebar" id="sidebar"></div> -->
-    <div class="content" id="content">
-	<h1>編輯優惠券</h1>
-	<form action="#" method="POST" >
-	<input type="hidden" name="_method" value="PUT">
-	<!--  <input type="hidden" name="hiddenCouponId" id="hiddenCouponId">-->
-    <table id="couponsTable">
-        <tbody>
-        </tbody>						
-    </table>
-        <button type="submit">送出修改</button>
-	</form>
-	</div>
-	<script>
-      const pathSegments = window.location.pathname.split('/');
-      const couponId = pathSegments[pathSegments.indexOf('coupon') + 1];
-	
-	    document.addEventListener('DOMContentLoaded', function() {
-    	  document.querySelector('form').action = `/SpanTasty/coupon/${couponId}/post`;
-    	});
-  
-	//document.getElementById("hiddenCouponId").value = couponId;
+	<div th:replace="~{/display/navbar}"></div>
+	<div class="content">
+		<div class="container">
+			<form action="#" th:method="PUT"><!-- action透過JS修改 -->
+				<div class="h1 mb-3">編輯優惠券</div>
+				<div class="accordion " id="accordionPanelsStayOpenExample">
+					<!-- 1 -->
+					<div class="accordion-item">
+						<h2 class="accordion-header">
+							<button class="accordion-button bg-light" type="button" data-bs-toggle="collapse"
+								data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
+								aria-controls="panelsStayOpen-collapseOne">
+								基本設定
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+							<!-- body1 -->
+							<div class="accordion-body">
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3 align-items-center">
+										優惠券編號
+									</div>
+									<div class="col-9">
+										<input class="form-control" type="text" id="couponId" name="couponId" placeholder=""
+											aria-label="default input example" disabled>
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3 align-items-center">
+										優惠券代碼
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="couponCode" name="couponCode" type="text" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										優惠券名稱
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="couponDescription" name="couponDescription" type="text" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										使用開始日期
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="couponStartDate" name="couponStartDate" type="date" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										使用結束日期
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="couponEndDate" name="couponEndDate" type="date" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										狀態
+									</div>
+									<div class="col-9">
+										<select class="form-select" id="couponStatus" name="couponStatus"
+											aria-label="Default select example">
+											<option value="上架">上架</option>
+											<option value="下架">下架</option>
+										</select>
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										折扣種類
+									</div>
+									<div class="col-9">
+										<select class="form-select" id="discountType" name="discountType"
+											aria-label="Default select example">
+											<option value="固定金額">固定金額</option>
+											<option value="百分比">百分比</option>
+										</select>
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										<div data-bs-toggle="tooltip" data-bs-placement="left"
+											data-bs-title="百分比8折請填80">
+											折扣金額<i class="fa-regular fa-circle-question ms-2"></i>
+										</div>
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="discount" name="discount" type="text" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										優惠描述
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="rulesDescription" name="rulesDescription" type="text" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
 
-	
-	    fetch(`/SpanTasty/coupon/${couponId}/show`, {
-	        method: 'POST',
-	        headers: {
-	            'Content-Type': 'text/plain'
-	        },
-	        body: couponId
-	    })
-	    .then(response => response.json())
-	    .then(data => {
-	        console.log( data);
-	        // 在這裡處理或展示接收到的優惠券資料
-	        generateInput(data);
-	        
-	    })
-	    .catch(error => {
-	        console.error('Error:', error);
-	    });
-	
-	</script>
-    <script>
-    	function generateInput(data) {
-			const tableBody = document.querySelector('#couponsTable tbody');
-      	    tableBody.innerHTML = '';
-      	    
-			const labelMap = new Map([
-			     ['couponId', '優惠券編號'],
-			     ['couponCode', '優惠券代碼'],
-			     ['couponDescription', '優惠券名稱'],
-			     ['couponStartDate', '使用開始日期'],
-			     ['couponEndDate', '使用結束日期'],
-			     ['maxCoupon', '優惠券數量'],
-			     ['perMaxCoupon', '每人限領數量'],
-			     ['couponStatus', '狀態'],
-			     ['rulesDescription', '優惠限制描述'],
-			     ['discountType', '折扣種類(固定、百分比)'],
-			     ['discount', '金額(百分比8折請填80)'],
-			     ['minOrderDiscount', '滿額多少才能使用'],
-			     ['maxDiscount', '最多可折扣多少金額'],
-			     // 可以繼續加入其他鍵的對應
-			 ]);
-			
-			Object.keys(data.coupon).forEach(key => {
-				if (key != 'tags'&& key != 'receivedAmount') {   //tag跟ra以外,
-					const row = document.createElement('tr');
-					const cell = document.createElement('td');
-				
-					const label = labelMap.get(key) || key;
-					if(key != 'discountType' && key != 'couponStatus'){   //tag跟ra以外，也不是dt跟cs 執行這個
-						const value = data.coupon[key] === null ? '' : data.coupon[key];
-						cell.innerHTML=`${label} : <input type="text" name=${key} value=${value}>`
-						row.appendChild(cell);            				
-						 //if (key === 'couponStartDate' || key === 'couponEndDate') {
-			                    // 将日期格式化为 yyyy-MM-dd
-			                   // const dateValue = new Date(data.coupon[key]);
-			                   // const formattedDate = dateValue.toISOString().split('T')[0]; // yyyy-MM-dd 格式
-			                    //cell.innerHTML = `${label} : <input type="date" name="${key}" value="${formattedDate}">`;
-			                    //console.log(formattedDate);
-			               // } else {
-			                   // cell.innerHTML = `${label} : <input type="text" name="${key}" value="${data.coupon[key]}">`;
-			               // }
-					}else if(key === 'discountType'){   //dt執行這個
-						cell.innerHTML=`${label} : <select name=${key} value=${data.coupon[key]}>
-													<option ${data.coupon[key] === '固定金額' ? 'selected' : ''}>固定金額</option>
-													<option ${data.coupon[key] === '百分比' ? 'selected' : ''}>百分比</option>
-													</select>`
-						row.appendChild(cell);   		
-					}else if(key === 'couponStatus'){   //cs執行這個
-						cell.innerHTML=`${label} : <select name=${key} value=${data.coupon[key]}>
-							<option ${data.coupon[key] === '下架' ? 'selected' : ''}>下架</option>
-							<option ${data.coupon[key] === '上架' ? 'selected' : ''}>上架</option>
-							</select>`
-						row.appendChild(cell);
-					}
-					tableBody.appendChild(row)
-				}else if(key === 'tags'){  //tag執行這個
-					generateCheckBox(data.tagOptions, data.coupon.tags);					
-				}
-			})	 
-			setInput();
-            	
-    	}
-    	function generateCheckBox(tagOptions, selectedTags){
-    		const tableBody = document.querySelector('#couponsTable tbody');    		
-			
-    	    // Create a row for Product tags
-    	    const productRow = document.createElement('tr');
-    	    const productCell = document.createElement('td');
-    	    productCell.innerHTML = '綁定標籤(商城) :';
-			
-    	    
-    	    tagOptions.product.forEach(tag => {
-    	        const isChecked = selectedTags.some(t => t.tagName === tag && t.tagType === 'product');
-    	        productCell.innerHTML += `<label><input type="checkbox" name="product" value="${tag}" ${isChecked ? 'checked' : ''}> ${tag}</label>`;
-    	    });
-    	    
-    	    productRow.appendChild(productCell);
-    	    tableBody.appendChild(productRow);
+							</div>
+						</div>
+					</div>
+					<!--  -->
+					<div class="accordion-item">
+						<h2 class="accordion-header ">
+							<button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
+								data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
+								aria-controls="panelsStayOpen-collapseTwo">
+								進階設定
+							</button>
+						</h2>
+						<div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+							<!--  -->
+							<div class="accordion-body">
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										優惠券數量
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="maxCoupon" name="maxCoupon" type="text" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										每人限領數量
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="perMaxCoupon" name="perMaxCoupon" type="text" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										<div data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="消費滿額才能使用">
+											最低消費金額<i class="fa-regular fa-circle-question ms-2"></i>
+										</div>
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="minOrderDiscount" name="minOrderDiscount" type="text" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3">
+										<div data-bs-toggle="tooltip" data-bs-placement="left"
+											data-bs-title="單筆消費最大折扣金額">
+											最大折扣金額<i class="fa-regular fa-circle-question ms-2"></i>
+										</div>
+									</div>
+									<div class="col-9">
+										<input class="form-control" id="maxDiscount" name="maxDiscount" type="text" placeholder=""
+											aria-label="default input example">
+									</div>
+								</div>
+								<!--  -->
+								<div class="row">
+									<div class="col">綁定標籤 :</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3 d-flex justify-content-end"><label>( 商城 )</label></div>
+									<div class="col" id="productTags" namd="product">
+										<!-- <div class="form-check form-check-inline">
+											<input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+											<label class="form-check-label" for="inlineCheckbox1">1</label>
+										</div>-->
+									</div>
+								</div>
+								<!--  -->
+								<div class="row mb-3 me-auto">
+									<div class="col-3 d-flex justify-content-end"><label>( 訂餐 )</label></div>
+									<div class="col" id="togoTags" name="togo">
+										<!-- <div class="form-check form-check-inline">
+											<input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+											<label class="form-check-label" for="inlineCheckbox1">1</label>
+										</div> -->
+									</div>
+								</div>
+								<!--  -->
+							</div>
+						</div>
+					</div>
+					<div class="accordion-item">
+						<div class="card-footer d-flex justify-content-end">
+							<div class="m-3">
+								<button id="backBtn" type="button" class="btn btn-secondary me-2">返回</button>
+								<button type="submit" class="btn btn-primary me-2">修改</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+			<script>
+				document.addEventListener("DOMContentLoaded", function () {
+					//載入tagoption
+					axios.get('/SpanTasty/coupon/api/preadd')
+						.then(res => {
 
-    	    // Create a row for Togo tags
-    	    const togoRow = document.createElement('tr');
-    	    const togoCell = document.createElement('td');
-    	    togoCell.innerHTML = '綁定標籤(外帶) :';
+							res.data.product.forEach(element => {
+								document.getElementById('productTags').innerHTML += `
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="${element}" value="${element}" name="product">
+										<label class="form-check-label" for="${element}">${element}</label>
+									</div>`
+							});
+							res.data.togo.forEach(element => {
+								document.getElementById('togoTags').innerHTML += `
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="checkbox" id="${element}" value="${element}" name="togo">
+										<label class="form-check-label" for="${element}">${element}</label>
+									</div>`
+							});
+						})
+						.catch(err => {
+							console.log("err: " + err)
+						})
 
-    	    tagOptions.togo.forEach(tag => {
-    	        const isChecked = selectedTags.some(t => t.tagName === tag && t.tagType === 'togo');
-    	        togoCell.innerHTML += `<label><input type="checkbox" name="togo" value="${tag}" ${isChecked ? 'checked' : ''}> ${tag}</label>`;
-    	    });
+					//載入bootstrap
+					const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+					const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
-    	    togoRow.appendChild(togoCell);
-    	    tableBody.appendChild(togoRow);	    
-   		}
-	
-    	function setInput(){
-   			const inputId=document.querySelector('[name="couponId"]')
-   	    	inputId.setAttribute('disabled',true)
-   	     	
-   	    	const InputStartDate=document.querySelector('[name="couponStartDate"]')
-   	    	InputStartDate.setAttribute('type','date')
-   	    	
-   	    	const InputEndDate=document.querySelector('[name="couponEndDate"]')
-   	    	InputEndDate.setAttribute('type','date')
-   	    	
-   	    	//const inputReceivedAmount=document.querySelector('[name="receivedAmount"]')
-   	    	//inputReceivedAmount.setAttribute('disabled',true)
-   	    	//inputReceivedAmount.setAttribute('hidden',true)
-   	    	
-   	    	const inputs=document.querySelectorAll('input')
-   	    	inputs.forEach(input => {  
-   	       		if (input.type !== 'checkbox') {  
-   	        		input.style.width = '250px';
-   	        	}
-   	     	});
-   			
-   			
- 		}
-    </script>
+					//navbar
+					showSidebar('points');
+					
+					//修改action,載入優惠券資料
+					const pathSegments = window.location.pathname.split('/');
+					const couponId = pathSegments[pathSegments.indexOf('coupon') + 1];
+					document.querySelector('form').action = `/SpanTasty/coupon/${couponId}/post`;
+					fetch(`/SpanTasty/coupon/${couponId}/show`, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'text/plain'
+						},
+						body: couponId
+					})
+					.then(response => response.json())
+					.then(data => {
+						console.log(data);
+						document.getElementById('couponId').value=data.coupon.couponId
+						document.getElementById('couponCode').value=data.coupon.couponCode
+						document.getElementById('couponDescription').value=data.coupon.couponDescription
+						document.getElementById('couponStartDate').value=data.coupon.couponStartDate
+						document.getElementById('couponEndDate').value=data.coupon.couponEndDate
+						document.getElementById('couponStatus').value=data.coupon.couponStatus
+						document.getElementById('discount').value=data.coupon.discount
+						document.getElementById('rulesDescription').value=data.coupon.rulesDescription
+						document.getElementById('maxCoupon').value=data.coupon.maxCoupon
+						document.getElementById('perMaxCoupon').value=data.coupon.perMaxCoupon
+						document.getElementById('minOrderDiscount').value=data.coupon.minOrderDiscount
+						document.getElementById('maxDiscount').value=data.coupon.maxDiscount
+						document.querySelectorAll('[name=product]').forEach(option=>{
+							const isCheck = data.coupon.tags.some(t=>t.tagName==option.value && t.tagType=='product' )
+							option.checked=isCheck
+						})
+						document.querySelectorAll('[name=togo]').forEach(option=>{
+							const isCheck = data.coupon.tags.some(t=>t.tagName==option.value && t.tagType=='togo' )
+							option.checked=isCheck
+						})
+						
+						
+					})
+					.catch(error => {
+						console.error('Error:', error);
+					});
+
+				})
+
+
+			</script>
+			<script>
+				document.getElementById('backBtn').addEventListener('click', () => {
+					window.location.href = '/SpanTasty/coupon'
+				})
+			</script>
+			<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+			<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+			<script th:src="@{/js/axios.min.js}"></script>
 </body>
+
 </html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<div th:replace="~{display/navbar}"></div>
+<!-- 主要內容區域 -->
+<div class="content">
+    <div class="container mt-2">
+        <h1 class="display-6">☕菜單資料☕</h1>
+        
+        
+        
+	</div>
+</div>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showSidebar('order');
+
+          //  const getTogoBtn = document.getElementById('getAllTogo')
+          //  getTogoBtn.addEventListener('click', function (e) {
+          //      const table = document.getElementById('demoData');
+          //      table.style.removeProperty('display');
+           // })
+        })
+
+
+    </script>
+    
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/js/axios.min.js}"></script>
+</body>
+</html>

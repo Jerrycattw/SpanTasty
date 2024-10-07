@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -17,8 +18,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,6 +58,17 @@ public class TogoEntity implements Serializable {
 	@Column(name = "togoCreateTime")
 	private LocalDateTime togoCreateTime;
 	
+	@Transient
+    private String formattedDate;
+
+    public String getFormattedDate() {
+        return formattedDate;
+    }
+
+    public void setFormattedDate(String formattedDate) {
+        this.formattedDate = formattedDate;
+    }
+	
 	@Column(name = "rentId")
 	private Integer rentId;    //FK(rent)
 	
@@ -75,6 +91,19 @@ public class TogoEntity implements Serializable {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "togo", cascade = CascadeType.ALL)
 	private List<TogoItemEntity> togoItems = new ArrayList<TogoItemEntity>();
 	
+	@ManyToOne
+	@JoinColumn(name = "restaurant_id", insertable = false, updatable = false)
+	private Restaurant restaurant;
+	
+	@PrePersist
+	public void defaultData() {
+		if (togoCreateTime == null) {
+			togoCreateTime = LocalDateTime.now();
+		}
+		if(togoStatus == null) {
+			togoStatus = 1;
+		}
+	}
 	
 }
 

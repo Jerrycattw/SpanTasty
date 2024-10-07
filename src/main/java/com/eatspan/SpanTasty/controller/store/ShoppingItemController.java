@@ -51,7 +51,7 @@ public class ShoppingItemController {
         model.addAttribute("productList",productList);
         Integer totalAmount = shoppingOrderService.calculateTotalAmount(id);
         model.addAttribute("totalAmount",totalAmount);
-        
+        System.out.println();
         return "store/shopping/shoppingItemDetail";
     }
     
@@ -77,19 +77,46 @@ public class ShoppingItemController {
     
 
     // 新增商品項目
+//    @PostMapping("/addItem")
+//    public String addShoppingItem(@ModelAttribute ShoppingItem shoppingItem) {
+//        shoppingItemService.addShoppingItem(shoppingItem);
+//        return "redirect:/shoppingItem/details?shoppingId=" + shoppingItem.getId().getShoppingId();
+//    }
+    
     @PostMapping("/addItem")
-    public String addShoppingItem(@ModelAttribute ShoppingItem shoppingItem) {
-        shoppingItemService.addShoppingItem(shoppingItem);
-        return "redirect:/shoppingItem/details?shoppingId=" + shoppingItem.getId().getShoppingId();
+    public String addShoppingItem(@RequestParam Integer shoppingId,
+                                   @RequestParam Integer productId,
+                                   @RequestParam Integer shoppingItemQuantity,
+                                   Model model) {
+
+        ShoppingItem newItem = new ShoppingItem();
+        newItem.setId(new ShoppingItemId(shoppingId, productId));
+        newItem.setShoppingItemQuantity(shoppingItemQuantity);
+
+        Integer productPrice = shoppingItemService.getProductPriceById(productId);
+        Integer totalPrice = productPrice != null ? productPrice * shoppingItemQuantity : 0;
+        newItem.setShoppingItemPrice(totalPrice);
+        
+        ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+        shopping.setShoppingTotal(shoppingOrderService.calculateTotalAmount(shoppingId));
+        shoppingItemService.addShoppingItem(newItem);
+        shoppingOrderService.updateShoppingOrder(shopping);
+
+        return "redirect:/shoppingItem/itemDetail/" + shoppingId;
     }
+
+    
 
 
     // 刪除商品項目
     @PostMapping("/delItem")
     public String deleteShoppingItem(@RequestParam Integer shoppingId, @RequestParam Integer productId) {
         ShoppingItemId shoppingItemId = new ShoppingItemId(shoppingId, productId);
+        ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+        shopping.setShoppingTotal(shoppingOrderService.calculateTotalAmount(shoppingId));
         shoppingItemService.deleteShoppingItem(shoppingItemId);
-        return "redirect:/shoppingItem/details?shoppingId=" + shoppingId;
+        shoppingOrderService.updateShoppingOrder(shopping);
+        return "redirect:/shoppingItem/itemDetail/" + shoppingId;
     }
 
     // 刪除所有商品項目
@@ -101,8 +128,29 @@ public class ShoppingItemController {
     
     // 更新商品項目
     @PostMapping("/updateItem")
-    public String updateShoppingItem(@ModelAttribute ShoppingItem shoppingItem) {
-    	shoppingItemService.updateShoppingItem(shoppingItem);
-    	return "redirect:/shoppingItem/details?shoppingId=" + shoppingItem.getId().getShoppingId();
+    public String updateShoppingItem(@RequestParam Integer shoppingId,
+                                      @RequestParam Integer productId,
+                                      @RequestParam Integer shoppingItemQuantity,
+                                      Model model) {
+        ShoppingItemId shoppingItemId = new ShoppingItemId(shoppingId, productId);
+        
+        ShoppingItem existingItem = shoppingItemService.findShoppingItemById(shoppingItemId);
+        
+        if (existingItem != null) {
+            existingItem.setShoppingItemQuantity(shoppingItemQuantity);
+            
+            Integer productPrice = shoppingItemService.getProductPriceById(productId);
+            
+            Integer totalPrice = productPrice != null ? productPrice * shoppingItemQuantity : 0;
+            existingItem.setShoppingItemPrice(totalPrice);
+            shoppingItemService.updateShoppingItem(existingItem);
+            
+            ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+            shopping.setShoppingTotal(shoppingOrderService.calculateTotalAmount(shoppingId));
+            shoppingOrderService.updateShoppingOrder(shopping);
+        }
+        
+        return "redirect:/shoppingItem/itemDetail/" + shoppingId; 
     }
+
 }

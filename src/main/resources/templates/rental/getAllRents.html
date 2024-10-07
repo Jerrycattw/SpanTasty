@@ -11,7 +11,6 @@
 	}
 	#btn-yellow{
 		background-color: #f9e79f;
-		border: 1px solid black;
 	}
 	#btn-orange{
 		background-color: #f7d6a3;
@@ -23,7 +22,7 @@
 <div class="content" id="content">
  <div class="container mt-5">
   <div class="row justify-content-center">
-   <div class="col-15 text-align" style="font-size:15px">
+   <div class="col-15 text-align" style="font-size:14px">
     <div class="card shadow" id="card-warning" >
 	<div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
     <h2 class="mb-0">租借訂單系統</h2>
@@ -47,10 +46,11 @@
             <th>訂單備註</th>
             <th>歸還餐廳</th>
             <th>查看訂單</th>
+            <th>歸還訂單</th>
         </tr>
         </thead>
         <tbody>
-    	<th:block th:each=" rent : ${rents}">
+    	<th:block th:each=" rent : ${rentPages.content}">
         <tr>
             <td th:text="${rent.rentId}">訂單編號</td>
             <td th:text="${rent.rentDeposit}">租借押金</td>
@@ -71,18 +71,44 @@
 				<form th:action="@{/rent/set/{id}(id=${rent.rentId})}" th:method="get">
 					<button type="submit" class="btn bg-success text-white btn-sm" name="action" value="get">查看</button>
                	</form>
-				<!--
-				<form th:action="@{/rent/del/{id}(id=${rent.rentId})}" th:method="delete">
-               		<input type="submit" th:value="刪除訂單" class="btn bg-danger text-white btn-sm">
+			</td>
+            <td class="align-middle">
+				<form th:action="@{/rent/set/{id}(id=${rent.rentId})}" th:method="get">
+					<button type="submit" class="btn bg-success text-white btn-sm" name="action" value="return">歸還</button>
                	</form>
-               	  -->
 			</td>
         </tr>
     </th:block>
     </tbody>
     </table>
-</div>
+	 </div>
     </div>
+    <div>
+      <ul th:if="${rentPages.totalPages != 0}" class="pagination">
+  
+  <!-- 上一頁 -->
+	  <th:block th:switch="${rentPages.number + 1 == 1}">
+	      <li th:case="${false}" class="page-item"><a class="page-link" th:href="@{/rent/getAll(p=${ rentPages.number })}" th:text="上一頁"></a></li>
+	      <li th:case="${true}" class="page-item disabled"><a class="page-link" th:href="@{/rent/getAll(p=${ rentPages.number })}" th:text="已經第一頁了"></a></li>
+	  </th:block>
+  
+  <!-- 頁數 -->
+	  <th:block th:each=" aNumber : ${#numbers.sequence(1, rentPages.totalPages)}">
+	    <th:block th:switch="${rentPages.number + 1 == aNumber}">
+	      <li th:case="${true}" class="page-item active"><a class="page-link"><span th:text="${aNumber}"></span></a></li>
+	      <li th:case="${false}" class="page-item"><a class="page-link"  th:href="@{/rent/getAll(p=${aNumber})}" th:text="${aNumber}"></a></li>
+	    </th:block> 
+	  </th:block>
+  
+  <!-- 下一頁 -->
+	  <th:block th:switch="${rentPages.number + 1 == rentPages.totalPages}">
+	     <li th:case="${true}" class="page-item disabled"><a class="page-link" th:href="@{/rent/getAll(p=${ rentPages.number + 2 })}" th:text="已經最後了"></a></li>
+	     <li th:case="${false}" class="page-item"><a class="page-link" th:href="@{/rent/getAll(p=${ rentPages.number + 2 })}" th:text="下一頁"></a></li>
+	  </th:block>
+  </ul>
+  
+  <div>總共有 <span th:text="${rentPages.totalElements}"></span> 筆</div>
+  </div>
    </div>
   </div>
  </div>

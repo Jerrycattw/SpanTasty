@@ -18,10 +18,12 @@ public class ProductTypeService {
 	@Autowired
 	private ProductTypeRepository productTypeRepo;
 		
-	
-	public ProductType addProductType(ProductType productType) {
-		return productTypeRepo.save(productType);
-	}
+	public ProductType addProductType(String productTypeName) {
+        ProductType productType = new ProductType();
+        productType.setProductTypeName(productTypeName);
+        return productTypeRepo.save(productType);
+    }
+
 	
 //	public ProductType addProductType(String productTypeName) {
 //		ProductType productType = new ProductType();

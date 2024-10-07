@@ -1,6 +1,7 @@
 package com.eatspan.SpanTasty.controller.discount;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,19 @@ public class PointController {
 	private PointService pointService;
 	
 	
+	//點數中心-----------------------------
+	@GetMapping("/pointCenter")
+	public String pointCenter() {
+		return "discount/point/pointCenter";
+	}
+	
+	@GetMapping("/pointCenter/show")
+	@ResponseBody
+	public Map<String, Object> pointCenterShow(){
+		return pointService.pointCenterResult();	
+	}
+	
+	
 	//點數設定-----------------------------
 	@GetMapping("/pointSet")
 	public String pointSet(Model model) {
@@ -52,49 +66,67 @@ public class PointController {
 		return "redirect:/point/pointSet";
 	}
 	
-	//Home查詢-------------------------
-	@GetMapping//  /point在類上
-	public String findAllPointMembers(Model model) {
-		List<PointMemberDTO> pointMembers = pointService.getAllPointMember();
-		System.out.println(pointMembers);
-		model.addAttribute("pointMembers", pointMembers);
-		return "discount/point/pointMembers";	
-	}
+//	//Home查詢-------------------------
+//	@GetMapping//  /point在類上
+//	public String findAllPointMembers(Model model) {
+//		List<PointMemberDTO> pointMembers = pointService.getAllPointMember();
+//		System.out.println(pointMembers);
+//		model.addAttribute("pointMembers", pointMembers);
+//		return "discount/point/pointMembers";	
+//	}
+	
+//	// search-------------------------
+//	@GetMapping("/search")
+//	public String searchPoint(@RequestParam(value = "q", required = false) String keyWord, Model model) {
+//		List<PointMemberDTO> pointMembers = pointService.searchPointMember(keyWord);
+//		model.addAttribute("pointMembers", pointMembers);
+//		model.addAttribute("keyWord", keyWord);
+//		return "discount/point/pointMembers";
+//	}
 	
 	// search-------------------------
-	@GetMapping("/search")
-	public String searchPoint(@RequestParam(value = "q", required = false) String keyWord, Model model) {
-		List<PointMemberDTO> pointMembers = pointService.searchPointMember(keyWord);
-		model.addAttribute("pointMembers", pointMembers);
-		model.addAttribute("keyWord", keyWord);
-		return "discount/point/pointMembers";
+	@GetMapping("/api/search")
+	@ResponseBody
+	public List<PointMemberDTO> searchPointApi(@RequestParam(value = "q", required = false) String keyWord, Model model) {
+		return pointService.searchPointMember(keyWord);
+
 	}
 	
+	
 	// 批次新增-------------------------
-	@PostMapping("/batchAdd")
+//	@PostMapping("/batchAdd")
+//	@ResponseBody
+//	public String batchInsertPoint(@RequestBody List<String> memberIds, Model model) {
+//		System.out.println(memberIds);
+//		String message = pointService.printMessage(memberIds);
+//
+//		model.addAttribute("point_memberIds", memberIds);
+//		model.addAttribute("point_message", message);
+//
+//		return "success";
+//	}
+	
+	@PostMapping("/api/batchAdd")
 	@ResponseBody
-	public String batchInsertPoint(@RequestBody List<String> memberIds, Model model) {
-		System.out.println("1111111111111");
-		String message = pointService.printMessage(memberIds);
-
+	public String batchInsertPointApi(@RequestBody List<String> memberIds, Model model) {
+		System.out.println(memberIds);
 		model.addAttribute("point_memberIds", memberIds);
-		model.addAttribute("point_message", message);
-
-		return "success";
+		return pointService.printMessage(memberIds);
 	}
-	@GetMapping("/batchAdd/members")
-	public String batchInsertPoint() {
-		System.out.println("2222222222222222");
-		return "discount/point/batchAddPoint";
-	}
+	
+	
+//	@GetMapping("/batchAdd/members")
+//	public String batchInsertPoint() {
+//		return "discount/point/batchAddPoint";
+//	}
 	
 	
 	@PostMapping("/batchAdd/members")
 	public String batchInsertExcute(@SessionAttribute("point_memberIds") List<String> memberIds, Point pointBean) {
-		System.out.println("333333333333333333");
 		pointService.insertBatchRecord(memberIds, pointBean);
-		return "redirect:/point";
+		return "redirect:/point/pointCenter";
 	}
+	
 	// 點擊檢視-------------------------
 	@GetMapping("/member/{memberId}")
 	public String getPointsMember(@PathVariable Integer memberId, Model model) {
@@ -106,32 +138,59 @@ public class PointController {
 		return "discount/point/showPoint";
 	}
 	
-	// 修改-------------------------
-	@GetMapping("/member/{memberId}/point/{pointId}")
-	public String getPoint(@PathVariable Integer pointId, Model model) {
-		Point point = pointService.getOneRecord(pointId);
-		model.addAttribute("point", point);
-		return "discount/point/updatePoint";
+//	// 修改-------------------------
+//	@GetMapping("/member/{memberId}/point/{pointId}")
+//	public String getPoint(@PathVariable Integer pointId, Model model) {
+//		Point point = pointService.getOneRecord(pointId);
+//		model.addAttribute("point", point);
+//		return "discount/point/updatePoint";
+//	}
+	
+	@GetMapping("/api/member/{memberId}/point/{pointId}")
+	@ResponseBody
+	public Point getPointApi(@PathVariable Integer pointId, Model model) {
+		return pointService.getOneRecord(pointId);		
 	}
+	
 
 	@PutMapping("/member/{memberId}/point/{pointId}")
 	public String updatePoint(@PathVariable Integer memberId, Point pointBean) {
+		System.out.println("touch");
 		System.out.println(pointBean);
 		pointService.updatePoint(pointBean);
 		return "redirect:/point/member/"+memberId;
 	}
 	
 	// 新增-------------------------
-	@GetMapping("/member/{memberId}/point")
-	public String insertPoint(@PathVariable Integer memberId,Model model) {
-		model.addAttribute("memberId", memberId);
-		return "discount/point/addPoint";
+//	@GetMapping("/member/{memberId}/point")
+//	public String insertPoint(@PathVariable Integer memberId,Model model) {
+//		model.addAttribute("memberId", memberId);
+//		return "discount/point/addPoint";
+//	}
+	
+	@PostMapping("/member/point/new")
+	public String insertPointNew(@RequestParam Integer memberId,@RequestParam String plusOrMinus,Point pointBean) {
+		switch (plusOrMinus) {
+			case "plus" -> pointBean.setPointChange(pointBean.getPointChange());
+			case "minus" -> pointBean.setPointChange(pointBean.getPointChange()*-1);
+		};
+		pointBean.setMemberId(memberId);
+		
+
+		pointService.insertOneRecord(pointBean);
+		return "redirect:/point/pointCenter";
 	}
 	
 	
 	@PostMapping("/member/{memberId}/point")
-	public String insertPoint( @PathVariable Integer memberId,Point pointBean) {
+	public String insertPoint( @PathVariable Integer memberId,@RequestParam String plusOrMinus,Point pointBean) throws Exception {
+		switch (plusOrMinus) {
+			case "plus" -> pointBean.setPointChange(pointBean.getPointChange());
+			case "minus" -> pointBean.setPointChange(pointBean.getPointChange()*-1);
+		};
 		pointBean.setMemberId(memberId);
+		System.out.println(pointBean);
+		pointService.usePoint(pointBean.getPointChange(), pointBean.getMemberId());
 		pointService.insertOneRecord(pointBean);
 		return "redirect:/point/member/"+memberId;
 	}
