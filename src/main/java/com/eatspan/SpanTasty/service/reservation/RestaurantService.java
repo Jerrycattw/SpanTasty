@@ -11,20 +11,43 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
+import com.eatspan.SpanTasty.entity.reservation.RestaurantTable;
+import com.eatspan.SpanTasty.entity.reservation.RestaurantTableId;
+import com.eatspan.SpanTasty.entity.reservation.TableType;
 import com.eatspan.SpanTasty.repository.reservation.RestaurantRepository;
+import com.eatspan.SpanTasty.repository.reservation.RestaurantTableRepository;
+import com.eatspan.SpanTasty.repository.reservation.TableTypeRepository;
 
 @Service
 public class RestaurantService {
 	
 	@Autowired
 	private RestaurantRepository restaurantRepository;
+	@Autowired
+	private TableTypeRepository tableTypeRepository;
+	@Autowired
+	private RestaurantTableRepository restaurantTableRepository;
 	
 	// 新增餐廳
 	public Restaurant addRestaurant(Restaurant restaurant) {
-		if(restaurant.getRestaurantStatus()==null) {
-			restaurant.setRestaurantStatus(1);
-		}
-		return restaurantRepository.save(restaurant);
+	    if (restaurant.getRestaurantStatus() == null) {
+	        restaurant.setRestaurantStatus(3);
+	    }
+	    
+	    // 儲存餐廳以獲取其 ID
+	    Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+
+	    // 插入所有現有桌位種類對於新插入的餐廳
+	    List<TableType> tableTypes = tableTypeRepository.findAll();
+	    for (TableType tableType : tableTypes) {
+	    	RestaurantTable restaurantTable = new RestaurantTable();
+	    	RestaurantTableId restaurantTableId = new RestaurantTableId(savedRestaurant.getRestaurantId(), tableType.getTableTypeId());
+	    	restaurantTable.setId(restaurantTableId);
+	        restaurantTable.setTableTypeNumber(0);
+	        restaurantTableRepository.save(restaurantTable);
+	    }
+	    
+	    return savedRestaurant; // 返回保存的餐廳對象
 	}
 	
 	

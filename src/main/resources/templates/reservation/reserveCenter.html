@@ -25,12 +25,12 @@
                     </div>
 
                     <div class="col-3 d-flex align-items-center">
-                        <label for="reservePercent" class="form-label mb-0 text-nowrap">開放訂位比例:</label>
+                        <label for="reservePercent" class="form-label mb-0 text-nowrap">開放訂位比例(%):</label>
                         <input type="number" name="reservePercent" id="reservePercent" class="form-control ms-2" min="0" max="100" step="10" />
                     </div>
 
                     <div class="col-3 d-flex align-items-center">
-                        <label for="reserveTimeScale" class="form-label mb-0 text-nowrap">訂位區間設定:</label>
+                        <label for="reserveTimeScale" class="form-label mb-0 text-nowrap">訂位間距設定(分):</label>
                         <input type="number" name="reserveTimeScale" id="reserveTimeScale" class="form-control ms-2" min="15" max="180" step="30"/>
                     </div>
 
@@ -45,11 +45,11 @@
 
         <div class="container mt-5">
             <div class="row gap-3 d-flex justify-content-center">
-                <div class="col-5">
-                    <canvas id="myChart3" height="200"></canvas>
+                <div class="col-9">
+                    <canvas id="myChart3" height="100"></canvas>
                 </div>
-                <div class="col-5">
-                    <canvas id="myChart4" height="200"></canvas>
+                <div class="col-9">
+                    <canvas id="myChart4" height="100"></canvas>
                 </div>
             </div>
         </div>
@@ -114,8 +114,8 @@
                 
                 
 	            // 將餐廳名稱和對應的訂位數量分別提取到 labels 和 data 陣列
-	            const labels = Object.keys(reserveData); // 餐廳名稱
-	            const data = Object.values(reserveData); // 訂位數量
+	            const labels = Object.keys(res.data); // 餐廳名稱
+	            const data = Object.values(res.data); // 訂位數量
 	
 	            // 更新圖表
 	            updateChart(myChart3, labels, data);
@@ -171,7 +171,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: '顏色',
+                            text: '餐廳名稱',
                             font: {
                                 size: 16,
                                 weight: 'bold'

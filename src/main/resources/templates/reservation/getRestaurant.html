@@ -22,10 +22,15 @@
         <div class="col-md-10"> <!-- 設定卡片寬度 -->
             <div class="card bg-dark text-white rounded-3 d-flex flex-row align-items-center">
                 <div class="restaurant-img flex-shrink-0">
-                    <img th:src="${restaurant.restaurantImg}" alt="Restaurant Image" class="img-fluid rounded-3 m-3">
-                </div>
+    <img th:src="${restaurant.restaurantImg != null ? restaurant.restaurantImg : 'https://via.placeholder.com/450x400'}" 
+         alt="Restaurant Image" class="img-fluid rounded-3 m-3">                </div>
                 <div class="restaurant-details flex-grow-1 p-3">
                     <form>
+                    <div class="mt-0 d-flex justify-content-end">
+                        <a th:href="@{/table/getAll(restaurantId=${restaurant.restaurantId})}" class="btn btn-success me-2">查看餐廳桌位</a>
+                        <!-- <a href="#" class="btn btn-success">餐廳訂位</a>  -->
+                    </div>
+                    
                         <label class="form-label mb-0">餐廳名稱 :</label>
                         <input type="text" class="form-control text-warning mb-1 bg-secondary" th:value="${restaurant.restaurantName}" disabled>
 
@@ -45,10 +50,6 @@
                         <textarea class="form-control text-warning mb-1 bg-secondary" th:text="${restaurant.restaurantDesc}" disabled></textarea>
                     </form>
 
-                    <div class="mt-3">
-                        <a th:href="@{/table/getAll(restaurantId=${restaurant.restaurantId})}" class="btn btn-success me-2">查看餐廳桌位</a>
-                        <a href="#" class="btn btn-success">餐廳訂位</a>
-                    </div>
                 </div>
             </div>
         </div>
