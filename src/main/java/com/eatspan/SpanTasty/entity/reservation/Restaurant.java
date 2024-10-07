@@ -99,11 +99,11 @@ public class Restaurant {
 	
 	@PrePersist //當物件轉換成persist時先做該方法
 	public void onCreate() {
-		if(reservePercent == null) {
-			reservePercent = 100; // 餐廳開放訂位的比例
+		if(this.reservePercent == null) {
+			this.reservePercent = 100; // 餐廳開放訂位的比例
 		}
-		if(reserveTimeScale == null) {
-			reserveTimeScale = 30; // 訂位的區間(預設為30分鐘)
+		if(this.reserveTimeScale == null) {
+			this.reserveTimeScale = 30; // 訂位的區間(預設為30分鐘)
 		}
 	}
 	
