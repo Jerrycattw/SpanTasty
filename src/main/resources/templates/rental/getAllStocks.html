@@ -47,7 +47,7 @@
 <body class="body">
 <div th:replace="~{display/navbar}" ></div>
 <div class="content" id="content">
- <div class="container mt-4" style="font-size:12px">
+ <div class="container mt-4" style="font-size:15px">
   <div class="row justify-content-center">
    <div class="col-11">
     <div class="shadow" id="card" >
@@ -60,18 +60,18 @@
 	</div>
 	<div class="mt-0 mb-2 ms-2 gap-2 d-flex">
 		
-		<select id="tablewareId" class="form-select form-select-sm" style="width:300px">
+		<select id="tablewareId" class="form-select form-select-sm" style="width:180px">
 			<option value="" selected disabled>請選擇餐具編號</option>
 			<option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:text="${tableware.tablewareName}"></option>
 		</select>
         
-        <select id="restaurantId" class="form-select form-select-sm" style="width:300px">
+        <select id="restaurantId" class="form-select form-select-sm" style="width:180px">
 			<option value="" selected disabled>請選擇餐廳名稱</option>
 			<option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
 		</select>
 		
 		<button id="send_btn" class="btn btn-success btn-sm" >搜尋</button>
-		<button id="clear_btn" class="btn btn-secondary btn-sm">清空所有選項</button>
+		<button id="clear_btn" class="btn btn-sm" style="background-color:#baffbf">清空所有選項</button>
 	</div>
 	<div class="table-responsive">
     <table class="table table-striped" id="table">
@@ -84,17 +84,18 @@
         </tr>
     </thead>
     <tbody>
-    <th:block th:each=" stock : ${stocks}">
-        <tr>
-            <td th:text="${stock.tablewareId}">用具編號</td>
-            <td th:text="${stock.restaurantId}">餐廳編號</td>
-            <td th:text="${stock.stock}">用具庫存</td>
-            <td class="align-middle">
-           	<form th:action="@{/stock/set/{tid}/{rid}(tid=${stock.tablewareId}, rid=${stock.restaurantId})}" th:method="get">
-           		<input type="submit" th:value="盤盈虧" class="btn btn-sm" id="btn-light-green">
-           	</form>
-            </td>
-        </tr>
+    
+     <th:block th:each=" stock : ${stocks}">
+                <tr>
+                    <td th:text="${stock.tablewareName}">用具名稱</td>
+                    <td th:text="${stock.restaurantName}">餐廳名稱</td>
+                    <td th:text="${stock.stock}">用具庫存</td>
+                    <td class="align-middle">
+                        <form th:action="@{/stock/set/{tid}/{rid}(tid=${stock.tablewareId}, rid=${stock.restaurantId})}" th:method="get">
+                            <input type="submit" th:value="盤盈虧" class="btn btn-sm" id="btn-light-green">
+                        </form>
+                    </td>
+                </tr>
     </th:block>
     </tbody>
     </table>
@@ -166,8 +167,8 @@
         	const tr = document.createElement('tr');
             tr.innerHTML = 
             `
-			<td>${stock.tablewareId}</td>
-			<td>${stock.restaurantId}</td>
+			<td>${stock.tablewareName}</td>
+			<td>${stock.restaurantName}</td>
 			<td>${stock.stock}</td>
 			<td class="align-middle">
 			    <button onclick="updateData(event,${stock.tablewareId},${stock.restaurantId})" class="btn btn-sm" id="btn-light-green">盤盈虧</button>

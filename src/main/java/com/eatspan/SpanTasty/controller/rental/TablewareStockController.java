@@ -1,8 +1,7 @@
 package com.eatspan.SpanTasty.controller.rental;
 
 import java.util.List;
-
-
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eatspan.SpanTasty.dto.rental.StockDetailDTO;
 import com.eatspan.SpanTasty.dto.rental.StockKeywordDTO;
 import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
@@ -82,7 +82,7 @@ public class TablewareStockController {
 	// 查詢庫存
 	@ResponseBody
 	@PostMapping("/get")
-	protected ResponseEntity<List<TablewareStock>> getStocks(@RequestBody StockKeywordDTO stockKeywordDTO) {
+	protected ResponseEntity<List<StockDetailDTO>> getStocks(@RequestBody StockKeywordDTO stockKeywordDTO) {
 		Integer tablewareId = stockKeywordDTO.getTablewareId();
 		Integer restaurantId = stockKeywordDTO.getRestaurantId();
 		if (tablewareId != null && (tablewareId == 0 || tablewareId.toString().trim().isEmpty())) {
@@ -92,7 +92,32 @@ public class TablewareStockController {
 	        restaurantId = null;
 	    }
 		List<TablewareStock> stocks = tablewareStockService.findStocksByCriteria(tablewareId, restaurantId);
-		return ResponseEntity.ok(stocks);
+		
+		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+	    List<Tableware> tablewares = tablewareService.findAllTablewares();
+		
+	    List<StockDetailDTO> stockDetails = stocks.stream().map(stock -> {
+	        StockDetailDTO dto = new StockDetailDTO();
+	        dto.setTablewareId(stock.getTablewareId());
+	        dto.setRestaurantId(stock.getRestaurantId());
+	        dto.setStock(stock.getStock());
+
+	        // 設置餐具名稱
+	        tablewares.stream()
+	            .filter(t -> t.getTablewareId().equals(stock.getTablewareId()))
+	            .findFirst()
+	            .ifPresent(t -> dto.setTablewareName(t.getTablewareName()));
+
+	        // 設置餐廳名稱
+	        restaurants.stream()
+	            .filter(r -> r.getRestaurantId().equals(stock.getRestaurantId()))
+	            .findFirst()
+	            .ifPresent(r -> dto.setRestaurantName(r.getRestaurantName()));
+
+	        return dto;
+	    }).collect(Collectors.toList());
+		
+		return ResponseEntity.ok(stockDetails);
 	}
 	
 	
@@ -102,9 +127,31 @@ public class TablewareStockController {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		List<TablewareStock> stocks = tablewareStockService.findAllStocks();
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
+
+		List<StockDetailDTO> stockDetails = stocks.stream().map(stock -> {
+	        StockDetailDTO dto = new StockDetailDTO();
+	        dto.setTablewareId(stock.getTablewareId());
+	        dto.setRestaurantId(stock.getRestaurantId());
+	        dto.setStock(stock.getStock());
+
+	        // 設置餐具名稱
+	        tablewares.stream()
+	            .filter(t -> t.getTablewareId().equals(stock.getTablewareId()))
+	            .findFirst()
+	            .ifPresent(t -> dto.setTablewareName(t.getTablewareName()));
+
+	        // 設置餐廳名稱
+	        restaurants.stream()
+	            .filter(r -> r.getRestaurantId().equals(stock.getRestaurantId()))
+	            .findFirst()
+	            .ifPresent(r -> dto.setRestaurantName(r.getRestaurantName()));
+
+	        return dto;
+	    }).collect(Collectors.toList());
+		
 		model.addAttribute("restaurants",restaurants);
 		model.addAttribute("tablewares",tablewares);
-		model.addAttribute("stocks",stocks);
+		model.addAttribute("stocks", stockDetails);
 		return "rental/getAllStocks";
 	}
 }
