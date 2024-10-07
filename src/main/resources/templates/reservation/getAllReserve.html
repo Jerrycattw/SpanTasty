@@ -76,6 +76,8 @@
                             <th>訂位人數</th>
                             <th>桌位種類</th>
                             <th>用餐時段</th>
+                            <th>訂位狀態</th>
+                            <th>修改狀態</th>
                             <th>修改訂位</th>
                             <th>刪除訂位</th>
                         </tr>
@@ -230,6 +232,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('reservation');
 
+            
             // 頁面加載完成後執行一次查詢
             fetchReservations();
 
@@ -246,6 +249,7 @@
             document.getElementById('setReserveSeat').addEventListener('change', getReserveTimeAndSet);
             document.getElementById('setCheckDate').addEventListener('change', getReserveTimeAndSet);
         });
+
 
 
         // Ajax查詢訂位時間+新增訂位訂單
@@ -419,6 +423,24 @@
 
                     // 動態生成表格內容
                     reserves.forEach(reserve => {
+                        
+                        const finishedTime = new Date(reserve.finishedTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+                    	// 根據 reserveStatus 值套用不同的樣式
+			            let statusClass = '';
+			            let statusText = '';
+			
+			            if (reserve.reserveStatus === 1) {
+			                statusClass = 'badge bg-warning text-dark';
+			                statusText = '未完成';
+			            } else if (reserve.reserveStatus === 2) {
+			                statusClass = 'badge bg-success text-white';
+			                statusText = '已完成';
+			            } else if (reserve.reserveStatus === 3) {
+			                statusClass = 'badge bg-danger text-white';
+			                statusText = '已取消';
+			            }
+                    
                         const row = document.createElement('tr');
                         row.innerHTML = `
                         <td>${reserve.reserveId}</td>
@@ -427,7 +449,15 @@
                         <td>${reserve.restaurant.restaurantName}</td>
                         <td>${reserve.reserveSeat}</td>
                         <td>${reserve.tableType.tableTypeName} 人桌</td>
-                        <td>${reserve.reserveTime} - ${reserve.finishedTime}</td>
+                        <td>${reserve.reserveTime} - ${finishedTime}</td>
+                        <td><span class="${statusClass}">${statusText}</span></td>
+                        <td>
+                        <select onchange="updateReserveStatus(${reserve.reserveId}, this.value)" class="form-select form-select-sm">
+                            <option value="1" ${reserve.reserveStatus === 1 ? 'selected' : ''}>未完成</option>
+                            <option value="2" ${reserve.reserveStatus === 2 ? 'selected' : ''}>已完成</option>
+                            <option value="3" ${reserve.reserveStatus === 3 ? 'selected' : ''}>已取消</option>
+                        </select>
+                        </td>
                         <td><button class="btn btn-warning btn-sm"  onclick="openSetReserveModal(${reserve.reserveId})">修改</button></td>
                         <td><button class="btn btn-danger btn-sm" onclick="deleteReservation(${reserve.reserveId})">刪除</button></td>
                     `;
@@ -522,13 +552,11 @@
             axios.put(`http://localhost:8080/SpanTasty/reserve/set`, setReserveDTO)
                 .then(res => {
                     console.log(res.data)
-                    // 插入訂位成功視窗
-                    alert("修改訂位成功！");
-
                     // 關閉模態框
                     const modal = bootstrap.Modal.getInstance(document.getElementById('setReserveModal'));
                     modal.hide();
-
+                    // 插入訂位成功視窗
+                    alert("修改訂位成功！");
                     fetchReservations();// 修改後重新查詢訂位
                 })
                 .catch(err => {
@@ -538,6 +566,29 @@
                 })
 
         }
+
+        // 更新並修改訂位狀態的函數
+        function updateReserveStatus(reserveId, newStatus) {
+            const setReserveStatus = {
+                reserveId: reserveId,
+                reserveStatus: newStatus
+            };
+
+            // 發送修改訂位狀態的 AJAX 請求
+            axios.put(`http://localhost:8080/SpanTasty/reserve/setStatus`, setReserveStatus)
+                .then(res => {
+                    console.log(res.data);
+                    // 插入訂位成功視窗
+                    alert("修改訂位狀態成功！");
+                    fetchReservations(); // 修改後重新查詢訂位
+                })
+                .catch(err => {
+                    console.error(err);
+                    // 插入訂位失敗視窗
+                    alert("修改訂位狀態失敗，請稍後再試。");
+                });
+        }
+
 
     </script>
 </body>

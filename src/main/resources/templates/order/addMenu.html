@@ -70,32 +70,11 @@
             document.getElementById("menuForm").addEventListener("submit", function (event) {
                 event.preventDefault();
                 const submitter = document.querySelector("button[value=add]");
-                // console.log({submitter});
                 const menuForm = document.getElementById("menuForm");
-                console.log(menuForm)
                 const formDataObject = new FormData(menuForm, submitter);
-                for (var [key, value] of formDataObject.entries()) {
-                    console.log(key, value);
-                }
-
-                // const newFood = {
-                //     foodName: document.getElementById("foodName").value,
-                //     foodPicture: document.getElementById("foodPicture").value,
-                //     foodPrice: document.getElementById("foodPrice").value,
-                //     foodKindId: document.getElementById("foodKindId").value,
-                //     foodStock: document.getElementById("foodStock").value,
-                //     foodStatus: document.getElementById("foodStatus").value,
-                //     togoMefoodDescriptionmo: document.getElementById("foodDescription").value
-                // };
-
 
                 // 發送 POST 請求
-                axios.post('http://localhost:8080/SpanTasty/order/menu', formDataObject, {
-                    headers: {
-                        "Content-Type":
-                            'multipart/form-data',
-                    },
-                })
+                axios.post('http://localhost:8080/SpanTasty/order/menu', formDataObject)
                     .then(function (response) {
                         console.log(response.data);
                         alert("菜單已成功提交！");
@@ -106,8 +85,8 @@
                         console.error("提交菜單時發生錯誤：", error);
                         alert("提交失敗，請稍後再試。");
                     })
-            })
-        })
+            	})
+        	})
 
     </script>
 

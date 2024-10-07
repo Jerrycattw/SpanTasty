@@ -1,5 +1,6 @@
 package com.eatspan.SpanTasty.entity.reservation;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,6 +73,12 @@ public class Restaurant {
 	@Column(name = "restaurant_desc")
 	private String restaurantDesc;
 	
+	@Column(name = "reserve_percent")
+	private Integer reservePercent;
+	
+	@Column(name = "reserve_time_scale")
+	private Integer reserveTimeScale;
+	
 	
 	@JsonIgnore //該屬性不要做JSON序列化避免無線迴圈 //預設lazy
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL)
@@ -87,5 +95,16 @@ public class Restaurant {
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL)
 	private List<TogoEntity> togo = new ArrayList<TogoEntity>();
+	
+	
+	@PrePersist //當物件轉換成persist時先做該方法
+	public void onCreate() {
+		if(reservePercent == null) {
+			reservePercent = 100; // 餐廳開放訂位的比例
+		}
+		if(reserveTimeScale == null) {
+			reserveTimeScale = 30; // 訂位的區間(預設為30分鐘)
+		}
+	}
 	
 }

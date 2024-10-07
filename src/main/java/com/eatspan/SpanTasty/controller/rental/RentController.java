@@ -54,22 +54,14 @@ public class RentController {
 	
 	//查詢下拉式選單
 	@GetMapping("/add")
-	public String toAddAndSearch(@RequestParam(name = "action") String action , Model model) {
+	public String toAddAndSearch(Model model) {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		List<Member> members = memberService.findAllMembers();
 		model.addAttribute("restaurants" ,restaurants);
 		model.addAttribute("members" ,members);
-		if("add".equals(action)) {
-			List<Tableware> tablewares = tablewareService.findAllTablewares();
-			model.addAttribute("tablewares" ,tablewares);
-			return "rental/addRent";
-			
-		}else if ("get".equals(action)) {
-			List<Rent> rents = rentService.findAllRents();
-			model.addAttribute("rents" ,rents);
-			return "rental/getRents";
-		}
-		return null;
+		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		model.addAttribute("tablewares" ,tablewares);
+		return "rental/addRent";
 	}
 	
 	
@@ -180,25 +172,31 @@ public class RentController {
 	//歸還訂單
 	@PutMapping("/setPut2")
 	public String returnRent(@ModelAttribute Rent rent, Model model) {
-		try {
-			Date returnDate = new Date();
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(returnDate);
-			rent.setReturnDate(returnDate);
-			rentService.addRent(rent);
-			return "redirect:/rent/getAll";
-		} catch (Exception e) {
-			e.printStackTrace();
+		rent.setRentStatus(2);
+		rent.setRentMemo("已歸還");
+		rentService.addRent(rent);
+		
+		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rent.getRentId());
+		for(RentItem rentItem: rentItems) {
+			rentItem.setReturnStatus(2);
+			rentItem.setReturnMemo("完全歸還");
+			rentItemService.addRentItem(rentItem);
 		}
-		return null;
+		return "redirect:/rent/getAll";
 	}
 
 	
 	//查詢所有訂單
 	@GetMapping("getAll")
 	public String getAllRents(Model model, @RequestParam(value = "p", defaultValue = "1") Integer page) {
+		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		Page<Rent> rentPages = rentService.findAllRentPages(page);
+		List<Member> members = memberService.findAllMembers();
+		List<Rent> rents = rentService.findAllRents();
+		model.addAttribute("restaurants" ,restaurants);
 		model.addAttribute("rentPages",rentPages);
+		model.addAttribute("members" ,members);
+		model.addAttribute("rents" ,rents);
 		return "rental/getAllRents";
 	}
 	

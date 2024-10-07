@@ -3,6 +3,7 @@ package com.eatspan.SpanTasty.controller.reservation;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -60,6 +61,31 @@ public class ReserveController {
         return "reservation/getAllReserve";
     }
 	
+    // 導向到訂位中心頁面
+    @GetMapping("/reserveCenter")
+    public String showReserveCenter(Model model) {
+    	List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+    	model.addAttribute("restaurants", restaurants);
+    	return "reservation/reserveCenter";
+    }
+    
+    
+
+    
+    
+    
+	// 修改訂位參數的ajax
+	@PutMapping("/setReserveCenter")
+	@ResponseBody
+	public String updateReserveCenter(@RequestBody Restaurant newRestaurant) {
+		System.out.println(newRestaurant.getRestaurantId());
+		System.out.println(newRestaurant.getReservePercent());
+		Restaurant restaurant = restaurantService.findRestaurantById(newRestaurant.getRestaurantId());
+		restaurant.setReservePercent(newRestaurant.getReservePercent());
+		restaurant.setReserveTimeScale(newRestaurant.getReserveTimeScale());
+		restaurantService.updateRestaurant(restaurant);
+		return "ReserveCenter update ok";
+	}
     
     
     // ajax 查詢訂位訂單
@@ -74,6 +100,16 @@ public class ReserveController {
     	
     	List<Reserve> reserveByCriteria = reserveService.findReserveByCriteria(memberName, phone, restaurantId, tableTypeId, reserveTimeStart, reserveTimeEnd);
     	return reserveByCriteria;
+    }
+    
+    
+    // ajax 查詢所有餐廳特定時間內訂位訂單數量
+    @GetMapping("/getReserveSum")
+    @ResponseBody
+    public Map<String, Integer> getReserveSum(@RequestParam(required = false) LocalDate slotEndDate,
+    								   		  @RequestParam(required = false) LocalDate slotStartDate) {
+    	Map<String, Integer> reserveSum = reserveService.getReserveSum(slotEndDate, slotStartDate);
+    	return reserveSum;
     }
     
     
@@ -198,6 +234,16 @@ public class ReserveController {
 		
 		return "Reserve update ok";
 		
+	}
+	
+	// 修改訂位狀態的ajax
+	@PutMapping("/setStatus")
+	@ResponseBody
+	public String updateReserveStatus(@RequestBody Reserve newReserveStatus) {
+		Reserve reserve = reserveService.findReserveById(newReserveStatus.getReserveId());
+		reserve.setReserveStatus(newReserveStatus.getReserveStatus());
+		reserveService.updateReserve(reserve);
+		return "ReserveStatus update ok";
 	}
     
     
