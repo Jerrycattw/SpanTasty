@@ -55,13 +55,13 @@ public class ShoppingCartController {
         int totalAmount = 0;
         if (cart != null) {
             for (ShoppingItem item : cart) {
-                totalAmount += item.getShoppingItemPrice() * item.getShoppingItemQuantity(); // 計算總金額
+                totalAmount += item.getShoppingItemPrice() * item.getShoppingItemQuantity(); 
             }
         }
         model.addAttribute("totalAmount", totalAmount);
-        model.addAttribute("cart", cart); // 添加購物車內容
+        model.addAttribute("cart", cart); 
 
-        return "store/shopping/shoppingCart"; // 返回購物車頁面
+        return "store/shopping/shoppingCart"; 
     }
 
 //    @PostMapping("/cart/add/{id}")

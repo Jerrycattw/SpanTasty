@@ -100,22 +100,6 @@ public class ShoppingOrderController {
 	}
 	
 	
-//	 // 更新訂單
-//    @PutMapping("/{id}")
-//    public ResponseEntity<ShoppingOrder> updateOrder(@PathVariable Integer id, @RequestBody ShoppingOrder shoppingOrder) {
-//        ShoppingOrder updatedOrder = shoppingOrderService.update(id, shoppingOrder);
-//        return updatedOrder != null ? ResponseEntity.ok(updatedOrder) : ResponseEntity.notFound().build();
-//    }
-	
-	
-//	@PutMapping("/update")
-//	public ResponseEntity<?> updateShoppingOrder(@RequestBody ShoppingOrder updateShoppingOrder){
-//		ShoppingOrder shoppingOrder = shoppingOrderService.updateShoppingOrder(updateShoppingOrder);
-//		if(shoppingOrder != null) {
-//			return new ResponseEntity<>(shoppingOrder, HttpStatus.OK);
-//		}
-//		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//	}
 	
 	@GetMapping("/find/{id}")
 	public ResponseEntity<?> findByShoppingOrderId(@PathVariable("id") Integer shoppingOrderId){
@@ -126,18 +110,6 @@ public class ShoppingOrderController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
-//	@GetMapping("/findAll")
-//	public String findAllShoppingOrder(@RequestParam Integer memberId, Model model) {
-//	    // 獲取會員
-//	    Member member = memberService.findMemberById(memberId).orElse(null);
-//	    model.addAttribute("member", member);
-//	    
-//	    // 獲取所有購物訂單
-//	    List<ShoppingOrder> shoppings = shoppingOrderService.findAllShoppingOrder();
-//	    model.addAttribute("shoppings", shoppings);
-//	    
-//	    return "store/shopping/searchAllShopping";
-//	}
 	
 	
 	@GetMapping("/findAll")
@@ -161,10 +133,4 @@ public class ShoppingOrderController {
 	    return "store/shopping/searchAllShopping";
 	}
 
-	
-//	@GetMapping("/findAll")
-//	public ResponseEntity<List<ShoppingOrder>> findAllShoppingOrder(){
-//		List<ShoppingOrder> shoppingOrders = shoppingOrderService.findAllShoppingOrder();
-//		return new ResponseEntity<>(shoppingOrders,HttpStatus.OK);
-//	}
 }
