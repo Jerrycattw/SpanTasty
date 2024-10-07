@@ -60,6 +60,9 @@
             showSidebar('reservation');
             document.getElementById('restaurantId').addEventListener('change', getRestaurant);
             document.getElementById('setReserveCenterbtn').addEventListener('click', setReserveCenter);
+            
+            getReserveSum()
+            
         });
 
         function setReserveCenter() {
@@ -102,17 +105,34 @@
         }
 
 
-        // 查詢訂單待完成
+        // 查詢訂單
         function getReserveSum() {
 
             axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveSum`)
             .then(res => {
                 console.log(res.data)
-            })
-            .catch(err => {
-                console.error(err);
-            })
+                
+                
+	            // 將餐廳名稱和對應的訂位數量分別提取到 labels 和 data 陣列
+	            const labels = Object.keys(reserveData); // 餐廳名稱
+	            const data = Object.values(reserveData); // 訂位數量
+	
+	            // 更新圖表
+	            updateChart(myChart3, labels, data);
+	                
+	            })
+	            .catch(err => {
+	                console.error(err);
+	            })
         }
+        
+        
+        // 更新圖表的資料
+		function updateChart(chart, labels, data) {
+		    chart.data.labels = labels; // 更新餐廳名稱（x 軸）
+		    chart.data.datasets[0].data = data; // 更新訂位數量（y 軸）
+		    chart.update(); // 重新繪製圖表
+		}
 
 
         const ctx3 = document.getElementById('myChart3').getContext('2d');

@@ -112,6 +112,7 @@
 <body>
     <!-- 上方選單 -->
     <div class="top-menu d-flex justify-content-start">
+        <a id="adminLink" href="#" onclick="showSidebar('index')">SpanTasty</a>
         <a id="adminLink" href="#" style="display: none;" onclick="showSidebar('admin')">管理員管理</a>
         <a id="memberLink" href="#" style="display: none;" onclick="showSidebar('member')">會員管理</a>
         <a id="storeLink" href="#" style="display: none;" onclick="showSidebar('store')">線上商城管理</a>
@@ -121,7 +122,7 @@
         <a id="pointsLink" href="#" style="display: none;" onclick="showSidebar('points')">會員積分與優惠券管理</a>
 
         <div id="authButtonContainer">
-            <button id="authButton" onclick="handleAuth()">登入</button>
+            <button id="authButton" class="btn btn-secondary" onclick="handleAuth()">登入</button>
         </div>
     </div>
 
@@ -271,6 +272,12 @@
                 let menuItems = '';
 
                 switch (menu) {
+                    case 'index':
+                        menuItems = `
+                        `;
+                        window.location.href="/SpanTasty/"
+                        break;
+                        
                     case 'admin':
                         menuItems = `
                             <a href="/SpanTasty/admin/addAdminPage">新增管理員</a>

@@ -145,26 +145,50 @@ public class ReserveService {
     
     
 	// 查詢所有餐廳的預約狀況
-    public Map<String, Integer> getReserveSum(LocalDate slotEndDate, LocalDate slotStartDate) {
-    	
+//    public Map<String, Integer> getReserveSum(LocalDate slotEndDate, LocalDate slotStartDate) {
+//    	
+//        List<Restaurant> restaurants = restaurantRepository.findAll();
+//        Map<String, Integer> restaurantReserveMap = new HashMap<>();
+//        if(slotStartDate==null) {
+//        	slotStartDate = LocalDate.now();
+//        }
+//        if(slotEndDate==null) {
+//        	slotEndDate = LocalDate.now().minusYears(1);
+//        }
+//        
+//        for(Restaurant restaurant : restaurants) {
+//        	Integer restaurantId = restaurant.getRestaurantId();
+//        	Integer countReservationsInDate = reserveRepository.countReservationsInDateSlot(restaurantId, slotEndDate, slotStartDate);
+//        	restaurantReserveMap.put(restaurant.getRestaurantName(), countReservationsInDate);
+//        }
+//
+//        return restaurantReserveMap;
+//    }
+    
+    public Map<String, Integer> getReserveSum(LocalDateTime slotStartDate, LocalDateTime slotEndDate) {
+
+        // 如果沒有傳入開始日期，則使用一年前的日期作為開始日期
+        if (slotStartDate == null) {
+            slotStartDate = LocalDateTime.now().minusYears(1); // 默認為一年前
+        }
+
+        // 如果沒有傳入結束日期，則使用當前日期作為結束日期
+        if (slotEndDate == null) {
+            slotEndDate = LocalDateTime.now(); // 默認為當前時間
+        }
+
         List<Restaurant> restaurants = restaurantRepository.findAll();
         Map<String, Integer> restaurantReserveMap = new HashMap<>();
-        if(slotStartDate==null) {
-        	slotStartDate = LocalDate.now();
-        }
-        if(slotEndDate==null) {
-        	slotEndDate = LocalDate.now().minusYears(1);
-        }
-        
-        for(Restaurant restaurant : restaurants) {
-        	Integer restaurantId = restaurant.getRestaurantId();
-        	Integer countReservationsInDate = reserveRepository.countReservationsInDateSlot(restaurantId, slotEndDate, slotStartDate);
-        	restaurantReserveMap.put(restaurant.getRestaurantName(), countReservationsInDate);
+
+        for (Restaurant restaurant : restaurants) {
+            Integer restaurantId = restaurant.getRestaurantId();
+            Integer countReservationsInDate = reserveRepository.countReservationsInDateSlot(restaurantId, slotStartDate, slotEndDate);
+            restaurantReserveMap.put(restaurant.getRestaurantName(), countReservationsInDate);
         }
 
         return restaurantReserveMap;
     }
-    
+
     
     
 	
