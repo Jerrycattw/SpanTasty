@@ -30,4 +30,9 @@ public class AdminPageController {
     public String showUpdateAdminInfoPage() {
         return "/account/updateAdminInfo"; 
     }
+    
+    @GetMapping("/admin/adminPermissionPage")
+    public String showAdminPermissionPage() {
+        return "/account/adminPermission"; 
+    }
 }

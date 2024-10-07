@@ -1,6 +1,7 @@
 package com.eatspan.SpanTasty.repository.account;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,7 @@ public interface PermissionRepository extends JpaRepository<Permission, Integer>
            "WHERE a.adminId = :adminId AND p.permissionId = :permissionId")
     boolean existsByAdminIdAndPermissionId(@Param("adminId") Integer adminId, @Param("permissionId") Integer permissionId);
 
-	List<Permission> findByPermissionNameIn(List<String> permissions);
+    List<Permission> findByPermissionNameIn(List<String> permissionNames);
+    
 
 }

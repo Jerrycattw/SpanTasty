@@ -3,7 +3,7 @@ package com.eatspan.SpanTasty.entity.account;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -56,7 +56,7 @@ public class Admin {
         joinColumns = @JoinColumn(name = "admin_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    @JsonIgnore
+	@JsonManagedReference
     private Set<Permission> permissions = new HashSet<>();
 
     // Getters and Setters
