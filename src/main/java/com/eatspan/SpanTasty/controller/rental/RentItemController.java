@@ -101,11 +101,4 @@ public class RentItemController {
 	}
 	
 	
-//	查詢所有訂單明細
-//	@GetMapping("/getAll")
-//	public String getAllRentItems(Model model) {
-//		List<RentItem> rentItems = rentItemService.findAllRentItems();
-//		model.addAttribute("rentItems",rentItems);
-//		return "rental/ShowAllRentItems";
-//	}
 }

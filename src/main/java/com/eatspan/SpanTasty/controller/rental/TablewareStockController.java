@@ -40,19 +40,12 @@ public class TablewareStockController {
 	
 	// 導向頁面(新增 搜尋)
 	@GetMapping("/add")
-	public String toAddAndSearch(@RequestParam(name= "action") String action, Model model) {
+	public String toAddAndSearch(Model model) {
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
-		//暫時修改
-		List<Restaurant> restaurants = (List<Restaurant>) restaurantService.findAllRestaurants();
+		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		model.addAttribute("tablewares",tablewares);
 		model.addAttribute("restaurants",restaurants);
-		if ("add".equals(action)) {
-			return "rental/addStock";
-	    } else if ("get".equals(action)) {
-	    	return "rental/getStocks";
-	    }
-		
-		return null;
+		return "rental/addStock";
 	}
 	
 	
@@ -106,7 +99,11 @@ public class TablewareStockController {
 	// 查詢所有庫存
 	@GetMapping("/getAll")
 	public String getAllStocks(Model model) {
+		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		List<TablewareStock> stocks = tablewareStockService.findAllStocks();
+		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		model.addAttribute("restaurants",restaurants);
+		model.addAttribute("tablewares",tablewares);
 		model.addAttribute("stocks",stocks);
 		return "rental/getAllStocks";
 	}
