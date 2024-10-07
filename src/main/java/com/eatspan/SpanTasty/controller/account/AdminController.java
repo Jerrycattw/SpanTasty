@@ -79,16 +79,24 @@ public class AdminController {
 
 	// 登入信息
 	@GetMapping("/info")
-	public Result<Map<String, String>> getAdminInfo(HttpSession session) {
-		Admin admin = (Admin) session.getAttribute("admin");
+	public Result<Map<String, Object>> getAdminInfo(HttpSession session) {
+	    Admin admin = (Admin) session.getAttribute("admin");
 
-		if (admin != null) {
-			Map<String, String> data = new HashMap<>();
-			data.put("adminName", admin.getAdminName()); // 假設 Admin 有 getAdminName() 方法
-			return Result.success(data);
-		} else {
-			return Result.failure("未登入");
-		}
+	    if (admin != null) {
+	        Map<String, Object> data = new HashMap<>();
+	        data.put("adminName", admin.getAdminName());
+	        data.put("role", admin.getRole()); // 返回角色信息
+	        
+	        // 提取管理員的權限名稱列表
+	        List<String> permissions = admin.getPermissions().stream()
+	                                        .map(Permission::getPermissionName)
+	                                        .collect(Collectors.toList());
+	        data.put("permissions", permissions); // 返回權限信息
+
+	        return Result.success(data);
+	    } else {
+	        return Result.failure("未登入");
+	    }
 	}
 
 	// 登出
