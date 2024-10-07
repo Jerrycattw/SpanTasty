@@ -70,8 +70,8 @@ public class MenuEntity implements Serializable {
 	
 	@PrePersist
 	public void defaultData() {
-		if(foodStatus == null) {
-			foodStatus = 1;
+		if(this.foodStatus == null) {
+			this.foodStatus = 1;
 		}
 	}
 

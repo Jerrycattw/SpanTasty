@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.eatspan.SpanTasty.entity.order.TogoEntity;
 import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -81,8 +82,9 @@ public class Member {
     @Column(name = "provider_id", length = 100)
     private String providerId;  // 用來儲存第三方提供者的唯一用戶 ID
     
-    
-    
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "member", cascade = CascadeType.ALL)
+    private List<TogoEntity> togo = new ArrayList<TogoEntity>();
     
 	@JsonIgnore //該屬性不要做JSON序列化避免無線迴圈 //預設lazy
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)

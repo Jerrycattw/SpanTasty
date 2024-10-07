@@ -59,7 +59,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="updateMenuModalLabel">更新訂單資訊</h5>
+                    <h5 class="modal-title" id="updateMenuModalLabel">更新餐點資訊</h5>
 
                 </div>
                 <div class="modal-body">
@@ -94,10 +94,10 @@
                         </div>
                         <div class="form-group mb-3">
                             <label for="foodStatus">狀態</label>
-                            <select class="form-control" id="foodStatus" name="foodStatus" required>
+                            <select class="form-select" id="foodStatus" name="foodStatus" required>
                                 <option value="" selected>請選擇</option>
                                 <option value="1">正常供應</option>
-                                <option value="2">已取餐</option>
+                                <option value="2">停售</option>
                             </select>
                         </div>
                         <div class="form-group mb-3">
@@ -122,13 +122,27 @@
             showSidebar('order');
 
             document.getElementById("idSearchBtn").addEventListener("click", function () {
-                getMenu();
+                getMenuById();
+            });
+            document.getElementById("nameSearchBtn").addEventListener("click", function () {
+                getMenuByName();
             });
         })
 
         // id 查詢
-        function getMenu() {
+        function getMenuById() {
             const foodId = document.getElementById("idSearch").value;
+            // 檢查是否為空以及是否符合數字格式
+            const idPattern = /^[0-9]+$/;
+            if (!foodId) {
+                alert("請輸入餐點編號！");
+                return;
+            }
+            // 檢查是否符合數字格式
+            if (!idPattern.test(foodId)) {
+                alert("餐點編號只能包含數字！");
+                return;
+            }
             // 發送 GET 請求到 /menu/{togoId}
             axios.get(`http://localhost:8080/SpanTasty/order/menu/${foodId}`)
                 .then(function (response) {
@@ -150,14 +164,14 @@
                         <td>${menuData.foodId}</td>
                         <td>${menuData.foodName}</td>
                         <td>
-                            <img th:src="${menuData.foodPicture}" th:alt="${menuData.foodName}" width="100" height="100">
+                            <img src="${menuData.foodPicture}" th:alt="${menuData.foodName}" width="100" height="100">
                         </td>
                         <td>${menuData.foodPrice}</td>
                         <td>${menuData.foodKind.foodKindName}</td>
                         <td>${menuData.foodStock || ''}</td>
                         <td>${menuData.foodDescription || ''}</td>
                         <td>${getFoodStatusBadge(menuData.foodStatus)}</td>
-                        <td><button class="btn btn-warning" onclick="showUpdateModal(${menuData.foodId})">修改</button></td>
+                        <td><button class="btn btn-primary" onclick="showUpdateModal(${menuData.foodId})">修改</button></td>
                         <td><button class="btn btn-danger" onclick="deleteMenu(${menuData.foodId})">刪除</button></td>
                     `;
 
@@ -169,8 +183,67 @@
 
                 })
                 .catch(function (error) {
-                    console.error("查詢訂單時發生錯誤：", error);
-                    alert("查詢失敗，請檢查訂單編號。");
+                    console.error("查詢菜單時發生錯誤：", error);
+                    alert("查詢失敗，請檢查餐點編號。");
+                });
+
+        }
+
+        // name 查詢
+        function getMenuByName() {
+            const foodName = document.getElementById("nameSearch").value;
+            //檢查輸入不得為空白
+            if (!foodName) {
+                alert("請輸入餐點名稱！");
+                return;
+            }
+            const params = {
+                foodName: foodName
+            };
+            // 發送 GET 請求
+            axios.get('http://localhost:8080/SpanTasty/order/menu/name', { params })
+                .then(function (response) {
+                    console.log(response.data)
+                    const menuList = response.data;
+
+                    // 清空表格內容
+                    const tbody = document.querySelector("#demoData tbody");
+                    tbody.innerHTML = "";
+
+                    // 動態生成表格內容
+                    const foodStock = menuList.foodStock !== null ? menuList.foodStock : '';
+                    const foodDescription = menuList.foodDescription !== null ? menuList.foodDescription : '';
+
+                    menuList.forEach(menuData => {
+                        const row = document.createElement("tr");
+                        row.setAttribute("data-id", menuData.foodId);
+                        row.innerHTML = `
+                        <td>${menuData.foodId}</td>
+                        <td>${menuData.foodName}</td>
+                        <td>
+                            <img src="${menuData.foodPicture}" th:alt="${menuData.foodName}" width="100" height="100">
+                        </td>
+                        <td>${menuData.foodPrice}</td>
+                        <td>${menuData.foodKind.foodKindName}</td>
+                        <td>${menuData.foodStock || ''}</td>
+                        <td>${menuData.foodDescription || ''}</td>
+                        <td>${getFoodStatusBadge(menuData.foodStatus)}</td>
+                        <td><button class="btn btn-primary" onclick="showUpdateModal(${menuData.foodId})">修改</button></td>
+                        <td><button class="btn btn-danger" onclick="deleteMenu(${menuData.foodId})">刪除</button></td>
+                    `;
+
+                        // 添加到表格中
+                        tbody.appendChild(row);
+                    })
+
+
+                    // 清空輸入框
+                    document.getElementById("idSearch").value = "";
+
+                })
+                .catch(function (error) {
+                    console.error("查詢菜單時發生錯誤：", error);
+                    alert("查詢失敗，請檢查餐點名稱。");
                 });
 
         }
@@ -185,9 +258,9 @@
                     // 填入modal表單
                     document.getElementById('foodName').value = foodData.foodName;
                     document.getElementById('foodPrice').value = foodData.foodPrice;
-                    // document.getElementById('foodKindId').value = foodData.foodKind.foodKindName; 
+                    document.getElementById('foodKindId').value = foodData.foodKindId; 
                     document.getElementById('foodStock').value = foodData.foodStock;
-                    //document.getElementById('foodStatus').value = foodData.foodStatus;
+                    document.getElementById('foodStatus').value = foodData.foodStatus;
                     document.getElementById('foodDescription').value = foodData.foodDescription;
 
                     // 顯示modal
@@ -253,14 +326,14 @@
                         <td>${menuData.foodId}</td>
                         <td>${menuData.foodName}</td>
                         <td>
-                            <img th:src="${menuData.foodPicture}" th:alt="${menuData.foodName}" width="100" height="100">
+                            <img src="${menuData.foodPicture}" th:alt="${menuData.foodName}" width="100" height="100">
                         </td>
                         <td>${menuData.foodPrice}</td>
                         <td>${menuData.foodKind.foodKindName}</td>
                         <td>${menuData.foodStock || ''}</td>
                         <td>${menuData.foodDescription || ''}</td>
                         <td>${getFoodStatusBadge(menuData.foodStatus)}</td>
-                        <td><button class="btn btn-warning" onclick="showUpdateModal(${menuData.foodId})">修改</button></td>
+                        <td><button class="btn btn-primary" onclick="showUpdateModal(${menuData.foodId})">修改</button></td>
                         <td><button class="btn btn-danger" onclick="deleteMenu(${menuData.foodId})">刪除</button></td>
     `;
                     }
@@ -273,18 +346,18 @@
         //刪除
         function deleteMenu(foodId) {
 
-            const isConfirmed = confirm("您確定要刪除這個訂單嗎？");
+            const isConfirmed = confirm("您確定要刪除這個餐點嗎？");
             if (isConfirmed) {
                 const deleteMenu = { foodId: foodId };
                 axios.delete(`http://localhost:8080/SpanTasty/order/menu/${foodId}`, deleteMenu)
                     .then(function (response) {
                         console.log("删除成功：", response.data);
-                        alert("訂單刪除成功！");
+                        alert("餐點刪除成功！");
                         window.location.href = 'http://localhost:8080/SpanTasty/order/menu';
                     })
                     .catch(function (error) {
                         console.error("刪除時發生錯誤：", error);
-                        alert("刪除失敗，請檢查訂單編號。");
+                        alert("刪除失敗，請檢查餐點編號。");
                     });
             }
         }
