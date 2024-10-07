@@ -60,11 +60,11 @@ public class TogoController {
 //		return ResponseEntity.ok(togoService.getAllTogo());
 //	}
 	
-	@GetMapping("/get")
+	@GetMapping("/togo/get")
 	public String getTogoPage() {
 		return "order/getTogo";
 	}
-	@GetMapping("/add")
+	@GetMapping("/togo/add")
 	public String addTogoPage(Model model) {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		model.addAttribute("restaurants", restaurants);
@@ -76,7 +76,7 @@ public class TogoController {
 		List<TogoEntity> togoList = togoService.getAllTogo();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	    for (TogoEntity togo : togoList) {
-	        togo.setFormattedDate(togo.getTogoCreateTime().format(formatter)); // 將日期格式化為字符串
+	        togo.setFormattedDate(togo.getTogoCreateTime().format(formatter)); // 將日期格式化為字串
 	    }
 		model.addAttribute("togoList", togoList);
 		return "order/getAllTogo";
@@ -85,7 +85,10 @@ public class TogoController {
 	@GetMapping("/togo/{togoId}")
 	@ResponseBody
 	public ResponseEntity<TogoEntity> getTogoById(@PathVariable Integer togoId) {
-		return ResponseEntity.ok(togoService.getTogoById(togoId));
+		TogoEntity togo = togoService.getTogoById(togoId);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		togo.setFormattedDate(togo.getTogoCreateTime().format(formatter));
+		return ResponseEntity.ok(togo);
 	}
 	
 	@PostMapping("/togo")
@@ -95,19 +98,16 @@ public class TogoController {
 		return ResponseEntity.ok(togoService.getAllTogo());
 	}
 	
-	//有updateTogo:更新訂單資訊，無updateTogo:刪除，更改togoStatus=3
+	//刪除&更新
 	@PutMapping("/togo/{togoId}")
 	@ResponseBody
 	public ResponseEntity<TogoEntity> updateTogoById(@PathVariable Integer togoId, @RequestBody TogoEntity updateTogo) {
 		TogoEntity togo = togoService.getTogoById(togoId);
 		if (togo == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		} else {
-			if (updateTogo.getTogoId() != null) {
-				return ResponseEntity.ok(togoService.updateTogoById(togoId, updateTogo));
-			}
-			return ResponseEntity.ok(togoService.deleteTogoById(togoId));
 		}
+		togoService.updateTogoById(togoId, updateTogo);
+		return ResponseEntity.ok(togoService.getTogoById(togoId));
 	}
 	
 }

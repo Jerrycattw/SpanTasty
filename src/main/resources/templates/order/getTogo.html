@@ -55,55 +55,242 @@
         </div>
     </div>
 
+    <!-- modal for update -->
+    <div class="modal fade" id="updateTogoModal" tabindex="-1" role="dialog" aria-labelledby="updateTogoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateTogoModalLabel">更新訂單資訊</h5>
+
+                </div>
+                <div class="modal-body">
+                    <!-- 更新的表單 -->
+                    <form id="updateTogoForm">
+                        <div class="form-group mb-3">
+                            <label for="memberId">會員編號</label>
+                            <input type="text" class="form-control" id="memberId" placeholder="輸入會員編號">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="tgName">顧客姓名</label>
+                            <input type="text" class="form-control" id="tgName" placeholder="輸入顧客姓名">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="tgPhone">電話</label>
+                            <input type="text" class="form-control" id="tgPhone" placeholder="輸入電話">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="togoStatus">取餐狀態</label>
+                            <select class="form-control" id="togoStatus">
+                                <option value="" selected>請選擇</option>
+                                <option value="1">未取餐</option>
+                                <option value="2">已取餐</option>
+                                <option value="3">已取消</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="rentid">租借單號</label>
+                            <input type="text" class="form-control" id="rentId" placeholder="輸入租借單號">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="togoMemo">備註</label>
+                            <textarea class="form-control" id="togoMemo" placeholder="輸入備註"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelChangesBtn">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveChangesBtn">保存修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('order');
 
-            document.getElementById("idSearchBtn").addEventListener("click", function (e) {
-                const togoId = document.getElementById("idSearch").value;
+            document.getElementById("idSearchBtn").addEventListener("click", function () {
+                getTogo();
+            });
 
+        })
 
-                // 發送 GET 請求到 /togo/{togoId}
-                axios.get(`http://localhost:8080/SpanTasty/order/togo/${togoId}`)
+        // id 查詢
+        function getTogo() {
+            const togoId = document.getElementById("idSearch").value;
+            // 發送 GET 請求到 /togo/{togoId}
+            axios.get(`http://localhost:8080/SpanTasty/order/togo/${togoId}`)
+                .then(function (response) {
+                    console.log(response.data)
+                    const togoData = response.data;
+
+                    // 清空表格內容
+                    const tbody = document.querySelector("#demoData tbody");
+                    tbody.innerHTML = "";
+
+                    // 動態生成表格內容
+
+                    const row = document.createElement("tr");
+                    row.setAttribute("data-id", togoData.togoId);
+                    const memberId = togoData.memberId !== null ? togoData.memberId : '';
+                    const rentId = togoData.rentId !== null ? togoData.rentId : '';
+                    const togoMemo = togoData.togoMemo !== null ? togoData.togoMemo : '';
+
+                    row.innerHTML = `
+                        <td>${togoData.togoId}</td>
+                        <td>${togoData.memberId || ''}</td>
+                        <td>${togoData.tgName}</td>
+                        <td>${togoData.tgPhone}</td>
+                        <td>${togoData.totalPrice}</td>
+                        <td>${togoData.formattedDate}</td>
+                        <td>${togoData.rentId || ''}</td>
+                        <td>${getTogoStatusBadge(togoData.togoStatus)}</td>
+                        <td>${togoData.restaurant.restaurantName}</td>
+                        <td>${togoData.togoMemo || ''}</td>
+                        <td><button class="btn btn-info">查看</button></td>
+                        <td><button class="btn btn-warning" onclick="showUpdateModal(${togoData.togoId})">修改</button></td>
+                        <td><button class="btn btn-danger" onclick="deleteTogo(${togoData.togoId})">刪除</button></td>
+                    `;
+
+                    // 添加到表格中
+                    tbody.appendChild(row);
+
+                    // 清空輸入框
+                    document.getElementById("idSearch").value = "";
+
+                })
+                .catch(function (error) {
+                    console.error("查詢訂單時發生錯誤：", error);
+                    alert("查詢失敗，請檢查訂單編號。");
+                });
+
+        }
+
+        //刪除(更新狀態為3)
+        function deleteTogo(togoId) {
+
+            const isConfirmed = confirm("您確定要刪除這個訂單嗎？");
+            if (isConfirmed) {
+                const updateTogo = { togoId: togoId, togoStatus: 3 };
+                axios.put(`http://localhost:8080/SpanTasty/order/togo/${togoId}`, updateTogo)
                     .then(function (response) {
-                        console.log(response.data)
-                        const togoData = response.data;
+                        console.log("删除成功：", response.data);
+                        alert("訂單刪除成功！");
+                        updateTogoRow(togoId);
+                    })
+                    .catch(function (error) {
+                        console.error("刪除時發生錯誤：", error);
+                        alert("刪除失敗，請檢查訂單編號。");
+                    });
+            }
+        }
 
-                        // 清空表格內容
-                        const tbody = document.querySelector("#demoData tbody");
-                        tbody.innerHTML = "";
-						history.pushState(null, "", `http://localhost:8080/SpanTasty/orde/togo/${togoId}`);
-                        // 遍歷JSON數據，動態生成表格內容
-                        const row = document.createElement("tr");
+        // 顯示modal且有原先的資料
+        function showUpdateModal(togoId) {
+            // togoId找要更新的資料
+            axios.get(`http://localhost:8080/SpanTasty/order/togo/${togoId}`)
+                .then(function (response) {
+                    const togoData = response.data;
+
+                    // 填入modal表單
+                    document.getElementById('memberId').value = togoData.memberId;
+                    document.getElementById('tgName').value = togoData.tgName;
+                    document.getElementById('tgPhone').value = togoData.tgPhone;
+                    //document.getElementById('togoStatus').value = togoData.togoStatus;
+                    document.getElementById('rentId').value = togoData.rentId;
+                    document.getElementById('togoMemo').value = togoData.togoMemo;
+
+                    // 顯示modal
+                    $('#updateTogoModal').modal('show');
+
+                    // 绑定保存按钮的点击事件（注意：为避免重复绑定，每次显示模态框时重新绑定）
+                    document.getElementById('saveChangesBtn').onclick = function () {
+                        updateTogo(togoId);
+                    };
+                    document.getElementById('cancelChangesBtn').onclick = function () {
+                        $('#updateTogoModal').modal('hide');
+                    };
+                })
+                .catch(function (error) {
+                    console.error("獲取訂單時發生錯誤：", error);
+                    alert("取得訂單資訊失敗。");
+                });
+        }
+
+        function updateTogo(togoId) {
+            const updateTogo = {
+                memberId: document.getElementById('memberId').value,
+                tgName: document.getElementById('tgName').value,
+                tgPhone: document.getElementById('tgPhone').value,
+                togoStatus: document.getElementById('togoStatus').value,
+                rentId: document.getElementById('rentId').value,
+                togoMemo: document.getElementById('togoMemo').value
+            };
+
+            axios.put(`http://localhost:8080/SpanTasty/order/togo/${togoId}`, updateTogo)
+                .then(function (response) {
+                    console.log("更新成功：", response.data);
+                    alert("訂單更新成功！");
+
+                    // 關閉modal
+                    $('#updateTogoModal').modal('hide');
+
+                    // 重新顯示訂單資訊
+                    updateTogoRow(togoId);
+                })
+                .catch(function (error) {
+                    console.error("更新訂單時發生錯誤：", error);
+                    alert("更新失敗。");
+                    $('#updateTogoModal').modal('hide');
+                });
+
+        }
+
+        //重新查詢
+        function updateTogoRow(togoId) {
+
+            axios.get(`http://localhost:8080/SpanTasty/order/togo/${togoId}`)
+                .then(function (response) {
+                    const togoData = response.data;
+                    const row = document.querySelector(`tr[data-id="${togoId}"]`);
+                    const memberId = togoData.memberId !== null ? togoData.memberId : '';
+                    const rentId = togoData.rentId !== null ? togoData.rentId : '';
+                    const togoMemo = togoData.togoMemo !== null ? togoData.togoMemo : '';
+
+                    if (row) {
                         row.innerHTML = `
                     <td>${togoData.togoId}</td>
-                    <td>${togoData.memberId}</td>
+                    <td>${togoData.memberId || ''}</td>
                     <td>${togoData.tgName}</td>
                     <td>${togoData.tgPhone}</td>
                     <td>${togoData.totalPrice}</td>
                     <td>${togoData.formattedDate}</td>
-                    <td>${togoData.rentId}</td>
-                    <td>${togoData.togoStatus}</td>
-                    <td>${togoData.restaurantName}</td>
-                    <td>${togoData.togoMemo}</td>
+                    <td>${togoData.rentId || ''}</td>
+                    <td>${getTogoStatusBadge(togoData.togoStatus)}</td>
+                    <td>${togoData.restaurant.restaurantName}</td>
+                    <td>${togoData.togoMemo || ''}</td>
                     <td><button class="btn btn-info">查看</button></td>
-                    <td><button class="btn btn-warning">修改</button></td>
-                    <td><button class="btn btn-danger">刪除</button></td>
+                    <td><button class="btn btn-warning" onclick="showUpdateModal(${togoData.togoId})">修改</button></td>
+                    <td><button class="btn btn-danger" onclick="deleteTogo(${togoData.togoId})">刪除</button></td>
                 `;
+                    }
+                })
+                .catch(function (error) {
+                    console.error("更新行時發生錯誤：", error);
+                });
+        }
 
-                        // 將生成的表格行加入到表格中
-                        tbody.appendChild(row);
-
-                    })
-                    .catch(function (error) {
-                        console.error("查詢訂單時發生錯誤：", error);
-                        alert("查詢失敗，請檢查訂單編號。");
-                    });
-            });
-
-
-        })
-
+        //顯示togo狀態
+        function getTogoStatusBadge(status) {
+            if (status === 1) {
+                return '<span class="badge bg-warning">未取餐</span>';
+            } else if (status === 2) {
+                return '<span class="badge bg-success">已取餐</span>';
+            } else if (status === 3) {
+                return '<span class="badge bg-danger">已取消</span>';
+            }
+        }
 
 
 
