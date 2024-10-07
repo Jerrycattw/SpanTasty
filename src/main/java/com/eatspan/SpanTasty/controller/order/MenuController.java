@@ -59,12 +59,14 @@ public class MenuController {
 //	}
 	
 	@GetMapping("/menu/get")
-	public String getTogoPage() {
+	public String getMenuPage(Model model) {
+		List<FoodKindEntity> foodKinds = foodKindService.getAllFoodKind();
+		model.addAttribute("foodKinds", foodKinds);
 		return "order/getMenu";
 	}
 	
 	@GetMapping("/menu/add")
-	public String addTogoPage(Model model) {
+	public String addMenuPage(Model model) {
 		List<FoodKindEntity> foodKinds = foodKindService.getAllFoodKind();
 		model.addAttribute("foodKinds", foodKinds);
 		return "order/addMenu";
@@ -95,7 +97,7 @@ public class MenuController {
 		return ResponseEntity.ok(menuService.getFoodsByKind(foodKindId));
 	}
 	
-	@PostMapping(value = "/menu")
+	@PostMapping("/menu")
 	@ResponseBody
 	public ResponseEntity<List<MenuEntity>> addFood(@ModelAttribute AddMenuDto newFood)
 			throws IllegalStateException, IOException {
@@ -135,23 +137,31 @@ public class MenuController {
 	@ResponseBody
 	public ResponseEntity<MenuEntity> updateFoodById(
 			@PathVariable Integer foodId,
-			@RequestBody MenuEntity updateFood,
-			@RequestParam(value = "foodPicture", required = false) MultipartFile file)
+			@ModelAttribute AddMenuDto updateFood)
 					throws IllegalStateException, IOException {
+		MenuEntity menu = new MenuEntity();
+		menu.setFoodName(updateFood.getFoodName());
+		menu.setFoodPrice(updateFood.getFoodPrice());
+		menu.setFoodKindId(updateFood.getFoodKindId());
+		menu.setFoodStock(updateFood.getFoodStock());
+		menu.setFoodDescription(updateFood.getFoodDescription());
+		menu.setFoodStatus(updateFood.getFoodStatus());
+		
 		// 建立資料夾
         File fileSaveDirectory = new File(uploadPath);
         if (!fileSaveDirectory.exists()) {
             fileSaveDirectory.mkdirs();
         }
+        MultipartFile file = updateFood.getFoodPicture();
         if (file != null && !file.isEmpty()) {
         	String fileName = file.getOriginalFilename();
         	String filePath = uploadPath + File.separator + fileName;
         	File fileToSave = new File(filePath);
         	file.transferTo(fileToSave);
-        	updateFood.setFoodPicture("/SpanTasty/upload/order/" + fileName);
+        	menu.setFoodPicture("/SpanTasty/upload/order/" + fileName);
         }
-		
-		return ResponseEntity.ok(menuService.updateFoodById(foodId, updateFood));
+        menuService.updateFoodById(foodId, menu);
+		return ResponseEntity.ok(menuService.getMenuById(foodId));
 	}
 	
 }

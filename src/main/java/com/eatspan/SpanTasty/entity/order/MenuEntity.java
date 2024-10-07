@@ -1,6 +1,7 @@
 package com.eatspan.SpanTasty.entity.order;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,7 +48,7 @@ public class MenuEntity implements Serializable {
 	@Column(name = "food_price")
 	private Integer foodPrice;
 	
-	@Column(name = "food_kind_id" , insertable = false, updatable = false)
+	@Column(name = "food_kind_id" ,insertable = false, updatable = false)
 	private Integer foodKindId;
 	
 	@Column(name = "food_stock")
@@ -58,13 +60,19 @@ public class MenuEntity implements Serializable {
 	@Column(name = "food_status")
 	private Integer foodStatus;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "food_kind_id")
 	private FoodKindEntity foodKind;
 	
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "menu")
 	private List<TogoItemEntity> togoItem = new ArrayList<TogoItemEntity>();
-
+	
+	@PrePersist
+	public void defaultData() {
+		if(foodStatus == null) {
+			foodStatus = 1;
+		}
+	}
 
 }

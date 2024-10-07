@@ -1,36 +1,308 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/">
+
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <title>查詢</title>
 </head>
+
 <body>
-<div th:replace="~{display/navbar}"></div>
-<!-- 主要內容區域 -->
-<div class="content">
-    <div class="container mt-2">
-        <h1 class="display-6">☕菜單資料☕</h1>
-        
-        
-        
-	</div>
-</div>
-<script>
+    <div th:replace="~{display/navbar}"></div>
+    <!-- 主要內容區域 -->
+    <div class="content">
+        <div class="container mt-2">
+            <h1 class="display-6">☕菜單查詢☕</h1>
+            <!-- 查詢輸入框和按鈕 -->
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <input type="text" id="idSearch" class="form-control" placeholder="請輸入餐點編號">
+                </div>
+                <div class="col-md-4">
+                    <button id="idSearchBtn" class="btn btn-primary">查詢</button>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <input type="text" id="nameSearch" class="form-control" placeholder="請輸入餐點名稱">
+                </div>
+                <div class="col-md-4">
+                    <button id="nameSearchBtn" class="btn btn-primary">查詢</button>
+                </div>
+            </div>
+            <div class="table-responsive mt-3">
+                <table id="demoData" class="table table-secondary table-striped table-hover text-center">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">餐點編號</th>
+                            <th scope="col">餐點名稱</th>
+                            <th scope="col">餐點圖片</th>
+                            <th scope="col">餐點價格</th>
+                            <th scope="col">餐點種類</th>
+                            <th scope="col">庫存</th>
+                            <th scope="col">描述</th>
+                            <th scope="col">狀態</th>
+                            <th scope="col">修改</th>
+                            <th scope="col">刪除</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ajax -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal for update -->
+    <div class="modal fade" id="updateMenuModal" tabindex="-1" role="dialog" aria-labelledby="updateMenuModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateMenuModalLabel">更新訂單資訊</h5>
+
+                </div>
+                <div class="modal-body">
+                    <!-- 更新的表單 -->
+                    <form id="updateMenuForm">
+                        <div class="form-group mb-3">
+                            <label for="foodName">餐點名稱</label>
+                            <input type="text" class="form-control" id="foodName" name="foodName" placeholder="輸入餐點名稱">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="foodPicture" class="form-label">圖片上傳</label>
+                            <input type="file" class="form-control" id="foodPicture" name="foodPicture">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="foodPrice">餐點價格</label>
+                            <input type="text" class="form-control" id="foodPrice" name="foodPrice"
+                                placeholder="輸入餐點價格">
+                        </div>
+                        <div class="mb-3">
+                            <label for="foodKindId" class="form-label mb-0 col-4">餐點種類:</label>
+                            <select name="foodKindId" id="foodKindId" class="form-select" required>
+                                <option value="" selected>請選擇</option>
+                                <th:block th:each="foodKind : ${foodKinds}">
+                                    <option th:value="${foodKind.foodKindId}" th:text="${foodKind.foodKindName}">
+                                    </option>
+                                </th:block>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="foodStock">庫存</label>
+                            <input type="text" class="form-control" id="foodStock" name="foodStock" placeholder="輸入庫存">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="foodStatus">狀態</label>
+                            <select class="form-control" id="foodStatus" name="foodStatus" required>
+                                <option value="" selected>請選擇</option>
+                                <option value="1">正常供應</option>
+                                <option value="2">已取餐</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="foodDescription">描述</label>
+                            <textarea class="form-control" id="foodDescription" name="foodDescription"
+                                placeholder="輸入描述"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        id="cancelChangesBtn">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveChangesBtn">保存修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('order');
 
-          //  const getTogoBtn = document.getElementById('getAllTogo')
-          //  getTogoBtn.addEventListener('click', function (e) {
-          //      const table = document.getElementById('demoData');
-          //      table.style.removeProperty('display');
-           // })
+            document.getElementById("idSearchBtn").addEventListener("click", function () {
+                getMenu();
+            });
         })
 
+        // id 查詢
+        function getMenu() {
+            const foodId = document.getElementById("idSearch").value;
+            // 發送 GET 請求到 /menu/{togoId}
+            axios.get(`http://localhost:8080/SpanTasty/order/menu/${foodId}`)
+                .then(function (response) {
+                    console.log(response.data)
+                    const menuData = response.data;
+
+                    // 清空表格內容
+                    const tbody = document.querySelector("#demoData tbody");
+                    tbody.innerHTML = "";
+
+                    // 動態生成表格內容
+
+                    const row = document.createElement("tr");
+                    row.setAttribute("data-id", menuData.foodId);
+                    const foodStock = menuData.foodStock !== null ? menuData.foodStock : '';
+                    const foodDescription = menuData.foodDescription !== null ? menuData.foodDescription : '';
+
+                    row.innerHTML = `
+                        <td>${menuData.foodId}</td>
+                        <td>${menuData.foodName}</td>
+                        <td>
+                            <img th:src="${menuData.foodPicture}" th:alt="${menuData.foodName}" width="100" height="100">
+                        </td>
+                        <td>${menuData.foodPrice}</td>
+                        <td>${menuData.foodKind.foodKindName}</td>
+                        <td>${menuData.foodStock || ''}</td>
+                        <td>${menuData.foodDescription || ''}</td>
+                        <td>${getFoodStatusBadge(menuData.foodStatus)}</td>
+                        <td><button class="btn btn-warning" onclick="showUpdateModal(${menuData.foodId})">修改</button></td>
+                        <td><button class="btn btn-danger" onclick="deleteMenu(${menuData.foodId})">刪除</button></td>
+                    `;
+
+                    // 添加到表格中
+                    tbody.appendChild(row);
+
+                    // 清空輸入框
+                    document.getElementById("idSearch").value = "";
+
+                })
+                .catch(function (error) {
+                    console.error("查詢訂單時發生錯誤：", error);
+                    alert("查詢失敗，請檢查訂單編號。");
+                });
+
+        }
+
+        // 顯示modal且有原先的資料
+        function showUpdateModal(foodId) {
+            // foodId找要更新的資料
+            axios.get(`http://localhost:8080/SpanTasty/order/menu/${foodId}`)
+                .then(function (response) {
+                    const foodData = response.data;
+
+                    // 填入modal表單
+                    document.getElementById('foodName').value = foodData.foodName;
+                    document.getElementById('foodPrice').value = foodData.foodPrice;
+                    // document.getElementById('foodKindId').value = foodData.foodKind.foodKindName; 
+                    document.getElementById('foodStock').value = foodData.foodStock;
+                    //document.getElementById('foodStatus').value = foodData.foodStatus;
+                    document.getElementById('foodDescription').value = foodData.foodDescription;
+
+                    // 顯示modal
+                    $('#updateMenuModal').modal('show');
+
+                    // 绑定保存按钮的点击事件（注意：为避免重复绑定，每次显示模态框时重新绑定）
+                    document.getElementById('saveChangesBtn').onclick = function () {
+                        updateMenu(foodId);
+                    };
+                    document.getElementById('cancelChangesBtn').onclick = function () {
+                        $('#updateMenuModal').modal('hide');
+                    };
+                })
+                .catch(function (error) {
+                    console.error("查詢餐點時發生錯誤：", error);
+                    alert("取得餐點資訊失敗。");
+                });
+        }
+
+        function updateMenu(foodId) {
+            // const updateFood = {
+            //     foodName: document.getElementById('foodName').value,
+            //     foodPicture: document.getElementById('foodPicture').value,
+            //     foodPrice: document.getElementById('foodPrice').value,
+            //     foodKindId: document.getElementById('foodKindId').value,
+            //     foodStock: document.getElementById('foodStock').value,
+            //     foodStatus: document.getElementById('foodStatus').value,
+            //     foodDescription: document.getElementById('foodDescription').value
+            // };
+            const menuForm = document.getElementById("updateMenuForm");
+            const formDataObject = new FormData(menuForm);
+            axios.put(`http://localhost:8080/SpanTasty/order/menu/${foodId}`, formDataObject)
+                .then(function (response) {
+                    console.log("更新成功：", response.data);
+                    alert("餐點更新成功！");
+
+                    // 關閉modal
+                    $('#updateMenuModal').modal('hide');
+
+                    // 重新顯示訂單資訊
+                    updateMenuRow(foodId);
+                })
+                .catch(function (error) {
+                    console.error("更新餐點時發生錯誤：", error);
+                    alert("更新失敗。");
+                    $('#updateMenuModal').modal('hide');
+                });
+
+        }
+
+        //重新查詢
+        function updateMenuRow(foodId) {
+
+            axios.get(`http://localhost:8080/SpanTasty/order/menu/${foodId}`)
+                .then(function (response) {
+                    const menuData = response.data;
+                    const row = document.querySelector(`tr[data-id="${foodId}"]`);
+                    const foodStock = menuData.foodStock !== null ? menuData.foodStock : '';
+                    const foodDescription = menuData.foodDescription !== null ? menuData.foodDescription : '';
+
+                    if (row) {
+                        row.innerHTML = `
+                        <td>${menuData.foodId}</td>
+                        <td>${menuData.foodName}</td>
+                        <td>
+                            <img th:src="${menuData.foodPicture}" th:alt="${menuData.foodName}" width="100" height="100">
+                        </td>
+                        <td>${menuData.foodPrice}</td>
+                        <td>${menuData.foodKind.foodKindName}</td>
+                        <td>${menuData.foodStock || ''}</td>
+                        <td>${menuData.foodDescription || ''}</td>
+                        <td>${getFoodStatusBadge(menuData.foodStatus)}</td>
+                        <td><button class="btn btn-warning" onclick="showUpdateModal(${menuData.foodId})">修改</button></td>
+                        <td><button class="btn btn-danger" onclick="deleteMenu(${menuData.foodId})">刪除</button></td>
+    `;
+                    }
+                })
+                .catch(function (error) {
+                    console.error("更新時發生錯誤：", error);
+                });
+        }
+
+        //刪除
+        function deleteMenu(foodId) {
+
+            const isConfirmed = confirm("您確定要刪除這個訂單嗎？");
+            if (isConfirmed) {
+                const deleteMenu = { foodId: foodId };
+                axios.delete(`http://localhost:8080/SpanTasty/order/menu/${foodId}`, deleteMenu)
+                    .then(function (response) {
+                        console.log("删除成功：", response.data);
+                        alert("訂單刪除成功！");
+                        window.location.href = 'http://localhost:8080/SpanTasty/order/menu';
+                    })
+                    .catch(function (error) {
+                        console.error("刪除時發生錯誤：", error);
+                        alert("刪除失敗，請檢查訂單編號。");
+                    });
+            }
+        }
+
+        //顯示food狀態
+        function getFoodStatusBadge(status) {
+            if (status === 1) {
+                return '<span class="badge bg-success">正常供應</span>';
+            } else if (status === 2) {
+                return '<span class="badge bg-warning">停售</span>';
+            }
+        }
 
     </script>
-    
-<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-<script th:src="@{/js/axios.min.js}"></script>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
 </body>
+
 </html>
