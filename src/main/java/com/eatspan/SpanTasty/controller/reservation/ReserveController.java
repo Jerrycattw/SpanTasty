@@ -108,7 +108,7 @@ public class ReserveController {
     @ResponseBody
     public Map<String, Integer> getReserveSum(@RequestParam(required = false) LocalDate slotEndDate,
     								   		  @RequestParam(required = false) LocalDate slotStartDate) {
-    	Map<String, Integer> reserveSum = reserveService.getReserveSum(slotEndDate, slotStartDate);
+    	Map<String, Integer> reserveSum = reserveService.getReserveSum(null, null);
     	return reserveSum;
     }
     

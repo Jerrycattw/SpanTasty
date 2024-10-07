@@ -46,12 +46,20 @@ public interface ReserveRepository extends JpaRepository<Reserve, Integer> {
                                         @Param("slotEnd") LocalTime slotEnd);
     
     // 查詢餐廳某個日期時間段內的預訂數量
+//    @Query("SELECT COUNT(r) FROM Reserve r WHERE r.restaurant.id = :restaurantId "
+//    		+ "AND CAST(r.reserveTime AS DATE) BETWEEN :slotStartDate AND :slotEndDate")
+//    Integer countReservationsInDateSlot(@Param("restaurantId") Integer restaurantId,
+//							    		@Param("slotEndDate") LocalDate slotEndDate,
+//							    		@Param("slotStartDate") LocalDate slotStartDate);
+    
     @Query("SELECT COUNT(r) FROM Reserve r WHERE r.restaurant.id = :restaurantId "
-    		+ "AND CAST(r.reserveTime AS DATE) <= CAST(:slotEndDate AS DATE)"
-    		+ "AND CAST(r.finishedTime AS DATE) >= CAST(:slotStartDate AS DATE)")
+            + "AND r.reserveTime BETWEEN :startDate AND :endDate")
     Integer countReservationsInDateSlot(@Param("restaurantId") Integer restaurantId,
-							    		@Param("slotEndDate") LocalDate slotEndDate,
-							    		@Param("slotStartDate") LocalDate slotStartDate);
+                                        @Param("startDate") LocalDateTime startDate,
+                                        @Param("endDate") LocalDateTime endDate);
+    
+    
+    
 
     // 查詢該餐廳和桌型下的總桌數
     @Query("SELECT COUNT(rt) FROM RestaurantTable rt WHERE rt.restaurant.id = :restaurantId "
