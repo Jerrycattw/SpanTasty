@@ -58,6 +58,7 @@ public class PointService {
 		
 		//點數會員紀錄
 		List<PointMemberDTO> pointMembers = getAllPointMember();
+		System.out.println(pointMembers);
 		resultMap.put("pointMembers",pointMembers);
 		
 		return resultMap;
@@ -71,8 +72,8 @@ public class PointService {
 			projection.getMemberId(),
             projection.getMemberName(),
             projection.getPhone(),
-            projection.getTotalPointBalance(),
-            projection.getExpiringPoints(),
+            projection.getTotalPointBalance()==null? 0 : projection.getTotalPointBalance(),
+            projection.getExpiringPoints()==null? 0 :projection.getExpiringPoints(),
             projection.getExpiryDate()
 	        );
 	    }
@@ -93,6 +94,7 @@ public class PointService {
 	@Transactional
 	public void usePoint(Integer pointChange,Integer memberId) throws Exception {
 		List<Point> points = pointRepo.findByMemberIdBeforeUsePoint(memberId);
+		System.out.println("123:"+ points);
 		Integer pointChangeAbs = Math.abs(pointChange);
 		
 		points.forEach(point -> System.out.println(point));
@@ -120,7 +122,7 @@ public class PointService {
         	Integer pointId = entry.getKey();
             Integer currentPointUsage = entry.getValue();
             
-            if(pointChangeAbs > currentPointUsage) {
+            if(pointChangeAbs >= currentPointUsage) {
 				newPointMap.put(pointId, 0);	
 				pointChangeAbs -= currentPointUsage;
 				System.out.println("333333333333333");
@@ -148,10 +150,11 @@ public class PointService {
 	
 	
 	// 新增點數紀錄
-	public void insertOneRecord(Point point) {
+	public void insertOneRecord(Point point) throws Exception {
 		//使用點數 無到期日
 		if(point.getPointChange()<0) {			
 			point.setExpiryDate(null);
+			usePoint(point.getPointChange(), point.getMemberId());
 			pointRepo.save(point);
 		}else {
 			//增加點數 依設定判斷到期日
@@ -181,7 +184,7 @@ public class PointService {
 	}
 	
 	// 批次新增點數紀錄
-	public void insertBatchRecord(List<String> memberIDs, Point pointBean) {
+	public void insertBatchRecord(List<String> memberIDs, Point pointBean) throws Exception {
 		for (String memberID : memberIDs) {
 			int IntMemberID = Integer.parseInt(memberID);
 			Point insertBean = new Point();

@@ -121,8 +121,8 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                       <span>會員點數紀錄</span>
                       <div>
-                        <button id="add" class="btn btn-info me-md-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"  type="button">新增點數</button>
-                        <button id="batchAdd" class="btn btn-primary me-md-2" type="button">批次新增點數<i class="fa-regular fa-circle-question ms-1 fa-sm" style="color: #ffffff;"></i></button>
+                        <!-- <button id="add" class="btn btn-info me-md-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop2"  type="button">新增點數</button> -->
+                        <button id="batchAdd" class="btn btn-primary me-md-2" type="button">新增點數<i class="fa-regular fa-circle-question ms-1 fa-sm" style="color: #ffffff;"></i></button>
                       </div>
                     </div>
                     <div class="card-body">
@@ -131,6 +131,8 @@
                         <button  class="btn btn-outline-secondary" type="button" id="button-addon1"><i class="fa-solid fa-magnifying-glass"></i></button>
                         <input id="search" type="text" class="form-control" placeholder="搜尋會員編號、姓名及手機等資訊" >
                       </div>
+                      <!-- add place -->
+                      <div id="liveAlertPlaceholder" class="d-flex "></div>
                       <!-- table -->
                       <table class="table">
                         <thead>
@@ -140,7 +142,7 @@
                             <th scope="col">姓名</th>
                             <th scope="col">電話</th>
                             <th scope="col">總點數</th>
-                            <th scope="col">即將到期</th>
+                            <th scope="col">即將到期點數</th>
                             <th scope="col">到期日</th>
                             <th scope="col">#</th>
                           </tr>
@@ -171,7 +173,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">批次新增點數紀錄</h1>
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">新增點數紀錄</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -380,8 +382,8 @@
                             <td>${e.memberName}</td>
                             <td>${e.phone}</td>
                             <td>${e.totalPointBalance}</td>
-                            <td>${e.expiringPoints}</td>
-                            <td>${e.expiryDate}</td>
+                            <td>${(e.totalPointBalance != 0 && e.expiringPoints==0)? '已過期' : e.expiringPoints}</td>
+                            <td>${e.expiryDate? e.expiryDate : "-"}</td>
                             <td><i class="fa-solid fa-image-portrait fa-xl edit-button" data-memberId="${e.memberId}"></i></td>
                           </tr>
                           `         
@@ -414,33 +416,93 @@
   
 
   //批次新增
+  const alertPlaceholder = document.getElementById('liveAlertPlaceholder');
   document.addEventListener('DOMContentLoaded', (event) => {
-	    let checkAll = document.getElementById("checkAll");
-	    checkAll.addEventListener('change', function() {
-	        let checkboxes = document.getElementsByName("selectedMembers");
-	        for (let index = 0; index < checkboxes.length; index++) {
-	            checkboxes[index].checked = checkAll.checked;
-	        }
-	    });	    
+    const appendAlert = (message, type, memberId) => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = [
+            `<div class="alert alert-${type} alert-dismissible" role="alert" data-member-id="${memberId}" name="alerts" >`,
+            `   <div>${message}</div>`,
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+        ].join('');
+
+        alertPlaceholder.appendChild(wrapper);
+    };
+
+    const removeAlert = (memberId) => {
+        const alertToRemove = alertPlaceholder.querySelector(`[data-member-id="${memberId}"]`);
+        if (alertToRemove) {
+            alertToRemove.remove();
+        }
+    };
+
+    // 使用事件委託來處理複選框的變化
+    document.getElementById('pointMembers').addEventListener('change', function(event) {
+        if (event.target.name === 'selectedMembers') {
+            if (event.target.checked) {
+                appendAlert(`已選擇會員 ${event.target.value}`, 'success', event.target.value);
+            } else {
+                removeAlert(event.target.value);
+            }
+        }
+    });
+
+    // 全選複選框邏輯
+    let checkAll = document.getElementById("checkAll");
+    checkAll.addEventListener('change', function() {
+        let checkboxes = document.getElementsByName("selectedMembers");
+        if (checkAll.checked) {
+            for (let checkbox of checkboxes) {
+                if (!checkbox.checked) {
+                    checkbox.checked = true;
+                    appendAlert(`已選擇會員 ${checkbox.value}`, 'success', checkbox.value);
+                }
+            }
+        } else {
+            for (let checkbox of checkboxes) {
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                    removeAlert(checkbox.value);
+                }
+            }
+        }
+    });
+
+
 	});
 
 
   document.getElementById("batchAdd").addEventListener('click', function(e) {
-        let selectedMembers = [];
-        let checkboxes = document.getElementsByName("selectedMembers");
+        // let selectedMembers = [];
+        // let checkboxes = document.getElementsByName("selectedMembers");
 
-        // 收集所有打勾的複選框
-        for (let index = 0; index < checkboxes.length; index++) {
-            if (checkboxes[index].checked) {
-                selectedMembers.push(checkboxes[index].value);
-            }
-        }
+        // // 收集所有打勾的複選框
+        // for (let index = 0; index < checkboxes.length; index++) {
+        //     if (checkboxes[index].checked) {
+        //         selectedMembers.push(checkboxes[index].value);
+        //     }
+        // }
+
+        // if (selectedMembers.length === 0) {
+        //     e.preventDefault();
+        //     alert("請選擇至少一個會員");
+        //     return;
+        // }
+
+        let selectedMembers = [];
+        let alerts = alertPlaceholder.querySelectorAll('.alert');
+
+        alerts.forEach(alert => {
+            selectedMembers.push(alert.dataset.memberId);
+        });
 
         if (selectedMembers.length === 0) {
             e.preventDefault();
             alert("請選擇至少一個會員");
             return;
         }
+        console.log(selectedMembers);
         // 如果有選擇會員，手動顯示 modal
         var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
         myModal.show();
@@ -476,6 +538,8 @@
     document.addEventListener("DOMContentLoaded", function() {
      showSidebar('points');
 	});
+ 
+
   </script>
   
 </body>

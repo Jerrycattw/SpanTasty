@@ -122,7 +122,12 @@ public class PointController {
 	
 	
 	@PostMapping("/batchAdd/members")
-	public String batchInsertExcute(@SessionAttribute("point_memberIds") List<String> memberIds, Point pointBean) {
+	public String batchInsertExcute(@SessionAttribute("point_memberIds") List<String> memberIds,@RequestParam String plusOrMinus, Point pointBean) throws Exception {
+		switch (plusOrMinus) {
+		case "plus" -> pointBean.setPointChange(pointBean.getPointChange());
+		case "minus" -> pointBean.setPointChange(pointBean.getPointChange()*-1);
+	};
+//		pointService.usePoint(pointBean.getPointChange(), pointBean.getMemberId());
 		pointService.insertBatchRecord(memberIds, pointBean);
 		return "redirect:/point/pointCenter";
 	}
@@ -154,7 +159,11 @@ public class PointController {
 	
 
 	@PutMapping("/member/{memberId}/point/{pointId}")
-	public String updatePoint(@PathVariable Integer memberId, Point pointBean) {
+	public String updatePoint(@PathVariable Integer memberId,@RequestParam String plusOrMinus, Point pointBean) {
+		switch (plusOrMinus) {
+		case "plus" -> pointBean.setPointChange(pointBean.getPointChange());
+		case "minus" -> pointBean.setPointChange(pointBean.getPointChange()*-1);
+	};
 		System.out.println("touch");
 		System.out.println(pointBean);
 		pointService.updatePoint(pointBean);
@@ -169,7 +178,7 @@ public class PointController {
 //	}
 	
 	@PostMapping("/member/point/new")
-	public String insertPointNew(@RequestParam Integer memberId,@RequestParam String plusOrMinus,Point pointBean) {
+	public String insertPointNew(@RequestParam Integer memberId,@RequestParam String plusOrMinus,Point pointBean) throws Exception {
 		switch (plusOrMinus) {
 			case "plus" -> pointBean.setPointChange(pointBean.getPointChange());
 			case "minus" -> pointBean.setPointChange(pointBean.getPointChange()*-1);
