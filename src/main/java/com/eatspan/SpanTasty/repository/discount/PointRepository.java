@@ -1,7 +1,10 @@
 package com.eatspan.SpanTasty.repository.discount;
 
+
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -48,6 +51,34 @@ public interface PointRepository extends JpaRepository<Point, Integer> {
 	    """)
 	List<PointMemberProjection> findPointMembers();
 	
+	@Query(nativeQuery = true, value = """
+	        WITH point_summary AS (
+	            SELECT member_id, SUM(COALESCE(point_usage, 0)) AS total_point
+	            FROM point
+	            GROUP BY member_id
+	        ),
+	        expiry_points AS (
+	            SELECT member_id, SUM(COALESCE(point_usage, 0)) AS total_point, get_expiry_date,
+	                   ROW_NUMBER() OVER (PARTITION BY member_id ORDER BY get_expiry_date) AS rank
+	            FROM point
+				where get_expiry_date IS NOT NULL　and point_usage>0
+				AND get_expiry_date > GETDATE()
+	            GROUP BY get_expiry_date, member_id
+	        )
+	        SELECT 
+					ps.member_id AS memberId, 
+	            　m.member_name AS memberName, 
+	               m.phone AS phone, 
+	               ps.total_point AS totalPointBalance,
+	               ep.total_point AS expiringPoints, 
+	               ep.get_expiry_date AS expiryDate
+	        FROM point_summary ps 
+	        LEFT JOIN expiry_points ep ON ps.member_id = ep.member_id
+	        LEFT JOIN members m ON ps.member_id = m.member_id
+	        WHERE ep.rank = 1 or ep.rank is Null
+	        ORDER BY ps.member_id
+	    """)
+	Page<PointMemberProjection> findPointMembersPage(Pageable pageable);
 	
 	@Query(value ="""
 	       WITH point_summary AS (
@@ -77,6 +108,7 @@ public interface PointRepository extends JpaRepository<Point, Integer> {
 	        """,nativeQuery = true)
 	PointMemberProjection findPointMembersByMemberId(@Param("memberId") Integer memberId);
 	
+
 	
 	@Query(value ="""
 	        WITH point_summary AS (
@@ -120,5 +152,10 @@ public interface PointRepository extends JpaRepository<Point, Integer> {
 	           "SUM(CASE WHEN p.expiryDate < CURRENT_DATE THEN p.pointUsage ELSE 0 END)) " +//累計過期
 	           "FROM Point p")
 	PointCenterDTO sumPointsAll();
+	
+	@Query("SELECT SUM(p.pointUsage) "+
+			"FROM Point p "+
+			"WHERE p.expiryDate > CURRENT_DATE AND p.memberId= :memberId")
+	Integer getExpiryPointByMemberId(@Param(value = "memberId") Integer memberId);
 	
 }

@@ -22,8 +22,8 @@
               <button class="btn btn-outline-primary btn-sm me-3 " data-bs-toggle="modal" data-bs-target="#staticBackdrop" >新增點數</button>
             </div>
             <hr>
-            <p class="mb-1" th:text="'現有點數 : '+${pointMember.totalPointBalance}"></p>
-            <p class="mb-3" th:text="${pointMember.expiringPoints}+' 點 將於 '+${pointMember.expiryDate}+' 到期'"></p>
+            <p class="mb-1" th:text="'現有點數 : '+${pointMemberTotalPoint!=null? pointMemberTotalPoint : 0}"></p>
+            <p class="mb-3" th:text="${pointMember.expiringPoints}+' 點 將於 '+${pointMember.expiryDate != null? pointMember.expiryDate : '-'}+' 到期'"></p>
             <h6>活動紀錄</h6>
             <div class="table-responsive">
               <table class="table table-striped table-hover">

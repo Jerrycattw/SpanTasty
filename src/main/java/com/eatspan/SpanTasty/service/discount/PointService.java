@@ -12,9 +12,15 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.eatspan.SpanTasty.dto.discount.PointCenterDTO;
 import com.eatspan.SpanTasty.dto.discount.PointMemberDTO;
@@ -38,7 +44,7 @@ public class PointService {
 	private static PointSet currentPointSet;
 	
 	//pointCenter(點數中心使用)
-	public  Map<String, Object> pointCenterResult() {
+	public  Map<String, Object> pointCenterResult(Integer pageNumber) {
 		Map<String, Object> resultMap = new HashMap<String,Object>();
 		//用於活動列表
 		List<PointCenterDTO> pointsByTransaction = pointRepo.sumPointsByTrans();
@@ -57,13 +63,32 @@ public class PointService {
 		resultMap.put("simpleSet",setMessage);
 		
 		//點數會員紀錄
-		List<PointMemberDTO> pointMembers = getAllPointMember();
-		System.out.println(pointMembers);
-		resultMap.put("pointMembers",pointMembers);
-		
+//		List<PointMemberDTO> pointMembers = getAllPointMember();
+//		System.out.println(pointMembers);
+//		resultMap.put("pointMembers",pointMembers);
+		Pageable pageable = PageRequest.of(pageNumber-1,10,Sort.Direction.ASC,"id");
+		List<PointMemberDTO> allPointMembers = getAllPointMember();
+		        
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), allPointMembers.size());
+        
+        List<PointMemberDTO> pageContent = allPointMembers.subList(start, end);
+        Page<PointMemberDTO> page = new PageImpl<>(pageContent, pageable, allPointMembers.size());
+        resultMap.put("pointMembers",page);
 		return resultMap;
 	}
 	
+	public Page<PointMemberDTO> piontCenterPointMembers(Integer pageNumber){
+		Pageable pageable = PageRequest.of(pageNumber-1,3,Sort.Direction.ASC,"id");
+		List<PointMemberDTO> allPointMembers = getAllPointMember();
+		        
+		        int start = (int) pageable.getOffset();
+		        int end = Math.min((start + pageable.getPageSize()), allPointMembers.size());
+		        
+		        List<PointMemberDTO> pageContent = allPointMembers.subList(start, end);
+		        
+		        return new PageImpl<>(pageContent, pageable, allPointMembers.size());
+	}
 	
 	
 	//convertDTO ponintMeberDTO(會員紀錄總攬使用)
@@ -93,18 +118,18 @@ public class PointService {
 	//消耗點數
 	@Transactional
 	public void usePoint(Integer pointChange,Integer memberId) throws Exception {
+		System.out.println("use");
 		List<Point> points = pointRepo.findByMemberIdBeforeUsePoint(memberId);
-		System.out.println("123:"+ points);
 		Integer pointChangeAbs = Math.abs(pointChange);
 		
 		points.forEach(point -> System.out.println(point));
 		
 		int totalpoints = points.stream().mapToInt(Point::getPointUsage).sum();
+		System.out.println("use "+pointChangeAbs+" "+ totalpoints);
 		if(pointChangeAbs > totalpoints) {
-			System.out.println("111111111111");
+			System.out.println("use 不夠扣 "+pointChangeAbs+" "+ totalpoints);
 			throw new Exception();
 		}
-		System.out.println("22222222222222");
 		//消耗前的map  //Map<pointId,pointUsage>
 		Map<Integer, Integer> pointMap = points.stream()
 				.map(Point::pointToMapEntry)
@@ -114,7 +139,6 @@ public class PointService {
 						(existing, replacement) -> existing,// 處理重複鍵的情況
 						LinkedHashMap::new));
 		
-		System.out.println(pointMap);
 		//消耗後的map
 		Map<Integer, Integer> newPointMap = new HashMap<Integer, Integer>();
 		
@@ -125,22 +149,22 @@ public class PointService {
             if(pointChangeAbs >= currentPointUsage) {
 				newPointMap.put(pointId, 0);	
 				pointChangeAbs -= currentPointUsage;
-				System.out.println("333333333333333");
+				System.out.println("use 扣 "+pointChangeAbs+" "+ currentPointUsage);
 			}else if(pointChangeAbs < currentPointUsage) {
 				newPointMap.put(pointId, currentPointUsage-pointChangeAbs);
 				pointChangeAbs -= currentPointUsage;
-				System.out.println("444444444444444444");
+				System.out.println("use 扣完"+pointChangeAbs+" "+ currentPointUsage);
 				break;
 			}
 		}
-        System.out.println(newPointMap);
+
 		newPointMap.forEach((pointId,pointUsage)->{
 			Optional<Point> optional = pointRepo.findById(pointId);
 			if (optional.isPresent()) {
 				Point point = optional.get();
 				point.setPointUsage(pointUsage);
 				pointRepo.save(point);
-				System.out.println("5555555555555555555555");
+				System.out.println("use 保存");
 				
 			}
 		});
@@ -152,11 +176,12 @@ public class PointService {
 	// 新增點數紀錄
 	public void insertOneRecord(Point point) throws Exception {
 		//使用點數 無到期日
-		if(point.getPointChange()<0) {			
+		if(point.getPointChange()<0) {
+			System.out.println("insert -");
 			point.setExpiryDate(null);
-			usePoint(point.getPointChange(), point.getMemberId());
 			pointRepo.save(point);
 		}else {
+			System.out.println("insert +");
 			//增加點數 依設定判斷到期日
 			String createDateStr = DateUtils.getStringFromDate(point.getCreateDate());		
 			currentPointSet = pointSetService.findAllPointSet();// 取得點數設定		
@@ -226,6 +251,11 @@ public class PointService {
 		return convertToDTO(projection);
 	}
 	
+	//查詢(過期點數) bymemberId
+	public Integer getPointMemberExpiryPoint(Integer memberId) {
+		return pointRepo.getExpiryPointByMemberId(memberId);
+	}
+	
 	//查詢所有紀錄BY memberID
 	public List<Point> getAllRecord(Integer memberId){
 		return pointRepo.findByMemberId(memberId);
@@ -243,6 +273,7 @@ public class PointService {
 	//修改
 	@Transactional
 	public void updatePoint(Point point) {
+		System.out.println("update");
 		Optional<Point> optional = pointRepo.findById(point.getPointId());
 		
 		Point updatePoint = optional.get();
