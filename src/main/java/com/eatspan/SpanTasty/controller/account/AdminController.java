@@ -200,7 +200,7 @@ public class AdminController {
 		}
 	}
 
-	// 更新頭像
+	// 更新管理員個人頭像
 	@PostMapping("/updateAvatar")
 	public Result<String> updateAdminAvatar(@RequestParam("avatar") MultipartFile avatarFile, HttpSession session) {
 		try {

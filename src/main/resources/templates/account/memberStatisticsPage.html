@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+<meta charset="UTF-8">
+<title>會員資料統計</title>
+<script src="https://cdn.jsdelivr.net/npm/progressbar.js"></script>
+<style>
+.btn-primary, .btn-secondary, .btn-success {
+	background-color: #333;
+	border: none;
+}
+
+.btn-primary:hover, .btn-secondary:hover, .btn-success:hover {
+	background-color: #555;
+}
+
+.card {
+	background-color: #1e1e1e;
+	border: none;
+}
+
+input[type="number"] {
+	background-color: #333;
+	color: #ffffff;
+	border: 1px solid #555;
+	width: 80px;
+}
+
+#progressContainer {
+	padding: 20px;
+	border-radius: 10px;
+	width: 100%;
+	height: 400px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#chartSection {
+	position: relative;
+	text-align: center;
+	margin-top: 50px;
+}
+
+#inputSection {
+	position: relative;
+	z-index: 1000;
+	margin-top: 20px;
+	display: none; /* 默認不顯示 */
+	color: white;
+	text-align: center;
+}
+
+#yearlySection, #monthlySection {
+    display: none; /* 默認不顯示 */
+}
+
+#goalText {
+    font-size: 18px;
+    color: black; /* 確保字體顏色為白色 */
+    font-weight: bold; /* 加粗字體使其更醒目 */
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="~{display/navbar}"></div>
+	<!-- 主要內容區域 -->
+	<div class="container mt-5" style="padding-left: 270px; padding-top: 80px;">
+		<div class="row">
+			<div class="col-12 mb-3">
+				<div class="d-flex justify-content-around">
+					<button class="btn btn-secondary col-2" onclick="showMemberGoal()">會員目標</button>
+					<button class="btn btn-secondary col-2" onclick="showYearlyRegistrationInputs()">年度註冊人數統計</button>
+					<button class="btn btn-secondary col-2" onclick="showMonthlyRegistrationInputs()">當月註冊人數統計</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12">
+				<div id="inputSection" class="card p-4">
+					<div id="goalSection" style="display: none;">
+						<p id="goalText"></p>
+					</div>
+
+					<div id="yearlySection" style="display: none;">
+						<label for="year" id="yearLabel" class="mr-2">年份:</label>
+						<input type="number" id="year" name="year" min="2000" max="2100" class="form-control d-inline-block mr-2">
+						<button id="fetchYearlyButton" class="btn btn-success" onclick="fetchYearlyRegistrationData()">查詢</button>
+					</div>
+
+					<div id="monthlySection" style="display: none;">
+						<label for="month" id="monthLabel" class="mr-2">月份:</label>
+						<input type="number" id="month" name="month" min="1" max="12" class="form-control d-inline-block mr-2">
+						<button id="fetchMonthlyButton" class="btn btn-success" onclick="fetchMonthlyRegistrationData()">查詢</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12">
+				<div id="chartSection" class="mt-5" style="display: block; width: 450px; height: 450px;">
+					<div id="progressContainer"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	let bar; // 保存進度條對象的引用
+
+	// 自動加載當月會員目標
+	window.onload = function () {
+		showMemberGoal();
+	};
+
+	// 加載會員目標
+	function loadMemberGoal() {
+		const today = new Date();
+		const year = today.getFullYear();
+		const month = today.getMonth() + 1; // JavaScript 的月份是 0-11，因此加 1
+
+		// 發送請求到後端，獲取當月的會員數據
+		fetch(`/SpanTasty/api/statistics/count?year=${year}&month=${month}`)
+		  .then(response => {
+		    if (!response.ok) {
+		      throw new Error('Network response was not ok');
+		    }
+		    return response.json();
+		  })
+		  .then(data => {
+		    const memberCount = data.data.memberCount;
+		    const goal = 30;  // 設置目標會員數
+		    const achievedPercentage = memberCount / goal; // 計算達成率
+		    showProgressBar(achievedPercentage); // 顯示進度條
+
+			// 顯示當月會員註冊目標
+			document.getElementById('goalText').innerText = `當月會員註冊目標 : ${memberCount} / ${goal}`;
+		  })
+		  .catch(error => {
+		    console.error('Error fetching data:', error);
+		  });
+	}
+
+	// 顯示 ProgressBar.js 進度條
+	function showProgressBar(achievedPercentage) {
+		// 如果已經存在進度條，先清除
+		if (bar) {
+			bar.destroy();
+		}
+
+		// 創建 ProgressBar 圓形進度條
+		bar = new ProgressBar.Circle('#progressContainer', {
+			color: '#4caf50',  // 最終達成顏色
+			trailColor: '#d3d3d3',  // 灰色底色表示未達成部分
+			strokeWidth: 10,
+			duration: 1400,
+			easing: 'bounce',
+			text: {
+				value: '0%'  // 初始顯示值
+			},
+			from: { color: '#ff4d4d', width: 2 },  // 起始顏色紅色
+			to: { color: '#4caf50', width: 10 },  // 過渡到達成率對應顏色
+			step: function (state, circle) {
+				// 動態設置進度條顏色和寬度
+				circle.path.setAttribute('stroke', state.color);
+				circle.path.setAttribute('stroke-width', state.width);
+
+				// 更新進度文本顯示
+				var value = Math.round(circle.value() * 100);
+				if (value === 0) {
+					circle.setText('0%');
+				} else {
+					circle.setText(value + '%');
+				}
+			}
+		});
+
+		// 開始動畫，animate接受0到1之間的值，這裡傳入實際的達成百分比
+		bar.animate(achievedPercentage);
+	}
+
+	// 顯示會員目標區域
+	function showMemberGoal() {
+		clearInputSections(); // 清除其他顯示
+		document.getElementById('goalSection').style.display = 'block';
+		document.getElementById('inputSection').style.display = 'block';
+		loadMemberGoal();
+	}
+
+	// 顯示年度註冊輸入區域
+	function showYearlyRegistrationInputs() {
+		clearInputSections(); // 清除其他顯示
+		document.getElementById('yearlySection').style.display = 'block';
+		document.getElementById('inputSection').style.display = 'block';
+	}
+
+	// 顯示當月註冊輸入區域
+	function showMonthlyRegistrationInputs() {
+		clearInputSections(); // 清除其他顯示
+		document.getElementById('monthlySection').style.display = 'block';
+		document.getElementById('inputSection').style.display = 'block';
+	}
+
+	// 清除所有輸入區域顯示
+	function clearInputSections() {
+		document.getElementById('goalSection').style.display = 'none';
+		document.getElementById('yearlySection').style.display = 'none';
+		document.getElementById('monthlySection').style.display = 'none';
+	}
+	</script>
+</body>
+
+</html>

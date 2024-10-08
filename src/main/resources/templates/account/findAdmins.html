@@ -199,7 +199,7 @@
 
         function resetAdmin(adminId) {
             if (confirm("確定要重設這位管理員嗎？")) {
-                axios.post(`/SpanTasty/admin/resetAdmin?adminId=${adminId}`)  // 使用反引號以使用模板字符串
+                axios.post(`/SpanTasty/admin/resetAdmin?adminId=${adminId}`)
                     .then(function (response) {
                         if (response.data.success) {
                             alert(response.data.message);  // 顯示成功訊息
