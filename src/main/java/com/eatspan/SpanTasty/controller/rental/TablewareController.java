@@ -6,8 +6,10 @@ import java.io.File;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +57,11 @@ public class TablewareController {
 	@GetMapping("/add")
 	public String toAddTableware(Model model) {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
-		model.addAttribute("restaurants", restaurants);
+		// 過濾掉除了餐廳狀態1的餐廳
+		List<Restaurant> availableRestaurants = restaurants.stream()
+				.filter(restaurant -> restaurant.getRestaurantStatus() == 1)
+				.collect(Collectors.toList());
+		model.addAttribute("restaurants", availableRestaurants);
 		return "rental/addTableware";
 	}
 	
@@ -84,31 +90,46 @@ public class TablewareController {
 		tablewareService.addTableware(tableware);
 		int tablewareId = tableware.getTablewareId();
 		
-		List<String> restaurantIdParams = new ArrayList<>();
-		List<String> stockParams = new ArrayList<>();
+		List<Restaurant> allRestaurants = restaurantService.findAllRestaurants();
+		Map<Integer, Integer> restaurantStockMap = new HashMap<>(); 
+		System.out.println(allParams);
 		
+		// 解析餐廳 ID 和庫存
 		for (Map.Entry<String, String> entry : allParams.entrySet()) {
-			if (entry.getKey().startsWith("restaurantId")) {
-				restaurantIdParams.add(entry.getValue());
-			} else if (entry.getKey().startsWith("stock")) {
-				stockParams.add(entry.getValue());
+			// 使用正則表達式來匹配 restaurantId 和 stock
+			if (entry.getKey().matches("^restaurantId\\[\\d+]$")) {
+				// 提取餐廳 ID 索引
+				String index = entry.getKey().replaceAll("[^0-9]", ""); // 正確提取數字索引
+				Integer restaurantId = Integer.parseInt(entry.getValue());
+				String stockKey = "stock[" + index + "]"; // 正確生成 stockKey
+
+				// 檢查 stockKey 是否正確匹配到庫存數值
+				if (allParams.containsKey(stockKey)) {
+					String stockValue = allParams.get(stockKey);
+					System.out.println("匹配到庫存值: " + stockValue + "，對應餐廳ID: " + restaurantId);
+
+					Integer stock = !stockValue.isEmpty() ? Integer.parseInt(stockValue) : 0;
+
+					// 將餐廳ID與庫存放入 map，並打印數據以便確認
+					System.out.println("餐廳ID: " + restaurantId + ", 儲存庫存: " + stock);
+					restaurantStockMap.put(restaurantId, stock);
+				} else {
+					System.out.println("未匹配到 stockKey: " + stockKey);
+				}
 			}
 		}
 		List<TablewareStock> tablewareStocks = new ArrayList<>();
-		for (int i = 0; i < restaurantIdParams.size(); i++) {
-			String restaurantIdParam = restaurantIdParams.get(i);
-			String stockParam = stockParams.get(i);
-			System.out.println(restaurantIdParam);
-			if (restaurantIdParam != null && !restaurantIdParam.isEmpty() && stockParam != null && !stockParam.isEmpty()) {
-				Integer restaurantId = Integer.parseInt(restaurantIdParam);
-				Integer stock = Integer.parseInt(stockParam);
-				
-				TablewareStock tablewareStock = new TablewareStock();
-				tablewareStock.setRestaurantId(restaurantId);
-				tablewareStock.setTablewareId(tablewareId);
-				tablewareStock.setStock(stock);
-				tablewareStocks.add(tablewareStock);
-			}
+		
+		// 遍歷所有餐廳，對沒有輸入的庫存設為 0
+		for (Restaurant restaurant : allRestaurants) {
+		    Integer restaurantId = restaurant.getRestaurantId();
+		    Integer stock = restaurantStockMap.getOrDefault(restaurantId, 0);  // 如果沒有輸入庫存，則預設為 0
+		    System.out.println("餐廳ID: " + restaurantId + ", 庫存: " + stock);
+		    TablewareStock tablewareStock = new TablewareStock();
+		    tablewareStock.setRestaurantId(restaurantId);
+		    tablewareStock.setTablewareId(tablewareId);
+		    tablewareStock.setStock(stock);
+		    tablewareStocks.add(tablewareStock);
 		}
 		// 批量插入库存记录
 		for (TablewareStock tablewareStock : tablewareStocks) {

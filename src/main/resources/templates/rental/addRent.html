@@ -15,7 +15,7 @@ form {
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	background-color: #ffd966;
+	background-color: #c8e6c9;
 }
 .rent-input{
 	width: 86%;
@@ -54,24 +54,34 @@ form {
     justify-content: center; /* 讓文字在按鈕內居中 */
     height: 30px;
 }
+.table {
+    background-color: #f1f8e9; /* 表格背景：淡綠 */
+}
+.table thead {
+    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    color: #1b5e20;
+}
+.body {
+    background-color: #e9f7ef; /* 背景色：淡綠 */
+}
 </style>
 </head>
-<body>
+<body class="body">
     <div th:replace="~{display/navbar}"></div>
     
     <div class="content" id="container">
         <h3 class="h">輸入租借訂單資料</h3>
         <form th:action="@{/rent/addPost}" method="post">
-        <table class="table table-warning w-100 table-striped" id="table">
-            <tr><td>租借押金: <input type="text" class="rent-input" name="rentDeposit"/></td></tr>
+        <table class="table w-100 table-striped" id="table">
+            <tr><td>租借押金: <input type="text" class="rent-input" id="totalAmount" name="rentDeposit" readonly/></td></tr>
             <tr><td>租借餐廳:
-	            <select name="restaurantId" class="rent-input">
+	            <select name="restaurantId" class="rent-input" required>
 		            <option value="" selected disabled>請選擇租借餐廳</option>
 		            <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
 	            </select>
 		    </td></tr>
             <tr><td>租借會員:
-                <select name="memberId" class="rent-input">
+                <select name="memberId" class="rent-input" required>
 	                <option value="" selected disabled>請選擇會員編號</option>
 					<option th:each="member : ${members}" th:value="${member.memberId}" th:text="${member.account}"></option>
                 </select>
@@ -81,20 +91,20 @@ form {
         <div id="rentItemsContainer">
             <h4 class="h">輸入租借訂單項目</h4>
             <div class="item-entry">
-                <table class="table table-warning table-striped">
+                <table class="table table-striped">
                     <tr>
                         <td class="item-column">
                             餐具編號:
-                            <select name="tablewareId" class="item-input" onchange="updateDeposit(this)">
+                            <select name="tablewareId[0]" class="item-input"  onchange="handleSelectChange(this)" required>
                                 <option value="" selected disabled>請選擇餐具編號</option>
 								<option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:data-deposit="${tableware.tablewareDeposit}" th:text="${tableware.tablewareName}"></option>
                             </select>
                         </td>
                         <td class="item-column">
-                            租借數量:<input type="number" class="item-input" name="rentItemQuantity"  min="1" />
+                            租借數量:<input type="number" class="item-input" name="rentItemQuantity"  min="1" oninput="updateDepositByQuantity(this)" />
                         </td>
                         <td class="item-column">
-                            租借押金:<input type="number" class="item-input" name="rentItemDeposit" />
+                            租借押金:<input type="number" class="item-input" name="rentItemDeposit" readonly/>
                         </td>
                         <td class="item-column">
                             <br/><button class="delete-button" type="button" onclick="removeRentItem(this)">刪除</button>
@@ -118,27 +128,25 @@ form {
     </script>
     <script>
     let rentItemIndex = 0;
-	
-	
     
     document.getElementById('add-item-button').addEventListener('click', function() {
         rentItemIndex++;
         const optionsTemplate = document.getElementById('tableware-options-template').innerHTML;
         const itemEntryHTML = `
             <div class="item-entry">
-                <table class="table table-warning table-striped">
+                <table class="table table-striped">
                     <tr>
                         <td class="item-column">
                             餐具編號:
-                            <select name="tablewareId[${rentItemIndex}]" class="item-input" onchange="updateDeposit(this)">
+                            <select name="tablewareId[${rentItemIndex}]" class="item-input" onchange="handleSelectChange(this)" required>
                                 ${optionsTemplate}
                             </select>
                         </td>
                         <td class="item-column">
-                            租借數量:<input type="number" class="item-input" name="rentItemQuantity[${rentItemIndex}]"  min="1" />
+                            租借數量:<input type="number" class="item-input" name="rentItemQuantity[${rentItemIndex}]"  min="1" oninput="updateDepositByQuantity(this)"/>
                         </td>
                         <td class="item-column">
-                            租借押金:<input type="number" class="item-input" name="rentItemDeposit[${rentItemIndex}]" />
+                            租借押金:<input type="number" class="item-input" name="rentItemDeposit[${rentItemIndex}]" readonly/>
                         </td>
                         <td class="item-column">
                             <br/><button class="delete-button" type="button" onclick="removeRentItem(this)">刪除</button>
@@ -149,24 +157,70 @@ form {
         `;
         
         document.getElementById('rentItemsContainer').insertAdjacentHTML('beforeend', itemEntryHTML);
+        disableSelectedOptions();
     });
+    
+    // 禁用已選過的餐具編號
+	function disableSelectedOptions() {
+	    const allSelectElements = document.querySelectorAll('.item-input[name^="tablewareId"]');
+	    const selectedValues = Array.from(allSelectElements)
+	        .map(select => select.value)
+	        .filter(value => value !== "");
+	
+	    allSelectElements.forEach(select => {
+	        Array.from(select.options).forEach(option => {
+	            if (selectedValues.includes(option.value)) {
+	                option.hidden = true; // 禁用已選過的選項
+	            } else {
+	                option.hidden = false; // 解除禁用狀態
+	            }
+	        });
+	    });
+	}
+	
+	// 更新押金值和數量自動跳為1
+	function handleSelectChange(selectElement) {
+	    const quantityInput = selectElement.closest('.item-entry').querySelector('input[name^="rentItemQuantity"]');
+	    quantityInput.value = 1;
+	    updateDeposit(selectElement);
+	    disableSelectedOptions();
+	    updateTotalAmount();
+	}
 
-        // 删除订单明细
-        function removeRentItem(button) {
-            const rentItem = button.closest('.item-entry');
-            rentItem.remove();
-        }
-    </script>
-    <script>
+     // 删除订单明细
+     function removeRentItem(button) {
+	    const rentItem = button.closest('.item-entry');
+	    rentItem.remove();
+	    disableSelectedOptions();
+	    updateTotalAmount();
+	}
+    
     // 更新押金值
     function updateDeposit(selectElement) {
 	    const selectedOption = selectElement.options[selectElement.selectedIndex];
 	    const deposit = selectedOption.getAttribute('data-deposit');
+	    const quantityInput = selectElement.closest('.item-entry').querySelector('input[name^="rentItemQuantity"]');
 	    const rentItemDepositInput = selectElement.closest('.item-entry').querySelector('input[name^="rentItemDeposit"]');
-	    
+    
 	    if (deposit && rentItemDepositInput) {
-	        rentItemDepositInput.value = deposit;
+	        rentItemDepositInput.value = deposit * quantityInput.value; // 根據數量倍增押金
 	    }
+	    updateTotalAmount();
+	}
+	
+	// 根據數量更新押金
+	function updateDepositByQuantity(quantityInput) {
+	    const selectElement = quantityInput.closest('.item-entry').querySelector('select[name^="tablewareId"]');
+	    updateDeposit(selectElement);
+	}
+	
+	// 計算訂單總金額
+	function updateTotalAmount() {
+	    let totalAmount = 0;
+	    document.querySelectorAll('input[name^="rentItemDeposit"]').forEach(input => {
+	        totalAmount += parseFloat(input.value) || 0;
+	    });
+	    document.getElementById('totalAmount').value = totalAmount;
 	}
 </script>
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>

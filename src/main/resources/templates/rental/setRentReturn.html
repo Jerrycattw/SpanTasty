@@ -16,41 +16,60 @@ form {
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	background-color: #ffd966;
+	background-color: #c8e6c9;
+}
+.table {
+    background-color: #f1f8e9; /* 表格背景：淡綠 */
+}
+.table thead {
+    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    color: #1b5e20;
+}
+.tableware-input{
+	width: 86%;
+	padding: 5px;
+	margin-bottom: 0px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+.body {
+    background-color: #e9f7ef; /* 背景色：淡綠 */
 }
 </style>
-<body>
+<body class="body">
     <div th:replace="~{display/navbar}"></div>
     <div class="content" id="container">
-        <h2>輸入歸還資料</h2>
+        <h3 class="h">輸入歸還資料</h3>
         <form th:action="@{/rent/setPut2}" th:method="post">
 	    <input type="hidden" name="_method" value="put" />
-	   	<table class="table table-warning table-striped" id="table">
-        <tr><td>訂單編號: <input type="text" name="rentId" th:value="${rent.rentId}" readonly></td></tr>
-        <tr><td>歸還日期: <input type="date" name="returnDate" th:value="${#dates.format(rent.returnDate, 'yyyy-MM-dd')}" readonly /></td></tr>
+	   	<table class="table table-striped" id="table">
+        <tr><td>訂單編號: <input class="tableware-input" type="text" name="rentId" th:value="${rent.rentId}" readonly></td></tr>
+        <tr><td>歸還日期: <input class="tableware-input" type="date" name="returnDate" th:value="${#dates.format(rent.returnDate, 'yyyy-MM-dd')}" readonly /></td></tr>
         <tr><td>歸還餐廳:
-           <select name="returnRestaurantId" id="return_restaurant_id">
+           <select class="tableware-input" name="returnRestaurantId" id="returnRestaurantId" required>
                <option value="" selected disabled>請選擇租借餐廳</option>
-               <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+               <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}" th:selected="${rent.returnRestaurantId == restaurant.restaurantId}"></option>
            </select>
-		<p id="disabledMsg" style="color: red; display: none;">訂單已完全歸還，無法再更改。</p>
         </td></tr>
     	</table>
+		<span id="disabledMsg" style="color:red; display: none">訂單已完全歸還，無法再更改。</span>
 	    <input type="submit" id="submitBtn" value="確定歸還"/>
 	    <input type="hidden" name="rentDeposit" th:value="${rent.rentDeposit}"/>
 	    <input type="hidden" name="rentDate" th:value="${rent.rentDate}">
 	    <input type="hidden" name="restaurantId" th:value="${rent.restaurantId}">
 	    <input type="hidden" name="memberId" th:value="${rent.memberId}">
 	    <input type="hidden" name="dueDate" th:value="${rent.dueDate}">
-	    <input type="hidden" name="rentStatus" th:value="${rent.rentStatus}">
+	    <input type="hidden" id="rentStatus" name="rentStatus" th:value="${rent.rentStatus}">
 	    <input type="hidden" name="rentMemo" th:value="${rent.rentMemo}"/>
 		</form>
     </div>
     <script>
     	window.onload = function() {
-		    const returnRestaurantId = document.getElementById('return_restaurant_id');
+		    const rentStatus = document.getElementById('rentStatus');
+		    const returnRestaurantId = document.getElementById('returnRestaurantId');
         	const submitBtn = document.getElementById('submitBtn');
-	        if (returnRestaurantId.value !== "") {
+	        if (rentStatus.value === '2') {
 	            submitBtn.disabled = true;
 	            returnRestaurantId.disabled = true;
 	            document.getElementById('disabledMsg').style.display = 'block';

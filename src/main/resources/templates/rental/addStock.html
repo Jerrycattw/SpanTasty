@@ -15,7 +15,7 @@ form {
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	background-color: #ffd966;
+	background-color: #c8e6c9;
 }
 .stock-input{
 	width: 86%;
@@ -25,14 +25,24 @@ form {
 	border-radius: 5px;
 	box-sizing: border-box;
 }
+.table {
+    background-color: #f1f8e9; /* 表格背景：淡綠 */
+}
+.table thead {
+    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    color: #1b5e20;
+}
+.body {
+    background-color: #e9f7ef; /* 背景色：淡綠 */
+}
 </style>
 </head>
-<body>
+<body class="body">
     <div th:replace="~{display/navbar}"></div>
     <div class="content" id="container">
         <h3 class="h">輸入餐具庫存資料</h3>
         <form th:action="@{/stock/addPost}" method="post">
-        <table class="table table-warning table-striped" id="table">
+        <table class="table table-striped" id="table">
             <tr><td>用具名稱: 
                     <select name="tablewareId" class="stock-input">
 						<option value="" selected disabled>請選擇餐具編號</option>

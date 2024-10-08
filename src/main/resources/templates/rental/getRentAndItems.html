@@ -7,22 +7,33 @@
 <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
 <style>
 	#card-warning {
-	  background-color: #ffd966; 
+	  background-color: #c8e6c9; 
 	}
+	.table {
+    background-color: #f1f8e9; /* 表格背景：淡綠 */
+}
+.table thead {
+    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    color: #1b5e20;
+}
+.body {
+    background-color: #e9f7ef; /* 背景色：淡綠 */
+}
+	
 </style>
 </head>
-<body>
+<body class="body">
 <div th:replace="~{display/navbar}" ></div>
 <div class="content" id="content">
  <div class="container mt-5">
   <div class="row justify-content-center">
-   <div class="col-5 text-align" style="font-size:13px">
+   <div class="col-5 text-align" style="font-size:15px">
     <div class="card shadow" id="card-warning" >
 	<div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
     <h2 class="mb-0">租借訂單</h2>
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
 	<form th:action="@{/rent/set/{id}(id=${rent.rentId})}" th:method="get">
-   		<input type="submit" th:value="更新訂單" class="btn bg-primary text-white btn-sm">
+   		<input type="submit" th:value="更新訂單" class="btn bg-success text-white btn-sm">
    		<input type="hidden" name="action" value="update"/>
    	</form>
 	<form th:action="@{/rent/del/{id}(id=${rent.rentId})}" th:method="delete">
@@ -33,7 +44,7 @@
     <h5>訂單編號: #<span th:text="${rent.rentId}"></span></h5>   
     <h6>租借日期: <span th:text="${#dates.format(rent.rentDate, 'yyyy年MM月dd日')}"></span></h6>
     <div class="table-responsive">
-    <table class="table table-warning table-striped" id="table">
+    <table class="table table-striped" id="table">
         <tr>
             <th>用具編號</th>
             <th>品項數量</th>

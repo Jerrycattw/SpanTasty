@@ -15,18 +15,29 @@ form {
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	background-color: #ffd966;
+	background-color: #c8e6c9;
 }
+.body {
+    background-color: #e9f7ef; /* 背景色：淡綠 */
+}
+.table {
+    background-color: #f1f8e9; /* 表格背景：淡綠 */
+}
+.table thead {
+    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    color: #1b5e20;
+}
+
 </style>
 </head>
 
-<body>
+<body class="body">
     <div th:replace="~{display/navbar}"></div>
     <div class="content" id="container">
         <h3 class="h">庫存調整</h3>
         <form th:action="@{/stock/setPut}" th:method="post" >
         <input type="hidden" name="_method" value="put"> 
-        <table class="table table-warning table-striped" id="table">
+        <table class="table table-striped" id="table">
             <tr><td>用具名稱:<input type="text" name="tablewareId" th:value="${stock.tablewareId}" readonly/></td></tr>
             <tr><td>餐廳名稱:<input type="text" name="restaurantId" th:value="${stock.restaurantId}" readonly/></td></tr>
             <tr><td>用具庫存:<input type="number" name="stock" th:value="${stock.stock}" ></td></tr>

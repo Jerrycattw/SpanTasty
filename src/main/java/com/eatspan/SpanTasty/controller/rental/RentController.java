@@ -62,7 +62,12 @@ public class RentController {
 		model.addAttribute("restaurants" ,restaurants);
 		model.addAttribute("members" ,members);
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
-		model.addAttribute("tablewares" ,tablewares);
+		// 過濾掉 tablewareStatus == 2 的餐具
+		List<Tableware> availableTablewares = tablewares.stream()
+		        .filter(tableware -> tableware.getTablewareStatus() != 2)
+		        .collect(Collectors.toList());
+		
+		model.addAttribute("tablewares" ,availableTablewares);
 		return "rental/addRent";
 	}
 	
@@ -192,36 +197,36 @@ public class RentController {
 	@GetMapping("getAll")
 	public String getAllRents(Model model, @RequestParam(value = "p", defaultValue = "1") Integer page) {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
-		Page<Rent> rentPages = rentService.findAllRentPages(page);
 		List<Member> members = memberService.findAllMembers();
-		List<Rent> rents = rentService.findAllRents();
 		model.addAttribute("restaurants" ,restaurants);
-		model.addAttribute("rentPages",rentPages);
 		model.addAttribute("members" ,members);
+		Page<Rent> rentPages = rentService.findAllRentPages(page );
+		model.addAttribute("rentPages",rentPages);
 		
-		List<RentDetailDTO> rentDetails = rents.stream().map(rent -> {
-			RentDetailDTO dto = new RentDetailDTO();
-			dto.setRentId(rent.getRentId());
-	        dto.setRentDeposit(rent.getRentDeposit());
-	        dto.setRentDate(rent.getRentDate());
-	        dto.setDueDate(rent.getDueDate());
-	        dto.setReturnDate(rent.getReturnDate());
-	        dto.setRentStatus(rent.getRentStatus());
-	        dto.setRentMemo(rent.getRentMemo());
-	        dto.setRestaurantId(rent.getRestaurantId());
-	        dto.setMemberId(rent.getMemberId());
-	        dto.setReturnRestaurantId(rent.getReturnRestaurantId());
-	        
-	        restaurants.stream()
-	            .filter(r -> r.getRestaurantId().equals(rent.getRestaurantId()))
-	            .findFirst()
-	            .ifPresent(r -> dto.setRestaurantName(r.getRestaurantName()));
+		Map<Integer, String> restaurantMap = restaurants.stream()
+		        .collect(Collectors.toMap(Restaurant::getRestaurantId, Restaurant::getRestaurantName));
+		    Map<Integer, String> memberMap = members.stream()
+		        .collect(Collectors.toMap(Member::getMemberId, Member::getMemberName));
 
-        // 查找對應的成員名稱
-	        members.stream()
-	            .filter(m -> m.getMemberId().equals(rent.getMemberId()))
-	            .findFirst()
-	            .ifPresent(m -> dto.setMemberName(m.getMemberName()));
+		    // 使用分頁中的租借訂單進行 DTO 轉換
+		    List<RentDetailDTO> rentDetails = rentPages.getContent().stream().map(rent -> {
+		        RentDetailDTO dto = new RentDetailDTO();
+		        dto.setRentId(rent.getRentId());
+		        dto.setRentDeposit(rent.getRentDeposit());
+		        dto.setRentDate(rent.getRentDate());
+		        dto.setDueDate(rent.getDueDate());
+		        dto.setReturnDate(rent.getReturnDate());
+		        dto.setRentStatus(rent.getRentStatus());
+		        dto.setRentMemo(rent.getRentMemo());
+		        dto.setRestaurantId(rent.getRestaurantId());
+		        dto.setMemberId(rent.getMemberId());
+		        dto.setReturnRestaurantId(rent.getReturnRestaurantId());
+
+		        // 從 Map 中查找對應的餐廳名稱和成員名稱
+		        dto.setRestaurantName(restaurantMap.get(rent.getRestaurantId()));
+		        dto.setMemberName(memberMap.get(rent.getMemberId()));
+		        dto.setReturnRestaurantName(restaurantMap.get(rent.getReturnRestaurantId()));
+
 	        
 	        return dto;
 		}).collect(Collectors.toList());
