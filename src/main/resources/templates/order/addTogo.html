@@ -4,6 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <title>新增訂單</title>
+    <style>
+        .description {
+            padding-left: 5px;
+            color: #ADADAD;
+            font-size: 0.9em;
+        }
+
+        .error {
+            padding-left: 5px;
+            color: red;
+            font-size: 0.7em;
+        }
+    </style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/validate.js/0.13.1/validate.min.js"></script>
 </head>
 
 <body>
@@ -11,22 +25,29 @@
     <div class="content">
         <div class="container mt-1">
             <h1 class="display-6">📍新增訂單📍</h1>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button class="btn btn-secondary btn-sm" id="autoFillBtn">一鍵填入</button>
+            </div>
             <form id="togoForm" class="row g-3 mt-1">
                 <div class="col-md-4">
                     <label for="memberId" class="form-label">會員編號</label>
-                    <input type="text" class="form-control" id="memberId">
+                    <input type="text" class="form-control" name="memberId" id="memberId">
+                    <span class="error text-danger" id="memberIdError"></span>
                 </div>
                 <div class="col-md-4">
-                    <label for="tgName" class="form-label">姓名</label>
-                    <input type="text" class="form-control" id="tgName">
+                    <label for="tgName" class="form-label">訂購人姓名</label>
+                    <input type="text" class="form-control" name="tgName" id="tgName" required>
+                    <span class="error text-danger" id="tgNameError"></span>
                 </div>
                 <div class="col-md-4">
-                    <label for="tgPhone" class="form-label">電話</label>
-                    <input type="text" class="form-control" id="tgPhone">
+                    <label for="tgPhone" class="form-label">訂購人電話</label>
+                    <input type="text" class="form-control" name="tgPhone" id="tgPhone" required>
+                    <span class="error text-danger" id="tgPhoneError"></span>
                 </div>
                 <div class="col-md-4">
                     <label for="rentId" class="form-label">租借單號</label>
-                    <input type="text" class="form-control" id="rentId">
+                    <input type="text" class="form-control" name="rentId" id="rentId">
+                    <span class="error text-danger" id="rentIdError"></span>
                 </div>
                 <div class="col-md-4">
                     <label for="restaurantId" class="form-label">取餐餐廳</label>
@@ -40,7 +61,7 @@
                 </div>
                 <div class="col-md-4">
                     <label for="togoStatus" class="form-label">取餐狀態</label>
-                    <select class="form-select" id="togoStatus" aria-label="Default select example">
+                    <select class="form-select" id="togoStatus" aria-label="Default select example" required>
                         <option selected value="">請選擇</option>
                         <option value="1">未取餐</option>
                         <option value="2">已取餐</option>
@@ -61,43 +82,162 @@
 
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function (event) {
             showSidebar('order');
+
+
 
             document.getElementById("togoForm").addEventListener("submit", function (event) {
                 event.preventDefault();
-                // 表單數據
-                const newTogo = {
-                    memberId: document.getElementById("memberId").value,
-                    tgName: document.getElementById("tgName").value,
-                    tgPhone: document.getElementById("tgPhone").value,
-                    rentId: document.getElementById("rentId").value,
-                    restaurantId: document.getElementById("restaurantId").value,
-                    togoStatus: document.getElementById("togoStatus").value,
-                    togoMemo: document.getElementById("togoMemo").value
-                };
+                if (validateForm()) {
+                    // 表單數據
+                    const newTogo = {
+                        memberId: document.getElementById("memberId").value,
+                        tgName: document.getElementById("tgName").value,
+                        tgPhone: document.getElementById("tgPhone").value,
+                        rentId: document.getElementById("rentId").value,
+                        restaurantId: document.getElementById("restaurantId").value,
+                        togoStatus: document.getElementById("togoStatus").value,
+                        togoMemo: document.getElementById("togoMemo").value
+                    };
 
-                // 發送 POST 請求
-                axios.post('http://localhost:8080/SpanTasty/order/togo', newTogo)
-                    .then(function (response) {
-                        console.log(response.data);
-                        alert("訂單已成功提交！");
-                        //提交後回到getAllTogo
-                        window.location.href = 'http://localhost:8080/SpanTasty/order/togo';
-                    })
-                    .catch(function (error) {
-                        console.error("提交訂單時發生錯誤：", error);
-                        alert("提交失敗，請稍後再試。");
-                    })
+                    // 發送 POST 請求
+                    axios.post('http://localhost:8080/SpanTasty/order/togo', newTogo)
+                        .then(function (response) {
+                            console.log(response.data);
+                            alert("訂單已成功提交！");
+                            //提交後回到getAllTogo
+                            window.location.href = 'http://localhost:8080/SpanTasty/order/togo';
+                        })
+                        .catch(function (error) {
+                            console.error("提交訂單時發生錯誤：", error);
+                            alert("提交失敗，請稍後再試。");
+                        })
+                } else {
+                    alert("請修正表單中的錯誤！");
+                }
             })
+
+
+            document.getElementById("autoFillBtn").addEventListener("click", function () {
+                // 填入輸入框
+                document.getElementById("memberId").value = "3";
+                document.getElementById("tgName").value = "Johnson";
+                document.getElementById("tgPhone").value = "0973829123";
+                document.getElementById("restaurantId").value = "3";
+                document.getElementById("togoStatus").value = "1";
+                document.getElementById("togoMemo").value = "不用餐具";
+
+            });
         })
 
+        // 表單驗證的 constraints 和邏輯與之前一樣
+        const constraints = {
+            memberId: {
+                numericality: {
+                    onlyInteger: true,
+                    greaterThan: 0,
+                    message: "會員編號格式錯誤，只能為數字"
+                }
+            },
+            tgName: {
+                presence: {
+                    allowEmpty: false,
+                    message: "取餐人姓名不能為空白"
+                }
+            },
+            tgPhone: {
+                format: {
+                    onlyInteger: true,
+                    pattern: /^09\d{8}$/,
+                    message: "電話格式錯誤且取餐電話不能為空白"
+                },
+                presence: {
+                    allowEmpty: false,
+                    message: "取餐電話不能為空白"
+                }
+            },
+            rentId: {
+                numericality: {
+                    onlyInteger: true,
+                    greaterThan: 0,
+                    message: "租借單號格式錯誤，只能為數字"
+                }
+            }
+        };
 
+        function validateForm() {
+            const isValid = true;
+            ['memberId', 'tgName', 'tgPhone', 'rentId'].forEach(field => {
+                const input = document.querySelector(`input[name="${field}"]`);
+                validateField(input, field);
+                if (document.getElementById(`${field}Error`).textContent !== '') {
+                    isValid = false;
+                }
+            });
+            return isValid;
+        }
+
+        // 驗證字段函數
+        function validateField(input, fieldName) {
+            const value = input.value;
+            const errors = validate({ [fieldName]: value }, { [fieldName]: constraints[fieldName] });
+            const errorSpan = document.getElementById(`${fieldName}Error`);
+
+            if (errors && errors[fieldName]) {
+                // 使用 constraints 中的 message 來顯示錯誤信息
+                if (constraints[fieldName].presence) {
+                    errorSpan.textContent = constraints[fieldName].presence.message;
+                    if (constraints[fieldName].format) {
+                        errorSpan.textContent = constraints[fieldName].format.message;
+                    } else if (constraints[fieldName].presence) {
+                        errorSpan.textContent = constraints[fieldName].numericality.message;
+                    }
+                } else {
+                    if (constraints[fieldName].format) {
+                        errorSpan.textContent = constraints[fieldName].format.message;
+                    } else if (constraints[fieldName].presence) {
+                        errorSpan.textContent = constraints[fieldName].numericality.message;
+                    }
+                }
+
+            } else {
+                errorSpan.textContent = '';
+            }
+        }
+
+        // 綁定 blur 事件來驗證輸入框
+        const memberId = document.getElementById('memberId');
+        const tgName = document.getElementById('tgName');
+        const tgPhone = document.getElementById('tgPhone');
+        const rentId = document.getElementById('rentId');
+
+        memberId.addEventListener('blur', function () {
+            console.log("memberId blur triggered");
+            validateField(this, 'memberId');
+        });
+
+        tgName.addEventListener('blur', function () {
+            console.log("tgName blur triggered");
+            validateField(this, 'tgName');
+        });
+
+        tgPhone.addEventListener('blur', function () {
+            console.log("tgPhone blur triggered");
+            validateField(this, 'tgPhone');
+        });
+
+        rentId.addEventListener('blur', function () {
+            console.log("rentId blur triggered");
+            validateField(this, 'rentId');
+        });
 
 
     </script>
+
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/js/axios.min.js}"></script>
 </body>
+
 </html>

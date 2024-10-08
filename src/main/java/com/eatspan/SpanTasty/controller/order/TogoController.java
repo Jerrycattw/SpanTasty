@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.eatspan.SpanTasty.entity.order.TogoEntity;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
@@ -64,6 +63,7 @@ public class TogoController {
 	public String getTogoPage() {
 		return "order/getTogo";
 	}
+	
 	@GetMapping("/togo/add")
 	public String addTogoPage(Model model) {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
