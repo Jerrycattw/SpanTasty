@@ -62,6 +62,7 @@
             document.getElementById('setReserveCenterbtn').addEventListener('click', setReserveCenter);
             
             getReserveSum()
+            getReserveMonth()
             
         });
 
@@ -105,7 +106,7 @@
         }
 
 
-        // 查詢訂單
+        // 查詢餐廳訂位訂單統計
         function getReserveSum() {
 
             axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveSum`)
@@ -124,6 +125,28 @@
 	            .catch(err => {
 	                console.error(err);
 	            })
+        }
+
+
+        // 查詢每月訂位訂單統計
+        function getReserveMonth() {
+            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveMonth`)
+                .then(res => {
+                    console.log(res.data);
+                    
+                    // 假設 res.data 是一個數組，包含每個月的訂位數量
+                    const data = res.data; // 訂位數量
+
+                    // 生成對應的月份標籤
+                    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+                    // 更新圖表
+                    updateChart(myChart4, labels, data); // 更新 myChart4
+                    
+                })
+                .catch(err => {
+                    console.error(err);
+                });
         }
         
         
@@ -206,7 +229,7 @@
         const myChart4 = new Chart(ctx4, {
             type: 'line',
             data: {
-                labels: ['January', 'February', 'March', 'April', 'May'],
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
                 datasets: [{
                     label: '訂位狀況',
                     data: [10, 20, 15, 25, 30],
