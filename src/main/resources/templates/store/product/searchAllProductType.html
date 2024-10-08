@@ -8,39 +8,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        h2 {
-            font-weight: 900;
-            text-align: left;
-            font-family: Arial, sans-serif;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-        }
-        th, td {
-            border: 1px solid #dddddd;
-            text-align: center;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        tr:hover {
-            background-color: #e2e2e2;
-        }
-        h3 {
-            text-align: right;
-            font-family: Arial, sans-serif;
-        }
-        h5 {
-            text-align: right;
-        }
         .custom-button {
             background: none;
             border: none;
@@ -56,6 +23,11 @@
             cursor: pointer;
             color: #1b2b46;
         }
+        .addProductType{
+        display: flex;
+		justify-content: center;
+		margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -67,12 +39,7 @@
                 <div class="card bg-light text-dark shadow">
                     <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                         <h3 class="mb-0">商品類別資料</h3>
-                        <form method="post" th:action="@{/productType/add}">
-                            <input type="text" name="productTypeName" placeholder="請輸入欲新增的類別名稱" required>
-                            <button type="submit" class="custom-button-add">
-                                <i class="fa-solid fa-folder-plus fa-xl"></i>
-                            </button>
-                        </form>
+                        
                     </div>
                     <div class="table-responsive">
                         <table id="productsTable" class="table table-striped table-hover text-center">
@@ -113,13 +80,35 @@
                     <h5>
                         共<span th:text="${#lists.size(productTypes)}">0</span>筆商品類別資料
                     </h5>
-                </div>
+                    <div class="addProductType">
+						<form method="post" th:action="@{/productType/add}" id="addType" onsubmit="showSuccessAlert(event);">
+							<input type="text" name="productTypeName"
+								placeholder="請輸入欲新增的類別名稱" required>
+							<button type="submit" class="custom-button-add">
+								<i class="fa-solid fa-folder-plus fa-xl"></i>
+							</button>
+						</form>
+						</div>
+					</div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+function showSuccessAlert(event) {
+    event.preventDefault(); // 防止表單提交
+    Swal.fire({
+        icon: "success",
+        title: "產品總類已成功新增",
+        showConfirmButton: false,
+        timer: 1500
+    }).then(() => {
+        document.getElementById('addType').submit(); 
+    });
+	}
+
+
     $(document).ready(function() {
         $('#productsTable').DataTable({
             "paging": true,

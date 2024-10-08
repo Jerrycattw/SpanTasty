@@ -42,6 +42,11 @@
         .form-check-label {
             margin-left: 10px; /* 讓文字與開關有間距 */
         }
+       .custom-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -114,16 +119,33 @@
                 </div>
             </div>
 
+            <button type="button" id="demo1" class="custom-button"><i class="fa-solid fa-star" style="color: #bed2f3;"></i></button>
             <button type="submit" class="btn btn-primary">確定</button>
+            <button type="button" id="demo2" class="custom-button"><i class="fa-solid fa-star" style="color: #c7c9ff;"></i></button>
         </form>
     </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // 調用左側導航
-        showSidebar('store');
 
+ 		const demoBtn = document.getElementById('demo1');
+ 		demoBtn.addEventListener('click',function(e){
+ 			document.getElementById('productName').value='Dimond Candy';
+ 			document.getElementById('productPrice').value='250';
+ 			document.getElementById('productStock').value='20';
+ 			document.getElementById('productDescription').value='一盒四入'
+ 		})
+ 		
+ 		
+ 		const demoBtn2 = document.getElementById('demo2');
+ 		demoBtn2.addEventListener('click',function(e){
+ 			document.getElementById('productName').value='Beauty & the Beast';
+ 			document.getElementById('productPrice').value='890';
+ 			document.getElementById('productStock').value='15';
+ 			document.getElementById('productDescription').value='聯名餅乾禮盒'
+ 		})
+ 		
+ 		
         const priceInput = document.getElementById('productPrice');
         const stockInput = document.getElementById('productStock');
         const statusInput = document.getElementById('productStatus');
@@ -159,7 +181,7 @@
                 statusLabel.textContent = '已停售';
             }
         });
-    });
+   
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
