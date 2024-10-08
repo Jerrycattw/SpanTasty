@@ -19,6 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,6 +72,12 @@ public class Restaurant {
 	@Column(name = "restaurant_desc")
 	private String restaurantDesc;
 	
+	@Column(name = "reserve_percent")
+	private Integer reservePercent;
+	
+	@Column(name = "reserve_time_scale")
+	private Integer reserveTimeScale;
+	
 	
 	@JsonIgnore //該屬性不要做JSON序列化避免無線迴圈 //預設lazy
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL)
@@ -87,5 +94,20 @@ public class Restaurant {
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL)
 	private List<TogoEntity> togo = new ArrayList<TogoEntity>();
+	
+	
+	@PrePersist //當物件轉換成persist時先做該方法
+	public void onCreate() {
+		
+		if(this.restaurantStatus == null) {
+			this.restaurantStatus = 3; // 餐廳開放訂位的比例
+		}
+		if(this.reservePercent == null) {
+			this.reservePercent = 100; // 餐廳開放訂位的比例
+		}
+		if(this.reserveTimeScale == null) {
+			this.reserveTimeScale = 30; // 訂位的區間(預設為30分鐘)
+		}
+	}
 	
 }

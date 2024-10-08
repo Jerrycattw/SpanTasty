@@ -2,6 +2,7 @@ package com.eatspan.SpanTasty.controller.reservation;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.service.reservation.RestaurantService;
 
@@ -46,6 +49,13 @@ public class RestaurantController {
         return "reservation/getAllRestaurant";
     }
     
+    
+    // ajax 查詢餐廳
+    @GetMapping("/getapi/{id}")
+    @ResponseBody
+    public Restaurant getRestaurant(@PathVariable(name = "id") Integer restaurantId) {
+    	return restaurantService.findRestaurantById(restaurantId);
+    }
     
     
 	
@@ -131,7 +141,10 @@ public class RestaurantController {
             File fileToSave = new File(uploadPath + File.separator + newFileName);
             file.transferTo(fileToSave);
             setRestaurant.setRestaurantImg("/SpanTasty/upload/reservation/" + newFileName);
-        }
+        } else {
+        	String restaurantImg = restaurantService.findRestaurantById(setRestaurant.getRestaurantId()).getRestaurantImg();
+			setRestaurant.setRestaurantImg(restaurantImg);
+		}
 
         restaurantService.updateRestaurant(setRestaurant);
         
@@ -144,9 +157,9 @@ public class RestaurantController {
     
     // 刪除餐廳
     @DeleteMapping("/del/{id}")
-    public String deleteRestaurant(@PathVariable("id") Integer restaurantId) {
+    public ResponseEntity<?> deleteRestaurant(@PathVariable("id") Integer restaurantId) {
         restaurantService.deleteRestaurant(restaurantId);
-        return "redirect:/restaurant/getAll";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
     
 

@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Restaurant</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 </head>
 <body>
 <div th:replace="~{display/navbar}"></div>
@@ -40,11 +42,11 @@
                                         th:data-tabletypeid="${table.tableType.tableTypeId}" th:data-tabletypename="${table.tableType.tableTypeName}" 
                                         th:data-tabletypenumber="${table.tableTypeNumber}">修改</button>
                             </td>
-                            <td>
-                                <form th:action="@{/table/del(tableTypeId=${table.tableType.tableTypeId})(restaurantId=${restaurant.restaurantId})}" th:method="delete">
-                                    <button type="submit" class="btn btn-danger btn-sm">刪除</button>
-                                </form>
-                            </td>
+                            
+							<td id="delRestaurantTableBtn" class="align-middle">
+							    <button th:data-table-type-id="${table.tableType.tableTypeId}" th:data-restaurant-id="${restaurant.restaurantId}" 
+							            class="btn btn-danger btn-sm" onclick="confirmDelete(this)">刪除</button>
+							</td>
                         </tr>
                     </th:block>
                 </tbody>
@@ -163,7 +165,43 @@
             inputTableTypeNumber.value = tableTypeNumber;
         });
     });
-
+    
+    
+	function confirmDelete(button) {
+	    const tableTypeId = button.getAttribute('data-table-type-id');
+	    const restaurantId = button.getAttribute('data-restaurant-id');
+	    
+	    Swal.fire({
+	        title: "確定刪除？",
+	        text: "一旦刪除，將無法恢復！",
+	        icon: "warning",
+	        showCancelButton: true,
+	        confirmButtonText: "刪除",
+	        cancelButtonText: "取消",
+	    }).then((result) => {
+	        if (result.isConfirmed) {
+	            // 使用 axios 發送 DELETE 請求
+	            axios.delete(`/SpanTasty/table/del?restaurantId=${restaurantId}&tableTypeId=${tableTypeId}`)
+	                .then(response => {
+	                    if (response.status === 200) {
+						    Swal.fire("刪除成功！", "", "success").then(() => {
+						        location.reload(); // 立即重新加載頁面
+						    });
+	                        // 延遲 3 秒後重新加載頁面
+	                        setTimeout(() => {
+	                            location.reload(); // 重新加載頁面
+	                        }, 3000);
+	                    }
+	                })
+	                .catch(error => {
+	                    Swal.fire("發生錯誤！", "請稍後再試。", "error");
+	                    console.error('刪除失敗：', error);
+	                });
+	        } else {
+	            Swal.fire("您的資料未被刪除！");
+	        }
+	    });
+	}
 
 
     

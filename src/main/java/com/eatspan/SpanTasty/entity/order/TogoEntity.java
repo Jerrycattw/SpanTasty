@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -87,6 +88,10 @@ public class TogoEntity implements Serializable {
 	@Column(name = "final_total")
 	private Integer finalTotal;   //discount
 	
+	@ManyToOne
+	@JoinColumn(name = "member_id", insertable = false, updatable = false)
+	private Member member;
+	
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "togo", cascade = CascadeType.ALL)
 	private List<TogoItemEntity> togoItems = new ArrayList<TogoItemEntity>();
@@ -100,8 +105,8 @@ public class TogoEntity implements Serializable {
 		if (togoCreateTime == null) {
 			togoCreateTime = LocalDateTime.now();
 		}
-		if(togoStatus == null) {
-			togoStatus = 1;
+		if(this.togoStatus == null) {
+			this.togoStatus = 1;
 		}
 	}
 	

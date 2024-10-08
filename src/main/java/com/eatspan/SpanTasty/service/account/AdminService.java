@@ -4,13 +4,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eatspan.SpanTasty.dto.account.AdminDto;
 import com.eatspan.SpanTasty.entity.account.Admin;
 import com.eatspan.SpanTasty.entity.account.Permission;
 import com.eatspan.SpanTasty.repository.account.AdminRepository;
@@ -140,7 +143,7 @@ public class AdminService {
 	    }
 	}
 
-    public boolean removeAdminAvatar(int adminId) {
+    public boolean removeAdminAvatar(Integer adminId) {
         Optional<Admin> adminOptional = adminRepository.findById(adminId);
         
         if (adminOptional.isPresent()) {
@@ -152,4 +155,96 @@ public class AdminService {
 
         return false;
     }
+
+    public boolean resetAdmin(Integer adminId) {
+        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
+            String defaultPassword = "admin" + adminId;
+            String defaultAccount = "admin" + adminId;
+            String defaultName = "Admin" + adminId;
+            admin.setPassword(defaultPassword);
+            admin.setAccount(defaultAccount);
+            admin.setAdminName(defaultName);
+            admin.setAvatar(null);
+            adminRepository.save(admin);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean resetPassword(Integer adminId) {
+        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
+            String defaultPassword = "1234"; // 預設密碼
+            admin.setPassword(defaultPassword);
+            adminRepository.save(admin);
+            return true;
+        }
+        return false;
+    }
+
+//    public Page<Admin> findAdminsByPermissions(List<String> permissions, int page, int size) {
+//        PageRequest pageRequest = PageRequest.of(page, size);
+//
+//        if (permissions.contains("none")) {
+//            // 查找無任何權限的管理員
+//            return adminRepository.findByPermissionsIsEmpty(pageRequest);
+//        } else {
+//            // 查找有特定權限的管理員
+//            List<Integer> permissionIds = permissionRepository.findByPermissionNameIn(permissions)
+//                    .stream()
+//                    .map(Permission::getPermissionId)
+//                    .collect(Collectors.toList());
+//
+//            return adminRepository.findByPermissions_PermissionIdIn(permissionIds, pageRequest);
+//        }
+//    }
+    
+    public Page<Admin> findAdminsByPermissions(List<String> permissions, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return adminRepository.findAdminsByPermissions(permissions, pageRequest);
+    }
+
+    public Page<Admin> findAdminsWithNoPermissions(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return adminRepository.findAllByPermissionsIsEmpty(pageable);
+    }
+
+	public Admin findById(Integer adminId) {
+		// TODO Auto-generated method stub
+		return adminRepository.findById(adminId).orElse(null);
+	}
+
+	// 更新指定管理員的權限
+	public boolean updatePermissions(Integer adminId, List<String> permissionNames) {
+	    Optional<Admin> optionalAdmin = adminRepository.findById(adminId);
+
+	    if (optionalAdmin.isPresent()) {
+	        Admin admin = optionalAdmin.get();
+
+	        // 根據權限名稱查找對應的權限
+	        Set<Permission> newPermissions = new HashSet<>(permissionRepository.findByPermissionNameIn(permissionNames));
+	        System.out.println("Loaded permissions: " + newPermissions);
+
+	        // 清除舊的權限
+	        admin.getPermissions().clear();
+
+	        // 添加新的權限
+	        admin.getPermissions().addAll(newPermissions);
+
+	        // 保存管理員
+	        adminRepository.save(admin);
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
+    
+
+    
+    
+    
+
 }

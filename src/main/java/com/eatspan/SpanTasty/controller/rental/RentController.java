@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eatspan.SpanTasty.dto.rental.RentDetailDTO;
 import com.eatspan.SpanTasty.dto.rental.RentKeywordDTO;
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.rental.Rent;
@@ -54,22 +56,14 @@ public class RentController {
 	
 	//查詢下拉式選單
 	@GetMapping("/add")
-	public String toAddAndSearch(@RequestParam(name = "action") String action , Model model) {
+	public String toAddAndSearch(Model model) {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		List<Member> members = memberService.findAllMembers();
 		model.addAttribute("restaurants" ,restaurants);
 		model.addAttribute("members" ,members);
-		if("add".equals(action)) {
-			List<Tableware> tablewares = tablewareService.findAllTablewares();
-			model.addAttribute("tablewares" ,tablewares);
-			return "rental/addRent";
-			
-		}else if ("get".equals(action)) {
-			List<Rent> rents = rentService.findAllRents();
-			model.addAttribute("rents" ,rents);
-			return "rental/getRents";
-		}
-		return null;
+		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		model.addAttribute("tablewares" ,tablewares);
+		return "rental/addRent";
 	}
 	
 	
@@ -180,25 +174,59 @@ public class RentController {
 	//歸還訂單
 	@PutMapping("/setPut2")
 	public String returnRent(@ModelAttribute Rent rent, Model model) {
-		try {
-			Date returnDate = new Date();
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(returnDate);
-			rent.setReturnDate(returnDate);
-			rentService.addRent(rent);
-			return "redirect:/rent/getAll";
-		} catch (Exception e) {
-			e.printStackTrace();
+		rent.setRentStatus(2);
+		rent.setRentMemo("已歸還");
+		rentService.addRent(rent);
+		
+		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rent.getRentId());
+		for(RentItem rentItem: rentItems) {
+			rentItem.setReturnStatus(2);
+			rentItem.setReturnMemo("完全歸還");
+			rentItemService.addRentItem(rentItem);
 		}
-		return null;
+		return "redirect:/rent/getAll";
 	}
 
 	
 	//查詢所有訂單
 	@GetMapping("getAll")
 	public String getAllRents(Model model, @RequestParam(value = "p", defaultValue = "1") Integer page) {
+		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		Page<Rent> rentPages = rentService.findAllRentPages(page);
+		List<Member> members = memberService.findAllMembers();
+		List<Rent> rents = rentService.findAllRents();
+		model.addAttribute("restaurants" ,restaurants);
 		model.addAttribute("rentPages",rentPages);
+		model.addAttribute("members" ,members);
+		
+		List<RentDetailDTO> rentDetails = rents.stream().map(rent -> {
+			RentDetailDTO dto = new RentDetailDTO();
+			dto.setRentId(rent.getRentId());
+	        dto.setRentDeposit(rent.getRentDeposit());
+	        dto.setRentDate(rent.getRentDate());
+	        dto.setDueDate(rent.getDueDate());
+	        dto.setReturnDate(rent.getReturnDate());
+	        dto.setRentStatus(rent.getRentStatus());
+	        dto.setRentMemo(rent.getRentMemo());
+	        dto.setRestaurantId(rent.getRestaurantId());
+	        dto.setMemberId(rent.getMemberId());
+	        dto.setReturnRestaurantId(rent.getReturnRestaurantId());
+	        
+	        restaurants.stream()
+	            .filter(r -> r.getRestaurantId().equals(rent.getRestaurantId()))
+	            .findFirst()
+	            .ifPresent(r -> dto.setRestaurantName(r.getRestaurantName()));
+
+        // 查找對應的成員名稱
+	        members.stream()
+	            .filter(m -> m.getMemberId().equals(rent.getMemberId()))
+	            .findFirst()
+	            .ifPresent(m -> dto.setMemberName(m.getMemberName()));
+	        
+	        return dto;
+		}).collect(Collectors.toList());
+		
+		model.addAttribute("rents" ,rentDetails);
 		return "rental/getAllRents";
 	}
 	
@@ -206,8 +234,11 @@ public class RentController {
 	//查詢訂單(By多個條件)
 	@ResponseBody
 	@PostMapping("/get")
-	public ResponseEntity<List<Rent>> getRents(@RequestBody RentKeywordDTO rentKeywordDTO) {
+	public ResponseEntity<List<RentDetailDTO>> getRents(@RequestBody RentKeywordDTO rentKeywordDTO) {
 		try {
+			List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+			List<Member> members = memberService.findAllMembers();
+			
 			Integer rentId = (rentKeywordDTO.getRentId() != null && rentKeywordDTO.getRentId() != 0) ? rentKeywordDTO.getRentId() : null;
 	        Integer memberId = (rentKeywordDTO.getMemberId() != null && rentKeywordDTO.getMemberId() != 0) ? rentKeywordDTO.getMemberId() : null;
 	        Integer restaurantId = (rentKeywordDTO.getRestaurantId() != null && rentKeywordDTO.getRestaurantId() != 0) ? rentKeywordDTO.getRestaurantId() : null;
@@ -216,7 +247,40 @@ public class RentController {
 	        Date rentDateEnd = (rentKeywordDTO.getRentDateEnd() != null && !rentKeywordDTO.getRentDateEnd().trim().isEmpty()) ? new SimpleDateFormat("yyyy-MM-dd").parse(rentKeywordDTO.getRentDateEnd()) : null;
 	        
 			List<Rent> rents = rentService.findRentsByCriteria(rentId, memberId, restaurantId, rentStatus, rentDateStart, rentDateEnd);
-			return ResponseEntity.ok(rents);
+			
+			List<RentDetailDTO> rentDetails = rents.stream().map(rent -> {
+				RentDetailDTO dto = new RentDetailDTO();
+				dto.setRentId(rent.getRentId());
+		        dto.setRentDeposit(rent.getRentDeposit());
+		        dto.setRentDate(rent.getRentDate());
+		        dto.setDueDate(rent.getDueDate());
+		        dto.setReturnDate(rent.getReturnDate());
+		        dto.setRentStatus(rent.getRentStatus());
+		        dto.setRentMemo(rent.getRentMemo());
+		        dto.setRestaurantId(rent.getRestaurantId());
+		        dto.setMemberId(rent.getMemberId());
+		        dto.setReturnRestaurantId(rent.getReturnRestaurantId());
+		        
+		        restaurants.stream()
+		            .filter(r -> r.getRestaurantId().equals(rent.getRestaurantId()))
+		            .findFirst()
+		            .ifPresent(r -> dto.setRestaurantName(r.getRestaurantName()));
+
+	        // 查找對應的成員名稱
+		        members.stream()
+		            .filter(m -> m.getMemberId().equals(rent.getMemberId()))
+		            .findFirst()
+		            .ifPresent(m -> dto.setMemberName(m.getMemberName()));
+		        
+		        restaurants.stream()
+			        .filter(r -> r.getRestaurantId().equals(rent.getReturnRestaurantId()))
+			        .findFirst()
+			        .ifPresent(r -> dto.setReturnRestaurantName(r.getRestaurantName()));
+		        
+		        return dto;
+			}).collect(Collectors.toList());
+			
+			return ResponseEntity.ok(rentDetails);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

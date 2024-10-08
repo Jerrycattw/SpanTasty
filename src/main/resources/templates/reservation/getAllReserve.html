@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Restaurant</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 </head>
 <body>
     <div th:replace="~{display/navbar}"></div>
@@ -63,27 +65,34 @@
         <!-- 訂位ajax查詢表單 -->
 
         <!-- 訂位資料顯示表格 -->
-        <h2 class="d-flex justify-content-center">餐 廳 訂 位 訂 單</h2>
-        <div class="row justify-content-center">
-            <div class="col-11">
-                <table class="table table-bordered table-striped">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>訂位編號</th>
-                            <th>會員名稱</th>
-                            <th>會員電話</th>
-                            <th>餐廳名稱</th>
-                            <th>訂位人數</th>
-                            <th>桌位種類</th>
-                            <th>用餐時段</th>
-                            <th>修改訂位</th>
-                            <th>刪除訂位</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- 動態生成reserve的資料 -->
-                    </tbody>
-                </table>
+        <div class="row justify-content-center mt-3">
+          <div class="col-11">
+          <div class="card bg-dark text-white shadow">
+		  <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+		    <h3 class="mb-0">餐廳訂位資料</h3>
+		  </div>
+				<table class="table table-dark table-striped table-hover text-center">
+				    <thead>
+				        <tr>
+				            <th>訂位編號</th>
+				            <th>會員名稱</th>
+				            <th>會員電話</th>
+				            <th>餐廳名稱</th>
+				            <th>訂位人數</th>
+				            <th>桌位種類</th>
+				            <th>用餐時段</th>
+				            <th>訂位狀態</th>
+				            <th>修改狀態</th>
+				            <th>修改訂位</th>
+				            <th>刪除訂位</th>
+				        </tr>
+				    </thead>
+				    <tbody>
+				        <!-- 動態生成reserve的資料 -->
+				    </tbody>
+				</table>
+            </div>
+                <div id="pagination" class="mt-3 d-flex justify-content-end"></div>
             </div>
         </div>
         <!-- 訂位資料顯示表格 -->
@@ -230,6 +239,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('reservation');
 
+            
             // 頁面加載完成後執行一次查詢
             fetchReservations();
 
@@ -246,6 +256,7 @@
             document.getElementById('setReserveSeat').addEventListener('change', getReserveTimeAndSet);
             document.getElementById('setCheckDate').addEventListener('change', getReserveTimeAndSet);
         });
+
 
 
         // Ajax查詢訂位時間+新增訂位訂單
@@ -389,56 +400,119 @@
                 });
         }
 
-        // 查詢訂位訂單的AJAX函數
-        function fetchReservations() {
-            // 取得輸入的值
-            const memberName = document.getElementById('memberName').value;
-            const phone = document.getElementById('phone').value;
-            const restaurantId = document.getElementById('restaurantId').value;
-            const tableTypeId = document.getElementById('tableTypeId').value;
-            const reserveTimeStart = document.getElementById('reserveTimeStart').value;
-            const reserveTimeEnd = document.getElementById('reserveTimeEnd').value;
-
-            // 建立查詢參數
-            const params = {
-                memberName: memberName ? memberName : null,
-                phone: phone ? phone : null,
-                restaurantId: restaurantId ? Number(restaurantId) : null,
-                tableTypeId: tableTypeId ? tableTypeId : null,
-                reserveTimeStart: reserveTimeStart ? reserveTimeStart : null,
-                reserveTimeEnd: reserveTimeEnd ? reserveTimeEnd : null
-            };
-
-            // 發送查詢訂位訂單的 AJAX 請求
-            axios.get('http://localhost:8080/SpanTasty/reserve/getList', { params })
-                .then(function (response) {
-                    console.log(response.data);
-                    const reserves = response.data;
-                    const tbody = document.querySelector('table tbody');
-                    tbody.innerHTML = ''; // 清空現有的資料
-
-                    // 動態生成表格內容
-                    reserves.forEach(reserve => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                        <td>${reserve.reserveId}</td>
-                        <td>${reserve.member.memberName}</td>
-                        <td>${reserve.member.phone}</td>
-                        <td>${reserve.restaurant.restaurantName}</td>
-                        <td>${reserve.reserveSeat}</td>
-                        <td>${reserve.tableType.tableTypeName} 人桌</td>
-                        <td>${reserve.reserveTime} - ${reserve.finishedTime}</td>
-                        <td><button class="btn btn-warning btn-sm"  onclick="openSetReserveModal(${reserve.reserveId})">修改</button></td>
-                        <td><button class="btn btn-danger btn-sm" onclick="deleteReservation(${reserve.reserveId})">刪除</button></td>
-                    `;
-                        tbody.appendChild(row);
-                    });
-                })
-                .catch(function (error) {
-                    console.error("查詢失敗:", error);
-                    alert("查詢訂位訂單失敗，請稍後再試。");
-                });
-        }
+		let allReservations = []; // 用來存儲所有的訂位資料
+		let currentPage = 1;
+		const itemsPerPage = 8; // 每頁顯示8筆資料
+		
+		// 查詢訂位訂單的AJAX函數
+		function fetchReservations() {
+		    // 取得輸入的值
+		    const memberName = document.getElementById('memberName').value;
+		    const phone = document.getElementById('phone').value;
+		    const restaurantId = document.getElementById('restaurantId').value;
+		    const tableTypeId = document.getElementById('tableTypeId').value;
+		    const reserveTimeStart = document.getElementById('reserveTimeStart').value;
+		    const reserveTimeEnd = document.getElementById('reserveTimeEnd').value;
+		
+		    // 建立查詢參數
+		    const params = {
+		        memberName: memberName ? memberName : null,
+		        phone: phone ? phone : null,
+		        restaurantId: restaurantId ? Number(restaurantId) : null,
+		        tableTypeId: tableTypeId ? tableTypeId : null,
+		        reserveTimeStart: reserveTimeStart ? reserveTimeStart : null,
+		        reserveTimeEnd: reserveTimeEnd ? reserveTimeEnd : null
+		    };
+		
+		    // 發送查詢訂位訂單的 AJAX 請求
+		    axios.get('http://localhost:8080/SpanTasty/reserve/getList', { params })
+		        .then(function (response) {
+		            allReservations = response.data; // 儲存所有訂位資料
+		            renderReservations(currentPage); // 根據當前頁碼顯示資料
+		            generatePagination(allReservations.length); // 根據資料數量生成分頁按鈕
+		        })
+		        .catch(function (error) {
+		            console.error("查詢失敗:", error);
+		            alert("查詢訂位訂單失敗，請稍後再試。");
+		        });
+		}
+		
+		// 根據頁碼顯示資料
+		function renderReservations(page) {
+		    const tbody = document.querySelector('table tbody');
+		    tbody.innerHTML = ''; // 清空現有的資料
+		
+		    // 計算當前頁面的資料範圍
+		    const start = (page - 1) * itemsPerPage;
+		    const end = start + itemsPerPage;
+		    const reservesToShow = allReservations.slice(start, end); // 取得當前頁應顯示的資料
+		
+		    // 動態生成表格內容
+		    reservesToShow.forEach(reserve => {
+		        const finishedTime = new Date(reserve.finishedTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+		        let statusClass = '';
+		        let statusText = '';
+		
+		        if (reserve.reserveStatus === 1) {
+		            statusClass = 'badge bg-warning text-dark';
+		            statusText = '未完成';
+		        } else if (reserve.reserveStatus === 2) {
+		            statusClass = 'badge bg-success text-white';
+		            statusText = '已完成';
+		        } else if (reserve.reserveStatus === 3) {
+		            statusClass = 'badge bg-danger text-white';
+		            statusText = '已取消';
+		        }
+		
+		        const row = document.createElement('tr');
+		        row.innerHTML = `
+		            <td>${reserve.reserveId}</td>
+		            <td>${reserve.member.memberName}</td>
+		            <td>${reserve.member.phone}</td>
+		            <td>${reserve.restaurant.restaurantName}</td>
+		            <td>${reserve.reserveSeat}</td>
+		            <td>${reserve.tableType.tableTypeName} 人桌</td>
+		            <td>${reserve.reserveTime} - ${finishedTime}</td>
+		            <td><span class="${statusClass}">${statusText}</span></td>
+		            <td>
+		                <select onchange="updateReserveStatus(${reserve.reserveId}, this.value)" class="form-select form-select-sm">
+		                    <option value="1" ${reserve.reserveStatus === 1 ? 'selected' : ''}>未完成</option>
+		                    <option value="2" ${reserve.reserveStatus === 2 ? 'selected' : ''}>已完成</option>
+		                    <option value="3" ${reserve.reserveStatus === 3 ? 'selected' : ''}>已取消</option>
+		                </select>
+		            </td>
+		            <td><button class="btn btn-warning btn-sm" onclick="openSetReserveModal(${reserve.reserveId})">修改</button></td>
+		            <td><button class="btn btn-danger btn-sm" onclick="deleteReservation(${reserve.reserveId})">刪除</button></td>
+		        `;
+		        tbody.appendChild(row);
+		    });
+		}
+		
+		// 分頁控制函數
+		function generatePagination(totalItems) {
+		    const totalPages = Math.ceil(totalItems / itemsPerPage);
+		    const paginationContainer = document.getElementById('pagination');
+		
+		    paginationContainer.innerHTML = ''; // 清空現有的分頁按鈕
+		
+		    // 建立分頁按鈕
+		    for (let i = 1; i <= totalPages; i++) {
+		        const pageButton = document.createElement('button');
+		        pageButton.classList.add('btn', 'btn-primary', 'mx-1');
+		        pageButton.textContent = i;
+		        pageButton.onclick = function () {
+		            currentPage = i; // 更新當前頁面
+		            renderReservations(i); // 渲染對應頁面的資料
+		        };
+		
+		        // 設置當前頁面的按鈕樣式
+		        if (i === currentPage) {
+		            pageButton.classList.add('active');
+		        }
+		
+		        paginationContainer.appendChild(pageButton);
+		    }
+		}
 
         // 開啟修改模態框並填入資料
         async function openSetReserveModal(reserveId) {
@@ -457,21 +531,40 @@
             }
         }
 
-        // 刪除訂位的AJAX函數
-        function deleteReservation(reserveId) {
-            if (confirm("確定要刪除此訂位嗎？")) {
-                axios.delete(`http://localhost:8080/SpanTasty/reserve/del`, { params: { reserveId: reserveId } })
-                    .then(function (response) {
-                        console.log(response.data);
-                        alert("刪除成功");
-                        fetchReservations(); // 刪除後重新查詢
-                    })
-                    .catch(function (error) {
-                        console.error("刪除失敗:", error);
-                        alert("刪除失敗，請稍後再試。");
-                    });
-            }
-        }
+
+		// 刪除訂位的AJAX函數
+		function deleteReservation(reserveId) {
+		    // 使用 SweetAlert 進行刪除確認
+		    Swal.fire({
+		        title: "確定刪除？",
+		        text: "一旦刪除，將無法恢復！",
+		        icon: "warning",
+		        showCancelButton: true,
+		        confirmButtonText: "刪除",
+		        cancelButtonText: "取消",
+		    }).then((result) => {
+		        if (result.isConfirmed) {
+		            // 發送 DELETE 請求
+		            axios.delete(`http://localhost:8080/SpanTasty/reserve/del`, { params: { reserveId: reserveId } })
+		                .then(function (response) {
+		                    if (response.status === 200) {
+		                        // 顯示刪除成功提示框
+		                        Swal.fire("刪除成功！", "", "success").then(() => {
+		                            fetchReservations(); // 刪除成功後重新查詢訂位資料
+		                        });
+		                    }
+		                })
+		                .catch(function (error) {
+		                    // 顯示錯誤提示框
+		                    Swal.fire("發生錯誤！", "請稍後再試。", "error");
+		                    console.error("刪除失敗:", error);
+		                });
+		        } else {
+		            // 取消刪除的提示
+		            Swal.fire("您的訂位未被刪除！");
+		        }
+		    });
+		}
 
         // 新增訂位的AJAX函數
         function addReservation(addReserveDTO) {
@@ -522,13 +615,11 @@
             axios.put(`http://localhost:8080/SpanTasty/reserve/set`, setReserveDTO)
                 .then(res => {
                     console.log(res.data)
-                    // 插入訂位成功視窗
-                    alert("修改訂位成功！");
-
                     // 關閉模態框
                     const modal = bootstrap.Modal.getInstance(document.getElementById('setReserveModal'));
                     modal.hide();
-
+                    // 插入訂位成功視窗
+                    alert("修改訂位成功！");
                     fetchReservations();// 修改後重新查詢訂位
                 })
                 .catch(err => {
@@ -538,6 +629,29 @@
                 })
 
         }
+
+        // 更新並修改訂位狀態的函數
+        function updateReserveStatus(reserveId, newStatus) {
+            const setReserveStatus = {
+                reserveId: reserveId,
+                reserveStatus: newStatus
+            };
+
+            // 發送修改訂位狀態的 AJAX 請求
+            axios.put(`http://localhost:8080/SpanTasty/reserve/setStatus`, setReserveStatus)
+                .then(res => {
+                    console.log(res.data);
+                    // 插入訂位成功視窗
+                    alert("修改訂位狀態成功！");
+                    fetchReservations(); // 修改後重新查詢訂位
+                })
+                .catch(err => {
+                    console.error(err);
+                    // 插入訂位失敗視窗
+                    alert("修改訂位狀態失敗，請稍後再試。");
+                });
+        }
+
 
     </script>
 </body>

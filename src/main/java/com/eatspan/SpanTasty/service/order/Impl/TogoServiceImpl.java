@@ -63,7 +63,7 @@ public class TogoServiceImpl implements TogoService {
 		if (optional.isPresent()) {
 			TogoEntity togo = optional.get();
 			if (updateTogo.getMemberId() != null) {
-				togo.setMemberId(togoId);
+				togo.setMemberId(updateTogo.getMemberId());
 			}
 			if (updateTogo.getTgName() != null) {
 				togo.setTgName(updateTogo.getTgName());

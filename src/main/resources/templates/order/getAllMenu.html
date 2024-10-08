@@ -35,7 +35,9 @@
                                 <tr>
                                     <td class="align-middle" th:text="${food.foodId}"></td>
                                     <td class="align-middle" th:text="${food.foodName}"></td>
-                                    <td class="align-middle" th:text="${food.foodPicture}"></td>
+                                    <td class="align-middle">
+    								<img th:src="${food.foodPicture}" th:alt="${food.foodName}" style="width: 100px; height: auto;">
+									</td>
                                     <td class="align-middle" th:text="${food.foodKind.foodKindName}"></td>
                                     <td class="align-middle" th:text="${food.foodStock}"></td>
                                     <td class="align-middle" th:text="${food.foodDescription}"></td>
@@ -59,15 +61,8 @@
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('order');
 
-          //  const getTogoBtn = document.getElementById('getAllTogo')
-          //  getTogoBtn.addEventListener('click', function (e) {
-          //      const table = document.getElementById('demoData');
-          //      table.style.removeProperty('display');
-           // })
+          
         })
-
-
-
 
     </script>
     

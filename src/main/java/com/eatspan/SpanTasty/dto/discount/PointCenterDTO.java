@@ -20,6 +20,10 @@ public class PointCenterDTO {
 	private List<PointMemberDTO> pointMembers;
 
 	public void calculateAndSetUsedPercentage() {
+		if(totalUsedPoint==null) {
+			totalUsedPoint=(long) 0;
+		}
+		
 		if (totalUsedPoint > 0) {
 			double percentage = (double) totalUsedPoint / totalPoint * 100;
 			DecimalFormat df = new DecimalFormat("#.00");

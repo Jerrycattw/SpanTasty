@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/">
+
 <head>
-<meta charset="UTF-8">
-<title>搜尋管理員</title>
+    <meta charset="UTF-8">
+    <title>搜尋管理員</title>
 </head>
+
 <body class="bg-dark text-white">
     <div th:replace="~{display/navbar}"></div>
     <!-- 主要內容區域 -->
@@ -23,6 +25,7 @@
                     <th>帳號</th>
                     <th>狀態</th>
                     <th>頭像</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,76 +64,117 @@
                     adminName: adminName || ''
                 }
             })
-            .then(function (response) {
-                // 清空當前的表格資料
-                document.querySelector('#admin-table tbody').innerHTML = '';
+                .then(function (response) {
+                    // 清空當前的表格資料
+                    document.querySelector('#admin-table tbody').innerHTML = '';
 
-                // 獲取管理員數據並追加到表格中
-                var admins = response.data.data.admins;
-                var tbody = document.querySelector('#admin-table tbody');
-                admins.forEach(function(admin) {
-                    var avatarHtml = admin.avatar
+                    // 獲取管理員數據並追加到表格中
+                    var admins = response.data.data.admins;
+                    var tbody = document.querySelector('#admin-table tbody');
+                    admins.forEach(function (admin) {
+                        var avatarHtml = admin.avatar
                             ? '<img src="' + admin.avatar + '" alt="Avatar" style="width:50px; height:50px;"/>'
                             : '<i class="fa-regular fa-user" style="font-size:50px;"></i>';
 
-                    var statusSelect = '<select class="form-select form-select-sm bg-dark text-white" onchange="handleStatusChange(this, ' + admin.adminId + ')">';
+                        var statusSelect = '<select class="form-select form-select-sm bg-dark text-white" onchange="handleStatusChange(this, ' + admin.adminId + ')">';
                         statusSelect += '<option value="A"' + (admin.status === 'A' ? ' selected' : '') + '>啟用</option>';
                         statusSelect += '<option value="S"' + (admin.status === 'S' ? ' selected' : '') + '>暫停</option>';
                         statusSelect += '<option value="I"' + (admin.status === 'I' ? ' selected' : '') + '>禁用</option>';
                         statusSelect += '</select>';
 
+                        var actionHtml = `
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        操作
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="resetAdmin(${admin.adminId})">重設管理員</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="resetPassword(${admin.adminId})">重設密碼</a></li>
+                    </ul>
+                </div>
+            `;
 
-                    var row = tbody.insertRow();
-                    var statusText = statusMap[admin.status] || '未知';
-                    row.innerHTML = `
-                        <td>${admin.adminId}</td>
-                        <td>${admin.adminName}</td>
-                        <td>${admin.account}</td>
-                        <td>${statusSelect}</td>
-                        <td>${avatarHtml}</td>
-                        
-                    `;
+                        var row = tbody.insertRow();
+                        row.innerHTML = `
+                <td>${admin.adminId}</td>
+                <td>${admin.adminName}</td>
+                <td>${admin.account}</td>
+                <td>${statusSelect}</td>
+                <td>${avatarHtml}</td>
+                <td>${actionHtml}</td>
+            `;
+                    });
+
+                    // 更新分頁信息
+                    currentPage = response.data.data.currentPage;
+                    totalPages = response.data.data.totalPages;
+
+                    // 控制上一頁和下一頁按鈕的可見性
+                    document.querySelector('#prevPage').disabled = currentPage === 0;
+                    document.querySelector('#nextPage').disabled = currentPage === totalPages - 1;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    alert("管理員資料加載失敗，請稍後重試！");
                 });
-
-                // 更新分頁信息
-                currentPage = response.data.data.currentPage;
-                totalPages = response.data.data.totalPages;
-
-                // 控制上一頁和下一頁按鈕的可見性
-                document.querySelector('#prevPage').disabled = currentPage === 0;
-                document.querySelector('#nextPage').disabled = currentPage === totalPages - 1;
-            })
-            .catch(function (error) {
-                console.log(error);
-                alert("管理員資料加載失敗，請稍後重試！");
-            });
         }
 
+// 重設管理員
+function resetAdmin(adminId) {
+    if (confirm("確定要重設此管理員嗎？")) {
+        axios.post('/SpanTasty/admin/resetAdmin?adminId=' + adminId)
+            .then(function (response) {
+                alert("管理員重設成功！");
+                loadAdmins(currentPage); // 重新加載管理員列表
+            })
+            .catch(function (error) {
+                console.error(error);
+                alert("重設管理員失敗，請稍後重試！");
+            });
+    }
+}
+
+// 重設密碼
+function resetPassword(adminId) {
+    if (confirm("確定要重設此管理員的密碼嗎？")) {
+        axios.post('/SpanTasty/admin/resetPassword?adminId=' + adminId)
+            .then(function (response) {
+                alert("密碼重設成功！");
+            })
+            .catch(function (error) {
+                console.error(error);
+                alert("重設密碼失敗，請稍後重試！");
+            });
+    }
+}
+
         // 點擊上一頁按鈕事件
-        document.querySelector('#prevPage').addEventListener('click', function() {
+        document.querySelector('#prevPage').addEventListener('click', function () {
             if (currentPage > 0) {
                 loadAdmins(currentPage - 1, document.querySelector('#searchAdminName').value);
             }
         });
 
         // 點擊下一頁按鈕事件
-        document.querySelector('#nextPage').addEventListener('click', function() {
+        document.querySelector('#nextPage').addEventListener('click', function () {
             if (currentPage < totalPages - 1) {
                 loadAdmins(currentPage + 1, document.querySelector('#searchAdminName').value);
             }
         });
 
         // 點擊搜索按鈕事件
-        document.querySelector('#searchBtn').addEventListener('click', function() {
+        document.querySelector('#searchBtn').addEventListener('click', function () {
             const adminName = document.querySelector('#searchAdminName').value;
             loadAdmins(0, adminName); // 從第 0 頁開始查詢
         });
 
         // 首次加載時調用
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             loadAdmins(0); // 預設加載第 0 頁
         });
+
     </script>
 
 </body>
+
 </html>

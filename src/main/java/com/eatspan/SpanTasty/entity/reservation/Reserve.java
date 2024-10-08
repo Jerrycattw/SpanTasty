@@ -1,7 +1,6 @@
 package com.eatspan.SpanTasty.entity.reservation;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -10,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -76,11 +74,11 @@ public class Reserve {
 	
 	@PrePersist //當物件轉換成persist時先做該方法
 	public void onCreate() {
-		if(reserveCreateTime == null) {
-			reserveCreateTime = LocalDateTime.now(); // 使用 LocalDateTime.now() 設置當前時間
+		if(this.reserveCreateTime == null) {
+			this.reserveCreateTime = LocalDateTime.now(); // 使用 LocalDateTime.now() 設置當前時間
 		}
-		if(reserveStatus == null) {
-			reserveStatus = 1; // 1=未完成, 2=已完成ㄝ, 3=已取消
+		if(this.reserveStatus == null) {
+			this.reserveStatus = 1; // 1=未完成, 2=已完成ㄝ, 3=已取消
 		}
 	}
 	

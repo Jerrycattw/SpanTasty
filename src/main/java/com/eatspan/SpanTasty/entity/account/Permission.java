@@ -1,6 +1,9 @@
 package com.eatspan.SpanTasty.entity.account;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +26,8 @@ public class Permission {
     private String permissionName;
 
     @ManyToMany(mappedBy = "permissions")
-    private Set<Admin> admins;
+    @JsonBackReference
+    private Set<Admin> admins = new HashSet<>();
 
     public Integer getPermissionId() {
         return permissionId;

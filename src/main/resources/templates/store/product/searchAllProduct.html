@@ -2,12 +2,43 @@
 <html xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
-    <title>SearchAllProducts</title>
+    <title>商品資料</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-  
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- 引入 SweetAlert2 -->
     <style>
+        h3 {
+            font-weight: 900;
+            text-align: right; 
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            table-layout: auto; 
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: center;
+            padding: 8px;
+            word-wrap: break-word; 
+            white-space: normal;
+        }
+        th {
+            background-color: #f2f2f2; 
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9; 
+        }
+        tr:hover {
+            background-color: #e2e2e2;
+        }
+        h5 {
+            text-align: right;
+        }
         .custom-button {
             background: none;
             border: none;
@@ -17,104 +48,86 @@
         .custom-button-delete {
             color: #6140c4;
         }
-        h2 {
-            font-weight: 900;
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: Arial, sans-serif;
-        }
-        th, td {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 8px;
-            text-align:center ;
-        }
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-            white-space: nowrap;
-            text-align:center ;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        tr:hover {
-            background-color: #e2e2e2;
-        }
-        h3 {
-            text-align: right;
-            font-family: Arial, sans-serif;
-        }
-        .hidden-column {
-            display: none; /* 隱藏類別編號 */
+        .custom-button-add {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #1b2b46;
         }
     </style>
 </head>
 <body>
 <div th:replace="~{display/navbar}"></div>
-<div class="content" id="content">
-    <div align="center">
-        <h2>所有商品資料</h2>
-        <table id="productsTable" class="display" border="1">
-            <thead>
-                <tr style="background-color: #9D9D9D">
-                    <th style=text-align:center>商品編號</th>
-                    <th style=text-align:center>商品名稱</th>
-                    <th style=text-align:center>商品金額</th>
-                    <th style=text-align:center>商品照片</th>
-                    <th style=text-align:center>商品庫存</th>
-                    <th style=text-align:center>商品狀態</th>
-                    <th style=text-align:center>商品描述</th>
-                    <th style=text-align:center class="hidden-column">商品類別編號</th> <!-- 隱藏的列 -->
-                    <th style=text-align:center>商品類別</th>
-                    <th style=text-align:center>商品修改</th>
-                    <th style=text-align:center>商品刪除</th>
-                </tr>
-            </thead>
-            <tbody>
-                <th:block th:each="product : ${products}">
-                    <tr>
-                        <td th:text="${product.productId}"></td>
-                        <td th:text="${product.productName}"></td>
-                        <td th:text="${product.productPrice}"></td>
-                        <td><img th:src="${product.productPicture}" alt="No Image" width="100" height="100"/></td>
-                        <td th:text="${product.productStock}"></td>
-                        <td>
-                            <span th:if="${product.productStatus == 1}">已上架</span>
-                            <span th:if="${product.productStatus == 2}">已停售</span>
-                        </td>
-                        <td th:text="${product.productDescription}"></td>
-                        <td class="hidden-column" th:text="${product.productType.productTypeId}"></td> <!-- 隱藏的類別編號資料 -->
-                        <td>
-                            <span th:if="${product.productType != null}" th:text="${product.productType.productTypeName}"></span>
-                            <span th:if="${product.productType == null}">無類別</span>
-                        </td>
-                        <td>
-                            <form th:action="@{/product/update/{id}(id=${product.productId})}" method="get">
-                                <button type="submit" class="custom-button">
-                                    <i class="fa-regular fa-pen-to-square fa-xl"></i>
-                                </button>
-                            </form>
-                        </td>
-                        <td>
-                            <form th:action="@{/product/del/{id}(id=${product.productId})}" method="post">
-                                <input type="hidden" name="_method" value="delete"/>
-                                <button type="submit" class="custom-button custom-button-delete" onclick="return confirm('確定要刪除這筆商品嗎？');">
-                                    <i class="fa-solid fa-trash-arrow-up fa-xl"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                </th:block>
-            </tbody>
-        </table>
-        <h3>
-            共<span th:text="${#lists.size(products)}">0</span>筆商品資料
-        </h3>
+<div class="content">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-11">
+                <div class="card bg-light text-dark shadow">
+                    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">商品資料</h3>
+                        <a th:href="@{/product/add}" class="custom-button-add">
+                            <i class="fa-solid fa-circle-plus"></i> 新增商品
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="productsTable" class="table table-striped table-hover text-center">
+                            <thead>
+                                <tr style="background-color: #9D9D9D">
+                                    <th style="text-align:center">商品編號</th>
+                                    <th style="text-align:center">商品名稱</th>
+                                    <th style="text-align:center">商品金額</th>
+                                    <th style="text-align:center">商品照片</th>
+                                    <th style="text-align:center">商品庫存</th>
+                                    <th style="text-align:center">商品狀態</th>
+                                    <th style="text-align:center">商品描述</th>
+                                    <th style="text-align:center">商品類別</th>
+                                    <th style="text-align:center">商品修改</th>
+                                    <th style="text-align:center">商品刪除</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <th:block th:each="product : ${products}">
+                                    <tr>
+                                        <td th:text="${product.productId}"></td>
+                                        <td th:text="${product.productName}"></td>
+                                        <td th:text="${product.productPrice}"></td>
+                                        <td><img th:src="${product.productPicture}" alt="No Image" width="100" height="100"/></td>
+                                        <td th:text="${product.productStock}"></td>
+                                        <td>
+                                            <span th:if="${product.productStatus == 1}">已上架</span>
+                                            <span th:if="${product.productStatus == 2}">已停售</span>
+                                        </td>
+                                        <td th:text="${product.productDescription}"></td>
+                                        <td>
+                                            <span th:if="${product.productType != null}" th:text="${product.productType.productTypeName}"></span>
+                                            <span th:if="${product.productType == null}">無類別</span>
+                                        </td>
+                                        <td>
+                                            <form th:action="@{/product/update/{id}(id=${product.productId})}" method="get">
+                                                <button type="submit" class="custom-button">
+                                                    <i class="fa-regular fa-pen-to-square fa-xl"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form th:action="@{/product/del/{id}(id=${product.productId})}" method="post" onsubmit="return confirmDelete(event);">
+                                                <input type="hidden" name="_method" value="delete"/>
+                                                <button type="submit" class="custom-button custom-button-delete">
+                                                    <i class="fa-solid fa-trash-arrow-up fa-xl"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h5>
+                        共<span th:text="${#lists.size(products)}">0</span>筆商品資料
+                    </h5>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -128,10 +141,30 @@
         });
     });
 
+    function confirmDelete(event) {
+        event.preventDefault(); // 防止表單提交
+        const form = event.target; // 獲取當前表單
+        Swal.fire({
+            title: "請確認是否要刪除該筆商品",
+            text: "刪除後將無法復原",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "確定",
+            cancelButtonText: "取消"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // 確認後提交表單
+            }
+        });
+    }
+    
+
     document.addEventListener("DOMContentLoaded", function() {
         showSidebar('store');
     });
 </script>
-  <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 </body>
 </html>

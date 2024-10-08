@@ -1,6 +1,7 @@
 package com.eatspan.SpanTasty.service.order.Impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,17 @@ public class FoodKindServiceImpl implements FoodKindService {
 	public List<FoodKindEntity> getAllFoodKind() {
 		return foodKindRepositoroy.findAll();
 	}
-
+	
+	@Override
+	public FoodKindEntity getFoodKindById(Integer foodKindId) {
+		Optional<FoodKindEntity> optional = foodKindRepositoroy.findById(foodKindId);
+		if (optional.isPresent()) {
+			return optional.get();
+		}
+		return null;
+	}
+	
+	
 	@Override
 	public FoodKindEntity addFoodKind(String foodKindName) {
 		try {
@@ -31,8 +42,7 @@ public class FoodKindServiceImpl implements FoodKindService {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 }
 
 
