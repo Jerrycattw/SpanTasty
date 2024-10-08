@@ -34,8 +34,8 @@
                         <tr>
                             <th scope="col">訂單編號</th>
                             <th scope="col">會員編號</th>
-                            <th scope="col">姓名</th>
-                            <th scope="col">電話</th>
+                            <th scope="col">訂購人姓名</th>
+                            <th scope="col">訂購人電話</th>
                             <th scope="col">訂單金額</th>
                             <th scope="col">成立時間</th>
                             <th scope="col">租借單號</th>
@@ -72,11 +72,11 @@
                             <input type="text" class="form-control" id="memberId" placeholder="輸入會員編號">
                         </div>
                         <div class="form-group mb-3">
-                            <label for="tgName">顧客姓名</label>
+                            <label for="tgName">訂購人姓名</label>
                             <input type="text" class="form-control" id="tgName" placeholder="輸入顧客姓名">
                         </div>
                         <div class="form-group mb-3">
-                            <label for="tgPhone">電話</label>
+                            <label for="tgPhone">訂購人電話</label>
                             <input type="text" class="form-control" id="tgPhone" placeholder="輸入電話">
                         </div>
                         <div class="form-group mb-3">
@@ -99,7 +99,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelChangesBtn">取消</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                        id="cancelChangesBtn">取消</button>
                     <button type="button" class="btn btn-primary" id="saveChangesBtn">保存修改</button>
                 </div>
             </div>
@@ -111,14 +112,28 @@
             showSidebar('order');
 
             document.getElementById("idSearchBtn").addEventListener("click", function () {
-                getTogo();
+                getTogoById();
+            });
+            document.getElementById("phoneSearchBtn").addEventListener("click", function () {
+                getTogoByPhone();
             });
 
         })
 
         // id 查詢
-        function getTogo() {
+        function getTogoById() {
             const togoId = document.getElementById("idSearch").value;
+            // 檢查是否為空以及是否符合數字格式
+            const idPattern = /^[0-9]+$/;
+            if (!togoId) {
+                alert("請輸入訂單編號！");
+                return;
+            }
+            // 檢查是否符合數字格式
+            if (!idPattern.test(togoId)) {
+                alert("訂單編號只能包含數字！");
+                return;
+            }
             // 發送 GET 請求到 /togo/{togoId}
             axios.get(`http://localhost:8080/SpanTasty/order/togo/${togoId}`)
                 .then(function (response) {
@@ -148,23 +163,90 @@
                         <td>${getTogoStatusBadge(togoData.togoStatus)}</td>
                         <td>${togoData.restaurant.restaurantName}</td>
                         <td>${togoData.togoMemo || ''}</td>
-                        <td><button class="btn btn-info">查看</button></td>
+                        <td><button class="btn btn-info" onclick="showTogoItems(${togoData.togoId})">查看</button></td>
                         <td><button class="btn btn-warning" onclick="showUpdateModal(${togoData.togoId})">修改</button></td>
                         <td><button class="btn btn-danger" onclick="deleteTogo(${togoData.togoId})">刪除</button></td>
                     `;
 
                     // 添加到表格中
                     tbody.appendChild(row);
-
                     // 清空輸入框
                     document.getElementById("idSearch").value = "";
-
                 })
                 .catch(function (error) {
                     console.error("查詢訂單時發生錯誤：", error);
                     alert("查詢失敗，請檢查訂單編號。");
                 });
+        }
 
+        // phone 查詢
+        function getTogoByPhone() {
+            const tgPhone = document.getElementById("phoneSearch").value;
+            //檢查是否輸入
+            if (!tgPhone) {
+                alert("請輸入訂購人電話號碼！");
+                return;
+            }
+            // 檢查是否為空以及是否符合數字格式
+            const phonePattern = /^[0-9]+$/;
+            if (!tgPhone) {
+                alert("請輸入訂購人電話號碼！");
+                return;
+            }
+            // 檢查是否符合數字格式
+            if (!phonePattern.test(tgPhone)) {
+                alert("電話號碼只能包含數字！");
+                return;
+            }
+            const params = {
+                tgPhone: tgPhone
+            };
+            // 發送 GET 請求
+            axios.get('http://localhost:8080/SpanTasty/order/togo/phone', { params })
+                .then(function (response) {
+                    console.log(response.data)
+                    const togoList = response.data;
+
+                    // 清空表格內容
+                    const tbody = document.querySelector("#demoData tbody");
+                    tbody.innerHTML = "";
+
+                    // 動態生成表格內容
+
+                    const memberId = togoList.memberId !== null ? togoList.memberId : '';
+                    const rentId = togoList.rentId !== null ? togoList.rentId : '';
+                    const togoMemo = togoList.togoMemo !== null ? togoList.togoMemo : '';
+
+                    togoList.forEach(togoData => {
+                        const row = document.createElement("tr");
+                        row.setAttribute("data-id", togoData.togoId);
+                        row.innerHTML = `
+                        <td>${togoData.togoId}</td>
+                        <td>${togoData.memberId || ''}</td>
+                        <td>${togoData.tgName}</td>
+                        <td>${togoData.tgPhone}</td>
+                        <td>${togoData.totalPrice}</td>
+                        <td>${togoData.formattedDate}</td>
+                        <td>${togoData.rentId || ''}</td>
+                        <td>${getTogoStatusBadge(togoData.togoStatus)}</td>
+                        <td>${togoData.restaurant.restaurantName}</td>
+                        <td>${togoData.togoMemo || ''}</td>
+                        <td><button class="btn btn-info" onclick="showTogoItems(${togoData.togoId})">查看</button></td>
+                        <td><button class="btn btn-warning" onclick="showUpdateModal(${togoData.togoId})">修改</button></td>
+                        <td><button class="btn btn-danger" onclick="deleteTogo(${togoData.togoId})">刪除</button></td>
+                    `;
+
+                        // 添加到表格中
+                        tbody.appendChild(row);
+                    })
+
+                    // 清空輸入框
+                    document.getElementById("idSearch").value = "";
+                })
+                .catch(function (error) {
+                    console.error("查詢訂單時發生錯誤：", error);
+                    alert("查詢失敗，請檢查訂購人電話。");
+                });
         }
 
         //刪除(更新狀態為3)
@@ -197,7 +279,7 @@
                     document.getElementById('memberId').value = togoData.memberId;
                     document.getElementById('tgName').value = togoData.tgName;
                     document.getElementById('tgPhone').value = togoData.tgPhone;
-                    //document.getElementById('togoStatus').value = togoData.togoStatus;
+                    document.getElementById('togoStatus').value = togoData.togoStatus;
                     document.getElementById('rentId').value = togoData.rentId;
                     document.getElementById('togoMemo').value = togoData.togoMemo;
 
@@ -270,7 +352,7 @@
                     <td>${getTogoStatusBadge(togoData.togoStatus)}</td>
                     <td>${togoData.restaurant.restaurantName}</td>
                     <td>${togoData.togoMemo || ''}</td>
-                    <td><button class="btn btn-info">查看</button></td>
+                    <td><button class="btn btn-info" onclick="showTogoItems(${togoData.togoId})>查看</button></td>
                     <td><button class="btn btn-warning" onclick="showUpdateModal(${togoData.togoId})">修改</button></td>
                     <td><button class="btn btn-danger" onclick="deleteTogo(${togoData.togoId})">刪除</button></td>
                 `;
@@ -292,7 +374,10 @@
             }
         }
 
-
+        // 查詢訂單明細
+        function showTogoItems(togoId) {
+            window.location.href = `http://localhost:8080/SpanTasty/order/showTogoItems.html`;
+        }
 
     </script>
     <script th:src="@{/js/bootstrap.bundle.min.js}"></script>

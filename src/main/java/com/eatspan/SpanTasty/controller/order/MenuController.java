@@ -79,9 +79,9 @@ public class MenuController {
 		return "order/getAllMenu";
 	}
 	
-	@GetMapping
+	@GetMapping("/menu/name")
 	@ResponseBody
-	public ResponseEntity<List<MenuEntity>> getFoodsByFoodName(@RequestBody String foodName) {
+	public ResponseEntity<List<MenuEntity>> getFoodsByFoodName(@RequestParam String foodName) {
 		return ResponseEntity.ok(menuService.getFoodsByFoodName(foodName));
 	}
 	

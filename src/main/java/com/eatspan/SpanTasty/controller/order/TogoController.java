@@ -91,6 +91,17 @@ public class TogoController {
 		return ResponseEntity.ok(togo);
 	}
 	
+	@GetMapping("/togo/phone")
+	@ResponseBody
+	public ResponseEntity<List<TogoEntity>> getTogoByPhone(@RequestParam String tgPhone) {
+		List<TogoEntity> togoList = togoService.getTogoByPhone(tgPhone);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		for (TogoEntity item : togoList) {
+			item.setFormattedDate(item.getTogoCreateTime().format(formatter));
+		}
+		return ResponseEntity.ok(togoList);
+	}
+	
 	@PostMapping("/togo")
 	@ResponseBody
 	public ResponseEntity<List<TogoEntity>> addTogo(@RequestBody TogoEntity newTogo) {
