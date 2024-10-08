@@ -5,66 +5,79 @@
 <meta charset="UTF-8">
 <title>會員資料統計</title>
 <script src="https://cdn.jsdelivr.net/npm/progressbar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-.btn-primary, .btn-secondary, .btn-success {
+body#statisticsPage {
+    background-color: #121212 !important; /* 使用 !important 来覆盖其他样式 */
+    color: #ffffff !important;
+}
+
+#statisticsPage .btn-primary, #statisticsPage .btn-secondary, #statisticsPage .btn-success {
+	background-color: #222;
+	border: none;
+	color: #fff;
+}
+
+#statisticsPage .btn-primary:hover, #statisticsPage .btn-secondary:hover, #statisticsPage .btn-success:hover {
+	background-color: #444;
+}
+
+#statisticsPage .card {
 	background-color: #333;
 	border: none;
+	color: #fff;
 }
 
-.btn-primary:hover, .btn-secondary:hover, .btn-success:hover {
-	background-color: #555;
-}
-
-.card {
-	background-color: #1e1e1e;
-	border: none;
-}
-
-input[type="number"] {
-	background-color: #333;
-	color: #ffffff;
+#statisticsPage input[type="number"] {
+	background-color: #444;
+	color: #fff;
 	border: 1px solid #555;
 	width: 80px;
 }
 
-#progressContainer {
-	padding: 20px;
-	border-radius: 10px;
-	width: 100%;
-	height: 400px;
+#statisticsPage #progressContainer {
+	width: 600px; /* 增加尺寸 */
+	height: 600px; /* 增加尺寸 */
+	margin: 0 auto;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
-#chartSection {
+#statisticsPage #registrationChart {
+	width: 700px;  /* 調整折線圖的寬度 */
+	height: 400px; /* 調整折線圖的高度 */
+}
+
+#statisticsPage #chartSection {
 	position: relative;
 	text-align: center;
 	margin-top: 50px;
 }
 
-#inputSection {
+#statisticsPage #inputSection {
 	position: relative;
 	z-index: 1000;
 	margin-top: 20px;
-	display: none; /* 默認不顯示 */
+	display: none;
 	color: white;
 	text-align: center;
 }
 
-#yearlySection, #monthlySection {
-    display: none; /* 默認不顯示 */
+#statisticsPage #yearlySection, #statisticsPage #monthlySection {
+	display: none;
 }
 
-#goalText {
-    font-size: 18px;
-    color: black; /* 確保字體顏色為白色 */
-    font-weight: bold; /* 加粗字體使其更醒目 */
+#statisticsPage #goalText {
+	font-size: 20px;
+	color: white;
+	font-weight: bold;
 }
+
 </style>
 </head>
 
-<body>
+<body id="statisticsPage">
 	<div th:replace="~{display/navbar}"></div>
 	<!-- 主要內容區域 -->
 	<div class="container mt-5" style="padding-left: 270px; padding-top: 80px;">
@@ -86,13 +99,13 @@ input[type="number"] {
 					</div>
 
 					<div id="yearlySection" style="display: none;">
-						<label for="year" id="yearLabel" class="mr-2">年份:</label>
+						<label for="year" id="yearLabel" class="mr-2">年份:</label> 
 						<input type="number" id="year" name="year" min="2000" max="2100" class="form-control d-inline-block mr-2">
 						<button id="fetchYearlyButton" class="btn btn-success" onclick="fetchYearlyRegistrationData()">查詢</button>
 					</div>
 
 					<div id="monthlySection" style="display: none;">
-						<label for="month" id="monthLabel" class="mr-2">月份:</label>
+						<label for="month" id="monthLabel" class="mr-2">月份:</label> 
 						<input type="number" id="month" name="month" min="1" max="12" class="form-control d-inline-block mr-2">
 						<button id="fetchMonthlyButton" class="btn btn-success" onclick="fetchMonthlyRegistrationData()">查詢</button>
 					</div>
@@ -102,116 +115,225 @@ input[type="number"] {
 
 		<div class="row">
 			<div class="col-12">
-				<div id="chartSection" class="mt-5" style="display: block; width: 450px; height: 450px;">
-					<div id="progressContainer"></div>
+				<div id="chartSection" class="mt-5" style="display: block;">
+					<!-- 根據需求插入 canvas 或 progressContainer -->
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<script>
-	let bar; // 保存進度條對象的引用
+        let bar;
+        let lineChart;
 
-	// 自動加載當月會員目標
-	window.onload = function () {
-		showMemberGoal();
-	};
+        // 自動加載當月會員目標
+        window.onload = function () {
+            showMemberGoal();
+        };
 
-	// 加載會員目標
-	function loadMemberGoal() {
-		const today = new Date();
-		const year = today.getFullYear();
-		const month = today.getMonth() + 1; // JavaScript 的月份是 0-11，因此加 1
+        // 清除 chartSection 並插入新的 canvas 或進度條容器
+        function clearChartSection() {
+            const chartSection = document.getElementById('chartSection');
+            chartSection.innerHTML = ''; // 清空 chartSection 內容
+        }
 
-		// 發送請求到後端，獲取當月的會員數據
-		fetch(`/SpanTasty/api/statistics/count?year=${year}&month=${month}`)
-		  .then(response => {
-		    if (!response.ok) {
-		      throw new Error('Network response was not ok');
-		    }
-		    return response.json();
-		  })
-		  .then(data => {
-		    const memberCount = data.data.memberCount;
-		    const goal = 30;  // 設置目標會員數
-		    const achievedPercentage = memberCount / goal; // 計算達成率
-		    showProgressBar(achievedPercentage); // 顯示進度條
+        // 加載會員目標
+        function loadMemberGoal() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1; // JavaScript 的月份是 0-11，因此加 1
 
-			// 顯示當月會員註冊目標
-			document.getElementById('goalText').innerText = `當月會員註冊目標 : ${memberCount} / ${goal}`;
-		  })
-		  .catch(error => {
-		    console.error('Error fetching data:', error);
-		  });
-	}
+            // 發送請求到後端，獲取當月的會員數據
+            fetch(`/SpanTasty/api/statistics/count?year=${year}&month=${month}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const memberCount = data.data.memberCount;
+                    const goal = 30;  // 設置目標會員數
+                    const achievedPercentage = memberCount / goal; // 計算達成率
+                    showProgressBar(achievedPercentage); // 顯示進度條
 
-	// 顯示 ProgressBar.js 進度條
-	function showProgressBar(achievedPercentage) {
-		// 如果已經存在進度條，先清除
-		if (bar) {
-			bar.destroy();
-		}
+                    // 顯示當月會員註冊目標
+                    document.getElementById('goalText').innerText = `當月會員註冊目標 : ${memberCount} / ${goal}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
 
-		// 創建 ProgressBar 圓形進度條
-		bar = new ProgressBar.Circle('#progressContainer', {
-			color: '#4caf50',  // 最終達成顏色
-			trailColor: '#d3d3d3',  // 灰色底色表示未達成部分
-			strokeWidth: 10,
-			duration: 1400,
-			easing: 'bounce',
-			text: {
-				value: '0%'  // 初始顯示值
-			},
-			from: { color: '#ff4d4d', width: 2 },  // 起始顏色紅色
-			to: { color: '#4caf50', width: 10 },  // 過渡到達成率對應顏色
-			step: function (state, circle) {
-				// 動態設置進度條顏色和寬度
-				circle.path.setAttribute('stroke', state.color);
-				circle.path.setAttribute('stroke-width', state.width);
+        // 顯示 ProgressBar.js 進度條
+        function showProgressBar(achievedPercentage) {
+            clearChartSection(); // 清空之前的圖表
+            const chartSection = document.getElementById('chartSection');
 
-				// 更新進度文本顯示
-				var value = Math.round(circle.value() * 100);
-				if (value === 0) {
-					circle.setText('0%');
-				} else {
-					circle.setText(value + '%');
-				}
-			}
-		});
+            // 創建進度條容器
+            const progressContainer = document.createElement('div');
+            progressContainer.id = 'progressContainer';
+            chartSection.appendChild(progressContainer);
 
-		// 開始動畫，animate接受0到1之間的值，這裡傳入實際的達成百分比
-		bar.animate(achievedPercentage);
-	}
+            // 如果已經存在進度條，先清除
+            if (bar) {
+                bar.destroy();
+            }
 
-	// 顯示會員目標區域
-	function showMemberGoal() {
-		clearInputSections(); // 清除其他顯示
-		document.getElementById('goalSection').style.display = 'block';
-		document.getElementById('inputSection').style.display = 'block';
-		loadMemberGoal();
-	}
+            // 創建 ProgressBar 圓形進度條
+            bar = new ProgressBar.Circle(progressContainer, {
+                color: '#4caf50',  // 最終達成顏色
+                trailColor: '#d3d3d3',  // 灰色底色表示未達成部分
+                strokeWidth: 10,
+                duration: 1400,
+                easing: 'bounce',
+                text: {
+                    value: '0%'  // 初始顯示值
+                },
+                from: { color: '#ff4d4d', width: 2 },  // 起始顏色紅色
+                to: { color: '#4caf50', width: 10 },  // 過渡到達成率對應顏色
+                step: function (state, circle) {
+                    // 動態設置進度條顏色和寬度
+                    circle.path.setAttribute('stroke', state.color);
+                    circle.path.setAttribute('stroke-width', state.width);
 
-	// 顯示年度註冊輸入區域
-	function showYearlyRegistrationInputs() {
-		clearInputSections(); // 清除其他顯示
-		document.getElementById('yearlySection').style.display = 'block';
-		document.getElementById('inputSection').style.display = 'block';
-	}
+                    // 更新進度文本顯示
+                    const value = Math.round(circle.value() * 100);
+                    circle.setText(value === 0 ? '0%' : value + '%');
+                }
+            });
 
-	// 顯示當月註冊輸入區域
-	function showMonthlyRegistrationInputs() {
-		clearInputSections(); // 清除其他顯示
-		document.getElementById('monthlySection').style.display = 'block';
-		document.getElementById('inputSection').style.display = 'block';
-	}
+            // 開始動畫，animate接受0到1之間的值，這裡傳入實際的達成百分比
+            bar.animate(achievedPercentage);
+        }
 
-	// 清除所有輸入區域顯示
-	function clearInputSections() {
-		document.getElementById('goalSection').style.display = 'none';
-		document.getElementById('yearlySection').style.display = 'none';
-		document.getElementById('monthlySection').style.display = 'none';
-	}
-	</script>
+        // 從後端獲取年度註冊數據並顯示折線圖
+        function fetchYearlyRegistrationData() {
+            const year = document.getElementById('year').value; // 獲取輸入的年份
+            fetch(`/SpanTasty/api/statistics/registrationCounts?year=${year}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const registrationCounts = data.data; // 從 API 返回的註冊數據
+                    const sortedKeys = Object.keys(registrationCounts).sort(); // 按字母順序排序鍵
+                    const sortedCounts = sortedKeys.map(key => registrationCounts[key]); // 生成排序後的值
+
+                    // 顯示折線圖
+                    showLineChart(sortedKeys, sortedCounts);
+                })
+                .catch(error => {
+                    console.error('Error fetching yearly registration data:', error);
+                });
+        }
+
+        // 顯示折線圖
+        function showLineChart(labels, data) {
+            clearChartSection(); // 清空之前的圖表
+            const chartSection = document.getElementById('chartSection');
+
+            // 創建 canvas 容器
+            const canvas = document.createElement('canvas');
+            canvas.id = 'registrationChart';
+            canvas.style.width = '700px';  // 增大 canvas 的寬度
+            canvas.style.height = '400px'; // 增大 canvas 的高度
+            chartSection.appendChild(canvas);
+
+            const ctx = canvas.getContext('2d');
+
+            // 如果之前已有圖表，先銷毀以免重疊
+            if (lineChart) {
+                lineChart.destroy();
+            }
+
+            // 創建新的折線圖
+            lineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels, // X軸的月份
+                    datasets: [{
+                        label: '每月註冊會員數',
+                        data: data, // Y軸的會員數據
+                        borderColor: '#4caf50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff' // 標籤文字顏色
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '月份',  // X軸的標題文字
+                                color: '#ffffff',  // 標題顏色
+                                font: {
+                                    size: 14, // 標題字體大小
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                color: '#ffffff' // X軸標籤文字顏色
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '註冊會員數',  // Y軸的標題文字
+                                color: '#ffffff',  // 標題顏色
+                                font: {
+                                    size: 14, // 標題字體大小
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                color: '#ffffff' // Y軸標籤文字顏色
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 顯示會員目標區域
+        function showMemberGoal() {
+            clearInputSections(); // 清除其他顯示
+            document.getElementById('goalSection').style.display = 'block';
+            document.getElementById('inputSection').style.display = 'block';
+            loadMemberGoal();
+        }
+
+        // 顯示年度註冊輸入區域
+        function showYearlyRegistrationInputs() {
+            clearInputSections(); // 清除其他顯示
+            document.getElementById('yearlySection').style.display = 'block';
+            document.getElementById('inputSection').style.display = 'block';
+        }
+
+        // 顯示當月註冊輸入區域
+        function showMonthlyRegistrationInputs() {
+            clearInputSections(); // 清除其他顯示
+            document.getElementById('monthlySection').style.display = 'block';
+            document.getElementById('inputSection').style.display = 'block';
+        }
+
+        // 清除所有輸入區域顯示
+        function clearInputSections() {
+            document.getElementById('goalSection').style.display = 'none';
+            document.getElementById('yearlySection').style.display = 'none';
+            document.getElementById('monthlySection').style.display = 'none';
+        }
+    </script>
 </body>
 
 </html>
