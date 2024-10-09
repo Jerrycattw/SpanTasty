@@ -52,7 +52,7 @@ public class ShoppingItemController {
         Integer totalAmount = shoppingOrderService.calculateTotalAmount(id);
         model.addAttribute("totalAmount",totalAmount);
         System.out.println();
-        return "store/shopping/shoppingItemDetail";
+        return "spantasty/store/shopping/shoppingItemDetail";
     }
     
 //    // 顯示訂單明細

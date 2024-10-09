@@ -32,7 +32,7 @@ public class RentItemController {
 	public String getRentIdOption(Model model) {
 		List<Rent> rents = rentService.findAllRents();
 		model.addAttribute("rents",rents);
-		return "rental/getRentItemsBySearch";
+		return "spantasty/rental/getRentItemsBySearch";
 	}
 	
 	
@@ -41,7 +41,7 @@ public class RentItemController {
 	protected String getRentItemsBySearch(@RequestParam("rentId") Integer rentId, Model model) {
 		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
 		model.addAttribute("rentItems", rentItems);
-		return "rental/getAllRentItems";
+		return "spantasty/rental/getAllRentItems";
 	}
 
 	
@@ -55,9 +55,9 @@ public class RentItemController {
 		RentItem rentItem = rentItemService.findRentItemById(rentId, tablewareId);
 		model.addAttribute("rentItem", rentItem);
 		if ("update".equals(action)) {
-			return "rental/updateRentItem";
+			return "spantasty/rental/updateRentItem";
 		} else if ("return".equals(action)) {
-			return "rental/returnRentItem";
+			return "spantasty/rental/returnRentItem";
 		}
 		return null;
 	}

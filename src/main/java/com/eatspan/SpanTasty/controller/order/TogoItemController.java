@@ -31,14 +31,14 @@ public class TogoItemController {
 		List<TogoItemEntity> togoItems = togoItemService.getAllTogoItemByTogoId(togoId);
 		if (togoItems.isEmpty()) {
 			model.addAttribute("message", "未找到對應的訂單項目");
-	        return "order/getTogoItems";
+	        return "spantasty/order/getTogoItems";
 		}
 		for (TogoItemEntity item : togoItems) {
 		    System.out.println(item.getMenu().getFoodName());
 		    System.out.println(item.getMenu().getFoodPrice());
 		}
 		model.addAttribute("togoItems", togoItems);
-		return "order/getTogoItems";
+		return "spantasty/order/getTogoItems";
 	}
 	
 	//togoId查詢 

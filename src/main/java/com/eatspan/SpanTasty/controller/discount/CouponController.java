@@ -33,7 +33,7 @@ public class CouponController {
 	//首頁--------------------------------
 	@GetMapping("/coupon")//導向
 	public String couponHome() {
-		return "discount/coupon/coupon";
+		return "spantasty/discount/coupon/coupon";
 	}
 	
 	@GetMapping("/coupon/show")
@@ -45,7 +45,7 @@ public class CouponController {
 	//編輯---------------------------------
 	@GetMapping("/coupon/{id}")//導向
 	public String couponEddit(@PathVariable(value = "id") Integer couponId) {
-		return"discount/coupon/updateCoupon";
+		return"spantasty/discount/coupon/updateCoupon";
 	}
 	
 	@PostMapping("/coupon/{id}/show")
@@ -74,7 +74,7 @@ public class CouponController {
  	//新增---------------------------------
  	@GetMapping("/coupon/add")//導向
  	public String couponAdd() {
- 		return "discount/coupon/insertCoupon";
+ 		return "spantasty/discount/coupon/insertCoupon";
  	}
  	
 // 	@PostMapping("/coupon/preAdd")//生成空input

@@ -48,7 +48,7 @@ public class PointController {
 	//點數中心-----------------------------
 	@GetMapping("/pointCenter")
 	public String pointCenter() {
-		return "discount/point/pointCenter";
+		return "spantasty/discount/point/pointCenter";
 	}
 	
 	@GetMapping("/pointCenter/show")
@@ -65,7 +65,7 @@ public class PointController {
 	public String pointSet(Model model) {
 		PointSet pointSet = pointSetService.findAllPointSet();
 		model.addAttribute("pointSet", pointSet);
-		return "discount/point/pointSet";
+		return "spantasty/discount/point/pointSet";
 	}
 	
 	@PutMapping("/pointSet/post")
@@ -157,7 +157,7 @@ public class PointController {
 		model.addAttribute("pointMember", pointMember);
 		model.addAttribute("pointMemberTotalPoint", pointMemberTotalPoint);
 		model.addAttribute("pointsById", pointsById);
-		return "discount/point/showPoint";
+		return "spantasty/discount/point/showPoint";
 	}
 	
 //	// 修改-------------------------

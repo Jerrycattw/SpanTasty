@@ -44,7 +44,7 @@ public class ProductTypeController {
 		ProductType productType = productTypeService.addProductType(productTypeName);
 		List<ProductType> productTypes = productTypeService.findAllProductType();
 		model.addAttribute("productTypes",productTypes);
-		return "store/product/searchAllProductType";
+		return "spantasty/store/product/searchAllProductType";
 	}
 	
 //	@DeleteMapping("/del/{id}")
@@ -100,6 +100,6 @@ public class ProductTypeController {
 	public String finaAllProductType(Model model){
 		List<ProductType> productTypes = productTypeService.findAllProductType();
 		model.addAttribute("productTypes",productTypes);
-		return "store/product/searchAllProductType";
+		return "spantasty/store/product/searchAllProductType";
 	}
 }

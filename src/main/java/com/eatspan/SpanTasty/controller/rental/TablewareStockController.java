@@ -45,7 +45,7 @@ public class TablewareStockController {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		model.addAttribute("tablewares",tablewares);
 		model.addAttribute("restaurants",restaurants);
-		return "rental/addStock";
+		return "spantasty/rental/addStock";
 	}
 	
 	
@@ -65,7 +65,7 @@ public class TablewareStockController {
 			Model model) {
 		TablewareStock stock = tablewareStockService.findStockById(tablewareId, restaurantId);
 		model.addAttribute("stock", stock);
-		return "rental/setStock";
+		return "spantasty/rental/setStock";
 	}
 	
 	
@@ -152,6 +152,6 @@ public class TablewareStockController {
 		model.addAttribute("restaurants",restaurants);
 		model.addAttribute("tablewares",tablewares);
 		model.addAttribute("stocks", stockDetails);
-		return "rental/getAllStocks";
+		return "spantasty/rental/getAllStocks";
 	}
 }

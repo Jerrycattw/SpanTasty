@@ -64,7 +64,7 @@ public class RestaurantController {
     public String getRestaurantById(@PathVariable("id") Integer restaurantId, Model model) {
         Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
         model.addAttribute("restaurant", restaurant);
-        return "reservation/getRestaurant";
+        return "spantasty/reservation/getRestaurant";
     }
     
     
@@ -72,7 +72,7 @@ public class RestaurantController {
     // 把頁面導向addRestaurant
     @GetMapping("/add")
     public String toAddRestaurant() {
-        return "reservation/addRestaurant";
+        return "spantasty/reservation/addRestaurant";
     }
     
     
@@ -115,7 +115,7 @@ public class RestaurantController {
     public String toSetRestaurant(@PathVariable("id") Integer restaurantId, Model model) {
         Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
         model.addAttribute("restaurant", restaurant);
-        return "reservation/setRestaurant";
+        return "spantasty/reservation/setRestaurant";
     }
     
     
