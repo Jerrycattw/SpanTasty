@@ -133,8 +133,14 @@ public class PointController {
 	@PostMapping("/batchAdd/members")
 	public String batchInsertExcute(@SessionAttribute("point_memberIds") List<String> memberIds,@RequestParam String plusOrMinus, Point pointBean) throws Exception {
 		switch (plusOrMinus) {
-		case "plus" -> pointBean.setPointChange(pointBean.getPointChange());
-		case "minus" -> pointBean.setPointChange(pointBean.getPointChange()*-1);
+		case "plus":
+			pointBean.setPointChange(pointBean.getPointChange());
+			pointService.insertBatchRecord(memberIds, pointBean);
+			break;
+		case "minus":
+			pointBean.setPointChange(pointBean.getPointChange()*-1);
+			pointService.useBatchPoint(memberIds, pointBean);
+			break;
 	};
 //		pointService.usePoint(pointBean.getPointChange(), pointBean.getMemberId());
 		pointService.insertBatchRecord(memberIds, pointBean);
