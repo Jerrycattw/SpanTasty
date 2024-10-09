@@ -49,6 +49,11 @@
     </div>
 
     <script>
+    
+    	document.addEventListener("DOMContentLoaded", function () {
+            showSidebar('admin');
+        });
+    
         // 新增管理員按鈕點擊事件
         document.getElementById('addAdminBtn').addEventListener('click', function () {
             // 收集選中的權限
