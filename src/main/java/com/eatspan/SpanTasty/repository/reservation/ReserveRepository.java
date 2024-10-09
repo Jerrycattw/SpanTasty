@@ -64,7 +64,7 @@ public interface ReserveRepository extends JpaRepository<Reserve, Integer> {
     
 
     // 查詢該餐廳和桌型下的總桌數
-    @Query("SELECT COUNT(rt) FROM RestaurantTable rt WHERE rt.restaurant.id = :restaurantId "
+    @Query("SELECT tableTypeNumber FROM RestaurantTable rt WHERE rt.restaurant.id = :restaurantId "
             + "AND rt.tableType.id = :tableTypeId")
     Integer countAvailableTables(@Param("restaurantId") Integer restaurantId,
                                  @Param("tableTypeId") String tableTypeId);
