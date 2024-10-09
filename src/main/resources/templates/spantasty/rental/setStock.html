@@ -2,13 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org/">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>新增環保用具庫存</title>
-<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<title>調整用具庫存</title>
 <style>
 .h {
 	text-align: center;
 }
+
 form {
 	width: 60%;
 	margin: 0 auto;
@@ -17,42 +16,39 @@ form {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	background-color: #c8e6c9;
 }
+
 .body {
     background-color: #e9f7ef; /* 背景色：淡綠 */
 }
+
 .table {
     background-color: #f1f8e9; /* 表格背景：淡綠 */
 }
+
 .table thead {
     background-color: #a5d6a7; /* 表格標題：淺綠 */
     color: #1b5e20;
 }
-
 </style>
 </head>
-
 <body class="body">
-    <div th:replace="~{spantasty/display/navbar}"></div>
-    <div class="content" id="container">
-        <h3 class="h">庫存調整</h3>
-        <form th:action="@{/stock/setPut}" th:method="post" >
-        <input type="hidden" name="_method" value="put"> 
-        <table class="table table-striped" id="table">
-            <tr><td>用具名稱:<input type="text" name="tablewareId" th:value="${stock.tablewareId}" readonly/></td></tr>
-            <tr><td>餐廳名稱:<input type="text" name="restaurantId" th:value="${stock.restaurantId}" readonly/></td></tr>
-            <tr><td>用具庫存:<input type="number" name="stock" th:value="${stock.stock}" ></td></tr>
-        </table>
-        <input type="submit" id="submitBtn" value="確定更改">
-        </form>
-    </div>
-     <script>
-		document.addEventListener("DOMContentLoaded", function() {
-			showSidebar('rental');
-		});
-	</script>
-    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-    <script th:src="@{/js/axios.min.js}"></script>
+<div th:replace="~{spantasty/display/navbar}"></div>
+<div class="content" id="container">
+<h3 class="h">庫存調整</h3>
+<form th:action="@{/stock/setPut}" th:method="post" >
+<input type="hidden" name="_method" value="put"> 
+<table class="table table-striped" id="table">
+    <tr><td>用具名稱:<input type="text" name="tablewareId" th:value="${stock.tablewareId}" readonly/></td></tr>
+    <tr><td>餐廳名稱:<input type="text" name="restaurantId" th:value="${stock.restaurantId}" readonly/></td></tr>
+    <tr><td>用具庫存:<input type="number" name="stock" th:value="${stock.stock}" ></td></tr>
+</table>
+<input type="submit" id="submitBtn" value="確定更改">
+</form>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    showSidebar('rental');
+});
+</script>
 </body>
-
 </html>

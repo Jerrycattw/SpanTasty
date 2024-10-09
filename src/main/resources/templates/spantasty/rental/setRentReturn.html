@@ -2,14 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org/">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>歸還環保用具</title>
-<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
 </head>
 <style>
 .h {
 	text-align: center;
 }
+
 form {
 	width: 60%;
 	margin: 0 auto;
@@ -18,13 +17,16 @@ form {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	background-color: #c8e6c9;
 }
+
 .table {
     background-color: #f1f8e9; /* 表格背景：淡綠 */
 }
+
 .table thead {
     background-color: #a5d6a7; /* 表格標題：淺綠 */
     color: #1b5e20;
 }
+
 .tableware-input{
 	width: 86%;
 	padding: 5px;
@@ -33,57 +35,54 @@ form {
 	border-radius: 5px;
 	box-sizing: border-box;
 }
+
 .body {
     background-color: #e9f7ef; /* 背景色：淡綠 */
 }
 </style>
 <body class="body">
-    <div th:replace="~{spantasty/display/navbar}"></div>
-    <div class="content" id="container">
-        <h3 class="h">輸入歸還資料</h3>
-        <form th:action="@{/rent/setPut2}" th:method="post">
-	    <input type="hidden" name="_method" value="put" />
-	   	<table class="table table-striped" id="table">
-        <tr><td>訂單編號: <input class="tableware-input" type="text" name="rentId" th:value="${rent.rentId}" readonly></td></tr>
-        <tr><td>歸還日期: <input class="tableware-input" type="date" name="returnDate" th:value="${#dates.format(rent.returnDate, 'yyyy-MM-dd')}" readonly /></td></tr>
-        <tr><td>歸還餐廳:
-           <select class="tableware-input" name="returnRestaurantId" id="returnRestaurantId" required>
-               <option value="" selected disabled>請選擇租借餐廳</option>
-               <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}" th:selected="${rent.returnRestaurantId == restaurant.restaurantId}"></option>
-           </select>
-        </td></tr>
-    	</table>
-		<span id="disabledMsg" style="color:red; display: none">訂單已完全歸還，無法再更改。</span>
-	    <input type="submit" id="submitBtn" value="確定歸還"/>
-	    <input type="hidden" name="rentDeposit" th:value="${rent.rentDeposit}"/>
-	    <input type="hidden" name="rentDate" th:value="${rent.rentDate}">
-	    <input type="hidden" name="restaurantId" th:value="${rent.restaurantId}">
-	    <input type="hidden" name="memberId" th:value="${rent.memberId}">
-	    <input type="hidden" name="dueDate" th:value="${rent.dueDate}">
-	    <input type="hidden" id="rentStatus" name="rentStatus" th:value="${rent.rentStatus}">
-	    <input type="hidden" name="rentMemo" th:value="${rent.rentMemo}"/>
-		</form>
-    </div>
-    <script>
-    	window.onload = function() {
-		    const rentStatus = document.getElementById('rentStatus');
-		    const returnRestaurantId = document.getElementById('returnRestaurantId');
-        	const submitBtn = document.getElementById('submitBtn');
-	        if (rentStatus.value === '2') {
-	            submitBtn.disabled = true;
-	            returnRestaurantId.disabled = true;
-	            document.getElementById('disabledMsg').style.display = 'block';
-	        }
-		};
-    </script>
-    <script>
-	document.addEventListener("DOMContentLoaded", function() {
-		showSidebar('rental');
-	});
+<div th:replace="~{spantasty/display/navbar}"></div>
+<div class="content" id="container">
+<h3 class="h">歸還用具</h3>
+<form th:action="@{/rent/setPut2}" th:method="post">
+<input type="hidden" name="_method" value="put" />
+<table class="table table-striped" id="table">
+	<tr><td>訂單編號: <input class="tableware-input" type="text" name="rentId" th:value="${rent.rentId}" readonly></td></tr>
+	<tr><td>歸還日期: <input class="tableware-input" type="date" name="returnDate" th:value="${#dates.format(rent.returnDate, 'yyyy-MM-dd')}" readonly /></td></tr>
+	<tr><td>歸還餐廳:
+		<select class="tableware-input" name="returnRestaurantId" id="returnRestaurantId" required>
+			<option value="" selected disabled>請選擇租借餐廳</option>
+			<option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}" th:selected="${rent.returnRestaurantId == restaurant.restaurantId}"></option>
+		</select>
+	</td></tr>
+</table>
+<span id="disabledMsg" style="color:red; display: none">訂單已完全歸還，無法再更改。</span>
+<input type="submit" id="submitBtn" value="確定歸還"/>
+<input type="hidden" name="rentDeposit" th:value="${rent.rentDeposit}"/>
+<input type="hidden" name="rentDate" th:value="${rent.rentDate}">
+<input type="hidden" name="restaurantId" th:value="${rent.restaurantId}">
+<input type="hidden" name="memberId" th:value="${rent.memberId}">
+<input type="hidden" name="dueDate" th:value="${rent.dueDate}">
+<input type="hidden" id="rentStatus" name="rentStatus" th:value="${rent.rentStatus}">
+<input type="hidden" name="rentMemo" th:value="${rent.rentMemo}"/>
+</form>
+</div>
+<script>
+window.onload = function() {
+	const rentStatus = document.getElementById('rentStatus');
+	const returnRestaurantId = document.getElementById('returnRestaurantId');
+	const submitBtn = document.getElementById('submitBtn');
+	if (rentStatus.value === '2') {
+		submitBtn.disabled = true;
+		returnRestaurantId.disabled = true;
+		document.getElementById('disabledMsg').style.display = 'block';
+	}
+};
 </script>
-    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-    <script th:src="@{/js/axios.min.js}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	showSidebar('rental');
+});
+</script>
 </body>
-
 </html>
