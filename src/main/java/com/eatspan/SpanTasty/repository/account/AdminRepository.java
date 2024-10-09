@@ -17,6 +17,12 @@ public interface AdminRepository extends JpaRepository<Admin, Integer> {
     // 根據名稱進行模糊查詢
     Page<Admin> findByAdminNameContaining(String adminName, Pageable pageable);
     
+    // 根據管理員名稱進行模糊查詢（忽略大小寫）
+    Page<Admin> findByAdminNameContainingIgnoreCase(String name, Pageable pageable);
+
+    // 根據帳號進行模糊查詢（忽略大小寫）
+    Page<Admin> findByAccountContainingIgnoreCase(String account, Pageable pageable);
+    
     // 帳號搜尋
 	Admin findByAccount(String account);
 	
@@ -30,7 +36,7 @@ public interface AdminRepository extends JpaRepository<Admin, Integer> {
     @Query("SELECT a FROM Admin a WHERE " +
             "(SELECT COUNT(p) FROM a.permissions p WHERE p.permissionName IN :permissions) = :#{#permissions.size()} " +
             "AND (COALESCE(:permissions, null) IS NULL OR SIZE(a.permissions) > 0)")
-     Page<Admin> findAdminsByPermissions(List<String> permissions, Pageable pageable);
+    Page<Admin> findAdminsByPermissions(List<String> permissions, Pageable pageable);
 
 	Page<Admin> findAllByPermissionsIsEmpty(Pageable pageable);
 	

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.repository.account.MemberRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class MemberService {
 
@@ -184,6 +186,22 @@ public class MemberService {
         // 保存會員變更
         memberRepository.save(member);
         return true;  // 更新成功
+    }
+
+    @Transactional
+    public boolean removeMemberAvatar(Integer memberId) {
+        try {
+            Member member = memberRepository.findById(memberId).orElse(null);
+            if (member == null) {
+                return false;
+            }
+            member.setAvatar(null);
+            memberRepository.save(member);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
     

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>搜尋管理員</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
 </head>
 
 <body class="bg-dark text-white">
@@ -21,10 +22,10 @@
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>頭像</th>
                     <th>管理員名稱</th>
                     <th>帳號</th>
                     <th>狀態</th>
-                    <th>頭像</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -39,16 +40,62 @@
         </div>
     </div>
 
-    <!-- JavaScript 部分：使用 Axios 請求數據 -->
+    <!-- 頭像預覽模態框 -->
+    <div class="modal fade" id="avatarPreviewModal" tabindex="-1" aria-labelledby="avatarPreviewModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="avatarPreviewModalLabel">頭像預覽</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="avatarPreviewImage" src="" alt="Avatar"
+                        style="max-width: 100%; height: auto; border-radius: 50%;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="deleteAvatar()">刪除頭像</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         var currentPage = 0;
         var totalPages = 0;
+        var selectedAdminId = null;
 
         var statusMap = {
             'A': '啟用',
             'S': '暫停',
             'I': '禁用'
         };
+
+        function handleStatusChange(selectElement, adminId) {
+            var status = selectElement.value;
+
+            var requestData = {
+                adminId: adminId,
+                status: status,
+
+            };
+
+            // 發送更新會員狀態的請求
+            axios.post('/SpanTasty/admin/updateAdminStatus', requestData)
+                .then(function (response) {
+                    if (response.data.success) {
+                        alert(response.data.message);  // 顯示成功訊息
+                        loadAdmins(currentPage);  // 重新加載當前頁面
+                    } else {
+                        alert(response.data.message);  // 顯示失敗訊息
+                    }
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    alert("會員狀態更新失敗，請重試！");
+                });
+        }
 
         // 函數來動態加載管理員資料
         function loadAdmins(page, adminName) {
@@ -73,36 +120,50 @@
                     var tbody = document.querySelector('#admin-table tbody');
                     admins.forEach(function (admin) {
                         var avatarHtml = admin.avatar
-                            ? '<img src="' + admin.avatar + '" alt="Avatar" style="width:50px; height:50px;"/>'
-                            : '<i class="fa-regular fa-user" style="font-size:50px;"></i>';
-
-                        var statusSelect = '<select class="form-select form-select-sm bg-dark text-white" onchange="handleStatusChange(this, ' + admin.adminId + ')">';
-                        statusSelect += '<option value="A"' + (admin.status === 'A' ? ' selected' : '') + '>啟用</option>';
-                        statusSelect += '<option value="S"' + (admin.status === 'S' ? ' selected' : '') + '>暫停</option>';
-                        statusSelect += '<option value="I"' + (admin.status === 'I' ? ' selected' : '') + '>禁用</option>';
-                        statusSelect += '</select>';
-
-                        var actionHtml = `
-                <div class="btn-group">
-                    <button type="button" class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        操作
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#" onclick="resetAdmin(${admin.adminId})">重設管理員</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="resetPassword(${admin.adminId})">重設密碼</a></li>
-                    </ul>
-                </div>
-            `;
+                            ? `<img src="${admin.avatar}" alt="Avatar" style="width:50px; height:50px; border-radius:50%; cursor: pointer;" onclick="previewAvatar('${admin.avatar}', ${admin.adminId})"/>`
+                            : '<i class="fa-regular fa-face-smile" style="font-size:50px; border-radius:50%;"></i>';
 
                         var row = tbody.insertRow();
-                        row.innerHTML = `
-                <td>${admin.adminId}</td>
-                <td>${admin.adminName}</td>
-                <td>${admin.account}</td>
-                <td>${statusSelect}</td>
-                <td>${avatarHtml}</td>
-                <td>${actionHtml}</td>
-            `;
+
+                        if (admin.adminId === 1) {
+                            // 如果管理員 ID 為 1，設置整行為只讀狀態，但保留樣式
+                            row.innerHTML = `
+                                <td>${admin.adminId}</td>
+                                <td>${avatarHtml}</td>
+                                <td>${admin.adminName}</td>
+                                <td>${admin.account}</td>
+                                <td>${admin.status === 'A' ? '啟用' : admin.status === 'S' ? '暫停' : '禁用'}</td>
+                                <td><span>無法操作</span></td>
+                            `;
+                            row.style.pointerEvents = 'none';  // 禁用所有互動
+                        } else {
+                            // 如果管理員 ID 不是 1，則可以進行操作
+                            var statusSelect = '<select class="form-select form-select-sm bg-dark text-white" onchange="handleStatusChange(this, ' + admin.adminId + ')">';
+                            statusSelect += '<option value="A"' + (admin.status === 'A' ? ' selected' : '') + '>啟用</option>';
+                            statusSelect += '<option value="I"' + (admin.status === 'I' ? ' selected' : '') + '>禁用</option>';
+                            statusSelect += '</select>';
+
+                            var actionHtml = `
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        操作
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="resetAdmin(${admin.adminId})">重設管理員</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="resetPassword(${admin.adminId})">重設密碼</a></li>
+                                    </ul>
+                                </div>
+                            `;
+
+                            row.innerHTML = `
+                                <td>${admin.adminId}</td>
+                                <td>${avatarHtml}</td>
+                                <td>${admin.adminName}</td>
+                                <td>${admin.account}</td>
+                                <td>${statusSelect}</td>
+                                <td>${actionHtml}</td>
+                            `;
+                        }
                     });
 
                     // 更新分頁信息
@@ -119,34 +180,70 @@
                 });
         }
 
-// 重設管理員
-function resetAdmin(adminId) {
-    if (confirm("確定要重設此管理員嗎？")) {
-        axios.post('/SpanTasty/admin/resetAdmin?adminId=' + adminId)
-            .then(function (response) {
-                alert("管理員重設成功！");
-                loadAdmins(currentPage); // 重新加載管理員列表
-            })
-            .catch(function (error) {
-                console.error(error);
-                alert("重設管理員失敗，請稍後重試！");
-            });
-    }
-}
+        function resetPassword(adminId) {
+            if (confirm("確定要重設這位管理員的密碼嗎？")) {
+                axios.post(`/SpanTasty/admin/resetPassword?adminId=${adminId}`)  // 使用反引號以使用模板字符串
+                    .then(function (response) {
+                        if (response.data.success) {
+                            alert(response.data.message);  // 顯示成功訊息
+                        } else {
+                            alert(response.data.message);  // 顯示失敗訊息
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('重設密碼失敗:', error);
+                        alert("重設密碼失敗，請稍後重試！");
+                    });
+            }
+        }
 
-// 重設密碼
-function resetPassword(adminId) {
-    if (confirm("確定要重設此管理員的密碼嗎？")) {
-        axios.post('/SpanTasty/admin/resetPassword?adminId=' + adminId)
-            .then(function (response) {
-                alert("密碼重設成功！");
-            })
-            .catch(function (error) {
-                console.error(error);
-                alert("重設密碼失敗，請稍後重試！");
-            });
-    }
-}
+        function resetAdmin(adminId) {
+            if (confirm("確定要重設這位管理員嗎？")) {
+                axios.post(`/SpanTasty/admin/resetAdmin?adminId=${adminId}`)
+                    .then(function (response) {
+                        if (response.data.success) {
+                            alert(response.data.message);  // 顯示成功訊息
+                            loadAdmins(currentPage);  // 重新加載當前頁面
+                        } else {
+                            alert(response.data.message);  // 顯示失敗訊息
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('重設管理員失敗:', error);
+                        alert("重設管理員失敗，請稍後重試！");
+                    });
+            }
+        }
+
+        // 預覽頭像
+        function previewAvatar(avatarUrl, adminId) {
+            document.getElementById('avatarPreviewImage').src = avatarUrl;
+            selectedAdminId = adminId; // 設置選中的管理員 ID
+            var avatarPreviewModal = new bootstrap.Modal(document.getElementById('avatarPreviewModal'));
+            avatarPreviewModal.show();
+        }
+
+        // 刪除頭像
+        function deleteAvatar() {
+            if (confirm("確定要刪除此頭像嗎？")) {
+                axios.post('/SpanTasty/admin/removeAdminAvatar', {
+                    adminId: selectedAdminId
+                })
+                    .then(function (response) {
+                        const result = response.data;  // 假設後端回傳的就是 Result 格式的 JSON
+                        if (result.success) {
+                            alert(result.message);  // 顯示成功訊息
+                            loadAdmins(currentPage); // 重新加載管理員列表
+                        } else {
+                            alert(result.message);  // 顯示失敗訊息
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error(error);
+                        alert("頭像刪除失敗，請稍後重試！");
+                    });
+            }
+        }
 
         // 點擊上一頁按鈕事件
         document.querySelector('#prevPage').addEventListener('click', function () {
@@ -172,9 +269,7 @@ function resetPassword(adminId) {
         document.addEventListener('DOMContentLoaded', function () {
             loadAdmins(0); // 預設加載第 0 頁
         });
-
     </script>
-
 </body>
 
 </html>

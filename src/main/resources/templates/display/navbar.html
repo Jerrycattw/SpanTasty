@@ -141,20 +141,20 @@
     <!-- 頭像上傳確認的彈跳窗 -->
     <div class="modal fade" id="avatarModal" tabindex="-1" role="dialog" aria-labelledby="avatarModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content bg-dark text-white">
                 <div class="modal-header">
                     <h5 class="modal-title" id="avatarModalLabel">頭像管理</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body text-center">
                     <img id="previewAvatar" src="" alt="Avatar Preview">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" id="uploadAvatarButton">上傳圖片</button>
-                    <button type="button" class="btn btn-secondary" id="removeAvatar">移除頭像</button>
+                    <button type="button" class="btn btn-danger" id="removeAvatar">移除頭像</button>
                     <button type="button" class="btn btn-primary" id="confirmUpload">確認更換頭像</button>
                 </div>
             </div>
@@ -165,6 +165,98 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+        
+			
+		
+        	// 點擊上傳圖片按鈕時觸發文件選擇器
+            document.getElementById('uploadAvatarButton').addEventListener('click', function () {
+                document.getElementById('avatarUpload').click();
+            });
+
+            // 當選擇新頭像後，顯示預覽
+            document.getElementById('avatarUpload').addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        // 顯示預覽圖片
+                        document.getElementById('previewAvatar').src = e.target.result;
+                        // 彈出頭像管理彈跳窗，確認是否更換頭像
+                        $('#avatarModal').modal('show');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // 確認更換頭像的邏輯
+            document.getElementById('confirmUpload').addEventListener('click', function () {
+                const file = document.getElementById('avatarUpload').files[0];
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('avatar', file);
+
+                    // 發送請求更新頭像
+                    axios.post('/SpanTasty/admin/updateAvatar', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    })
+                        .then(function (response) {
+                            if (response.data.success) {
+                                document.getElementById('adminAvatar').src = document.getElementById('previewAvatar').src;
+                                $('#avatarModal').modal('hide');
+                                alert('頭像更新成功');
+                            } else {
+                                alert('頭像更新失敗');
+                            }
+                        })
+                        .catch(function (error) {
+                            console.error('頭像上傳失敗', error);
+                            alert('頭像上傳失敗，請稍後重試');
+                        });
+                } else {
+                    alert('請先選擇一個頭像');
+                }
+            });
+
+            // 移除頭像邏輯
+            document.getElementById('removeAvatar').addEventListener('click', function () {
+                // 顯示確認對話框，讓用戶確認是否要移除頭像
+                const confirmRemoval = confirm("您確定要移除頭像嗎？");
+
+                if (confirmRemoval) {
+                    // 更新前端的預覽圖片為默認頭像
+                    const defaultAvatar = 'https://via.placeholder.com/50';
+                    document.getElementById('previewAvatar').src = defaultAvatar;
+
+                    // 發送請求將頭像重置為默認
+                    axios.post('/SpanTasty/admin/removeAvatar')
+                        .then(function (response) {
+                            if (response.data.success) {
+                                // 將 adminAvatarElement 設置為默認頭像
+                                document.getElementById('adminAvatar').src = defaultAvatar;
+                                // 隱藏彈跳窗
+                                $('#avatarModal').modal('hide');
+                                alert('頭像已移除');
+                            } else {
+                                alert('移除頭像失敗');
+                            }
+                        })
+                        .catch(function (error) {
+                            console.error('移除頭像失敗', error);
+                            alert('移除頭像失敗，請稍後重試');
+                        });
+                } else {
+                    // 如果用戶取消操作，什麼也不做
+                    console.log("用戶取消了移除頭像操作");
+                }
+            });
+
+            // 點擊頭像時觸發彈跳窗
+            document.getElementById('adminAvatar').addEventListener('click', function () {
+                $('#avatarModal').modal('show');
+            });
+        	
             // 檢查登入狀態
             axios.get('/SpanTasty/admin/checkLogin')
                 .then(function (response) {
@@ -263,12 +355,14 @@
                 } else {
                     // 如果是登入，跳轉到登入頁面
                     window.location.href = '/SpanTasty/admin/loginPage';
+                    console.log('???');
                 }
             }
 
             // 點擊上方選單時顯示對應的側邊欄內容
             window.showSidebar = function (menu) {
                 const sidebar = document.getElementById('sidebar');
+                
                 let menuItems = '';
 
                 switch (menu) {
@@ -289,6 +383,8 @@
                     case 'member':
                         menuItems = `
                             <a href="/SpanTasty/admin/member-list">查詢會員資料</a>
+                            <a href="/SpanTasty/MemberStatistics">會員統計</a>
+                            
                         `;
                         break;
 
