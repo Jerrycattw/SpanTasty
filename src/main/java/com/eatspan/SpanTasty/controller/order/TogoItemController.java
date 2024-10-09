@@ -5,33 +5,51 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.eatspan.SpanTasty.entity.order.TogoItemEntity;
 import com.eatspan.SpanTasty.entity.order.TogoItemId;
 import com.eatspan.SpanTasty.service.order.TogoItemService;
 
-@RestController
+@Controller
+@RequestMapping("/order")
 public class TogoItemController {
 	
 	@Autowired
 	private TogoItemService togoItemService;
 	
-	//togoId查詢 
 	@GetMapping("/togo/{togoId}/items")
-	public ResponseEntity<List<TogoItemEntity>> getTogoItemsById(Integer togoId) {
+	public String getTogoItemPage(@PathVariable Integer togoId, Model model) {
 		List<TogoItemEntity> togoItems = togoItemService.getAllTogoItemByTogoId(togoId);
 		if (togoItems.isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			model.addAttribute("message", "未找到對應的訂單項目");
+	        return "order/getTogoItems";
 		}
-		return ResponseEntity.ok(togoItems);
+		for (TogoItemEntity item : togoItems) {
+		    System.out.println(item.getMenu().getFoodName());
+		    System.out.println(item.getMenu().getFoodPrice());
+		}
+		model.addAttribute("togoItems", togoItems);
+		return "order/getTogoItems";
 	}
+	
+	//togoId查詢 
+//	@GetMapping("/togo/{togoId}/items")
+//	public ResponseEntity<List<TogoItemEntity>> getTogoItemsById(Integer togoId) {
+//		List<TogoItemEntity> togoItems = togoItemService.getAllTogoItemByTogoId(togoId);
+//		if (togoItems.isEmpty()) {
+//			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//		}
+//		return ResponseEntity.ok(togoItems);
+//	}
 	
 	@PostMapping("/togo/{togoId}/items")
 	public ResponseEntity<List<TogoItemEntity>> addTogoItems(

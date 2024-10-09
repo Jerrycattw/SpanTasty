@@ -1,83 +1,98 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/">
-<head>
-<meta charset="UTF-8">
-<title>訂單</title>
-</head>
-<body>
-<div th:replace="~{display/navbar}"></div>
-<!-- 主要內容區域 -->
-<div class="content">
-    <div class="container mt-2">
-        <h1 class="display-6">📍訂單資料📍</h1>
-        <div class="row justify-content-center">
-            <div class="col-11">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <a th:href="@{/order/togo/add}" class="btn btn-primary btn-sm">新增訂單</a>
-                    <a th:href="@{/order/togo/get}" class="btn btn-primary btn-sm">查詢訂單</a>
-                </div>
-                
-                <div class="table-responsive mt-3">
-                    <table id="demoData" class="table table-secondary table-striped table-hover text-center">
-                        <thead class="thead-light">
-                            <tr>
-                                <th scope="col">訂單編號</th>
-                                <th scope="col">會員編號</th>
-                                <th scope="col">姓名</th>
-                                <th scope="col">電話</th>
-                                <th scope="col">訂單金額</th>
-                                <th scope="col">成立時間</th>
-                                <th scope="col">租借單號</th>
-                                <th scope="col">訂單狀態</th>
-                                <th scope="col">餐廳名稱</th>
-                                <th scope="col">訂單備註</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <th:block th:each="togo : ${togoList}">
-                                <tr>
-                                    <td class="align-middle" th:text="${togo.togoId}"></td>
-                                    <td class="align-middle" th:text="${togo.memberId}"></td>
-                                    <td class="align-middle" th:text="${togo.tgName}"></td>
-                                    <td class="align-middle" th:text="${togo.tgPhone}"></td>
-                                    <td class="align-middle" th:text="${togo.totalPrice}"></td>
-                                    <td class="align-middle" th:text="${togo.formattedDate}"></td>
-                                    <td class="align-middle" th:text="${togo.rentId}"></td>
-                                    <td class="align-middle">
-                                        <span th:switch="${togo.togoStatus}">
-                                            <span th:case="1" class="badge bg-warning">未取餐</span>
-                                            <span th:case="2" class="badge bg-success">已取餐</span>
-                                            <span th:case="3" class="badge bg-danger">已取消</span>
-                                        </span>
-                                    </td>
-                                    <td class="align-middle" th:text="${togo.restaurant.restaurantName}"></td>
-                                    <td class="align-middle" th:text="${togo.togoMemo}"></td>
 
+<head>
+    <meta charset="UTF-8">
+    <title>訂單</title>
+</head>
+
+<body>
+    <div th:replace="~{display/navbar}"></div>
+    <!-- 主要內容區域 -->
+    <div class="content">
+        <div class="container mt-2">
+            <h1 class="display-6">📍訂單資料📍</h1>
+            <div class="row justify-content-center">
+                <div class="col-11">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a th:href="@{/order/togo/add}" class="btn btn-primary btn-sm">新增訂單</a>
+                        <a th:href="@{/order/togo/get}" class="btn btn-primary btn-sm">查詢訂單</a>
+                    </div>
+
+                    <div class="table-responsive mt-3">
+                        <table id="demoData" class="table table-secondary table-striped table-hover text-center">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">訂單編號</th>
+                                    <th scope="col">會員編號</th>
+                                    <th scope="col">姓名</th>
+                                    <th scope="col">電話</th>
+                                    <th scope="col">訂單金額</th>
+                                    <th scope="col">成立時間</th>
+                                    <th scope="col">租借單號</th>
+                                    <th scope="col">訂單狀態</th>
+                                    <th scope="col">餐廳名稱</th>
+                                    <th scope="col">訂單備註</th>
                                 </tr>
-                            </th:block>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <th:block th:each="togo : ${togoList}">
+                                    <tr>
+                                        <td class="align-middle" id="togoId" th:text="${togo.togoId}"></td>
+                                        <td class="align-middle" th:text="${togo.memberId}"></td>
+                                        <td class="align-middle" th:text="${togo.tgName}"></td>
+                                        <td class="align-middle" th:text="${togo.tgPhone}"></td>
+                                        <td class="align-middle" th:text="${togo.totalPrice}"></td>
+                                        <td class="align-middle" th:text="${togo.formattedDate}"></td>
+                                        <td class="align-middle" th:text="${togo.rentId}"></td>
+                                        <td class="align-middle">
+                                            <span th:switch="${togo.togoStatus}">
+                                                <span th:case="1" class="badge bg-warning">未取餐</span>
+                                                <span th:case="2" class="badge bg-success">已取餐</span>
+                                                <span th:case="3" class="badge bg-danger">已取消</span>
+                                            </span>
+                                        </td>
+                                        <td class="align-middle" th:text="${togo.restaurant.restaurantName}"></td>
+                                        <td class="align-middle" th:text="${togo.togoMemo}"></td>
+                                    </tr>
+                                </th:block>
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
-</div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('order');
 
-          //  const getTogoBtn = document.getElementById('getAllTogo')
-          //  getTogoBtn.addEventListener('click', function (e) {
-          //      const table = document.getElementById('demoData');
-          //      table.style.removeProperty('display');
-           // })
-        })
+            document.getElementById("showItemsBtn").addEventListener("click", function () {
+                showItemsPage();
+            });
 
+        })
+        function showItemsPage() {
+            const togoId = button.getAttribute('data-togo-id');
+            // 獲取 togoId
+            console.log(togoId)
+            // 使用 Axios 發送請求
+            axios.get(`http://localhost:8080/SpanTasty/order/togo/${togoId}/items`)
+                .then(function (response) {
+                    window.location.href = 'http://localhost:8080/SpanTasty/order/togo/{togoId}/items';
+                })
+                .catch(function (error) {
+                    console.error("獲取訂單項目失敗:", error);
+                    alert("獲取訂單項目失敗，請稍後再試。");
+                });
+        }
 
     </script>
-    
-<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-<script th:src="@{/js/axios.min.js}"></script>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
 </body>
+
 </html>
