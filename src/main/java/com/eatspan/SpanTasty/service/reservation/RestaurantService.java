@@ -33,6 +33,12 @@ public class RestaurantService {
 	    if (restaurant.getRestaurantStatus() == null) {
 	        restaurant.setRestaurantStatus(3);
 	    }
+		if(restaurant.getReservePercent() == null) {
+			restaurant.setReservePercent(100); // 餐廳開放訂位的比例
+		}
+		if(restaurant.getReserveTimeScale() == null) {
+			restaurant.setReserveTimeScale(30); // 訂位的區間(預設為30分鐘)
+		}
 	    
 	    // 儲存餐廳以獲取其 ID
 	    Restaurant savedRestaurant = restaurantRepository.save(restaurant);

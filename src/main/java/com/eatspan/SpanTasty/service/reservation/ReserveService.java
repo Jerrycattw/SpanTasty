@@ -94,9 +94,11 @@ public class ReserveService {
             // 使用自定義的查詢方法，查詢每個時間段的預訂數量與總桌數
             Integer reservedTableCount = reserveRepository.countReservationsInTimeSlot(restaurantId, tableTypeId, checkDate, timeSlot.getSlotStar(), timeSlot.getSlotEnd());
             Integer totalTableCount = reserveRepository.countAvailableTables(restaurantId, tableTypeId);
-            
+            System.out.println("reservedTableCount1:"+reservedTableCount);
+            System.out.println("totalTableCount1:"+totalTableCount);
             // 設定開放訂位的桌數比例
             totalTableCount = (Integer) (totalTableCount * restaurant.getReservePercent() / 100);
+            System.out.println("totalTableCount2:"+totalTableCount);
             
             ReserveCheckDTO bean = new ReserveCheckDTO(timeSlot.getSlotStar(), timeSlot.getSlotEnd(), totalTableCount, reservedTableCount);
             reserveChecks.add(bean);

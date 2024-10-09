@@ -62,6 +62,10 @@
         </div>
     </div>
     <script>
+	    document.addEventListener("DOMContentLoaded", function () {
+            showSidebar('admin');
+        });
+    
         var currentPage = 0;
         var totalPages = 0;
         var selectedAdminId = null;

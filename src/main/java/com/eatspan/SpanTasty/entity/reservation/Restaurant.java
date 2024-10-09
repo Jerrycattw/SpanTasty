@@ -100,7 +100,7 @@ public class Restaurant {
 	public void onCreate() {
 		
 		if(this.restaurantStatus == null) {
-			this.restaurantStatus = 3; // 餐廳開放訂位的比例
+			this.restaurantStatus = 3; // 餐廳狀態
 		}
 		if(this.reservePercent == null) {
 			this.reservePercent = 100; // 餐廳開放訂位的比例

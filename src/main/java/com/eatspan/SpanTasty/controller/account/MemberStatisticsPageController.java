@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class MemberStatisticsPageController {
 	
-    @GetMapping("/MemberStatistics")
+    @GetMapping("/memberStatistics")
     public String showMemberStatisticsPage() {
         return "/account/memberStatisticsPage"; 
     }

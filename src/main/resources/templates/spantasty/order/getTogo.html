@@ -341,6 +341,7 @@
                     const memberId = togoData.memberId !== null ? togoData.memberId : '';
                     const rentId = togoData.rentId !== null ? togoData.rentId : '';
                     const togoMemo = togoData.togoMemo !== null ? togoData.togoMemo : '';
+                    const totalPrice = togoData.totalPrice !== null ? togoData.totalPrice : '';
 
                     if (row) {
                         row.innerHTML = `
@@ -348,7 +349,7 @@
                     <td>${togoData.memberId || ''}</td>
                     <td>${togoData.tgName}</td>
                     <td>${togoData.tgPhone}</td>
-                    <td>${togoData.totalPrice}</td>
+                    <td>${togoData.totalPrice || ''}</td>
                     <td>${togoData.formattedDate}</td>
                     <td>${togoData.rentId || ''}</td>
                     <td>${getTogoStatusBadge(togoData.togoStatus)}</td>

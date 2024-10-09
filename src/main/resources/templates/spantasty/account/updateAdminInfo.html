@@ -36,6 +36,10 @@
     </div>
 
     <script>
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            showSidebar('admin');
+        });
         // 儲存變更按鈕點擊事件
         document.getElementById('saveChangesBtn').addEventListener('click', function () {
             const newAdminName = document.getElementById('newAdminName').value;
