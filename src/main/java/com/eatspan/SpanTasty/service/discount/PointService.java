@@ -223,6 +223,14 @@ public class PointService {
 		}
 	}
 	
+	public void useBatchPoint(List<String> memberIDs, Point pointBean) throws Exception {
+		for (String memberID : memberIDs) {
+			Integer IntMemberID = Integer.parseInt(memberID);		
+			usePoint(pointBean.getPointChange(),IntMemberID);
+		}
+	}
+	
+	
 	//打印訊息(批次新增)
 	public String printMessage(List<String> memberIds) {
 		StringBuilder message = new StringBuilder();
