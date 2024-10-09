@@ -20,8 +20,17 @@ public class PointCenterDTO {
 	private List<PointMemberDTO> pointMembers;
 
 	public void calculateAndSetUsedPercentage() {
-		if(totalUsedPoint==null) {
+		if(totalPoint==null ) {
+			totalPoint=(long) 0;
+		}
+		
+		if(totalUsedPoint==null ) {
 			totalUsedPoint=(long) 0;
+		}
+		
+		
+		if(totalExpierdPoint==null ) {
+			totalExpierdPoint=(long) 0;
 		}
 		
 		if (totalUsedPoint > 0) {

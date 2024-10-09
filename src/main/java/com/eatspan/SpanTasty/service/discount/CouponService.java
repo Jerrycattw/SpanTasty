@@ -75,7 +75,7 @@ public class CouponService {
 	//convert couponDTO
 	public CouponDTO convertCouponDTO(Coupon coupon) {
 		List<TagDTO> tagDTOs = coupon.getTags().stream()
-				.map(tagBean -> new TagDTO(tagBean.getTagId().getTagName(), tagBean.getTagType()))
+				.map(tagBean -> new TagDTO(tagBean.getTagId().getTagName(), tagBean.getTagId().getTagType()))
 				.collect(Collectors.toList());
 
 		return new CouponDTO(
@@ -112,15 +112,18 @@ public class CouponService {
 	    if (tags != null) {
 	        for (String tag : tags) {
 	            Tag tagBean = new Tag();
-	            tagBean.setTagType(tagType);
+//	            tagBean.setTagType(tagType);
 	            
 	            if (coupon.getCouponId() != null) {
-	            	tagBean.setTagId(new TagId(coupon.getCouponId(),tag));//修改透過coupon的ID
+	            	tagBean.setTagId(new TagId(coupon.getCouponId(),tag,tagType));//修改透過coupon的ID
 	            }else {
-	            	tagBean.setTagId(new TagId(tag));//新增的COUPON沒有ID，透過關聯coupon identity新增
+	            	tagBean.setTagId(new TagId(tag,tagType));//新增的COUPON沒有ID，透過關聯coupon identity新增
+
 	            }
 	            
 	            tagBean.setCoupon(coupon);
+	            List<Tag> tagsList = new ArrayList<Tag>();
+//	            coupon.setTags(tagsList);
 	            coupon.getTags().add(tagBean);
 	        }
 	    }
@@ -161,6 +164,7 @@ public class CouponService {
 	public void insertCoupon(Coupon couponBean,String[] productTags, String[] togoTags) {
 		addTags(couponBean,productTags,"product");
 		addTags(couponBean,togoTags,"togo");
+		System.out.println(couponBean);
 		CouponRepo.save(couponBean);
 	}
 	
