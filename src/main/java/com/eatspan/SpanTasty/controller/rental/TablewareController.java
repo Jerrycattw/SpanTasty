@@ -62,7 +62,7 @@ public class TablewareController {
 				.filter(restaurant -> restaurant.getRestaurantStatus() == 1)
 				.collect(Collectors.toList());
 		model.addAttribute("restaurants", availableRestaurants);
-		return "rental/addTableware";
+		return "spantasty/rental/addTableware";
 	}
 	
 	
@@ -144,7 +144,7 @@ public class TablewareController {
 	public String toSetTableware(@PathVariable("id") Integer tablewareId, Model model) {
 		Tableware tableware = tablewareService.findTablewareById(tablewareId);
 		model.addAttribute("tableware", tableware);
-		return "rental/setTableware";
+		return "spantasty/rental/setTableware";
 	}
 
 	
@@ -194,7 +194,7 @@ public class TablewareController {
 	public String getAllTablewares(Model model, @RequestParam(value="p", defaultValue = "1") Integer page) {
 		Page<Tableware> tablewarePages = tablewareService.findAllTablewarePages(page);
 		model.addAttribute("tablewarePages",tablewarePages);
-		return "rental/getAllTablewares";
+		return "spantasty/rental/getAllTablewares";
 	}
 	
 	

@@ -68,7 +68,7 @@ public class RentController {
 		        .collect(Collectors.toList());
 		
 		model.addAttribute("tablewares" ,availableTablewares);
-		return "rental/addRent";
+		return "spantasty/rental/addRent";
 	}
 	
 	
@@ -149,7 +149,7 @@ public class RentController {
 			model.addAttribute("restaurants" ,restaurants);
 			List<Member> members = memberService.findAllMembers();
 			model.addAttribute("members" ,members);
-			return "rental/setRent";
+			return "spantasty/rental/setRent";
 			
 		} else if ("return".equals(action)) {
 			List<Restaurant> restaurants = restaurantService.findAllRestaurants();
@@ -157,12 +157,12 @@ public class RentController {
 			Date returnDate = new Date();
 			rent.setReturnDate(returnDate);
 			model.addAttribute("rent", rent);
-			return "rental/setRentReturn";
+			return "spantasty/rental/setRentReturn";
 			
 		}else if("get".equals(action)){
 			List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
 			model.addAttribute("rentItems",rentItems);
-			return "rental/getRentAndItems";
+			return "spantasty/rental/getRentAndItems";
 		}
 		return null;
 	}
@@ -232,7 +232,7 @@ public class RentController {
 		}).collect(Collectors.toList());
 		
 		model.addAttribute("rents" ,rentDetails);
-		return "rental/getAllRents";
+		return "spantasty/rental/getAllRents";
 	}
 	
 	
@@ -298,6 +298,6 @@ public class RentController {
 	public String getOvertimeRents(Model model) {
 		List<Rent> rents = rentService.findOvertimeRents();
 		model.addAttribute("rents", rents);
-		return "rental/getAllRents";
+		return "spantasty/rental/getAllRents";
 	}
 }

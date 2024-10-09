@@ -59,7 +59,7 @@ public class ReserveController {
         List<Restaurant> restaurants = restaurantService.findAllRestaurants();
         model.addAttribute("tableTypes", tableTypes);
         model.addAttribute("restaurants", restaurants);
-        return "reservation/getAllReserve";
+        return "spantasty/reservation/getAllReserve";
     }
 	
     // 導向到訂位中心頁面
@@ -67,7 +67,7 @@ public class ReserveController {
     public String showReserveCenter(Model model) {
     	List<Restaurant> restaurants = restaurantService.findAllRestaurants();
     	model.addAttribute("restaurants", restaurants);
-    	return "reservation/reserveCenter";
+    	return "spantasty/reservation/reserveCenter";
     }
     
     

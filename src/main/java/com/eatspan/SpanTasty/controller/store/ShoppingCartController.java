@@ -61,7 +61,7 @@ public class ShoppingCartController {
         model.addAttribute("totalAmount", totalAmount);
         model.addAttribute("cart", cart); 
 
-        return "store/shopping/shoppingCart"; 
+        return "spantasty/store/shopping/shoppingCart"; 
     }
 
 //    @PostMapping("/cart/add/{id}")

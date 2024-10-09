@@ -46,7 +46,7 @@ public class RestaurantTableController {
         model.addAttribute("tables", tables);
         model.addAttribute("restaurant", restaurant);
         model.addAttribute("tableTypes", tableTypes);
-        return "reservation/getAllTable";
+        return "spantasty/reservation/getAllTable";
     }
 	
 	
