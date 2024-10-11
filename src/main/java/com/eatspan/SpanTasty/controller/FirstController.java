@@ -26,4 +26,5 @@ public class FirstController {
 		return "starcups/index";
 	}
 	
+	
 }
