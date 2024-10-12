@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+  <head>
+    <title>Home</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <!-- Stylesheets-->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+    <style>.ie-panel{display: none;background: #212121;padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);clear: both;text-align:center;position: relative;z-index: 1;} html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {display: block;}</style>
+  </head>
+  <body>
+      <!-- navbar  th:replace=-->
+      <div th:replace="~{starcups/display/navbar}" ></div>
+      <!-- Swiper-->
+      <section class="section swiper-container swiper-slider swiper-slider-modern" data-loop="true" data-autoplay="5000" data-simulate-touch="true" data-nav="true" data-slide-effect="fade">
+        <div class="swiper-wrapper text-start">
+          <div class="swiper-slide" data-slide-bg="/SpanTasty/starcups/images/index/coffee.jpg">
+            <div class="swiper-slide-caption">
+              <div class="container">
+                <div class="row row-fix">
+                  <div class="col-11 col-sm-9 col-md-8 col-lg-7 col-xl-6 col-xxl-5">
+                    <div class="slider-modern-box">
+                      <h2 class="oh slider-modern-title"><span data-caption-animate="slideInDown" data-caption-delay="0">Highest quality</span><span data-caption-animate="slideInUp" data-caption-delay="0">flooring solutions</span></h2>
+                      <p data-caption-animate="fadeInRight" data-caption-delay="400">Parquetry has been providing top-notch flooring products and solutions since our establishment.</p>
+                      <div class="oh button-wrap"><a class="button button-default-outline-2 button-ujarak" href="shop.html" data-caption-animate="slideInLeft" data-caption-delay="400">Shop now</a></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="swiper-slide" data-slide-bg="/SpanTasty/starcups/images/index/desert.jpg">
+            <div class="swiper-slide-caption">
+              <div class="container">
+                <div class="row row-fix">
+                  <div class="col-10 col-sm-8 col-md-7 col-lg-6 col-xl-5 col-xxl-4">
+                    <div class="slider-modern-box">
+                      <h2 class="oh slider-modern-title"><span data-caption-animate="slideInLeft" data-caption-delay="0">Professionals</span><span data-caption-animate="slideInUp" data-caption-delay="0">You can rely on</span></h2>
+                      <p data-caption-animate="fadeInRight" data-caption-delay="400">Let our professional team design the floor of your dreams today.</p>
+                      <div class="oh button-wrap"><a class="button button-default-outline-2 button-ujarak" href="shop.html" data-caption-animate="slideInLeft" data-caption-delay="400">Shop now</a></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="swiper-slide" data-slide-bg="/SpanTasty/starcups/images/index/cups.jpg">
+            <div class="swiper-slide-caption">
+              <div class="container">
+                <div class="row row-fix">
+                  <div class="col-11 col-sm-8 col-md-7 col-lg-5 col-xxl-4">
+                    <div class="slider-modern-box">
+                      <h2 class="oh slider-modern-title"><span data-caption-animate="slideInDown" data-caption-delay="0">Unique and</span><span data-caption-animate="slideInLeft" data-caption-delay="0">affordable</span></h2>
+                      <p data-caption-animate="fadeInRight" data-caption-delay="400">We offer our clients a unique variety of affordable flooring products.</p>
+                      <div class="oh button-wrap"><a class="button button-default-outline-2 button-ujarak" href="shop.html" data-caption-animate="slideInUp" data-caption-delay="400">Shop now</a></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Swiper Navigation-->
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        <!-- Swiper Pagination-->
+        <div class="swiper-pagination swiper-pagination-style-2"></div>
+      </section>
+
+      <!-- In the spotlight-->
+      <section class="section section-xl bg-default novi-bg novi-bg-img">
+        <div class="container">
+          <div class="oh">
+            <div class="title-decoration-lines wow slideInUp" data-wow-delay="0s">
+              <h6 class="title-decoration-lines-content">What We Offer</h6>
+            </div>
+          </div>
+          <div class="row row-30 justify-content-center">
+            <div class="col-md-12 col-lg-8">
+              <div class="oh">
+                <!-- box Spotlight-->
+                <article class="box-sportlight wow slideInDown" data-wow-delay="0s"><a class="box-sportlight-figure" href="#"><img src="images/spotlight-1-770x332.jpg" alt="" width="770" height="332"/></a>
+                  <div class="box-sportlight-caption">
+                    <h5 class="box-sportlight-title"><a href="#">菜單</a></h5>
+                    <div class="box-sportlight-arrow"></div>
+                  </div>
+                  <div class="box-sportlight-badge box-sportlight-new">New</div>
+                </article>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+              <div class="oh-desktop">
+                <!-- box Spotlight-->
+                <article class="box-sportlight box-sportlight-sm wow slideInRight" data-wow-delay=".1s"><a class="box-sportlight-figure" href="#"><img src="images/spotlight-2-370x332.jpg" alt="" width="370" height="332"/></a>
+                  <div class="box-sportlight-caption">
+                    <h5 class="box-sportlight-title"><a href="#">分店資訊</a></h5>
+                    <div class="box-sportlight-arrow"></div>
+                  </div>
+                  <!-- <div class="box-sportlight-badge box-sportlight-sale">-30%</div> -->
+                </article>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+              <div class="oh-desktop">
+                <!-- box Spotlight-->
+                <article class="box-sportlight box-sportlight-sm wow slideInLeft" data-wow-delay="0s"><a class="box-sportlight-figure" href="#"><img src="images/spotlight-3-370x332.jpg" alt="" width="370" height="332"/></a>
+                  <div class="box-sportlight-caption">
+                    <h5 class="box-sportlight-title"><a href="#">想到再加</a></h5>
+                    <div class="box-sportlight-arrow"></div>
+                  </div>
+                </article>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+              <div class="oh">
+                <!-- box Spotlight-->
+                <article class="box-sportlight wow slideInUp" data-wow-delay=".1s"><a class="box-sportlight-figure" href="#"><img src="images/spotlight-4-370x332.jpg" alt="" width="370" height="332"/></a>
+                  <div class="box-sportlight-caption">
+                    <h5 class="box-sportlight-title"><a href="#">或刪掉</a></h5>
+                    <div class="box-sportlight-arrow"></div>
+                  </div>
+                </article>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+              <div class="oh-desktop">
+                <!-- box Spotlight-->
+                <article class="box-sportlight box-sportlight-sm wow slideInRight" data-wow-delay=".1s"><a class="box-sportlight-figure" href="#"><img src="images/spotlight-5-370x332.jpg" alt="" width="370" height="332"/></a>
+                  <div class="box-sportlight-caption">
+                    <h5 class="box-sportlight-title"><a href="#">想到再加</a></h5>
+                    <div class="box-sportlight-arrow"></div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+ 
+    </div>
+    <!-- Global Mailform Output-->
+    <div class="snackbars" id="form-output-global"></div>
+    <!-- footer  th:replace=-->
+    <div th:replace="~{starcups/display/footer}" ></div>
+    
+     <!-- Javascript-->
+    <script src="/SpanTasty/starcups/js/core.min.js"></script>
+    <script src="/SpanTasty/starcups/js/script.js"></script>
+  </body>
+</html>
