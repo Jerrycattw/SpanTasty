@@ -52,13 +52,19 @@ public class TablewareStockService {
 	}
 	
 	
-	//查詢庫存
+	// 查詢庫存
 	public TablewareStock findStockById(Integer tablewareId, Integer restaurantId) {
 		TablewareStock tablewareStock = tablewareStockRepository.findById(tablewareId, restaurantId);
 		if(tablewareStock != null) {
 			return tablewareStock;
 		}
 		return null;
+	}
+	
+	
+	// 查詢餐具(By餐具編號)
+	public List<TablewareStock> findStockByTablewareId(Integer tablewareId) {
+		return tablewareStockRepository.findByTablewareId(tablewareId);
 	}
 	
 	

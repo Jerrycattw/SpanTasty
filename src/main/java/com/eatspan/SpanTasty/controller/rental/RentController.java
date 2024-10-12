@@ -27,15 +27,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eatspan.SpanTasty.dto.rental.RentDetailDTO;
 import com.eatspan.SpanTasty.dto.rental.RentKeywordDTO;
+import com.eatspan.SpanTasty.dto.rental.StockKeywordDTO;
+import com.eatspan.SpanTasty.dto.rental.TablewareFilterDTO;
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.rental.Rent;
 import com.eatspan.SpanTasty.entity.rental.RentItem;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.entity.rental.Tableware;
+import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.service.rental.RentItemService;
 import com.eatspan.SpanTasty.service.rental.RentService;
 import com.eatspan.SpanTasty.service.rental.TablewareService;
+import com.eatspan.SpanTasty.service.rental.TablewareStockService;
 import com.eatspan.SpanTasty.service.reservation.RestaurantService;
 
 @Controller
@@ -52,27 +56,64 @@ public class RentController {
 	private RestaurantService restaurantService;
 	@Autowired
 	private MemberService memberService;
+	@Autowired
+	private TablewareStockService tablewareStockService;
 	
 	
-	//查詢下拉式選單
+	// 查詢下拉式選單
 	@GetMapping("/add")
 	public String toAddAndSearch(Model model) {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		List<Member> members = memberService.findAllMembers();
 		model.addAttribute("restaurants" ,restaurants);
 		model.addAttribute("members" ,members);
-		List<Tableware> tablewares = tablewareService.findAllTablewares();
 		// 過濾掉 tablewareStatus == 2 的餐具
-		List<Tableware> availableTablewares = tablewares.stream()
+		List<Tableware> tablewares = tablewareService.findAllTablewares()
+		        .stream()
 		        .filter(tableware -> tableware.getTablewareStatus() != 2)
 		        .collect(Collectors.toList());
 		
-		model.addAttribute("tablewares" ,availableTablewares);
+		model.addAttribute("tablewares" ,tablewares);
 		return "spantasty/rental/addRent";
 	}
 	
 	
-	//新增訂單 訂單明細
+	//
+	@PostMapping("/filter")
+	@ResponseBody
+	public List<Tableware> getTablewaresByFilter(@RequestBody TablewareFilterDTO tablewareFilterDTO) {
+	    List<Tableware> availableTablewares = tablewareService.findAllTablewares()
+	        .stream()
+	        // 這裡不再需要過濾 tablewareStatus，因為在第一次已經過濾過了
+	        .filter(tableware -> {
+	            TablewareStock stock = tablewareStockService.findStockById(tableware.getTablewareId(), tablewareFilterDTO.getRestaurantId());
+	            return stock != null && stock.getStock() > 0;  // 只過濾庫存
+	        })
+	        .collect(Collectors.toList());
+	    
+	    return availableTablewares; // 返回 JSON 給前端 AJAX
+	}
+	
+	
+	// 檢查庫存
+	@PostMapping("/check")
+	@ResponseBody
+	public ResponseEntity<Integer> getRentStock(@RequestBody StockKeywordDTO stockKeywordDTO) {
+		Integer tablewareId = stockKeywordDTO.getTablewareId();
+		Integer restaurantId = stockKeywordDTO.getRestaurantId();
+		System.out.println(stockKeywordDTO);
+	    TablewareStock tablewareStock = tablewareStockService.findStockById(tablewareId, restaurantId);
+	    if (tablewareStock != null) {
+	        Integer stock = tablewareStock.getStock();
+	        System.out.println(stock);
+	        return ResponseEntity.ok(stock);
+	    } else {
+	        return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 如果未找到，返回 404
+	    }
+	}
+	
+	
+	// 新增訂單 訂單明細
 	@PostMapping("/addPost")
 	public String addRentAndRentItems(
 			@ModelAttribute Rent rent,
@@ -120,8 +161,14 @@ public class RentController {
 	        rentItem.setReturnStatus(1);
 	        rentItems.add(rentItem);
 	    }
+		
 		for (RentItem rentItem : rentItems) {
 	        rentItemService.addRentItem(rentItem);
+	        TablewareStock tablewareStock = tablewareStockService.findStockById(rentItem.getTablewareId(), rent.getRestaurantId());
+	        Integer stock = tablewareStock.getStock();
+	        stock -= rentItem.getRentItemQuantity();
+	        tablewareStock.setStock(stock);
+	        tablewareStockService.addStock(tablewareStock);
 	    }
 		return "redirect:/rent/getAll";
 	}
@@ -152,11 +199,13 @@ public class RentController {
 			return "spantasty/rental/setRent";
 			
 		} else if ("return".equals(action)) {
+			List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
 			List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 			model.addAttribute("restaurants" ,restaurants);
 			Date returnDate = new Date();
 			rent.setReturnDate(returnDate);
 			model.addAttribute("rent", rent);
+			model.addAttribute("rentItems", rentItems);
 			return "spantasty/rental/setRentReturn";
 			
 		}else if("get".equals(action)){

@@ -56,6 +56,53 @@ form {
 		</select>
 	</td></tr>
 </table>
+<div class="table-responsive">
+        <table class="table table-striped" id="table">
+            <tr>
+                <th>用具編號</th>
+                <th>品項數量</th>
+                <th>歸還備註</th>
+            </tr>
+        <th:block th:each=" rentItem : ${rentItems}">
+            <tr>
+                <td th:text="${rentItem.tablewareId}"></td>
+                <td th:text="${rentItem.rentItemQuantity}"></td>
+                <td>
+	                <select name="returnMemo" class="returnMemo" required>
+                    	<option th:text="${rentItem.returnMemo}" selected></option>
+                    </select>
+                    <script th:inline="javascript">
+                        var rentItemQuantity = [[${rentItem.rentItemQuantity}]];
+                        var returnMemo = '[[${rentItem.returnMemo}]]';
+                        var select = document.currentScript.previousElementSibling;
+                        // 清除之前的選項（除了第一個提示選項）
+                        while (select.options.length > 1) {
+                            select.remove(1);
+                        }
+                        // 生成每個選項
+                        for (var y = rentItemQuantity; y >= 0; y--) {
+                             for (var z = 0; z <= y; z++) {
+                                 var option = document.createElement('option');
+                                 var optionText = '租借' + rentItemQuantity + '歸還' + y + '破損' + z;
+                                 option.value = optionText;
+                                 option.text = optionText;
+                                 if (optionText === returnMemo) {
+                                     option.selected = true;  // 預設選中與returnMemo匹配的選項
+                                 }
+                                 select.appendChild(option);
+                             }
+                         }
+
+                         // 如果 returnMemo 存在但不匹配任何生成的選項，自動取消提示選項
+                         if (returnMemo) {
+                             select.options[0].disabled = true;
+                         }
+                    </script>
+                </td>
+            </tr>
+        </th:block>
+        </table>
+	 </div>
 <span id="disabledMsg" style="color:red; display: none">訂單已完全歸還，無法再更改。</span>
 <input type="submit" id="submitBtn" value="確定歸還"/>
 <input type="hidden" name="rentDeposit" th:value="${rent.rentDeposit}"/>
