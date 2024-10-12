@@ -2,6 +2,7 @@ package com.eatspan.SpanTasty.controller.account;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,28 +80,37 @@ public class MemberController {
 		return Result.success("登入成功", token);
 	}
 
-	// 查詢個人資訊
 	@GetMapping("/profile")
-	public Result<Optional<Member>> getMemberProfile(@RequestHeader("Authorization") String token) {
+	public Result<Member> getMemberProfile(@RequestHeader("Authorization") String token) {
 
-		// 解析 JWT token 取得 claims
-		Map<String, Object> claims = JwtUtil.parseToken(token);
+	    // 解析 JWT token 取得 claims
+	    Map<String, Object> claims = JwtUtil.parseToken(token);
 
-		// 取得會員 ID
-		Integer memberId = (Integer) claims.get("memberId");
+	    // 取得會員 ID
+	    Integer memberId = (Integer) claims.get("memberId");
 
-		if (memberId == null) {
-			return Result.failure("無法從 Token 中取得會員 ID");
-		}
+	    if (memberId == null) {
+	        return Result.failure("無法從 Token 中取得會員 ID");
+	    }
 
-		// 根據會員 ID 查詢個人資訊
-		Optional<Member> member = memberService.findMemberById(memberId);
+	    // 根據會員 ID 查詢個人資訊
+	    Optional<Member> memberOpt = memberService.findMemberById(memberId);
 
-		if (member != null) {
-			return Result.success("個人資訊查詢成功", member);
-		} else {
-			return Result.failure("無法找到該會員的個人資訊");
-		}
+	    if (memberOpt.isPresent()) {
+	        Member member = memberOpt.get();
+	        
+	        // 格式化日期為 "yyyy-MM-dd a hh:mm"
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm");
+	        
+	        // 如果 loginDate 不為 null，進行格式化處理
+	        if (member.getLoginDate() != null) {
+	            member.setFormattedLoginDate(member.getLoginDate().format(formatter)); // 格式化登入日期
+	        }
+
+	        return Result.success("個人資訊查詢成功", member);
+	    } else {
+	        return Result.failure("無法找到該會員的個人資訊");
+	    }
 	}
 	
 	//更新密碼
@@ -174,6 +184,20 @@ public class MemberController {
         
         return Result.success("頭像取得成功", base64Avatar);
 		
+	}
+	//刪除頭像
+	@PostMapping("/removeAvatar")
+	public Result<String> removeAvatar(@RequestHeader("Authorization") String token) {
+		Map<String, Object> claims = JwtUtil.parseToken(token);
+		Integer memberId = (Integer) claims.get("memberId");
+		
+		boolean isDeleted = memberService.removeMemberAvatar(memberId);
+		
+        if (isDeleted) {
+            return Result.success("頭像已成功刪除");
+        } else {
+            return Result.failure("刪除頭像失敗");
+        }
 	}
 
 }

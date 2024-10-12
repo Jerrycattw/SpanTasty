@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -74,6 +75,17 @@ public class Member {
 
     @Column(name = "suspended_until")
     private LocalDateTime suspendedUntil;
+    
+    @Transient
+    private String formattedLoginDate;
+    
+    public String getFormattedLoginDate() {
+        return formattedLoginDate;
+    }
+    
+    public void setFormattedLoginDate(String formattedLoginDate) {
+        this.formattedLoginDate = formattedLoginDate;
+    }
 
     // 新增第三方登入欄位
     @Column(name = "provider", length = 50)
