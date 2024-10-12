@@ -8,7 +8,7 @@ public class StarCupsPageController {
 	
 	@GetMapping("/StarCups/test")
 	public String test() {
-		return "starcups/account/NewFile"; 
+		return "starcups/account/login"; 
 	}
 
 }
