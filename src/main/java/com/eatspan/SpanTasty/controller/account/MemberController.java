@@ -142,7 +142,7 @@ public class MemberController {
 			@RequestHeader("Authorization") String token) {
         try {
             // 解析 JWT Token 並取得會員 ID
-            Map<String, Object> claims = JwtUtil.parseToken(token.replace("Bearer ", ""));
+            Map<String, Object> claims = JwtUtil.parseToken(token);
             Integer memberId = (Integer) claims.get("memberId");
 
             // 取得圖片的 byte[] 數據
