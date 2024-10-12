@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>帳戶管理</title>
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+</head>
+
+<body>
+  <div class="page">
+    <div class="section page-header" th:replace="~{starcups/display/navbar}"></div>
+    <section class="section breadcrumbs-custom-inset">
+      <div class="breadcrumbs-custom context-dark">
+        <div class="container">
+          <h2 class="breadcrumbs-custom-title">帳戶管理</h2>
+          <ul class="breadcrumbs-custom-path">
+            <li><a href="/SpanTasty/StarCups">Home</a></li>
+            <li class="active">帳戶管理</li>
+          </ul>
+        </div>
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+      </div>
+    </section>    
+    <section class="section novi-bg novi-bg-img section-xl bg-default text-start">
+      <div class="container">
+        <div class="col-md-10 col-lg-12">
+          <div class="card-login-register" id="card-l-r">
+            <div class="card-top-panel">
+              <div class="card-top-panel-left">
+                <h4 class="card-title card-title-login">Login</h4>
+                <h4 class="card-title card-title-register">Register</h4>
+              </div>
+              <div class="card-top-panel-right">
+                <span class="card-subtitle">
+                  <span class="card-subtitle-login">Register now</span>
+                  <span class="card-subtitle-register">Sign in</span>
+                </span>
+                <button class="card-toggle" data-custom-toggle="#card-l-r">
+                  <span class="card-toggle-circle"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Login Form -->
+            <div class="card-form card-form-login">
+              <div class="button-social">
+                <a class="button button-icon button-icon-left button-facebook button-pipaluk" href="#">
+                  <span class="icon fa fa-facebook"></span>Facebook
+                </a>
+                <a class="button button-icon button-icon-left button-twitter button-pipaluk" href="#">
+                  <span class="icon fa fa-twitter"></span>Twitter
+                </a>
+                <a class="button button-icon button-icon-left button-google button-pipaluk" href="#">
+                  <span class="icon fa fa-google-plus"></span>Google+
+                </a>
+              </div>
+              <div class="text-decoration-lines text-center">
+                <span class="text-decoration-lines-content">or</span>
+              </div>
+              <form id="loginForm">
+                <div class="form-wrap">
+                  <label class="form-label" for="form-login-name-1">Login</label>
+                  <input class="form-input" id="form-login-name-1" type="text" name="account"
+                    data-constraints="@Required">
+                </div>
+                <div class="form-wrap">
+                  <label class="form-label" for="form-login-password-1">Password</label>
+                  <input class="form-input" id="form-login-password-1" type="password" name="password"
+                    data-constraints="@Required">
+                </div>
+                <label class="checkbox-inline">
+                  <input name="input-checkbox-1" value="checkbox-1" type="checkbox">Remember Me
+                </label>
+                <button class="button button-block button-secondary button-pipaluk" type="button"
+                  onclick="loginMember()">Sign in</button>
+              </form>
+            </div>
+
+            <!-- Register Form -->
+            <div class="card-form card-form-register">
+              <div class="button-social">
+                <a class="button button-icon button-icon-left button-facebook button-pipaluk" href="#"> <span
+                    class="icon fa fa-facebook"></span>Facebook
+                </a> <a class="button button-icon button-icon-left button-twitter button-pipaluk" href="#"> <span
+                    class="icon fa fa-twitter"></span>Twitter
+                </a> <a class="button button-icon button-icon-left button-google button-pipaluk" href="#"> <span
+                    class="icon fa fa-google-plus"></span>Google+
+                </a>
+              </div>
+              <div class="text-decoration-lines text-center">
+                <span class="text-decoration-lines-content">or</span>
+              </div>
+              <form id="registerForm">
+                <div class="form-wrap">
+                  <label class="form-label" for="form-register-memberName">會員名稱</label>
+                  <input class="form-input" id="form-register-memberName" type="text" name="memberName"
+                    data-constraints="@Required">
+                </div>
+                <div class="form-wrap">
+                  <label class="form-label" for="form-register-account">帳號</label>
+                  <input class="form-input" id="form-register-account" type="text" name="account"
+                    data-constraints="@Required">
+                </div>
+                <div class="form-wrap">
+                  <label class="form-label" for="form-register-password">密碼</label>
+                  <input class="form-input" id="form-register-password" type="password" name="password"
+                    data-constraints="@Required">
+                </div>
+                <div class="form-wrap">
+                  <label class="form-label" for="form-register-confirmPassword">確認密碼</label>
+                  <input class="form-input" id="form-register-confirmPassword" type="password" name="confirmPassword"
+                    data-constraints="@Required">
+                </div>
+                <div class="form-wrap">
+                  <label class="form-label" for="form-register-email">電子郵件</label>
+                  <input class="form-input" id="form-register-email" type="email" name="email"
+                    data-constraints="@Email @Required">
+                </div>
+                <div class="form-wrap">
+                  <label class="form-label" for="form-register-birthday">生日</label>
+                  <input class="form-input" id="form-register-birthday" type="date" name="birthday"
+                    data-constraints="@Required">
+                </div>
+                <div class="form-wrap">
+                  <label class="form-label" for="form-register-address">地址</label>
+                  <input class="form-input" id="form-register-address" type="text" name="address"
+                    data-constraints="@Required">
+                </div>
+                <div class="form-wrap">
+                  <label class="form-label" for="form-register-phone">電話</label>
+                  <input class="form-input" id="form-register-phone" type="tel" name="phone"
+                    data-constraints="@Required">
+                </div>
+                <button class="button button-block button-secondary button-pipaluk" type="button"
+                  onclick="registerMember()">Register</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div th:replace="~{starcups/display/footer}"></div>
+  </div>
+  <!-- Add more content here -->
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+  <script th:src="@{/js/axios.min.js}"></script>
+  <script>
+    function loginMember() {
+      // 取得帳號與密碼
+      const account = document.getElementById('form-login-name-1').value;
+      const password = document.getElementById('form-login-password-1').value;
+
+      // 發送登入請求
+      axios.post('/SpanTasty/member/login', null, {
+        params: {
+          account: account,
+          password: password
+        }
+      })
+        .then(function (response) {
+          if (response.data.success) {
+            alert('登入成功');
+            localStorage.setItem('token', response.data.data); // 儲存 JWT Token
+            window.location.href = '/SpanTasty/StarCups'; // 登入成功後跳轉
+          } else {
+            alert(response.data.message);
+          }
+        })
+        .catch(function (error) {
+          console.error('Error:', error);
+          alert('登入過程中發生錯誤，請稍後再試');
+        });
+    }
+
+    function registerMember() {
+      // 取得註冊表單資料
+      const memberData = {
+        memberName: document.getElementById('form-register-memberName').value,
+        account: document.getElementById('form-register-account').value,
+        password: document.getElementById('form-register-password').value,
+        email: document.getElementById('form-register-email').value,
+        birthday: document.getElementById('form-register-birthday').value,
+        address: document.getElementById('form-register-address').value,
+        phone: document.getElementById('form-register-phone').value
+      };
+
+      const confirmPassword = document.getElementById('form-register-confirmPassword').value;
+
+      // 發送註冊請求
+      axios.post('/SpanTasty/member/register', memberData, {
+        params: {
+          confirmPassword: confirmPassword
+        }
+      })
+        .then(function (response) {
+          if (response.data.success) {
+            alert('註冊成功');
+            window.location.href = '/SpanTasty/StarCups/test'; // 註冊成功後跳轉
+          } else {
+            alert(response.data.message);
+          }
+        })
+        .catch(function (error) {
+          console.error('Error:', error);
+          alert('註冊過程中發生錯誤，請稍後再試');
+        });
+    }
+  </script>
+</body>
+
+</html>
