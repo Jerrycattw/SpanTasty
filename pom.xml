@@ -81,6 +81,22 @@
     		<artifactId>java-jwt</artifactId>
    			<version>4.4.0</version>
 		</dependency>
+		
+		<!-- 10.12 hao新增 javamail mail-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		
+		<!-- 10.12 hao新增 javamail 模板-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
+	
+
+		
+		
 
 	</dependencies>
 

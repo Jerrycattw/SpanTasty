@@ -161,7 +161,24 @@
                       </table>                                     
                     </div>
                     <div class="card-footer text-body-secondary">
-                      page not yet
+                      <!-- page -->
+                      <nav aria-label="Page navigation example">
+                        <ul class="pagination  justify-content-center" id="paginationPM">
+                          <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Previous">
+                              <span aria-hidden="true">&laquo;</span>
+                            </a>
+                          </li>
+                          <li class="page-item"><button class="page-link" href="#">1</a></li>
+                          <li class="page-item"><a class="page-link" href="#">2</a></li>
+                          <li class="page-item"><a class="page-link" href="#">3</a></li>
+                          <li class="page-item">
+                            <a class="page-link" href="#" aria-label="Next">
+                              <span aria-hidden="true">&raquo;</span>
+                            </a>
+                          </li>
+                        </ul>
+                      </nav>
                     </div>
                   </div>
             </div>
@@ -332,11 +349,14 @@
 	<script th:src="@{/js/axios.min.js}"></script>
   <script>
     //頁面初次加載
+    let pageData;
     document.addEventListener('DOMContentLoaded',(e)=>{
       axios.get('/SpanTasty/point/pointCenter/show?p=1')
       .then(res=>{
         console.log(res.data)
         htmlMaker(res.data)
+        pageData=res.data.pointMembers
+
       })
       .catch(err=>{
         console.log("err :" + err);
@@ -367,7 +387,9 @@
                             `                           
       });
       //row3
-      pointMemberHtmlMaker(data.pointMembers)
+      pointMemberHtmlMaker(data.pointMembers)//會員點數
+      paginationHtmlMaker(data.pointMembers)//分頁
+      
     }
 
 
@@ -389,7 +411,7 @@
                           `*/
       pointMemberTable.innerHTML +=`
                           <tr>
-                            <th scope="row"><input name="selectedMembers" class="form-check-input" type="checkbox" value="${e.memberId}" id="flexCheckDefault"></th>
+                            <th scope="row"><input name="selectedMembers" class="form-check-input" type="checkbox" value="${e.memberId}"  data-memberName="${e.memberName}" id="flexCheckDefault"></th>
                             <td>${e.memberId}</td>
                             <td>${e.memberName}</td>
                             <td>${e.phone}</td>
@@ -408,8 +430,79 @@
             window.location.href = `/SpanTasty/point/member/${memberId}`;
         }
     });
-
     }
+
+
+    function paginationHtmlMaker(data){
+      const pagination = document.getElementById('paginationPM')
+      pagination.innerHTML=`<nav aria-label="Page navigation example">   
+                              <ul class="pagination  justify-content-center">
+                                <li class="page-item ${data.first ? 'disabled' : ''}" >
+                                  <button class="page-link pagePrevious"   href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                  </button>
+                                </li>
+                                ${paginationLi(data)}
+                                <li class="page-item ${data.last ? 'disabled' : ''}" >
+                                  <button class="page-link pageNext"  href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                  </button>
+                                </li>
+                              </ul>
+                            </nav>`
+      pagination.removeEventListener('click',paginationClickHandler)                       
+      pagination.addEventListener('click',paginationClickHandler)
+    } 
+
+    function paginationLi(data){
+    const pages = data.totalPages
+    let paginationLi='';
+    for (let index = 1; index <= pages; index++) {
+      paginationLi += `<li class="page-item ${index === data.number + 1 ? 'active' : ''}"><button class="page-link pageBtn" data-page=${index}>${index}</button></li>`    
+    }
+    
+    return paginationLi
+    }
+
+  function paginationClickHandler(e){
+    const pageItem = e.target.closest('button')
+      if (!pageItem) return;
+      
+      let newPage;
+      
+      if(pageItem.classList.contains('pageBtn')){
+        url=`/SpanTasty/point/pointCenter/show?p=${pageItem.dataset.page}`
+        newPage=pageItem.dataset.page
+      }
+      if(pageItem.classList.contains('pagePrevious') && !pageData.first){
+          console.log("previous");
+          newPage=pageData.number//1 2 3 4  0 1 2 3  //  2 3 4 5   1 2 3 4  
+
+      }
+      if(pageItem.classList.contains('pageNext') && !pageData.last){
+          console.log("next");
+          newPage=pageData.number+2 //0 1 2 3  1 2 3 4   //1 2 3 4  2 3 4 5        
+
+      }
+
+      axios.get(`/SpanTasty/point/pointCenter/show?p=${newPage}`)
+      .then(res=>{
+        console.log(res.data)
+        pointMemberHtmlMaker(res.data.pointMembers)
+        paginationHtmlMaker(res.data.pointMembers);
+        pageData=res.data.pointMembers
+        })
+        .catch(err=>{
+          console.log("err :" + err);
+        })  
+  }
+  
+
+
+
+  
+
+  
 
   //查詢
   document.getElementById('button-addon1').addEventListener('click',()=>{
@@ -418,6 +511,8 @@
     .then(res=>{
       console.log(res.data)
       pointMemberHtmlMaker(res.data)
+      paginationHtmlMaker(res.data)
+      pageData=res.data.pointMembers
     })
     .catch(err=>{
       console.log(err);
@@ -433,7 +528,7 @@
     const appendAlert = (message, type, memberId) => {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = [
-            `<div class="alert alert-${type} alert-dismissible" role="alert" data-member-id="${memberId}" name="alerts" >`,
+            `<div class="alert alert-${type} alert-dismissible me-1" role="alert" data-member-id="${memberId}" name="alerts" >`,
             `   <div>${message}</div>`,
             '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
             '</div>'
@@ -453,7 +548,7 @@
     document.getElementById('pointMembers').addEventListener('change', function(event) {
         if (event.target.name === 'selectedMembers') {
             if (event.target.checked) {
-                appendAlert(`已選擇會員 ${event.target.value}`, 'success', event.target.value);
+                appendAlert(`${event.target.dataset.membername}`, 'success', event.target.value);
             } else {
                 removeAlert(event.target.value);
             }
