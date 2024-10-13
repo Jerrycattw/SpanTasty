@@ -2,230 +2,280 @@
 <html xmlns:th="http://www.thymeleaf.org/">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>新增訂單</title>
-<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
 <style>
 .h {
-	text-align: center;
+    text-align: center;
 }
+
 form {
-	width: 60%;
-	margin: 0 auto;
-	padding: 20px;
-	border-radius: 10px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	background-color: #c8e6c9;
+    width: 60%;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #c8e6c9;
 }
-.rent-input{
-	width: 86%;
-	padding: 5px;
-	margin-bottom: 0px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	box-sizing: border-box;
+
+.rent-input {
+    width: 86%;
+    padding: 5px;
+    margin-bottom: 0px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
 }
 
 .item-entry {
-	display: flex;
-	align-items: center;
-	margin-bottom: 0px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0px;
 }
+
 .item-input {
-    width: 200px; /* 根據需要調整寬度 */
+    width: 200px;
     margin-left: 0px;
     padding: 0px;
     height: 30px;
     width: 100%;
 }
-.item-column{
-	width: 220px;
-	margin-left: 10px;
-	padding: 0px;
+
+.item-column {
+    width: 220px;
+    margin-left: 10px;
+    padding: 0px;
 }
-.delete-button{
-	background-color: #fff;
+
+.delete-button {
+    background-color: #fff;
     border: 2px solid #000;
     padding: 0px 10px;
     cursor: pointer;
     margin-left: 10px;
     display: flex;
     align-items: center;
-    justify-content: center; /* 讓文字在按鈕內居中 */
+    justify-content: center;
     height: 30px;
 }
+
 .table {
-    background-color: #f1f8e9; /* 表格背景：淡綠 */
+    background-color: #f1f8e9;
 }
+
 .table thead {
-    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    background-color: #a5d6a7;
     color: #1b5e20;
 }
+
 .body {
-    background-color: #e9f7ef; /* 背景色：淡綠 */
+    background-color: #e9f7ef;
 }
 </style>
 </head>
 <body class="body">
-    <div th:replace="~{spantasty/display/navbar}"></div>
-    
-    <div class="content" id="container">
-        <h3 class="h">輸入租借訂單資料</h3>
-        <form th:action="@{/rent/addPost}" method="post">
-        <table class="table w-100 table-striped" id="table">
-            <tr><td>租借押金: <input type="text" class="rent-input" id="totalAmount" name="rentDeposit" readonly/></td></tr>
-            <tr><td>租借餐廳:
-	            <select name="restaurantId" class="rent-input" required>
-		            <option value="" selected disabled>請選擇租借餐廳</option>
-		            <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
-	            </select>
-		    </td></tr>
-            <tr><td>租借會員:
-                <select name="memberId" class="rent-input" required>
-	                <option value="" selected disabled>請選擇會員編號</option>
-					<option th:each="member : ${members}" th:value="${member.memberId}" th:text="${member.account}"></option>
-                </select>
-            </td></tr>
-        </table>
-        
-        <div id="rentItemsContainer">
-            <h4 class="h">輸入租借訂單項目</h4>
-            <div class="item-entry">
-                <table class="table table-striped">
-                    <tr>
-                        <td class="item-column">
-                            餐具編號:
-                            <select name="tablewareId[0]" class="item-input"  onchange="handleSelectChange(this)" required>
-                                <option value="" selected disabled>請選擇餐具編號</option>
-								<option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:data-deposit="${tableware.tablewareDeposit}" th:text="${tableware.tablewareName}"></option>
-                            </select>
-                        </td>
-                        <td class="item-column">
-                            租借數量:<input type="number" class="item-input" name="rentItemQuantity"  min="1" oninput="updateDepositByQuantity(this)" />
-                        </td>
-                        <td class="item-column">
-                            租借押金:<input type="number" class="item-input" name="rentItemDeposit" readonly/>
-                        </td>
-                        <td class="item-column">
-                            <br/><button class="delete-button" type="button" onclick="removeRentItem(this)">刪除</button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <button type="button" id="add-item-button">新增訂單明細</button>
-        <button type="submit">新增訂單</button>
-        </form>
-    </div>
-    <script>
-		document.addEventListener("DOMContentLoaded", function() {
-			showSidebar('rental');
-		});
-	</script>
-	<script type="text/template" id="tableware-options-template">
-        <option value="" selected disabled>請選擇餐具編號</option>
-        <option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:data-deposit="${tableware.tablewareDeposit}" th:text="${tableware.tablewareName}"></option>
-    </script>
-    <script>
-    let rentItemIndex = 0;
-    
-    document.getElementById('add-item-button').addEventListener('click', function() {
-        rentItemIndex++;
-        const optionsTemplate = document.getElementById('tableware-options-template').innerHTML;
-        const itemEntryHTML = `
-            <div class="item-entry">
-                <table class="table table-striped">
-                    <tr>
-                        <td class="item-column">
-                            餐具編號:
-                            <select name="tablewareId[${rentItemIndex}]" class="item-input" onchange="handleSelectChange(this)" required>
-                                ${optionsTemplate}
-                            </select>
-                        </td>
-                        <td class="item-column">
-                            租借數量:<input type="number" class="item-input" name="rentItemQuantity[${rentItemIndex}]"  min="1" oninput="updateDepositByQuantity(this)"/>
-                        </td>
-                        <td class="item-column">
-                            租借押金:<input type="number" class="item-input" name="rentItemDeposit[${rentItemIndex}]" readonly/>
-                        </td>
-                        <td class="item-column">
-                            <br/><button class="delete-button" type="button" onclick="removeRentItem(this)">刪除</button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        `;
-        
-        document.getElementById('rentItemsContainer').insertAdjacentHTML('beforeend', itemEntryHTML);
-        disableSelectedOptions();
-    });
-    
-    // 禁用已選過的餐具編號
-	function disableSelectedOptions() {
-	    const allSelectElements = document.querySelectorAll('.item-input[name^="tablewareId"]');
-	    const selectedValues = Array.from(allSelectElements)
-	        .map(select => select.value)
-	        .filter(value => value !== "");
-	
-	    allSelectElements.forEach(select => {
-	        Array.from(select.options).forEach(option => {
-	            if (selectedValues.includes(option.value)) {
-	                option.hidden = true; // 禁用已選過的選項
-	            } else {
-	                option.hidden = false; // 解除禁用狀態
-	            }
-	        });
-	    });
-	}
-	
-	// 更新押金值和數量自動跳為1
-	function handleSelectChange(selectElement) {
-	    const quantityInput = selectElement.closest('.item-entry').querySelector('input[name^="rentItemQuantity"]');
-	    quantityInput.value = 1;
-	    updateDeposit(selectElement);
-	    disableSelectedOptions();
-	    updateTotalAmount();
-	}
-
-     // 删除订单明细
-     function removeRentItem(button) {
-	    const rentItem = button.closest('.item-entry');
-	    rentItem.remove();
-	    disableSelectedOptions();
-	    updateTotalAmount();
-	}
-    
-    // 更新押金值
-    function updateDeposit(selectElement) {
-	    const selectedOption = selectElement.options[selectElement.selectedIndex];
-	    const deposit = selectedOption.getAttribute('data-deposit');
-	    const quantityInput = selectElement.closest('.item-entry').querySelector('input[name^="rentItemQuantity"]');
-	    const rentItemDepositInput = selectElement.closest('.item-entry').querySelector('input[name^="rentItemDeposit"]');
-    
-	    if (deposit && rentItemDepositInput) {
-	        rentItemDepositInput.value = deposit * quantityInput.value; // 根據數量倍增押金
-	    }
-	    updateTotalAmount();
-	}
-	
-	// 根據數量更新押金
-	function updateDepositByQuantity(quantityInput) {
-	    const selectElement = quantityInput.closest('.item-entry').querySelector('select[name^="tablewareId"]');
-	    updateDeposit(selectElement);
-	}
-	
-	// 計算訂單總金額
-	function updateTotalAmount() {
-	    let totalAmount = 0;
-	    document.querySelectorAll('input[name^="rentItemDeposit"]').forEach(input => {
-	        totalAmount += parseFloat(input.value) || 0;
-	    });
-	    document.getElementById('totalAmount').value = totalAmount;
-	}
+<div th:replace="~{spantasty/display/navbar}"></div>
+<div class="content" id="container">
+<h3 class="h">新增租借訂單</h3>
+<form th:action="@{/rent/addPost}" method="post">
+<table class="table w-100 table-striped" id="table">
+    <tr><td>租借押金: <input type="text" class="rent-input" id="totalAmount" name="rentDeposit" readonly /></td></tr>
+    <tr><td>租借餐廳:
+        <select name="restaurantId" id="restaurantId" class="rent-input" required onchange="filterTablewares()">
+            <option value="" selected disabled>請選擇租借餐廳</option>
+            <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+        </select>
+    </td></tr>
+    <tr><td>租借會員:
+        <select name="memberId" class="rent-input" required>
+            <option value="" selected disabled>請選擇會員編號</option>
+            <option th:each="member : ${members}" th:value="${member.memberId}" th:text="${member.account}"></option>
+        </select>
+    </td></tr>
+</table>
+<div id="rentItemsContainer">
+<h4 class="h">輸入租借訂單項目</h4>
+<div class="item-entry">
+<table class="table table-striped">
+    <tr>
+        <td class="item-column">餐具編號:
+            <select name="tablewareId[0]" id="tablewareId"  class="item-input" onchange="handleSelectChange(this)"required>
+                <option value="" selected disabled>請選擇餐具編號</option>
+                <option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:data-deposit="${tableware.tablewareDeposit}" th:text="${tableware.tablewareName}"></option>
+            </select>
+        </td>
+        <td class="item-column">租借數量: <input type="number" class="item-input" name="rentItemQuantity" min="1" oninput="updateDepositByQuantity(this)" /></td>
+        <td class="item-column"> 租借押金: <input type="number" class="item-input" name="rentItemDeposit" readonly /></td>
+        <td class="item-column"><br /><button class="delete-button" type="button"onclick="removeRentItem(this)">刪除</button></td>
+    </tr>
+</table>
+</div>
+</div>
+<button type="button" id="add-item-button">新增訂單明細</button>
+<button type="submit">新增訂單</button>
+</form>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    showSidebar('rental');
+});
 </script>
-    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-    <script th:src="@{/js/axios.min.js}"></script>
-</body>
+<script type="text/template" id="tableware-options-template">
+	<option value="" selected disabled>請選擇餐具編號</option>
+    <option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:data-deposit="${tableware.tablewareDeposit}" th:text="${tableware.tablewareName}"></option>
+</script>
+<script>
+let rentItemIndex = 0;
 
+document.getElementById('add-item-button').addEventListener('click', function () {
+    rentItemIndex++;
+    const optionsTemplate = document.getElementById('tableware-options-template').innerHTML;
+    const itemEntryHTML = `
+    <div class="item-entry">
+    <table class="table table-striped">
+    <tr>
+        <td class="item-column">
+            餐具編號:
+            <select name="tablewareId[${rentItemIndex}]" id="tablewareId" class="item-input" onchange="handleSelectChange(this)" required>
+                ${optionsTemplate}
+            </select>
+        </td>
+        <td class="item-column">租借數量:<input type="number" class="item-input" name="rentItemQuantity[${rentItemIndex}]"  min="1" oninput="updateDepositByQuantity(this)"/></td>
+        <td class="item-column">租借押金:<input type="number" class="item-input" name="rentItemDeposit[${rentItemIndex}]" readonly/></td>
+        <td class="item-column"><br/><button class="delete-button" type="button" onclick="removeRentItem(this)">刪除</button></td>
+    </tr>
+    </table>
+    </div>
+    `;
+    document.getElementById('rentItemsContainer').insertAdjacentHTML('beforeend', itemEntryHTML);
+    disableSelectedOptions();
+});
+
+function filterTablewares() {
+    const url = 'http://localhost:8080/SpanTasty/rent/filter';
+    var restaurantId = document.getElementById("restaurantId").value;
+    
+    if (restaurantId) {
+        let dtoObject = {
+            restaurantId: restaurantId
+        };
+        axios.post(url, dtoObject)
+        .then(function(response) {
+            document.querySelectorAll('select[id^="tablewareId"]').forEach(select => {
+                select.innerHTML = '<option value="">請選擇餐具</option>'; // 清空现有选项
+                response.data.forEach(function(tableware) {
+                    var option = document.createElement("option");
+                    option.value = tableware.tablewareId;
+                    option.text = tableware.name;
+                    option.setAttribute('data-deposit', tableware.tablewareDeposit); // 加上押金数据
+                    select.add(option);
+                });
+            });
+        })
+        .catch(function(error) {
+            console.log(error);
+        });
+    } else {
+        document.querySelectorAll('select[name^="tablewareId"]').forEach(select => {
+            select.innerHTML = '<option value="">請選擇餐具</option>'; // 清空選項
+        });
+    }
+}
+
+// 禁用已選過的餐具編號
+function disableSelectedOptions() {
+    const allSelectElements = document.querySelectorAll('.item-input[name^="tablewareId"]');
+    const selectedValues = Array.from(allSelectElements)
+        .map(select => select.value)
+        .filter(value => value !== "");
+
+    allSelectElements.forEach(select => {
+        Array.from(select.options).forEach(option => {
+            if (selectedValues.includes(option.value)) {
+                option.hidden = true; // 禁用已選過的選項
+            } else {
+                option.hidden = false; // 解除禁用狀態
+            }
+        });
+    });
+}
+
+// 更新押金值和數量自動跳為1
+function handleSelectChange(selectElement) {
+    const rentItemRow = selectElement.closest('.item-entry');
+    const quantityInput = rentItemRow.querySelector('input[name^="rentItemQuantity"]');
+    const restaurantId = document.getElementById('restaurantId').value; // 取得餐廳ID
+    const tablewareId = selectElement.value; // 取得餐具ID
+	
+	const url = 'http://localhost:8080/SpanTasty/rent/check';
+    if (restaurantId && tablewareId) {
+        let stock = {
+        	restaurantId: restaurantId,
+            tablewareId: tablewareId
+        };
+        axios.post(url, stock)
+        .then(response => {
+            const stock = response.data; // axios自動將回應解析為JSON
+            console.log('stock:', stock);
+			
+			
+            // 設置租借數量的最大值為該餐具庫存
+            quantityInput.value = Math.min(Number(quantityInput.value) || 1, stock);
+            quantityInput.max = stock; // 设置租借数量的最大值为库存
+            quantityInput.placeholder = `最大可租借數量: ${stock}`;
+            // 更新押金
+            updateDeposit(selectElement);
+        })
+        .catch(error => {
+            console.error('Error fetching stock:', error);
+            alert('餐廳庫存為0');
+        });
+    }
+    disableSelectedOptions();
+    updateTotalAmount();
+}
+
+// 删除订单明细
+function removeRentItem(button) {
+    const rentItem = button.closest('.item-entry');
+    rentItem.remove();
+    disableSelectedOptions();
+    updateTotalAmount();
+}
+
+// 更新押金值
+function updateDeposit(selectElement) {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const deposit = selectedOption.getAttribute('data-deposit');
+    const quantityInput = selectElement.closest('.item-entry').querySelector('input[name^="rentItemQuantity"]');
+    const rentItemDepositInput = selectElement.closest('.item-entry').querySelector('input[name^="rentItemDeposit"]');
+
+    if (deposit && rentItemDepositInput) {
+        rentItemDepositInput.value = deposit * quantityInput.value; // 根據數量倍增押金
+    }
+    updateTotalAmount();
+}
+
+// 根據數量更新押金
+function updateDepositByQuantity(quantityInput) {
+    const selectElement = quantityInput.closest('.item-entry').querySelector('select[name^="tablewareId"]');
+    const maxStock = quantityInput.max; // 獲取最大庫存值
+	
+    if (Number(quantityInput.value) == Number(maxStock)) {
+        alert('租借數量已達餐廳最大庫存數量');
+        quantityInput.value = maxStock; // 如果超過庫存，將數量設置為最大庫存
+    }
+    console.log('更新后的租借數量:', quantityInput.value);
+    updateDeposit(selectElement);
+}
+
+// 計算訂單總金額
+function updateTotalAmount() {
+    let totalAmount = 0;
+    document.querySelectorAll('input[name^="rentItemDeposit"]').forEach(input => {
+        totalAmount += parseFloat(input.value) || 0;
+    });
+    document.getElementById('totalAmount').value = totalAmount;
+}
+</script>
+</body>
 </html>
