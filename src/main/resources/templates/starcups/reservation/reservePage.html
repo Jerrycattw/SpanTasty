@@ -12,7 +12,20 @@
     <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
     <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
     <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
-    <style>.ie-panel{display: none;background: #212121;padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);clear: both;text-align:center;position: relative;z-index: 1;} html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {display: block;}</style>
+    <style>
+    .ie-panel{
+	    display: none;
+	    background: #212121;
+	    padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);
+	    clear: both;
+	    text-align:center;
+	    position: relative;
+	    z-index: 1;
+    } 
+    html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
+	    display: block;
+    }
+    </style>
   </head>
   <body>
     <!-- navbar  th:replace=-->
@@ -41,46 +54,65 @@
        
        <form class="rd-form rd-mailform" data-form-output="form-output-global" data-form-type="contact" method="post" action="bat/rd-mailform.php">
          <div class="row row-14 gutters-14 row-fix">
-           <div class="col-sm-12">
+         
+           <div class="col-sm-4">
              <div class="form-wrap">
-               <input class="form-input" id="contact-first-name" type="text" name="name" data-constraints="@Required">
-               <label class="form-label" for="contact-first-name">請選擇餐廳</label>
-             </div>
-           </div>
-           <div class="col-sm-12">
-             <div class="form-wrap">
-               <select class="form-select" id="contact-first-name" name="name" data-constraints="@Required">
-                <option value="2" >2</option>
-                <option value="2" >3</option>
-                <option value="2" >4</option>
-                <option value="2" >5</option>
-                <option value="2" >6</option>
+               <select name="restaurantId" id="addRestaurantId" class="form-select">
+                   <option value="" selected>請選擇餐廳</option>
+                   <th:block th:each="restaurant : ${restaurants}">
+                       <option th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+                   </th:block>
                </select>
              </div>
            </div>
+           
+           <div class="col-sm-4">
+             <div class="form-wrap">
+               <select name="reserveSeat" id="addReserveSeat" class="form-select" required>
+                   <option value="" selected>請選擇用餐人數</option>
+                   <th:block th:each="i : ${#numbers.sequence(2, 10)}">
+                       <option th:value="${i}" th:text="${i}"></option>
+                   </th:block>
+               </select>             
+             </div>
+           </div>
+           
+           <div class="col-sm-4">
+             <div class="form-wrap input-group input-group-sm">
+               <input class="form-input bg-white border" id="addCheckDate" type="Date" name="checkDate" data-constraints="@Required">
+             </div>
+           </div>
+           
+           <div class="col-sm-12">
+           	 <div class="form-wrap">
+               <!-- 動態生成訂位時間的按鈕 -->
+               <div id="addReserveDiv" class="row g-3 d-flex justify-content-start"></div>
+             </div>           
+           </div>           
+           
            <div class="col-sm-12">
              <div class="form-wrap">
-               <input class="form-input" id="contact-last-name" type="text" name="name" data-constraints="@Required">
-               <label class="form-label" for="contact-last-name">請選擇人數</label>
-             </div>
-           </div>
-           <div class="col-12">
-             <div class="form-wrap">
-               <input class="form-input" id="contact-email" type="email" name="email" data-constraints="@Email @Required">
-               <label class="form-label" for="contact-email">請選擇日期</label>
-             </div>
-           </div>
-           <div class="col-12">
-             <div class="form-wrap">
-               <label class="form-label" for="contact-message">Message</label>
+               <label class="form-label" for="contact-message">備註</label>
                <textarea class="form-input" id="contact-message" name="message" data-constraints="@Required"></textarea>
              </div>
            </div>
+           
+           
          </div>
          <button class="button button-secondary button-pipaluk" type="submit">立即預訂</button>
        </form>
        
-     </div>    
+     </div>
+		<h5 class="my-2">訂位須知</h5>
+		<div class="reservation-notice mt-3 mb-5">
+		  <ul class="list-marked">
+		    <li>網路開放時間為：一個月內。</li>
+		    <li>如欲用餐日期顯示訂位已額滿，建議可致電門市洽詢。</li>
+		    <li>網路訂位是否成功，可至「會員中心/訂位紀錄」進行查詢。</li>
+		    <li>用餐當日訂位保留時間為10分鐘，請準時入席，逾時將取消訂位。</li>
+		    <li>網路訂位如需取消，可於用餐前一日23:59前自行線上取消，如超過時間請聯繫門市為您服務。</li>
+		  </ul>
+		</div>
      </div>    
 
 
@@ -95,5 +127,108 @@
      <!-- Javascript-->
     <script src="/SpanTasty/starcups/js/core.min.js"></script>
     <script src="/SpanTasty/starcups/js/script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            
+            document.getElementById('addRestaurantId').addEventListener('change', getReserveTimeAndAdd);
+            document.getElementById('addReserveSeat').addEventListener('change', getReserveTimeAndAdd);
+            document.getElementById('addCheckDate').addEventListener('change', getReserveTimeAndAdd);
+
+        });
+
+
+        // Ajax查詢訂位時間+新增訂位訂單
+        function getReserveTimeAndAdd() {
+            const restaurantId = document.getElementById('addRestaurantId').value;
+            const reserveSeat = document.getElementById('addReserveSeat').value;
+            const checkDate = document.getElementById('addCheckDate').value;
+
+            // 檢查所有必要的值是否都有填寫
+            if (!restaurantId || !reserveSeat || !checkDate) {
+                return; // 若有任何一個值未填寫，則不進行查詢
+            }
+
+            const params = new URLSearchParams({
+                restaurantId: restaurantId,
+                reserveSeat: reserveSeat,
+                checkDate: checkDate
+            }).toString();
+
+            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveCheck?${params}`)
+                .then(function (response) {
+                    console.log(response.data);
+
+                    // 清空表格內容
+                    const reserveDiv = document.getElementById('addReserveDiv');
+                    reserveDiv.innerHTML = '';
+
+                    // 檢查是否有資料
+                    if (response.data.length > 0) {
+                        // 動態生成按鈕
+                        response.data.forEach(function (checkReserve) {
+
+                            const isAvailable = checkReserve.totalTableNumber > checkReserve.reservedTableNumber;
+                            // <div class="button button-md button-secondary button-pipaluk">Medium size</div>
+                            // const button = document.createElement('div');
+                            const button = document.createElement('input');
+                            button.type = 'button';
+                            button.name = 'reserveTime';
+                            button.value = checkReserve.startTime;
+                            // button.textContent = checkReserve.startTime;
+                            if (isAvailable) {
+                                button.className = 'btn btn-success col-1'
+                            } else {
+                                button.disabled = !isAvailable; // 設置禁用按鈕
+                                button.className = 'btn btn-secondary col-1'
+                            }
+                            reserveDiv.appendChild(button); // 添加按鈕到 reserveDiv
+
+                            // 按鈕的事件處理（例如，處理點擊事件）
+                            button.onclick = function () {
+                                // 這裡放新增訂位 ajax 函式
+                                let addReserveDTO = {
+                                    reserveSeat: reserveSeat,
+                                    checkDate: checkDate,
+                                    startTime: checkReserve.startTime,
+                                    restaurantId: restaurantId,
+                                }
+                                addReservation(addReserveDTO);
+                            };
+
+                        });
+                    } else {
+                        reserveDiv.textContent = '沒有找到任何訂位資料';
+                    }
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+                });
+        }
+        
+        // 新增訂位的AJAX函數
+        function addReservation(addReserveDTO) {
+
+            axios.post(`http://localhost:8080/SpanTasty/reserve/add`, addReserveDTO)
+                .then(res => {
+                    console.log(res.data)
+                    // 插入訂位成功視窗
+                    alert("新增訂位成功！");
+
+                    // 清空新增訂位表單資料
+                    document.getElementById('addRestaurantId').value = '';
+                    document.getElementById('addReserveSeat').value = '';
+                    document.getElementById('addCheckDate').value = '';
+                    document.getElementById('addReserveDiv').innerHTML = ''; // 清空訂位時間按鈕
+
+                })
+                .catch(err => {
+                    console.error(err);
+                    // 插入訂位失敗視窗
+                    alert("新增訂位失敗，請稍後再試。");
+                })
+
+        }
+    
+    </script>
   </body>
 </html>

@@ -86,10 +86,12 @@ public class RestaurantService {
 	
 	
 	// 查詢所有餐廳(Page)
-	public Page<Restaurant> findAllRestaurantsPage(Integer pageNumber) {
-		Pageable pageAble = PageRequest.of(pageNumber-1, 10, Sort.Direction.DESC, "restaurantId");
+	public Page<Restaurant> findAllRestaurantsPage(Integer pageNumber, Integer itemNumber) {
+		if(itemNumber == null) itemNumber=10;
+		Pageable pageAble = PageRequest.of(pageNumber-1, itemNumber, Sort.Direction.DESC, "restaurantId");
 		return restaurantRepository.findAll(pageAble);
 	}
+	
 
 
 }
