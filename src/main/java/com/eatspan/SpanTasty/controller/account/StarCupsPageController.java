@@ -19,5 +19,15 @@ public class StarCupsPageController {
 	public String showMemberCenterPage() {
 		return "starcups/account/memberCenter"; 
 	}
+	
+	@GetMapping("/StarCups/resetPassword")
+	public String showrRsetPasswordPage() {
+		return "starcups/account/resetPassword"; 
+	}
+	
+	@GetMapping("/StarCups/forgetPassword")
+	public String showrForgetPasswordPage() {
+		return "starcups/account/forgetPassword"; 
+	}
 
 }
