@@ -129,7 +129,12 @@ public class ProductController {
 			File fileToSave = new File(uploadPath + File.separator + newFileName);
 			file.transferTo(fileToSave);
 			updateProduct.setProductPicture("/SpanTasty/upload/store/" + newFileName);
+		}else {
+			String productImg = productService.findProductByIdU(updateProduct.getProductId()).getProductPicture();
+			updateProduct.setProductPicture(productImg);
 		}
+		
+		
 		productService.updateProduct(updateProduct);
 
 		return "redirect:/product/findAll";
