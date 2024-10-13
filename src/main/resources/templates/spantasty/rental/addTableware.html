@@ -2,13 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org/">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>新增環保用具</title>
-<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
 <style>
 .body {
     background-color: #e9f7ef; /* 背景色：淡綠 */
 }
+
 #card {
     background-color: #c8e6c9; /* 卡片背景色：淡綠 */
     border-radius: 10px;
@@ -26,6 +25,7 @@ form {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	background-color: #c8e6c9;
 }
+
 .tableware-input{
 	width: 86%;
 	padding: 5px;
@@ -34,12 +34,13 @@ form {
 	border-radius: 5px;
 	box-sizing: border-box;
 }
+
 .stock-entry {
 	display: flex;
 	align-items: center;
 	margin-bottom: 0px;
-	
 }
+
 .restaurant-select, .stock-input {
     width: 200px; /* 根據需要調整寬度 */
     margin-left: 0px;
@@ -47,11 +48,13 @@ form {
     height: 30px;
     width: 100%;
 }
+
 .stock-column{
 	width: 220px;
 	margin-left: 10px;
 	padding: 0px;
 }
+
 .delete-button{
 	background-color: #fff;
     border: 2px solid #000;
@@ -63,91 +66,85 @@ form {
     justify-content: center; /* 讓文字在按鈕內居中 */
     height: 30px;
 }
+
 .table {
     background-color: #f1f8e9; /* 表格背景：淡綠 */
 }
+
 .table thead {
     background-color: #a5d6a7; /* 表格標題：淺綠 */
     color: #1b5e20;
 }
-
-
-
 </style>
 </head>
 <body class="body">
 <div th:replace="~{spantasty/display/navbar}" ></div>
-
 <div class="content" id="container">
-        <h3 class="h">輸入環保用具資料</h3>
-        <div>
-	        <form method="post" th:action="@{/tableware/addPost}" enctype="multipart/form-data">
-	        <table class="table w-100 table-striped" id="table">
-	            <tr><td>用具名稱: <input class="tableware-input" type="text" name="tablewareName" required/></td></tr>
-	            <tr><td>押金金額: <input class="tableware-input" type="text" name="tablewareDeposit" required/></td></tr>
-	            <tr><td>用具圖片: <input class="tableware-input" type="file" name="timg" required/></td></tr>
-	            <tr><td>用具描述: <input class="tableware-input" type="text" name="tablewareDescription" required/></td></tr>
-	        </table>
-	        
-	        <div id="stock-container">
-	            <h4 class="h">輸入餐廳庫存資料</h4>
-	            <div class="stock-entry" >
-			    <table class="table table-striped">
-			        <tr>
-			            <td class="stock-column">餐廳名稱:
-			                <select name="restaurantId[0]" class="restaurant-select" onchange="handleSelectChange(this)" required>
-			                    <option value="" selected disabled>請選擇租借餐廳</option>
-			                    <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
-			                </select>
-			            </td>
-			            <td class="stock-column">用具庫存: <input type="number" name="stock[0]" class="stock-input" /></td>
-			            <td class="stock-column"><br/><button type="button" class="delete-button" onclick="removeStockEntry(this)">刪除</button></td>
-			        </tr>
-			    </table>
-				</div>
-			</div>
-			
-			<button type="button" id="add-stock-button" >添加庫存</button>
-			<button type="submit">新增餐具</button>
-			</form>
-		</div>
+<h3 class="h">新增環保用具</h3>
+<div>
+<form method="post" th:action="@{/tableware/addPost}" enctype="multipart/form-data">
+<table class="table w-100 table-striped" id="table">
+	<tr><td>用具名稱: <input class="tableware-input" type="text" name="tablewareName" required/></td></tr>
+	<tr><td>押金金額: <input class="tableware-input" type="text" name="tablewareDeposit" required/></td></tr>
+	<tr><td>用具圖片: <input class="tableware-input" type="file" name="timg" required/></td></tr>
+	<tr><td>用具描述: <input class="tableware-input" type="text" name="tablewareDescription" required/></td></tr>
+</table>
+<div id="stock-container">
+<h4 class="h">輸入餐廳庫存資料</h4>
+<div class="stock-entry" >
+<table class="table table-striped">
+	<tr>
+		<td class="stock-column">餐廳名稱:
+			<select name="restaurantId[0]" class="restaurant-select" onchange="handleSelectChange(this)" required>
+				<option value="" selected disabled>請選擇租借餐廳</option>
+				<option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+			</select>
+		</td>
+		<td class="stock-column">用具庫存: <input type="number" name="stock[0]" class="stock-input" /></td>
+		<td class="stock-column"><br/><button type="button" class="delete-button" onclick="removeStockEntry(this)">刪除</button></td>
+	</tr>
+</table>
 </div>
-    <script>
-		document.addEventListener("DOMContentLoaded", function() {
-			showSidebar('rental');
-		});
-	</script>
-	<script type="text/template" id="restaurant-options-template">
-    	<option value="" selected disabled>請選擇租借餐廳</option>
-    	<option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
-	</script>
-    <script>
+</div>
+<button type="button" id="add-stock-button" >添加庫存</button>
+<button type="submit">新增餐具</button>
+</form>
+</div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	showSidebar('rental');
+});
+</script>
+<script type="text/template" id="restaurant-options-template">
+	<option value="" selected disabled>請選擇租借餐廳</option>
+	<option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+</script>
+<script>
 let stockIndex = 0; // 初始化庫存索引
-
 // 監聽「添加庫存」按鈕
 document.getElementById('add-stock-button').addEventListener('click', function() {
     stockIndex++; // 增加索引
 	const optionsTemplate = document.getElementById('restaurant-options-template').innerHTML;
     // 新的庫存輸入框 HTML 結構
     const stockEntryHtml = `
-        <div class="stock-entry">
-            <table class="table table-striped">
-                <tr>
-                    <td class="stock-column">餐廳名稱:
-                        <select name="restaurantId[${stockIndex}]" class="restaurant-select" onchange="handleSelectChange(this)" required>
-                            ${optionsTemplate}
-                        </select>
-                    </td>
-                    <td class="stock-column">用具庫存: <input type="number" name="stock[${stockIndex}]" class="stock-input" /></td>
-                    <td class="stock-column"><br/><button type="button" class="delete-button" onclick="removeStockEntry(this)">刪除</button></td>
-                </tr>
-            </table>
-        </div>
+	<div class="stock-entry">
+	<table class="table table-striped">
+		<tr>
+			<td class="stock-column">餐廳名稱:
+				<select name="restaurantId[${stockIndex}]" class="restaurant-select" onchange="handleSelectChange(this)" required>
+					${optionsTemplate}
+				</select>
+			</td>
+			<td class="stock-column">用具庫存: <input type="number" name="stock[${stockIndex}]" class="stock-input" /></td>
+			<td class="stock-column"><br/><button type="button" class="delete-button" onclick="removeStockEntry(this)">刪除</button></td>
+		</tr>
+	</table>
+	</div>
     `;
 
     // 在 stock-container 下方插入新的 div
     document.getElementById('stock-container').insertAdjacentHTML('beforeend', stockEntryHtml);
-    
     disableSelectedOptions();
 });
 
@@ -156,57 +153,51 @@ function removeStockEntry(button) {
     const row = button.closest('.stock-entry');
     const selectElement = row.querySelector('.restaurant-select');
     const selectedOption = selectElement.options[selectElement.selectedIndex];
-
     // 檢查是否有選中的選項，如果有則移除禁用狀態
     if (selectedOption) {
         selectedOption.hidden = false;
     }
-
     // 刪除該行
     row.remove();
 }
 
 function setStockValue(selectElement) {
-        // 獲取當前選擇的 select 元素所屬的 stock 欄位
-        const stockInput = selectElement.closest('tr').querySelector('.stock-input');
-        
-        // 如果有選擇餐廳，將庫存值設為 1
-        if (selectElement.value) {
-        	// 如果有選擇餐廳，將庫存值設為 1
-            stockInput.value = 1;
-            // 禁用該選擇的餐廳選項
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            selectedOption.hidden = true;
-        }
-    }
+	// 獲取當前選擇的 select 元素所屬的 stock 欄位
+	const stockInput = selectElement.closest('tr').querySelector('.stock-input');
+	// 如果有選擇餐廳，將庫存值設為 1
+	if (selectElement.value) {
+		// 如果有選擇餐廳，將庫存值設為 1
+		stockInput.value = 1;
+		// 禁用該選擇的餐廳選項
+		const selectedOption = selectElement.options[selectElement.selectedIndex];
+		selectedOption.hidden = true;
+	}
+}
     
-    function disableSelectedOptions() {
-	    const allSelectElements = document.querySelectorAll('.restaurant-select');
-	    const selectedValues = Array.from(allSelectElements)
-	        .map(select => select.value)
-	        .filter(value => value !== ""); // 取得已選擇的餐廳值
+function disableSelectedOptions() {
+	const allSelectElements = document.querySelectorAll('.restaurant-select');
+	const selectedValues = Array.from(allSelectElements)
+		.map(select => select.value)
+		.filter(value => value !== ""); // 取得已選擇的餐廳值
+
+	allSelectElements.forEach(select => {
+		Array.from(select.options).forEach(option => {
+			if (selectedValues.includes(option.value) && option.value !== "") {
+				option.hidden = true; // 禁用已選過的選項
+			} else {
+				option.hidden = false; // 解除禁用狀態
+			}
+		});
+	});
+}
 	
-	    allSelectElements.forEach(select => {
-	        Array.from(select.options).forEach(option => {
-	            if (selectedValues.includes(option.value) && option.value !== "") {
-	                option.hidden = true; // 禁用已選過的選項
-	            } else {
-	                option.hidden = false; // 解除禁用狀態
-	            }
-	        });
-	    });
-	}
-	
-	function handleSelectChange(selectElement) {
-	    // 設定庫存值
-	    setStockValue(selectElement);
-	
-	    // 禁用已選過的選項
-	    disableSelectedOptions();
-	}
+function handleSelectChange(selectElement) {
+	// 設定庫存值
+	setStockValue(selectElement);
+
+	// 禁用已選過的選項
+	disableSelectedOptions();
+}
 </script>
-<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-<script th:src="@{/js/axios.min.js}"></script>
 </body>
 </html>
