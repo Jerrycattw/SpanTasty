@@ -44,7 +44,7 @@ public class RestaurantController {
 	
     @GetMapping("/getAll")
     public String getAllRestaurants(Model model, @RequestParam(defaultValue = "0") Integer page) {
-        Page<Restaurant> restaurantsPage = restaurantService.findAllRestaurantsPage(page+1);
+        Page<Restaurant> restaurantsPage = restaurantService.findAllRestaurantsPage(page+1, null);
         model.addAttribute("restaurantsPage", restaurantsPage);
         return "spantasty/reservation/getAllRestaurant";
     }
