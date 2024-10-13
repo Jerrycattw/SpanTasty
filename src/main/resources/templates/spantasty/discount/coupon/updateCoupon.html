@@ -14,7 +14,7 @@
 	<div class="content">
 		<div class="container">
 			<form action="#" th:method="PUT"><!-- action透過JS修改 -->
-				<div class="h1 mb-3">編輯優惠券</div>
+				<div class="h1 mb-3">查看/編輯優惠券</div>
 				<div class="accordion " id="accordionPanelsStayOpenExample">
 					<!-- 1 -->
 					<div class="accordion-item">
@@ -234,16 +234,16 @@
 
 							res.data.product.forEach(element => {
 								document.getElementById('productTags').innerHTML += `
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="${element}" value="${element}" name="product">
-										<label class="form-check-label" for="${element}">${element}</label>
+									<div class="form-check form-check-inline">									
+										<input class="form-check-input" type="checkbox" id="${element}_product" value="${element}" name="product">
+										<label class="form-check-label" for="${element}_product">${element}</label>
 									</div>`
 							});
 							res.data.togo.forEach(element => {
 								document.getElementById('togoTags').innerHTML += `
 									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="checkbox" id="${element}" value="${element}" name="togo">
-										<label class="form-check-label" for="${element}">${element}</label>
+										<input class="form-check-input" type="checkbox" id="${element}_togo" value="${element}" name="togo">
+										<label class="form-check-label" for="${element}_togo">${element}</label>
 									</div>`
 							});
 						})
@@ -308,9 +308,6 @@
 					window.location.href = '/SpanTasty/coupon'
 				})
 			</script>
-			<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-			<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-			<script th:src="@{/js/axios.min.js}"></script>
 </body>
 
 </html>

@@ -96,8 +96,9 @@ public class PointController {
 	// search-------------------------
 	@GetMapping("/api/search")
 	@ResponseBody
-	public List<PointMemberDTO> searchPointApi(@RequestParam(value = "q", required = false) String keyWord, Model model) {
-		return pointService.searchPointMember(keyWord);
+	public Page<PointMemberDTO> searchPointApi(@RequestParam(value = "q", required = false) String keyWord, Model model) {
+		System.out.println("search");
+		return pointService.searchPointMember(keyWord,1);
 
 	}
 	
@@ -140,10 +141,9 @@ public class PointController {
 		case "minus":
 			pointBean.setPointChange(pointBean.getPointChange()*-1);
 			pointService.useBatchPoint(memberIds, pointBean);
+			pointService.insertBatchRecord(memberIds, pointBean);
 			break;
 	};
-//		pointService.usePoint(pointBean.getPointChange(), pointBean.getMemberId());
-		pointService.insertBatchRecord(memberIds, pointBean);
 		return "redirect:/point/pointCenter";
 	}
 	

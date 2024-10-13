@@ -49,36 +49,7 @@ public interface PointRepository extends JpaRepository<Point, Integer> {
 	        LEFT JOIN members m ON ps.member_id = m.member_id
 	        WHERE ep.rank = 1 or ep.rank is Null
 	    """)
-	List<PointMemberProjection> findPointMembers();
-	
-	@Query(nativeQuery = true, value = """
-	        WITH point_summary AS (
-	            SELECT member_id, SUM(COALESCE(point_usage, 0)) AS total_point
-	            FROM point
-	            GROUP BY member_id
-	        ),
-	        expiry_points AS (
-	            SELECT member_id, SUM(COALESCE(point_usage, 0)) AS total_point, get_expiry_date,
-	                   ROW_NUMBER() OVER (PARTITION BY member_id ORDER BY get_expiry_date) AS rank
-	            FROM point
-				where get_expiry_date IS NOT NULL　and point_usage>0
-				AND get_expiry_date > GETDATE()
-	            GROUP BY get_expiry_date, member_id
-	        )
-	        SELECT 
-					ps.member_id AS memberId, 
-	            　m.member_name AS memberName, 
-	               m.phone AS phone, 
-	               ps.total_point AS totalPointBalance,
-	               ep.total_point AS expiringPoints, 
-	               ep.get_expiry_date AS expiryDate
-	        FROM point_summary ps 
-	        LEFT JOIN expiry_points ep ON ps.member_id = ep.member_id
-	        LEFT JOIN members m ON ps.member_id = m.member_id
-	        WHERE ep.rank = 1 or ep.rank is Null
-	        ORDER BY ps.member_id
-	    """)
-	Page<PointMemberProjection> findPointMembersPage(Pageable pageable);
+	List<PointMemberProjection> findPointMembers();	
 	
 	@Query(value ="""
 	       WITH point_summary AS (
@@ -107,8 +78,6 @@ public interface PointRepository extends JpaRepository<Point, Integer> {
 	        WHERE (ep.rank = 1 or ep.rank is Null) AND ps.member_id=:memberId
 	        """,nativeQuery = true)
 	PointMemberProjection findPointMembersByMemberId(@Param("memberId") Integer memberId);
-	
-
 	
 	@Query(value ="""
 	        WITH point_summary AS (

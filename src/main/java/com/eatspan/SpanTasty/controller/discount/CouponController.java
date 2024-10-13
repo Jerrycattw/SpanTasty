@@ -1,11 +1,14 @@
 package com.eatspan.SpanTasty.controller.discount;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,12 +25,29 @@ import com.eatspan.SpanTasty.dto.discount.CouponDistributeDTO;
 import com.eatspan.SpanTasty.entity.discount.Coupon;
 import com.eatspan.SpanTasty.service.discount.CouponService;
 
+import freemarker.core.ParseException;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+import jakarta.mail.MessagingException;
+
 @Controller
 //@RequestMapping("/coupon")
 public class CouponController {
 	
 	@Autowired
 	private CouponService couponService;
+	
+	
+	//mail----------------------------------------------
+	//範例
+	@GetMapping("/coupon/test")
+	public String testmail() throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException {
+		couponService.sendMail("奕兆大哥","andy860210@yahoo.com.tw");
+		return "spantasty/discount/coupon/coupon";
+	}
+	
+	
 	
 	
 	//首頁--------------------------------
@@ -107,6 +127,7 @@ public class CouponController {
  	@DeleteMapping("/coupon/{id}")
  	@ResponseBody
  	public ResponseEntity<?> deleteCoupon(@PathVariable(value = "id") Integer couponId) {
+ 		System.out.println("delete");
  		couponService.deleteCouponById(couponId);
  		return ResponseEntity.ok("刪除成功!");
  	}

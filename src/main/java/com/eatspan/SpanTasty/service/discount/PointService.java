@@ -66,7 +66,7 @@ public class PointService {
 //		List<PointMemberDTO> pointMembers = getAllPointMember();
 //		System.out.println(pointMembers);
 //		resultMap.put("pointMembers",pointMembers);
-		Pageable pageable = PageRequest.of(pageNumber-1,10,Sort.Direction.ASC,"id");
+		Pageable pageable = PageRequest.of(pageNumber-1,6,Sort.Direction.ASC,"id");
 		List<PointMemberDTO> allPointMembers = getAllPointMember();
 		        
         int start = (int) pageable.getOffset();
@@ -175,6 +175,7 @@ public class PointService {
 	
 	// 新增點數紀錄
 	public void insertOneRecord(Point point) throws Exception {
+		System.out.println(point);
 		//使用點數 無到期日
 		if(point.getPointChange()<0) {
 			System.out.println("insert -");
@@ -211,6 +212,7 @@ public class PointService {
 	// 批次新增點數紀錄
 	public void insertBatchRecord(List<String> memberIDs, Point pointBean) throws Exception {
 		for (String memberID : memberIDs) {
+			
 			int IntMemberID = Integer.parseInt(memberID);
 			Point insertBean = new Point();
 			
@@ -225,6 +227,7 @@ public class PointService {
 	
 	public void useBatchPoint(List<String> memberIDs, Point pointBean) throws Exception {
 		for (String memberID : memberIDs) {
+			System.out.println(memberID);
 			Integer IntMemberID = Integer.parseInt(memberID);		
 			usePoint(pointBean.getPointChange(),IntMemberID);
 		}
@@ -299,9 +302,20 @@ public class PointService {
 		pointRepo.deleteById(pointId);
 	}
 	
-	public  List<PointMemberDTO> searchPointMember(String keyWord) {		
-		List<PointMemberProjection> projection = pointRepo.searchPointMembers(keyWord);
-		return  convertToDTO(projection);
+	public  Page<PointMemberDTO> searchPointMember(String keyWord,Integer pageNumber) {		
+//		List<PointMemberProjection> projection = pointRepo.searchPointMembers(keyWord);
+		
+		Pageable pageable = PageRequest.of(pageNumber-1,6,Sort.Direction.ASC,"id");
+		List<PointMemberDTO> allPointMembers = convertToDTO(pointRepo.searchPointMembers(keyWord));
+		        
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), allPointMembers.size());
+        
+        List<PointMemberDTO> pageContent = allPointMembers.subList(start, end);
+        Page<PointMemberDTO> page = new PageImpl<>(pageContent, pageable, allPointMembers.size());
+        
+//		return  convertToDTO(projection);
+        return page;
 	}
 	
 }
