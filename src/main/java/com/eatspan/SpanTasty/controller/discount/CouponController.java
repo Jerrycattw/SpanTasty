@@ -1,6 +1,7 @@
 package com.eatspan.SpanTasty.controller.discount;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eatspan.SpanTasty.dto.discount.CouponDTO;
 import com.eatspan.SpanTasty.dto.discount.CouponDistributeDTO;
 import com.eatspan.SpanTasty.entity.discount.Coupon;
+import com.eatspan.SpanTasty.entity.discount.CouponSchedule;
+import com.eatspan.SpanTasty.repository.discount.CouponScheduleRepository;
+import com.eatspan.SpanTasty.service.discount.CouponScheduleService;
 import com.eatspan.SpanTasty.service.discount.CouponService;
+import com.eatspan.SpanTasty.utils.discount.DateUtils;
 
 import freemarker.core.ParseException;
 import freemarker.template.MalformedTemplateNameException;
@@ -38,6 +43,9 @@ public class CouponController {
 	@Autowired
 	private CouponService couponService;
 	
+	@Autowired
+	private CouponScheduleService couponScheduleService;
+	
 	
 	//mail----------------------------------------------
 	//範例
@@ -46,8 +54,9 @@ public class CouponController {
 		couponService.sendMail("奕兆大哥","andy860210@yahoo.com.tw");
 		return "spantasty/discount/coupon/coupon";
 	}
+	//--------------------------------------------------
 	
-	
+
 	
 	
 	//首頁--------------------------------
@@ -159,9 +168,12 @@ public class CouponController {
  		String memberIds =(String) jsonMap.get("memberIds");
  		Integer couponId =Integer.parseInt((String) jsonMap.get("couponId")) ;
  		Integer perMaxCoupon =(Integer) jsonMap.get("perMaxCoupon");
- 		System.out.println("XXXX"+memberIds+" "+couponId+" "+perMaxCoupon);
+ 		String scheduleName =(String) jsonMap.get("scheduleName");
+ 		LocalDateTime scheduleTime = LocalDateTime.parse((String)jsonMap.get("scheduleTime"));
+
+ 		System.out.println("XXXX"+memberIds+" "+couponId+" "+perMaxCoupon+""+scheduleTime);
  		
- 		List<CouponDistributeDTO> distributeResult = couponService.distributeExcute2(memberIds, couponId, perMaxCoupon);
+ 		List<CouponDistributeDTO> distributeResult = couponService.distributeExcute2(memberIds, couponId, perMaxCoupon,scheduleTime,scheduleName);
  		return distributeResult;
  	}
  	

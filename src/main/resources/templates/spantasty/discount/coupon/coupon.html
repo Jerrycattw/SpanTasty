@@ -80,24 +80,49 @@
 <div th:replace="~{spantasty//display/navbar}"></div>
 <div class="content"></div>
 	<div class="container">
-		<h1 ><i class="fa-solid fa-ticket me-2"></i>優惠券管理</h1>
+		<h1 ><i class="fa-solid fa-ticket me-2"></i>優惠券</h1>
+		<div class="row mb-2">
+			<div class="col">
+				<div class="card">
+					<div class="card-header">
+					  優惠券發送
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-6">
+								<div class="input-group mb-3">
+									<button id="distributebtn" class="btn btn-outline-primary" type="button"><i class="fa-solid fa-arrow-up-from-bracket"></i>&nbsp;發送優惠券</button>
+									<input id="scheduleName" type="text" class="form-control" placeholder="請輸入發送原因" required>
+								</div>
+							</div>
+							<div class="col-2">
+								<button id="scheduleBtn" class="btn btn-outline-primary me-md-2" type="button"><i class="fa-solid fa-list-check"></i>&nbsp;發送排程管理</button>
+							</div>
+						</div>
+					</div>
+				</div>	
+			</div>
+		</div>
 		<div class="row">
 			<div class="col">
 				
 				<div class="card">
 					<div class="card-header d-flex justify-content-between align-items-center">
-						<span>優惠券</span>
-						<div>
-							<button id="distribute" class="btn btn-outline-primary me-md-2" type="button"><i class="fa-solid fa-arrow-up-from-bracket"></i>&nbsp;發送優惠券</button>
+						<span>優惠券管理</span>
+						<div>	
 							<button id="add" class="btn btn-outline-primary me-md-2" type="button">新增優惠券</button>
 						</div>
 					</div>
 					<div class="card-body">
 						<!-- search bar -->
-						<div class="input-group mb-3">
-							<button class="btn btn-outline-secondary" type="button" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></button>
-							<input id="searchInput" type="text" class="form-control" placeholder="搜尋優惠券編號、代碼、名稱、使用開始及結束日期等" >
-						</div>
+						 <div class="row">
+							<div class="col-6">
+								<div class="input-group mb-3">
+									<button class="btn btn-outline-secondary" type="button" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></button>
+									<input id="searchInput" type="text" class="form-control" placeholder="搜尋優惠券編號、代碼、名稱、使用開始及結束日期等" >
+								</div>
+							</div>
+						 </div>
 						 <!-- 提示文字 -->
 				         <div class="row">
 				         	<div class="col-auto ms-auto">
@@ -158,9 +183,9 @@
         </div>
         <label></label>
         <p>預計發送時間</p>
-        <input type="datetime-local" value="2022-12-06T15:00">
+        <input type="datetime-local" id="scheduleTime">
         
-        <p>發送時間須設定 2 小時後</p>
+        <p>發送時間須設定 1 分鐘後</p>
         
 
         <div class="result" id="result" style="visibility:hidden">
@@ -203,8 +228,8 @@
 								  <td>${coupon.receivedAmount}</td>
 								  <td><span class="badge ${coupon.couponStatus === '上架' ? 'text-bg-success' : 'text-bg-danger'}">${coupon.couponStatus}</span></td>
 								  <td>
-									<button  type="button" class="updateBtn btn btn-outline-primary"><i class="fa-solid fa-file-lines" style="color: #74C0FC;"></i></button>
-									<button  type="button" class="deleteBtn btn btn-outline-secondary"><i class="fa-solid fa-trash-can-arrow-up" style="color: #b7b9bd;"></i></button
+									<button  type="button" class="updateBtn btn btn-outline-primary"><i class="fa-solid fa-file-lines" ></i></button>
+									<button  type="button" class="deleteBtn btn btn-outline-secondary"><i class="fa-solid fa-trash-can-arrow-up" ></i></button
 								  </td>							  
 								  </tr>`	
 			})
@@ -270,13 +295,22 @@
             })
     	})
 
+		//點擊任務排程
+		document.getElementById('scheduleBtn').addEventListener('click',function(){
+			window.location.href="/SpanTasty/coupon/schedule"
+		})
 		
 
 	})			
 	</script>
 	<script>
 		//點擊發送
-    	document.getElementById("distribute").addEventListener('click',function(){
+    	document.getElementById("distributebtn").addEventListener('click',function(e){
+			if(!document.getElementById('scheduleName').value){
+				e.preventDefault()
+				alert('請輸入發送原因')
+				return;
+			}
             updateDistribute();
 
     	})
@@ -349,8 +383,11 @@
     		   return;
     	   }
     	   
-           console.log(perMaxCoupon);
            let couponId=document.getElementById("couponInput").value
+		   let scheduleTime=document.getElementById('scheduleTime').value
+		   let scheduleName=document.getElementById('scheduleName').value
+		   console.log(scheduleTime);
+		   
            //fetch
            fetch('/SpanTasty/coupon/distribute/post', {
                method: 'POST',
@@ -358,13 +395,19 @@
                    'Content-Type': 'application/json'
                },
                body: JSON.stringify({
-                   memberIds:memberIds,
-                   couponId:couponId,
-                   perMaxCoupon:perMaxCoupon
+                   memberIds : memberIds,
+                   couponId : couponId,
+                   perMaxCoupon : perMaxCoupon,
+				   scheduleName: scheduleName,
+				   scheduleTime : scheduleTime
+				   
+
                })
            })
            .then(response => response.json())
            .then(data => {
+				console.log("print");
+				
                console.log(data);
                resultData=data;//結果賦值給resultData for打印(如需)
                //計算發放結果
@@ -372,7 +415,7 @@
                let successAmount=0;
                let failAmount=0;
                data.forEach(member=>{
-                   if(member.distributeStatus=="成功"){
+                   if(member.distributeStatus==="排程成功"){
                        successAmount++;
                    }else{
                        failAmount++;
@@ -408,7 +451,7 @@
        })
 	</script>
 
-
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>    <!--  EXCEL CDN -->
 	<script src="js/axios.min.js"></script>
 	<script src="js/bootstrap.bundle.min.js" ></script>
 	<script src="js/jquery-3.7.1.min.js" ></script>
