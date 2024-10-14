@@ -29,6 +29,7 @@
 								<thead>
 									<tr>
 									  <th scope="col">編號</th>
+									  <th scope="col">名稱</th>
 									  <th scope="col">優惠券ID</th>
 									  <th scope="col">會員ID</th>
 									  <th scope="col">預計發送時間 </th>
@@ -75,6 +76,7 @@
 			data.forEach(schedule=>{
 				scheduleTable.innerHTML +=`
 					<tr  data-scheduleId="${schedule.scheduleId}">
+						<td>${schedule.scheduleId}</td>
 						<td>${schedule.scheduleName}</td>
 						<th scope="row">${schedule.couponId}</th>
 						<td>${schedule.memberId}</td>

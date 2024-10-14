@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+  <head>
+    <title>Home</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <!-- Stylesheets-->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+    <style>.ie-panel{display: none;background: #212121;padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);clear: both;text-align:center;position: relative;z-index: 1;} html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {display: block;}</style>
+  </head>
+  <body>
+      <!-- navbar  th:replace=-->
+      <div th:replace="~{starcups/display/navbar}" ></div>
+      <!-- Breadcrumbs -->
+      <section class="section breadcrumbs-custom-inset">
+        <div class="breadcrumbs-custom context-dark">
+          <div class="container">
+            <h2 class="breadcrumbs-custom-title">Point</h2>
+            <ul class="breadcrumbs-custom-path">
+              <li><a href="index.html">Home</a></li>
+              <li class="active">Point</li>
+            </ul>
+          </div>
+          <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+        </div>
+      </section>
+      <!-- container -->
+      <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+        <div class="container">
+          <div class="row row-70 justify-content-center">
+            <div class="col-12">
+              <!-- Quote Creative-->
+              <article class="quote-creative"><a class="quote-creative-figure" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/pointlogo.jpg" alt="" width="87" height="87"/></a>
+                <div class="quote-creative-text">
+                  <form class="rd-form rd-mailform rd-form-inline rd-form-coupon quote-creative-cite">
+                    <div class="form-wrap">
+                      <input class="form-input form-input-inverse" id="coupon-code" type="text" name="email">
+                      <label class="form-label" for="coupon-code">輸入優惠代碼</label>
+                    </div>
+                    <div class="form-button">
+                      <button class="button button-secondary button-pipaluk" type="submit">新增優惠券</button>
+                    </div>
+                  </form>
+                </div>
+              </article>
+              <!-- table -->
+              <div class="col-12 mt-5">
+                <!-- Bootstrap tabs-->
+                <div class="tabs-custom tabs-horizontal tabs-corporate" id="tabs-3">
+                  <!-- Nav tabs-->
+                  <ul class="nav nav-tabs">
+                    <li class="nav-item" role="presentation"><a class="nav-link active" href="#tabs-3-1" data-bs-toggle="tab">所有紀錄</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-2" data-bs-toggle="tab">已獲得</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-3" data-bs-toggle="tab">已使用</a></li>
+                  </ul>
+                  <!-- Tab panes-->
+                  <div class="tab-content">
+                    <!-- 1 -->
+                    <div class="tab-pane fade show active" id="tabs-3-1">
+                        <!-- row -->
+                      <div class="row">
+                        <div class="col-2">
+                          <a class="" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/coinget.jpg" alt="" width="87" height="87"/></a>
+                        </div>
+                        <div class="col-4 me-auto">
+                          <ul class="">
+                            <li><span>商城</span><span></span></li>
+                            <li><span>2023/01/01</span><span></span></li>
+                            <li><span>到期日:</span><span>2024/01/01</span></li>
+                          </ul>
+                        </div>
+                        <div class="col-2 d-flex align-items-center">
+                          <h4>+100</h4>
+                        </div>
+                      </div>
+                      <!-- row -->
+                      <div class="row">
+                        <div class="col-2">
+                          <a class="" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/coinuse.jpg" alt="" width="87" height="87"/></a>
+                        </div>
+                        <div class="col-4 me-auto">
+                          <ul class="">
+                            <li><span>商城</span><span></span></li>
+                            <li><span>2023/01/01</span><span></span></li>
+                            <li><span>到期日:</span><span>2024/01/01</span></li>
+                          </ul>
+                        </div>
+                        <div class="col-2 d-flex lign-items-center">
+                          <h4>-100</h4>
+                        </div>
+                      </div>
+                      <!-- row -->
+                    </div>
+                    <!-- 2 -->
+                    <div class="tab-pane fade" id="tabs-3-2">
+                      <!-- row -->
+                      <div class="row">
+                        <div class="col-2">
+                          <a class="" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/coinuse.jpg" alt="" width="87" height="87"/></a>
+                        </div>
+                        <div class="col-4 me-auto">
+                          <ul class="">
+                            <li><span>商城</span><span></span></li>
+                            <li><span>2023/01/01</span><span></span></li>
+                            <li><span>到期日:</span><span>2024/01/01</span></li>
+                          </ul>
+                        </div>
+                        <div class="col-2 align-items-center">
+                          <h4>-100</h4>
+                        </div>
+                      </div>                
+                    </div>  
+                    <!-- 3 -->
+                    <div class="tab-pane fade" id="tabs-3-3">
+                      <div class="row">
+                        <!-- col -->
+                        <div class="col-6 d-flex mb-3">
+                          <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
+                          <div class="border w-100 d-flex justify-content-between">
+                            <div>                                                        
+                              <ul class="">
+                                <li><span>商城</span><span></span></li>
+                                <li><span>2023/01/01</span><span></span></li>
+                                <li><span>到期日:</span><span>2024/01/01</span></li>
+                              </ul>
+                            </div>                                                           
+                            <div class="d-flex align-items-center me-3">
+                              <button class="button button-md button-secondary button-pipaluk">去逛逛</button>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- col -->
+                        <div class="col-6 d-flex mb-3">
+                          <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
+                          <div class="border w-100 d-flex justify-content-between">
+                            <div>                                                        
+                              <ul class="">
+                                <li><span>商城</span><span></span></li>
+                                <li><span>2023/01/01</span><span></span></li>
+                                <li><span>到期日:</span><span>2024/01/01</span></li>
+                              </ul>
+                            </div>                                                           
+                            <div class="d-flex align-items-center me-3">
+                              <button class="button button-md button-secondary button-pipaluk">去逛逛</button>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- col -->
+                        <div class="col-6 d-flex mb-3">
+                          <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
+                          <div class="border w-100 d-flex justify-content-between">
+                            <div>                                                        
+                              <ul class="">
+                                <li><span>商城</span><span></span></li>
+                                <li><span>2023/01/01</span><span></span></li>
+                                <li><span>到期日:</span><span>2024/01/01</span></li>
+                              </ul>
+                            </div>                                                           
+                            <div class="d-flex align-items-center me-3">
+                              <button class="button button-md button-secondary button-pipaluk">去逛逛</button>
+                            </div>
+                          </div>
+                        </div>
+                         
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    <!-- Global Mailform Output-->
+    <div class="snackbars" id="form-output-global"></div>
+    <!-- footer  th:replace=-->
+    <div th:replace="~{starcups/display/footer}" ></div>
+
+
+
+
+     <!-- Javascript-->
+    <script src="/SpanTasty/starcups/js/core.min.js"></script>
+    <script src="/SpanTasty/starcups/js/script.js"></script>
+
+
+  </body>
+</html>
