@@ -108,9 +108,9 @@ public class ProductService {
             if (product.getProductName() != null) {
                 existingProduct.setProductName(product.getProductName());
             }
-            if (product.getProductType() != null) {
-                existingProduct.setProductType(product.getProductType());
-            }
+//            if (product.getProductType() != null) {
+//                existingProduct.setProductType(product.getProductType());
+//            }
             if (product.getProductPrice() != null) {
                 existingProduct.setProductPrice(product.getProductPrice());
             }

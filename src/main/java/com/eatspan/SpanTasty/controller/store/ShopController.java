@@ -32,23 +32,23 @@ public class ShopController {
     @Autowired
     private CartService cartService;
 
-	 @GetMapping("/allProduct")
-	    public String findAllProduct(
-	            @RequestParam(value = "page", defaultValue = "1") int page,
-	            Model model) {
-	        List<ProductType> productTypes = productTypeService.findAllProductType();
-	        model.addAttribute("productTypes", productTypes);
-	        
-	        List<Product> products = productService.findProductsByPage(page, 12); 
-	        model.addAttribute("products", products);
-	        
-	        int totalProducts = productService.countAllProducts();
-	        int totalPages = (int) Math.ceil((double) totalProducts / 12);
-	        model.addAttribute("totalPages", totalPages);
-	        model.addAttribute("currentPage", page);
-	        
-	        return "starcups/store/allProduct";
-	    }
+//	 @GetMapping("/allProduct")
+//	    public String findAllProduct(
+//	            @RequestParam(value = "page", defaultValue = "1") int page,
+//	            Model model) {
+//	        List<ProductType> productTypes = productTypeService.findAllProductType();
+//	        model.addAttribute("productTypes", productTypes);
+//	        
+//	        List<Product> products = productService.findProductsByPage(page, 12); 
+//	        model.addAttribute("products", products);
+//	        
+//	        int totalProducts = productService.countAllProducts();
+//	        int totalPages = (int) Math.ceil((double) totalProducts / 12);
+//	        model.addAttribute("totalPages", totalPages);
+//	        model.addAttribute("currentPage", page);
+//	        
+//	        return "starcups/store/allProduct";
+//	    }
 	
 //	@GetMapping("/allProduct")
 //	public String findAllProduct(Model model) {
