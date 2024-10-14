@@ -1,8 +1,7 @@
 package com.eatspan.SpanTasty.service.rental;
 
 import java.util.List;
-
-
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.repository.rental.TablewareStockRepository;
 
@@ -66,7 +66,7 @@ public class TablewareStockService {
 	public List<TablewareStock> findStockByTablewareId(Integer tablewareId) {
 		return tablewareStockRepository.findByTablewareId(tablewareId);
 	}
-	
+
 	
 //	查詢所有庫存(Page)
 //	public Page<TablewareStock> findAllStocksPage(Integer page){

@@ -78,21 +78,21 @@ public class RentController {
 	}
 	
 	
-//	篩選掉庫存為0的用具
-//	@PostMapping("/filter")
-//	@ResponseBody
-//	public List<Tableware> getTablewaresByFilter(@RequestBody TablewareFilterDTO tablewareFilterDTO) {
-//	    List<Tableware> availableTablewares = tablewareService.findAllTablewares()
-//	        .stream()
-//	        // 這裡不再需要過濾 tablewareStatus，因為在第一次已經過濾過了
-//	        .filter(tableware -> {
-//	            TablewareStock stock = tablewareStockService.findStockById(tableware.getTablewareId(), tablewareFilterDTO.getRestaurantId());
-//	            return stock != null && stock.getStock() > 0;  // 只過濾庫存
-//	        })
-//	        .collect(Collectors.toList());
-//	    
-//	    return availableTablewares; // 返回 JSON 給前端 AJAX
-//	}
+	// 篩選掉庫存為0的用具
+	@PostMapping("/filter")
+	@ResponseBody
+	public List<Tableware> getTablewaresByFilter(@RequestBody TablewareFilterDTO tablewareFilterDTO) {
+	    List<Tableware> availableTablewares = tablewareService.findAllTablewares()
+	        .stream()
+	        // 這裡不再需要過濾 tablewareStatus，因為在第一次已經過濾過了
+	        .filter(tableware -> {
+	            TablewareStock stock = tablewareStockService.findStockById(tableware.getTablewareId(), tablewareFilterDTO.getRestaurantId());
+	            return stock != null && stock.getStock() > 0;  // 只過濾庫存
+	        })
+	        .collect(Collectors.toList());
+	    
+	    return availableTablewares; // 返回 JSON 給前端 AJAX
+	}
 	
 	
 	// 檢查庫存
