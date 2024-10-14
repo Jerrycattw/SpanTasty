@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import com.eatspan.SpanTasty.config.MailConfig;
 import com.eatspan.SpanTasty.dto.discount.CouponDTO;
 import com.eatspan.SpanTasty.dto.discount.CouponDistributeDTO;
 import com.eatspan.SpanTasty.dto.discount.TagDTO;
@@ -62,6 +63,9 @@ public class CouponService {
 	
 	@Autowired
 	private ProductTypeRepository productTypeRepo;
+	
+	@Autowired
+	private MailConfig mailConfig;// javaMail要注入----------------------------
 
 	@Autowired
 	private JavaMailSender mailSender;// javaMail要注入----------------------------
@@ -76,9 +80,10 @@ public class CouponService {
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 		MimeMessageHelper  helper = new MimeMessageHelper(mimeMessage,true);
 		//設置mail
-		helper.setFrom("receipt0210@gmail.com");//誰寄信(application設定的信箱)
+		helper.setFrom(mailConfig.getUserName());//誰寄信(application設定的信箱,mail.properties的userName)
 		helper.setTo(memberEmail);//誰收信
 		helper.setSubject("【☕週年靜加碼】starcups 咖啡不限金額9折");//主旨
+		//helpr.setText();不要模板或圖片資源的話在這裡設置內文，下面只要mail.send
 		
 		//設置模板
 		//設置model
