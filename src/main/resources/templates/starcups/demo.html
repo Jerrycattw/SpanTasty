@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登入</title>
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+</head>
+
+<body>
+
+    <div th:replace="~{/starcups/display/navbar}"></div>
+	<!-- 標題 以下為DEMO -->
+    <!--  -->
+    <section class="section breadcrumbs-custom-inset">
+      <div class="breadcrumbs-custom context-dark">
+        <div class="container">
+          <h2 class="breadcrumbs-custom-title">Privacy Policy</h2>
+          <ul class="breadcrumbs-custom-path">
+            <li><a href="/SpanTasty/StarCups">Home</a></li>
+            <li class="active">LOGIN</li>
+          </ul>
+        </div>
+        <!-- 圖片-->
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+      </div>
+    </section>
+    <!-- 套用自己要的板 以下為DEMO -->
+    <section class="section novi-bg novi-bg-img section-xl bg-default text-start">
+      <div class="container">
+        <h2>Login</h2>
+        <!-- Login Form -->
+        <form action="/login" method="post">
+          <div class="form-group">
+            <label for="email" class="heading-5">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" required placeholder="Enter your email">
+          </div>
+          <div class="form-group">
+            <label for="password" class="heading-5">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required
+              placeholder="Enter your password">
+          </div>
+          <div class="form-group">
+            <button type="submit" class="button button-md button-secondary button-ujarak">Login</button>
+          </div>
+          <div class="form-group">
+            <p><a href="/forgot-password" class="privacy-link">Forgot your password?</a></p>
+          </div>
+        </form>
+      </div>
+    </section>
+    
+    
+    
+    <div th:replace="~{starcups/display/footer}" ></div>
+    
+     <!-- Javascript-->
+    <script src="/SpanTasty/starcups/js/core.min.js"></script>
+    <script src="/SpanTasty/starcups/js/script.js"></script>
+  <!-- Add more content here -->
+</body>
+
+</html>

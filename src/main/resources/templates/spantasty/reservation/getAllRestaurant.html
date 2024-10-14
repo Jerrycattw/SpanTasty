@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>Restaurant</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+</head>
+<body>
+<div th:replace="~{spantasty/display/navbar}" ></div>
+<!-- 主要內容區域 -->
+<div class="content">
+
+  <!-- Dark table -->
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-11">
+        <div class="card bg-dark text-white shadow">
+		  <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+		    <h3 class="mb-0">餐廳資料</h3>
+		    <a th:href="@{/restaurant/add}" class="btn btn-primary btn-sm">+新增餐廳</a>
+		  </div>
+          <div class="table-responsive">
+            <table class="table table-dark table-striped table-hover text-center">
+              <thead>
+                <tr>
+                  <th scope="col">餐廳名稱</th>
+                  <th scope="col">餐廳地址</th>
+                  <th scope="col">餐廳電話</th>
+                  <th scope="col">營業時間</th>
+                  <th scope="col">餐廳狀態</th>
+                  <th scope="col">查看資料</th>
+                  <th scope="col">修改資料</th>
+                  <th scope="col">刪除資料</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="restaurant : ${restaurantsPage.content}">
+                  <th scope="row" class="align-middle">
+                    <div class="media align-items-center">
+                      <div class="media-body">
+                        <span th:text="${restaurant.restaurantName}">餐廳名稱</span>
+                      </div>
+                    </div>
+                  </th>
+                  <td class="align-middle" th:text="${restaurant.restaurantAddress}">餐廳地址</td>
+                  <td class="align-middle" th:text="${restaurant.restaurantPhone}">餐廳電話</td>
+                  <td class="align-middle">
+                    <span th:text="${restaurant.restaurantOpentime} + ' ~ ' + ${restaurant.restaurantClosetime}">營業時間</span>
+                  </td>
+					<td class="align-middle">
+					  <span th:switch="${restaurant.restaurantStatus}">
+					    <span th:case="1" class="badge bg-success text-white">營業中</span>
+					    <span th:case="2" class="badge bg-danger text-white">已歇業</span>
+					    <span th:case="* " class="badge bg-warning text-dark">籌備中</span>
+					  </span>
+					</td>
+                  <td class="align-middle">
+                    <a th:href="@{/restaurant/get/{id}(id=${restaurant.restaurantId})}" class="btn btn-info btn-sm">檢視</a>
+                  </td>
+                  <td class="align-middle">
+                    <a th:href="@{/restaurant/set/{id}(id=${restaurant.restaurantId})}" class="btn btn-warning btn-sm">修改</a>
+                  </td>
+                  <td id="delRestaurantBtn_td" class="align-middle">
+				      <button th:onclick="confirmDelete([[${restaurant.restaurantId}]])" class="btn btn-danger btn-sm">刪除</button>
+				  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+        </div>
+        
+          <!-- 分頁連結 -->
+          <div class="d-flex justify-content-end mt-3">
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                <!-- 前一頁 -->
+                <li class="page-item" th:classappend="${restaurantsPage.hasPrevious()} ? '' : 'disabled'">
+                  <a class="page-link" th:href="@{/restaurant/getAll(page=${restaurantsPage.number - 1})}">上一頁</a>
+                </li>
+                <!-- 頁碼 -->
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, restaurantsPage.totalPages - 1)}"
+                    th:classappend="${i == restaurantsPage.number} ? 'active' : ''">
+                  <a class="page-link" th:href="@{/restaurant/getAll(page=${i})}" th:text="${i + 1}">1</a>
+                </li>
+                <!-- 下一頁 -->
+                <li class="page-item" th:classappend="${restaurantsPage.hasNext()} ? '' : 'disabled'">
+                  <a class="page-link" th:href="@{/restaurant/getAll(page=${restaurantsPage.number + 1})}">下一頁</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        
+        
+        
+      </div>
+    </div>
+  </div>
+  <!-- Dark table End -->
+</div>
+<script>
+     document.addEventListener("DOMContentLoaded", function() {
+         showSidebar('reservation');
+     });
+     
+     console.log(swal);
+     
+	function confirmDelete(id) {
+	    Swal.fire({
+	        title: "確定刪除？",
+	        text: "一旦刪除，將無法恢復！",
+	        icon: "warning",
+	        showCancelButton: true,
+	        confirmButtonText: "刪除",
+	        cancelButtonText: "取消",
+	    }).then((result) => {
+	        if (result.isConfirmed) {
+	            // 使用 axios 發送 DELETE 請求
+	            axios.delete(`/SpanTasty/restaurant/del/${id}`)
+	                .then(response => {
+	                    if (response.status === 200) {
+						    Swal.fire("刪除成功！", "", "success").then(() => {
+						        location.reload(); // 立即重新加載頁面
+						    });
+	
+	                        // 延遲 3 秒後重新加載頁面
+	                        setTimeout(() => {
+	                            location.reload(); // 重新加載頁面
+	                        }, 3000);
+	                    }
+	                })
+	                .catch(error => {
+	                    Swal.fire("發生錯誤！", "請稍後再試。", "error");
+	                    console.error('刪除失敗：', error);
+	                });
+	        } else {
+	            Swal.fire("您的資料未被刪除！");
+	        }
+	    });
+	}
+     
+
+</script>
+</body>
+</html>

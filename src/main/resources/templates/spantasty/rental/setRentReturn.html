@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>歸還環保用具</title>
+</head>
+<style>
+.h {
+	text-align: center;
+}
+
+form {
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background-color: #c8e6c9;
+}
+
+.table {
+    background-color: #f1f8e9; /* 表格背景：淡綠 */
+}
+
+.table thead {
+    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    color: #1b5e20;
+}
+
+.tableware-input{
+	width: 86%;
+	padding: 5px;
+	margin-bottom: 0px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+.body {
+    background-color: #e9f7ef; /* 背景色：淡綠 */
+}
+</style>
+<body class="body">
+<div th:replace="~{spantasty/display/navbar}"></div>
+<div class="content" id="container">
+<h3 class="h">歸還用具</h3>
+<form th:action="@{/rent/setPut2}" th:method="post">
+<input type="hidden" name="_method" value="put" />
+<table class="table table-striped" id="table">
+	<tr><td>訂單編號: <input class="tableware-input" type="text" name="rentId" th:value="${rent.rentId}" readonly></td></tr>
+	<tr><td>歸還日期: <input class="tableware-input" type="date" name="returnDate" th:value="${#dates.format(rent.returnDate, 'yyyy-MM-dd')}" readonly /></td></tr>
+	<tr><td>歸還餐廳:
+		<select class="tableware-input" name="returnRestaurantId" id="returnRestaurantId" required>
+			<option value="" selected disabled>請選擇租借餐廳</option>
+			<option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}" th:selected="${rent.returnRestaurantId == restaurant.restaurantId}"></option>
+		</select>
+	</td></tr>
+</table>
+<div class="table-responsive">
+        <table class="table table-striped" id="table">
+            <tr>
+                <th>用具編號</th>
+                <th>品項數量</th>
+                <th>歸還備註</th>
+            </tr>
+        <th:block th:each=" rentItem : ${rentItems}">
+            <tr>
+                <td th:text="${rentItem.tablewareId}"></td>
+                <td th:text="${rentItem.rentItemQuantity}"></td>
+                <td>
+	                <select name="returnMemo" class="returnMemo" required>
+                    	<option th:text="${rentItem.returnMemo}" selected></option>
+                    </select>
+                    <script th:inline="javascript">
+                        var rentItemQuantity = [[${rentItem.rentItemQuantity}]];
+                        var returnMemo = '[[${rentItem.returnMemo}]]';
+                        var select = document.currentScript.previousElementSibling;
+                        // 清除之前的選項（除了第一個提示選項）
+                        while (select.options.length > 1) {
+                            select.remove(1);
+                        }
+                        // 生成每個選項
+                        for (var y = rentItemQuantity; y >= 0; y--) {
+                             for (var z = 0; z <= y; z++) {
+                                 var option = document.createElement('option');
+                                 var optionText = '租借' + rentItemQuantity + '歸還' + y + '破損' + z;
+                                 option.value = optionText;
+                                 option.text = optionText;
+                                 if (optionText === returnMemo) {
+                                     option.selected = true;  // 預設選中與returnMemo匹配的選項
+                                 }
+                                 select.appendChild(option);
+                             }
+                         }
+
+                         // 如果 returnMemo 存在但不匹配任何生成的選項，自動取消提示選項
+                         if (returnMemo) {
+                             select.options[0].disabled = true;
+                         }
+                    </script>
+                </td>
+            </tr>
+        </th:block>
+        </table>
+	 </div>
+<span id="disabledMsg" style="color:red; display: none">訂單已完全歸還，無法再更改。</span>
+<input type="submit" id="submitBtn" value="確定歸還"/>
+<input type="hidden" name="rentDeposit" th:value="${rent.rentDeposit}"/>
+<input type="hidden" name="rentDate" th:value="${rent.rentDate}">
+<input type="hidden" name="restaurantId" th:value="${rent.restaurantId}">
+<input type="hidden" name="memberId" th:value="${rent.memberId}">
+<input type="hidden" name="dueDate" th:value="${rent.dueDate}">
+<input type="hidden" id="rentStatus" name="rentStatus" th:value="${rent.rentStatus}">
+<input type="hidden" name="rentMemo" th:value="${rent.rentMemo}"/>
+</form>
+</div>
+<script>
+window.onload = function() {
+	const rentStatus = document.getElementById('rentStatus');
+	const returnRestaurantId = document.getElementById('returnRestaurantId');
+	const submitBtn = document.getElementById('submitBtn');
+	if (rentStatus.value === '2') {
+		submitBtn.disabled = true;
+		returnRestaurantId.disabled = true;
+		document.getElementById('disabledMsg').style.display = 'block';
+	}
+};
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	showSidebar('rental');
+});
+</script>
+</body>
+</html>

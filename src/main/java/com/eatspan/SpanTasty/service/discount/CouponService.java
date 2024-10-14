@@ -1,6 +1,9 @@
 package com.eatspan.SpanTasty.service.discount;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,7 +13,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import com.eatspan.SpanTasty.dto.discount.CouponDTO;
 import com.eatspan.SpanTasty.dto.discount.CouponDistributeDTO;
@@ -18,13 +27,22 @@ import com.eatspan.SpanTasty.dto.discount.TagDTO;
 import com.eatspan.SpanTasty.entity.discount.Coupon;
 import com.eatspan.SpanTasty.entity.discount.CouponMember;
 import com.eatspan.SpanTasty.entity.discount.CouponMemberId;
+import com.eatspan.SpanTasty.entity.discount.CouponSchedule;
 import com.eatspan.SpanTasty.entity.discount.Tag;
 import com.eatspan.SpanTasty.entity.discount.TagId;
 import com.eatspan.SpanTasty.repository.discount.CouponMemberRepository;
 import com.eatspan.SpanTasty.repository.discount.CouponRepository;
+import com.eatspan.SpanTasty.repository.discount.CouponScheduleRepository;
 import com.eatspan.SpanTasty.repository.order.FoodKindRepository;
 import com.eatspan.SpanTasty.repository.store.ProductTypeRepository;
 import com.eatspan.SpanTasty.utils.discount.DateUtils;
+
+import freemarker.core.ParseException;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class CouponService {
@@ -37,12 +55,51 @@ public class CouponService {
 	private CouponMemberRepository couponMemberRepo;
 	
 	@Autowired
+	private CouponScheduleRepository couponScheduleRepo;
+	
+	@Autowired
 	private FoodKindRepository foodKindRepo;
 	
 	@Autowired
 	private ProductTypeRepository productTypeRepo;
 
+	@Autowired
+	private JavaMailSender mailSender;// javaMail要注入----------------------------
 	
+	@Autowired
+	private freemarker.template.Configuration freemarkerConfig; // javaMail要注入----------------------------
+	
+	
+	//mail------------------------------------------------------------------------------------
+	//範例   //傳入參數在自行設置
+	public void sendMail(String memberName,String memberEmail) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		MimeMessageHelper  helper = new MimeMessageHelper(mimeMessage,true);
+		//設置mail
+		helper.setFrom("receipt0210@gmail.com");//誰寄信(application設定的信箱)
+		helper.setTo(memberEmail);//誰收信
+		helper.setSubject("【☕週年靜加碼】starcups 咖啡不限金額9折");//主旨
+		
+		//設置模板
+		//設置model
+		Map<String, Object> model = new HashMap<String,Object>();
+		//透過modal傳入的物件("參數名","東西")
+		model.put("userName",memberName);
+		//get模板，並將modal傳入模板
+		String templateString = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfig.getTemplate("couponMail.html"), model);
+		
+		//設置mail內文
+		helper.setText(templateString,true);
+		
+		//設置資源，順序要在內文之後
+		FileSystemResource file = new FileSystemResource(new File("src/main/resources/static/images/mail/logo-starcups.png"));
+		helper.addInline("logo",file);
+		
+		mailSender.send(mimeMessage);	
+	}
+	//-------------------------------------------------------------------------------------------
+	
+
 	//convert distributeDTO(excute)
 	public CouponDistributeDTO converCouponDistributeDTO(CouponMember couponMember,String distributeStatus,String distributeFailReason ) {
 		CouponDistributeDTO couponDistributeDTO = new CouponDistributeDTO();	
@@ -75,7 +132,7 @@ public class CouponService {
 	//convert couponDTO
 	public CouponDTO convertCouponDTO(Coupon coupon) {
 		List<TagDTO> tagDTOs = coupon.getTags().stream()
-				.map(tagBean -> new TagDTO(tagBean.getTagId().getTagName(), tagBean.getTagType()))
+				.map(tagBean -> new TagDTO(tagBean.getTagId().getTagName(), tagBean.getTagId().getTagType()))
 				.collect(Collectors.toList());
 
 		return new CouponDTO(
@@ -112,15 +169,18 @@ public class CouponService {
 	    if (tags != null) {
 	        for (String tag : tags) {
 	            Tag tagBean = new Tag();
-	            tagBean.setTagType(tagType);
+//	            tagBean.setTagType(tagType);
 	            
 	            if (coupon.getCouponId() != null) {
-	            	tagBean.setTagId(new TagId(coupon.getCouponId(),tag));//修改透過coupon的ID
+	            	tagBean.setTagId(new TagId(coupon.getCouponId(),tag,tagType));//修改透過coupon的ID
 	            }else {
-	            	tagBean.setTagId(new TagId(tag));//新增的COUPON沒有ID，透過關聯coupon identity新增
+	            	tagBean.setTagId(new TagId(tag,tagType));//新增的COUPON沒有ID，透過關聯coupon identity新增
+
 	            }
 	            
 	            tagBean.setCoupon(coupon);
+	            List<Tag> tagsList = new ArrayList<Tag>();
+//	            coupon.setTags(tagsList);
 	            coupon.getTags().add(tagBean);
 	        }
 	    }
@@ -161,6 +221,7 @@ public class CouponService {
 	public void insertCoupon(Coupon couponBean,String[] productTags, String[] togoTags) {
 		addTags(couponBean,productTags,"product");
 		addTags(couponBean,togoTags,"togo");
+		System.out.println(couponBean);
 		CouponRepo.save(couponBean);
 	}
 	
@@ -214,77 +275,13 @@ public class CouponService {
 			}
 		}
 		return convertCouponDistributeDTO(couponOption);
-	}
+	}	
 	
 	//發放優惠券
-	public List<CouponDistributeDTO> distributeExcute(String memberIds,Integer couponId,Integer perMaxCoupon) {
-		List<CouponMember> couponMembers=new ArrayList<>();
-		List<CouponDistributeDTO> couponDistributeDTOs = new ArrayList<>();
-		
-		//memberIds="1,2,3,..."
-		String[] arrayMemberIds =  memberIds.split(",");
-		
-		for (String memberIdStr : arrayMemberIds) {
-			int memberId = Integer.parseInt(memberIdStr);
-			CouponMemberId couponMemberId = new CouponMemberId(couponId,memberId);
-			Optional<CouponMember> optional = couponMemberRepo.findById(couponMemberId);
-			
-			if(perMaxCoupon==null) {
-				if(optional.isEmpty()) {
-					//資料庫
-					CouponMember couponMember = new CouponMember(couponMemberId,1,1);
-					couponMembers.add(couponMember);
-					
-					//傳回前端
-					CouponDistributeDTO converCouponDistributeDTO = converCouponDistributeDTO(couponMember, "成功", null);
-					couponDistributeDTOs.add(converCouponDistributeDTO);
-				}else {
-					//資料庫
-					CouponMember couponMember = optional.get();
-					couponMember.setTotalAmount(couponMember.getTotalAmount()+1);
-					couponMember.setUsageAmount(couponMember.getUsageAmount()+1);
-					couponMembers.add(couponMember);
-					
-					//傳回前端
-					CouponDistributeDTO converCouponDistributeDTO = converCouponDistributeDTO(couponMember, "成功", null);
-					couponDistributeDTOs.add(converCouponDistributeDTO);
-				}
-				couponMemberRepo.saveAll(couponMembers);//資料庫
-				return couponDistributeDTOs;//傳回前端
-			}else {
-				if(optional.isEmpty()) {
-					//資料庫
-					CouponMember couponMember = new CouponMember(couponMemberId,1,1);
-					couponMembers.add(couponMember);
-					
-					//傳回前端
-					CouponDistributeDTO converCouponDistributeDTO = converCouponDistributeDTO(couponMember, "成功", null);
-					couponDistributeDTOs.add(converCouponDistributeDTO);					
-				}else if(optional.get().getTotalAmount()<perMaxCoupon){
-					//資料庫
-					CouponMember couponMember = optional.get();
-					couponMember.setTotalAmount(couponMember.getTotalAmount()+1);
-					couponMember.setUsageAmount(couponMember.getUsageAmount()+1);
-					couponMembers.add(couponMember);
-					
-					//傳回前端
-					CouponDistributeDTO converCouponDistributeDTO = converCouponDistributeDTO(couponMember, "失敗", "個人領取數量已達上限");
-					couponDistributeDTOs.add(converCouponDistributeDTO);
-				}else {
-					CouponMember couponMember = optional.get();
-					//傳回前端
-					CouponDistributeDTO converCouponDistributeDTO = converCouponDistributeDTO(couponMember, "失敗", "個人領取數量已達上限");
-					couponDistributeDTOs.add(converCouponDistributeDTO);
-				}
-				couponMemberRepo.saveAll(couponMembers);//資料庫
-				return couponDistributeDTOs;//傳回前端
-			}
-		}
-		return couponDistributeDTOs;
-	}
-	
-	public List<CouponDistributeDTO> distributeExcute2(String memberIds, Integer couponId, Integer perMaxCoupon) {
-	    List<CouponMember> couponMembersToSave = new ArrayList<>();
+	@Transactional
+	public List<CouponDistributeDTO> distributeExcute2(String memberIds, Integer couponId, Integer perMaxCoupon, LocalDateTime scheduleTime,String scheduleName) {
+//	    List<CouponMember> couponMembersToSave = new ArrayList<>();
+		List<CouponSchedule> schedulesToSave = new ArrayList<>();
 	    List<CouponDistributeDTO> results = new ArrayList<>();
 
 	    Arrays.stream(memberIds.split(","))
@@ -294,23 +291,34 @@ public class CouponService {
 	              Optional<CouponMember> optionalCouponMember = couponMemberRepo.findById(couponMemberId);
 	              
 	              CouponMember couponMember = optionalCouponMember.orElseGet(() -> new CouponMember(couponMemberId, 0, 0));
-	              String status = "成功";
+//	              String status = "成功";
+	              String status = "排程成功";
 	              String message = null;
 	              
 	              System.out.println("==="+couponMember.getTotalAmount()+" "+perMaxCoupon);
 	              if (perMaxCoupon == null || couponMember.getTotalAmount() < perMaxCoupon) {
-	                  couponMember.incrementAmounts();
-	                  couponMembersToSave.add(couponMember);
+//	                  couponMember.incrementAmounts();
+//	                  couponMembersToSave.add(couponMember);
+	                  CouponSchedule schedule = new CouponSchedule();
+	                  schedule.setCouponMember(couponMember);
+	                  schedule.setScheduleTime(scheduleTime);
+	                  schedule.setScheduleName(scheduleName);
+	                  schedule.setStatus("pending");
+	                  schedulesToSave.add(schedule);
 	              } else {
-	                  status = "失敗";
+//	                  status = "失敗";
+	                  status = "排程失敗";
 	                  message = "個人領取數量已達上限";
 	              }
 
 	              results.add(converCouponDistributeDTO(couponMember, status, message));
 	          });
 
-	    if (!couponMembersToSave.isEmpty()) {
-	        couponMemberRepo.saveAll(couponMembersToSave);
+//	    if (!couponMembersToSave.isEmpty()) {
+//	        couponMemberRepo.saveAll(couponMembersToSave);
+//	    }
+	    if(!schedulesToSave.isEmpty()) {
+	    	couponScheduleRepo.saveAll(schedulesToSave);
 	    }
 
 	    return results;

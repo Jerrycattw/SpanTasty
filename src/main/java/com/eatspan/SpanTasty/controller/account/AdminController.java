@@ -151,7 +151,6 @@ public class AdminController {
 	}
 
 	// 重設密碼
-	// 重設密碼
 	@PostMapping("/resetPassword")
 	public Result<String> resetPassword(@RequestParam Integer adminId) {
 		boolean success = adminService.resetPassword(adminId);
@@ -163,7 +162,6 @@ public class AdminController {
 		}
 	}
 
-	// 更新管理員資訊
 	// 更新管理員資訊
 	@PostMapping("/updateAdminProfile")
 	public Result<String> updateProfile(@RequestBody Map<String, String> updateData, HttpSession session) {
@@ -202,7 +200,7 @@ public class AdminController {
 		}
 	}
 
-	// 更新頭像
+	// 更新管理員個人頭像
 	@PostMapping("/updateAvatar")
 	public Result<String> updateAdminAvatar(@RequestParam("avatar") MultipartFile avatarFile, HttpSession session) {
 		try {
@@ -232,7 +230,7 @@ public class AdminController {
 		}
 	}
 
-	// 移除管理員頭像
+	// 移除管理員個人頭像
 	@PostMapping("/removeAvatar")
 	public Result<String> removeAvatar(HttpSession session) {
 		Admin admin = (Admin) session.getAttribute("admin");
@@ -252,8 +250,47 @@ public class AdminController {
 			return Result.failure("移除頭像失敗，請稍後再試");
 		}
 	}
+	
+	// 移除管理員頭像
+	@PostMapping("/removeAdminAvatar")
+	public Result<String> removeAdminAvatar(@RequestBody Map<String, Integer> requestData, HttpSession session){
+		Integer adminid = requestData.get("adminId");
+        Admin admin = (Admin) session.getAttribute("admin");
 
-	// 獲取頭像
+        if (admin == null) {
+            return Result.failure("未登入或會話已過期");
+        }
+        
+        boolean isRemoved = adminService.removeAdminAvatar(adminid);
+        
+        if (isRemoved) {
+            return Result.success("頭像已成功移除");
+        } else {
+            return Result.failure("移除頭像失敗，請稍後再試");
+        }
+        
+	}
+	
+	// 移除會員頭像
+	@PostMapping("/removeMemberAvatar")
+    public Result<String> removeMemberAvatar(@RequestBody Map<String, Integer> requestData, HttpSession session) {
+        Integer memberId = requestData.get("memberId");
+        Admin admin = (Admin) session.getAttribute("admin");
+
+        if (admin == null) {
+            return Result.failure("未登入或會話已過期");
+        }
+
+        boolean isRemoved = memberService.removeMemberAvatar(memberId);
+
+        if (isRemoved) {
+            return Result.success("頭像已成功移除");
+        } else {
+            return Result.failure("移除頭像失敗，請稍後再試");
+        }
+    }
+
+	// 獲取管理員個人頭像
 	@GetMapping("/getAvatar")
 	public Result<String> getAdminAvatar(HttpSession session) {
 		// 從 session 中獲取管理員資料
@@ -274,7 +311,7 @@ public class AdminController {
 		String base64Avatar = Base64.getEncoder().encodeToString(avatarBytes);
 		return Result.success("頭像取得成功", base64Avatar);
 	}
-
+	
 	// 搜索全部會員
 	@GetMapping("/findMembers")
 	public Result<Map<String, Object>> getAllMembers(@RequestParam(defaultValue = "0") int page,
@@ -391,7 +428,25 @@ public class AdminController {
 
 		return Result.success(data);
 	}
-
+	
+	// 更新管理員狀態
+	@PostMapping("/updateAdminStatus")
+	public Result<String> updateAdminStatus(@RequestBody Map<String, Object> requestData) {
+		Integer adminId = (Integer) requestData.get("adminId");
+		// 將 status 轉換為 String，再轉換為 char
+		String statusStr = (String) requestData.get("status");
+		
+		char status = statusStr != null && !statusStr.isEmpty() ? statusStr.charAt(0) : 'A'; // 默認 'A'
+		
+		boolean isUpdated = adminService.updateAdminStatus(adminId, status);
+		
+		if (isUpdated) {
+			return Result.success("管理員狀態更新成功");
+		} else {
+			return Result.failure("管理員狀態更新失敗");
+		}
+	}
+	
 	// 更新會員狀態
 	@PostMapping("/updateMemberStatus")
 	public Result<String> updateMemberStatus(@RequestBody Map<String, Object> requestData) {
@@ -416,7 +471,7 @@ public class AdminController {
 		}
 	}
 	
-	//搜尋管理員權限
+	//藉由權限搜尋管理員
 	@PostMapping("/searchAdminsByPermissions")
 	public Result<List<Admin>> searchAdminsByPermissions(@RequestBody Map<String, Object> request) {
 	    List<String> permissions = (List<String>) request.get("permissions");
@@ -432,6 +487,39 @@ public class AdminController {
 	    Page<Admin> adminPage = adminService.findAdminsByPermissions(permissions, page, size);
 	    return Result.success(adminPage.getContent());
 	}
+	
+	// 根據不同條件查詢管理員
+	@GetMapping("/search")
+	public Result<List<Admin>> searchAdmins(
+	    @RequestParam(required = false) Integer id,
+	    @RequestParam(required = false) String name,
+	    @RequestParam(required = false) String account,
+	    @RequestParam(defaultValue = "0") int page,
+	    @RequestParam(defaultValue = "10") int size
+	) {
+	    Pageable pageable = PageRequest.of(page, size);
+
+	    if (id != null) {
+	        // 根據 ID 查詢
+	        Admin admin = adminService.findById(id);
+	        if (admin != null) {
+	            return Result.success(List.of(admin));
+	        } else {
+	            return Result.failure("管理員未找到");
+	        }
+	    } else if (name != null && !name.isEmpty()) {
+	        // 根據名稱進行模糊查詢
+	        Page<Admin> adminPage = adminService.searchAdminsByName(name, pageable);
+	        return Result.success(adminPage.getContent());
+	    } else if (account != null && !account.isEmpty()) {
+	        // 根據帳號進行模糊查詢
+	        Page<Admin> adminPage = adminService.searchAdminsByAccount(account, pageable);
+	        return Result.success(adminPage.getContent());
+	    } else {
+	        return Result.failure("請提供有效的查詢條件");
+	    }
+	}
+
 	
     // 獲取指定管理員的權限
     @GetMapping("/{adminId}/permissions")

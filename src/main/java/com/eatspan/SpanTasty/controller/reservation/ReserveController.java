@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -58,7 +59,7 @@ public class ReserveController {
         List<Restaurant> restaurants = restaurantService.findAllRestaurants();
         model.addAttribute("tableTypes", tableTypes);
         model.addAttribute("restaurants", restaurants);
-        return "reservation/getAllReserve";
+        return "spantasty/reservation/getAllReserve";
     }
 	
     // 導向到訂位中心頁面
@@ -66,7 +67,7 @@ public class ReserveController {
     public String showReserveCenter(Model model) {
     	List<Restaurant> restaurants = restaurantService.findAllRestaurants();
     	model.addAttribute("restaurants", restaurants);
-    	return "reservation/reserveCenter";
+    	return "spantasty/reservation/reserveCenter";
     }
     
     
@@ -109,6 +110,15 @@ public class ReserveController {
     public Map<String, Integer> getReserveSum(@RequestParam(required = false) LocalDate slotEndDate,
     								   		  @RequestParam(required = false) LocalDate slotStartDate) {
     	Map<String, Integer> reserveSum = reserveService.getReserveSum(null, null);
+    	return reserveSum;
+    }
+    
+    
+    // ajax 查詢所有訂位訂單數量byMonth
+    @GetMapping("/getReserveMonth")
+    @ResponseBody
+    public List<Integer> getReserveMonth(@RequestParam(required = false) Integer year) {
+    	List<Integer> reserveSum = reserveService.getReserveInMonth(year);
     	return reserveSum;
     }
     

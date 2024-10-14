@@ -2,6 +2,7 @@ package com.eatspan.SpanTasty.controller.account;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +23,8 @@ import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.utils.account.JwtUtil;
 import com.eatspan.SpanTasty.utils.account.Result;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/member")
@@ -79,28 +82,37 @@ public class MemberController {
 		return Result.success("登入成功", token);
 	}
 
-	// 查詢個人資訊
 	@GetMapping("/profile")
-	public Result<Optional<Member>> getMemberProfile(@RequestHeader("Authorization") String token) {
+	public Result<Member> getMemberProfile(@RequestHeader("Authorization") String token) {
 
-		// 解析 JWT token 取得 claims
-		Map<String, Object> claims = JwtUtil.parseToken(token);
+	    // 解析 JWT token 取得 claims
+	    Map<String, Object> claims = JwtUtil.parseToken(token);
 
-		// 取得會員 ID
-		Integer memberId = (Integer) claims.get("memberId");
+	    // 取得會員 ID
+	    Integer memberId = (Integer) claims.get("memberId");
 
-		if (memberId == null) {
-			return Result.failure("無法從 Token 中取得會員 ID");
-		}
+	    if (memberId == null) {
+	        return Result.failure("無法從 Token 中取得會員 ID");
+	    }
 
-		// 根據會員 ID 查詢個人資訊
-		Optional<Member> member = memberService.findMemberById(memberId);
+	    // 根據會員 ID 查詢個人資訊
+	    Optional<Member> memberOpt = memberService.findMemberById(memberId);
 
-		if (member != null) {
-			return Result.success("個人資訊查詢成功", member);
-		} else {
-			return Result.failure("無法找到該會員的個人資訊");
-		}
+	    if (memberOpt.isPresent()) {
+	        Member member = memberOpt.get();
+	        
+	        // 格式化日期為 "yyyy-MM-dd a hh:mm"
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm");
+	        
+	        // 如果 loginDate 不為 null，進行格式化處理
+	        if (member.getLoginDate() != null) {
+	            member.setFormattedLoginDate(member.getLoginDate().format(formatter)); // 格式化登入日期
+	        }
+
+	        return Result.success("個人資訊查詢成功", member);
+	    } else {
+	        return Result.failure("無法找到該會員的個人資訊");
+	    }
 	}
 	
 	//更新密碼
@@ -110,7 +122,8 @@ public class MemberController {
 		// 解析 JWT token 來獲取 memberId
 		Map<String, Object> claims = JwtUtil.parseToken(token);
 		Integer memberId = (Integer) claims.get("memberId");
-
+		
+		
 		// 檢查新密碼和確認密碼是否一致
 		if (!newPassword.equals(confirmPassword)) {
 			return Result.failure("兩次輸入的密碼不一致");
@@ -132,7 +145,7 @@ public class MemberController {
 			@RequestHeader("Authorization") String token) {
         try {
             // 解析 JWT Token 並取得會員 ID
-            Map<String, Object> claims = JwtUtil.parseToken(token.replace("Bearer ", ""));
+            Map<String, Object> claims = JwtUtil.parseToken(token);
             Integer memberId = (Integer) claims.get("memberId");
 
             // 取得圖片的 byte[] 數據
@@ -175,5 +188,53 @@ public class MemberController {
         return Result.success("頭像取得成功", base64Avatar);
 		
 	}
+	//刪除頭像
+	@PostMapping("/removeAvatar")
+	public Result<String> removeAvatar(@RequestHeader("Authorization") String token) {
+		Map<String, Object> claims = JwtUtil.parseToken(token);
+		Integer memberId = (Integer) claims.get("memberId");
+		
+		boolean isDeleted = memberService.removeMemberAvatar(memberId);
+		
+        if (isDeleted) {
+            return Result.success("頭像已成功刪除");
+        } else {
+            return Result.failure("刪除頭像失敗");
+        }
+	}
+	
+    // 忘記密碼請求
+    @PostMapping("/forgot-password")
+    public Result<String> forgotPassword(@RequestParam String email, HttpServletRequest request) {
+        try {
+            // 調用服務層生成 token 並發送郵件
+            memberService.createPasswordResetToken(email, request);
+            return Result.success("重設密碼的連結已經發送至您的電子郵箱");
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
+
+ // 重設密碼請求
+    @PostMapping("/reset-password")
+    public Result<String> resetPassword(@RequestBody Map<String, String> passwordResetRequest) {
+        String token = passwordResetRequest.get("token");
+        String newPassword = passwordResetRequest.get("newPassword");
+        String confirmPassword = passwordResetRequest.get("confirmPassword");
+        System.out.println(token);
+
+        // 檢查兩次密碼是否一致
+        if (!newPassword.equals(confirmPassword)) {
+            return Result.failure("兩次輸入的密碼不一致");
+        }
+
+        try {
+            // 調用服務層進行密碼重設
+            memberService.resetPassword(token, newPassword);
+            return Result.success("您的密碼已經成功更新");
+        } catch (Exception e) {
+            return Result.failure(e.getMessage());
+        }
+    }
 
 }

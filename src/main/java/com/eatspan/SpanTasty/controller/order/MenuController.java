@@ -62,22 +62,29 @@ public class MenuController {
 	public String getMenuPage(Model model) {
 		List<FoodKindEntity> foodKinds = foodKindService.getAllFoodKind();
 		model.addAttribute("foodKinds", foodKinds);
-		return "order/getMenu";
+		return "spantasty/order/getMenu";
 	}
 	
 	@GetMapping("/menu/add")
 	public String addMenuPage(Model model) {
 		List<FoodKindEntity> foodKinds = foodKindService.getAllFoodKind();
 		model.addAttribute("foodKinds", foodKinds);
-		return "order/addMenu";
+		return "spantasty/order/addMenu";
 	}
 	
 	@GetMapping("/menu")
 	public String getAllMenu(Model model) {
 		List<MenuEntity> foodList = menuService.getAllFoods();
+		List<FoodKindEntity> foodKindList = foodKindService.getAllFoodKind();
 		model.addAttribute("foodList", foodList);
-		return "order/getAllMenu";
+		model.addAttribute("foodKindList", foodKindList);
+		return "starcups/order/showMenu";
 	}
+	
+//	@GetMapping("/menu")
+//	public ResponseEntity<List<MenuEntity>> getAllFoods() {
+//		return ResponseEntity.ok(menuService.getAllFoods());
+//	}
 	
 	@GetMapping("/menu/name")
 	@ResponseBody

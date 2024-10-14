@@ -50,7 +50,7 @@ public class ProductController {
 	public String toAddProduct(Model model) {
 		List<ProductType> productTypes = productTypeService.findAllProductType(); // 獲取所有商品類別
 		model.addAttribute("productTypes", productTypes); // 添加商品類別到模型
-		return "store/product/addProduct";
+		return "spantasty/store/product/addProduct";
 	}
 
 	// 新增
@@ -99,7 +99,7 @@ public class ProductController {
 		model.addAttribute("productTypes", productTypes);
 		Product product = productService.findProductById(productId);
 		model.addAttribute("product", product);
-		return "store/product/updateProduct";
+		return "spantasty/store/product/updateProduct";
 	}
 	
 
@@ -129,7 +129,12 @@ public class ProductController {
 			File fileToSave = new File(uploadPath + File.separator + newFileName);
 			file.transferTo(fileToSave);
 			updateProduct.setProductPicture("/SpanTasty/upload/store/" + newFileName);
+		}else {
+			String productImg = productService.findProductByIdU(updateProduct.getProductId()).getProductPicture();
+			updateProduct.setProductPicture(productImg);
 		}
+		
+		
 		productService.updateProduct(updateProduct);
 
 		return "redirect:/product/findAll";
@@ -151,7 +156,7 @@ public class ProductController {
 		model.addAttribute("productTypes", productTypes);
 		List<Product> products = productService.findAllProduct();
 		model.addAttribute("products", products);
-		return "store/product/searchAllProduct";
+		return "spantasty/store/product/searchAllProduct";
 	}
 
 }

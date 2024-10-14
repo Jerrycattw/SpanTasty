@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.eatspan.SpanTasty.entity.order.TogoEntity;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
@@ -62,13 +61,14 @@ public class TogoController {
 	
 	@GetMapping("/togo/get")
 	public String getTogoPage() {
-		return "order/getTogo";
+		return "spantasty/order/getTogo";
 	}
+	
 	@GetMapping("/togo/add")
 	public String addTogoPage(Model model) {
 		List<Restaurant> restaurants = restaurantService.findAllRestaurants();
 		model.addAttribute("restaurants", restaurants);
-		return "order/addTogo";
+		return "spantasty/order/addTogo";
 	}
 	
 	@GetMapping("/togo")
@@ -79,7 +79,7 @@ public class TogoController {
 	        togo.setFormattedDate(togo.getTogoCreateTime().format(formatter)); // 將日期格式化為字串
 	    }
 		model.addAttribute("togoList", togoList);
-		return "order/getAllTogo";
+		return "spantasty/order/getAllTogo";
 	}
 	
 	@GetMapping("/togo/{togoId}")

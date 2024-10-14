@@ -33,6 +33,12 @@ public class RestaurantService {
 	    if (restaurant.getRestaurantStatus() == null) {
 	        restaurant.setRestaurantStatus(3);
 	    }
+		if(restaurant.getReservePercent() == null) {
+			restaurant.setReservePercent(100); // 餐廳開放訂位的比例
+		}
+		if(restaurant.getReserveTimeScale() == null) {
+			restaurant.setReserveTimeScale(30); // 訂位的區間(預設為30分鐘)
+		}
 	    
 	    // 儲存餐廳以獲取其 ID
 	    Restaurant savedRestaurant = restaurantRepository.save(restaurant);
@@ -80,10 +86,12 @@ public class RestaurantService {
 	
 	
 	// 查詢所有餐廳(Page)
-	public Page<Restaurant> findAllRestaurantsPage(Integer pageNumber) {
-		Pageable pageAble = PageRequest.of(pageNumber-1, 10, Sort.Direction.DESC, "restaurantId");
+	public Page<Restaurant> findAllRestaurantsPage(Integer pageNumber, Integer itemNumber) {
+		if(itemNumber == null) itemNumber=10;
+		Pageable pageAble = PageRequest.of(pageNumber-1, itemNumber, Sort.Direction.DESC, "restaurantId");
 		return restaurantRepository.findAll(pageAble);
 	}
+	
 
 
 }

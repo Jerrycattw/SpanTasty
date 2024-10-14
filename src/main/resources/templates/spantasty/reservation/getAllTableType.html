@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>Restaurant</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+</head>
+<body>
+<div th:replace="~{spantasty/display/navbar}"></div>
+<!-- 主要內容區域 -->
+<div class="content">
+	
+    
+    <h2 class="mb-4 d-flex justify-content-center">餐 廳 桌 位 種 類</h2>
+    
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <div class="mb-2 d-flex justify-content-end">
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTableTypeModal">+新增桌位種類</button>
+            </div>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>桌位種類代碼</th>
+                        <th>桌位種類座位數</th>
+                        <th>刪除該種桌位</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <th:block th:each="tableType : ${tableTypes}">
+                        <tr th:if="${tableType != null}">
+                            <td th:text="${tableType.tableTypeId}"></td>
+                            <td th:text="${tableType.tableTypeName}"></td>
+
+                           	<td id="delTableTypeBtn" class="align-middle">
+							    <button th:data-table-type-id="${tableType.tableTypeId}" class="btn btn-danger btn-sm" onclick="confirmDelete(this)">刪除</button>
+							</td>
+                        </tr>
+                    </th:block>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 新增桌位種類的模態框 -->
+    <div class="modal fade" id="addTableTypeModal" tabindex="-1" aria-labelledby="addTableTypeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTableTypeModalLabel">新增桌位種類資料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                
+                    <form method="post" th:action="@{/tabletype/add}">
+                        <div class="mb-3">
+                            <label for="tableTypeId" class="form-label">輸入桌位種類代號:</label>
+                            <input type="text" class="form-control" name="tableTypeId" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="tableTypeName" class="form-label">輸入桌位種類人數:</label>
+                            <input type="number" class="form-control" name="tableTypeName" min="2" max="20" step="2" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary">確定</button>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+	<!-- 新增桌位種類的模態框 -->
+	
+	
+	
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        showSidebar('reservation');
+    });
+    
+    
+    function confirmDelete(button) {
+	    const tableTypeId = button.getAttribute('data-table-type-id');
+	    
+	    Swal.fire({
+	        title: "確定刪除？",
+	        text: "一旦刪除，將無法恢復！",
+	        icon: "warning",
+	        showCancelButton: true,
+	        confirmButtonText: "刪除",
+	        cancelButtonText: "取消",
+	    }).then((result) => {
+	        if (result.isConfirmed) {
+	            // 使用 axios 發送 DELETE 請求
+	            axios.delete(`/SpanTasty/tabletype/del?tableTypeId=${tableTypeId}`)
+	                .then(response => {
+	                    if (response.status === 200) {
+						    Swal.fire("刪除成功！", "", "success").then(() => {
+						        location.reload(); // 立即重新加載頁面
+						    });
+	                        // 延遲 3 秒後重新加載頁面
+	                        setTimeout(() => {
+	                            location.reload(); // 重新加載頁面
+	                        }, 3000);
+	                    }
+	                })
+	                .catch(error => {
+	                    Swal.fire("發生錯誤！", "請稍後再試。", "error");
+	                    console.error('刪除失敗：', error);
+	                });
+	        } else {
+	            Swal.fire("您的資料未被刪除！");
+	        }
+	    });
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>新增用具庫存</title>
+<style>
+.h {
+    text-align: center;
+}
+
+form {
+    width: 60%;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #c8e6c9;
+}
+
+.stock-input {
+    width: 86%;
+    padding: 5px;
+    margin-bottom: 0px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.table {
+    background-color: #f1f8e9;
+}
+
+.table thead {
+    background-color: #a5d6a7;
+    color: #1b5e20;
+}
+
+.body {
+    background-color: #e9f7ef;
+} 
+</style>
+</head>
+<body class="body">
+<div th:replace="~{spantasty/display/navbar}"></div>
+<div class="content" id="container">
+<h3 class="h">新增用具庫存</h3>
+<form th:action="@{/stock/addPost}" method="post">
+<table class="table table-striped" id="table">
+    <tr><td>用具名稱:
+            <select name="tablewareId" class="stock-input" required>
+                <option value="" selected disabled>請選擇餐具編號</option>
+                <option th:each="tableware : ${tablewares}" th:value="${tableware.tablewareId}" th:text="${tableware.tablewareName}"></option>
+            </select>
+    </td></tr>
+    <tr><td>餐廳名稱:
+            <select name="restaurantId" class="stock-input" required>
+                <option value="" selected disabled>請選擇餐廳名稱</option>
+                <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+            </select>
+    </td></tr>
+    <tr><td>用具庫存: <input type="number" name="stock" class="stock-input" required/></td></tr>
+</table>
+<input type="submit" value="新增庫存" />
+</form>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    showSidebar('rental');
+});
+</script>
+</body>
+</html>

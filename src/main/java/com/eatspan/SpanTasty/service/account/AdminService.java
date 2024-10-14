@@ -44,16 +44,6 @@ public class AdminService {
 		return permissionRepository.existsByAdminIdAndPermissionId(adminId, permissionId);
 	}
 
-	// 分頁查詢所有管理員，使用 Pageable 來控制分頁和排序
-	public Page<Admin> findAllAdmins(Pageable pageable) {
-		return adminRepository.findAll(pageable);
-	}
-
-	// 根據名稱進行模糊查詢管理員
-	public Page<Admin> searchAdminsByName(String adminName, Pageable pageable) {
-		return adminRepository.findByAdminNameContaining(adminName, pageable);
-	}
-
 	// 登入
 	public Admin login(String account, String password) {
 		// 根據帳號查找管理員
@@ -101,122 +91,7 @@ public class AdminService {
 			return false;
 		}
 	}
-
-	@Transactional
-	public boolean updateAdminPermissions(Integer adminId, List<String> permissions) {
-		// 找到管理員
-		Admin admin = adminRepository.findById(adminId).orElse(null);
-		if (admin == null) {
-			return false;
-		}
-
-		// 根據傳入的權限名稱列表找到對應的權限實體
-		List<Permission> permissionList = permissionRepository.findByPermissionNameIn(permissions);
-		if (permissionList == null || permissionList.isEmpty()) {
-			return false; // 如果找不到任何對應的權限，返回 false
-		}
-
-		// 設置管理員的權限
-		admin.setPermissions(new HashSet<>(permissionList));
-
-		// 保存更新後的管理員
-		adminRepository.save(admin);
-		return true;
-	}
 	
-	//更新管理員基本資訊
-	public boolean updateAdminProfile(Admin admin, String newAdminName, String newPassword) {
-	    try {
-	        if (newAdminName != null && !newAdminName.trim().isEmpty()) {
-	            admin.setAdminName(newAdminName);
-	        }
-	        if (newPassword != null && !newPassword.trim().isEmpty()) {
-	            admin.setPassword(newPassword);
-	        }
-	        // 設置首次登入為 0，表示已經完成首次資料修改
-	        admin.setFirstLogin(0);
-	        adminRepository.save(admin);
-	        return true;
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return false;
-	    }
-	}
-
-    public boolean removeAdminAvatar(Integer adminId) {
-        Optional<Admin> adminOptional = adminRepository.findById(adminId);
-        
-        if (adminOptional.isPresent()) {
-            Admin admin = adminOptional.get();
-            admin.setAvatar(null); // 將頭像設置為 null
-            adminRepository.save(admin); // 保存更新後的管理員資料
-            return true;
-        }
-
-        return false;
-    }
-
-    public boolean resetAdmin(Integer adminId) {
-        Optional<Admin> adminOptional = adminRepository.findById(adminId);
-        if (adminOptional.isPresent()) {
-            Admin admin = adminOptional.get();
-            String defaultPassword = "admin" + adminId;
-            String defaultAccount = "admin" + adminId;
-            String defaultName = "Admin" + adminId;
-            admin.setPassword(defaultPassword);
-            admin.setAccount(defaultAccount);
-            admin.setAdminName(defaultName);
-            admin.setAvatar(null);
-            adminRepository.save(admin);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean resetPassword(Integer adminId) {
-        Optional<Admin> adminOptional = adminRepository.findById(adminId);
-        if (adminOptional.isPresent()) {
-            Admin admin = adminOptional.get();
-            String defaultPassword = "1234"; // 預設密碼
-            admin.setPassword(defaultPassword);
-            adminRepository.save(admin);
-            return true;
-        }
-        return false;
-    }
-
-//    public Page<Admin> findAdminsByPermissions(List<String> permissions, int page, int size) {
-//        PageRequest pageRequest = PageRequest.of(page, size);
-//
-//        if (permissions.contains("none")) {
-//            // 查找無任何權限的管理員
-//            return adminRepository.findByPermissionsIsEmpty(pageRequest);
-//        } else {
-//            // 查找有特定權限的管理員
-//            List<Integer> permissionIds = permissionRepository.findByPermissionNameIn(permissions)
-//                    .stream()
-//                    .map(Permission::getPermissionId)
-//                    .collect(Collectors.toList());
-//
-//            return adminRepository.findByPermissions_PermissionIdIn(permissionIds, pageRequest);
-//        }
-//    }
-    
-    public Page<Admin> findAdminsByPermissions(List<String> permissions, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        return adminRepository.findAdminsByPermissions(permissions, pageRequest);
-    }
-
-    public Page<Admin> findAdminsWithNoPermissions(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return adminRepository.findAllByPermissionsIsEmpty(pageable);
-    }
-
-	public Admin findById(Integer adminId) {
-		// TODO Auto-generated method stub
-		return adminRepository.findById(adminId).orElse(null);
-	}
-
 	// 更新指定管理員的權限
 	public boolean updatePermissions(Integer adminId, List<String> permissionNames) {
 	    Optional<Admin> optionalAdmin = adminRepository.findById(adminId);
@@ -241,10 +116,135 @@ public class AdminService {
 	        return false;
 	    }
 	}
-    
+	
+	// 更新管理員的權限 用於新增管理員
+	@Transactional
+	public boolean updateAdminPermissions(Integer adminId, List<String> permissions) {
+		// 找到管理員
+		Admin admin = adminRepository.findById(adminId).orElse(null);
+		if (admin == null) {
+			return false;
+		}
 
+		// 根據傳入的權限名稱列表找到對應的權限實體
+		List<Permission> permissionList = permissionRepository.findByPermissionNameIn(permissions);
+		if (permissionList == null || permissionList.isEmpty()) {
+			return false; // 如果找不到任何對應的權限，返回 false
+		}
+
+		// 設置管理員的權限
+		admin.setPermissions(new HashSet<>(permissionList));
+
+		// 保存更新後的管理員
+		adminRepository.save(admin);
+		return true;
+	}
+	
+	//更新管理員狀態
+	public boolean updateAdminStatus(Integer adminId, char status) {
+		Admin admin = adminRepository.findById(adminId).orElse(null);
+		if(admin == null) {
+			return false;			
+		}
+		admin.setStatus(status);
+		adminRepository.save(admin);
+		return true;
+	}
+	
+	//更新管理員基本資訊
+	public boolean updateAdminProfile(Admin admin, String newAdminName, String newPassword) {
+	    try {
+	        if (newAdminName != null && !newAdminName.trim().isEmpty()) {
+	            admin.setAdminName(newAdminName);
+	        }
+	        if (newPassword != null && !newPassword.trim().isEmpty()) {
+	            admin.setPassword(newPassword);
+	        }
+	        // 設置首次登入為 0，表示已經完成首次資料修改
+	        admin.setFirstLogin(0);
+	        adminRepository.save(admin);
+	        return true;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+	
+	// 移除管理員頭像
+    public boolean removeAdminAvatar(Integer adminId) {
+        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+        
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
+            admin.setAvatar(null); // 將頭像設置為 null
+            adminRepository.save(admin); // 保存更新後的管理員資料
+            return true;
+        }
+
+        return false;
+    }
     
+    // 重設管理員的基本資料
+    public boolean resetAdmin(Integer adminId) {
+        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
+            String defaultPassword = "admin" + adminId;
+            String defaultAccount = "admin" + adminId;
+            String defaultName = "Admin" + adminId;
+            admin.setPassword(defaultPassword);
+            admin.setAccount(defaultAccount);
+            admin.setAdminName(defaultName);
+            admin.setAvatar(null);
+            adminRepository.save(admin);
+            return true;
+        }
+        return false;
+    }
     
+    //重設管理員密碼
+    public boolean resetPassword(Integer adminId) {
+        Optional<Admin> adminOptional = adminRepository.findById(adminId);
+        if (adminOptional.isPresent()) {
+            Admin admin = adminOptional.get();
+            String defaultPassword = "1234"; // 預設密碼
+            admin.setPassword(defaultPassword);
+            adminRepository.save(admin);
+            return true;
+        }
+        return false;
+    }
+    	
+    // 根據權限查詢管理員
+    public Page<Admin> findAdminsByPermissions(List<String> permissions, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return adminRepository.findAdminsByPermissions(permissions, pageRequest);
+    }
     
+    // 查詢沒有任何權限的管理員
+    public Page<Admin> findAdminsWithNoPermissions(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return adminRepository.findAllByPermissionsIsEmpty(pageable);
+    }
+
+	public Admin findById(Integer adminId) {
+		return adminRepository.findById(adminId).orElse(null);
+	}
+	
+	// 分頁查詢所有管理員，使用 Pageable 來控制分頁和排序
+	public Page<Admin> findAllAdmins(Pageable pageable) {
+		return adminRepository.findAll(pageable);
+	}
+
+	// 根據名稱進行模糊查詢管理員
+	public Page<Admin> searchAdminsByName(String adminName, Pageable pageable) {
+		return adminRepository.findByAdminNameContaining(adminName, pageable);
+	}
+	
+	// 根據帳號進行模糊查詢管理員
+	public Page<Admin> searchAdminsByAccount(String account, Pageable pageable) {
+	    return adminRepository.findByAccountContainingIgnoreCase(account, pageable);
+	}
+	 
 
 }

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員中心</title>
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <style>
+    .user-avatar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 300px;
+      height: 300px;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      overflow: hidden;
+    }
+
+    /* 確保圖片可以完整填滿容器 */
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div th:replace="~{/starcups/display/navbar}"></div>
+
+  <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+    <div class="container">
+      <div class="row row-50 justify-content-md-center">
+        <!-- 左側按鈕欄 -->
+        <div class="col-md-4">
+          <h4 class="text-spacing-50">會員中心</h4>
+          <div class="list-group">
+            <button class="button button-block button-secondary button-ujarak" id="btn-personal-info">
+              <span class="icon fa fa-user"></span> 個人資訊
+            </button>
+            <button class="button button-block button-secondary button-ujarak" id="btn-change-password">
+              <span class="icon fa fa-key"></span> 修改密碼
+            </button>
+            <button class="button button-block button-secondary button-ujarak" id="btn-change-avatar">
+              <span class="icon fa fa-image"></span> 修改頭像
+            </button>
+          </div>
+        </div>
+
+        <!-- 右側內容區域 -->
+        <div class="col-md-8">
+          <!-- 個人資訊 -->
+          <div id="personal-info" class="content-section">
+            <h4 class="text-spacing-50">個人資訊</h4>
+            <div class="card">
+              <div class="card-body text-center">
+                <!-- 頭像顯示區域 -->
+                <div class="user-avatar mb-3" id="personal-preview-avatar">
+                  <img id="personal-current-avatar" src="/SpanTasty/starcups/images/account/defaultUser.jpeg" alt="頭像"
+                    width="300" height="300">
+                </div>
+                <p><strong>姓名：</strong> <span id="member-name"></span></p>
+                <p><strong>生日：</strong> <span id="birthday"></span></p>
+                <p><strong>信箱：</strong> <span id="member-email"></span></p>
+                <p><strong>註冊日期：</strong> <span id="register-date"></span></p>
+                <p><strong>最近登入日期：</strong> <span id="last-login"></span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 修改密碼表單 -->
+          <div id="change-password" class="content-section" style="display:none;">
+            <h4 class="text-spacing-50">修改密碼</h4>
+            <form>
+              <div class="form-group">
+                <label for="current-password">原密碼</label>
+                <input class="form-control" id="current-password" type="password" required>
+              </div>
+              <div class="form-group">
+                <label for="new-password">新密碼</label>
+                <input class="form-control" id="new-password" type="password" required>
+              </div>
+              <div class="form-group">
+                <label for="confirm-password">確認新密碼</label>
+                <input class="form-control" id="confirm-password" type="password" required>
+              </div>
+              <button class="button button-block button-secondary" type="submit">修改密碼</button>
+            </form>
+          </div>
+
+          <!-- 修改頭像 -->
+          <div id="change-avatar" class="content-section" style="display:none;">
+            <h4 class="text-spacing-50">修改頭像</h4>
+            <div class="card">
+              <div class="card-body text-center">
+                <div class="user-avatar mb-3" id="change-preview-avatar">
+                  <img id="change-current-avatar" src="/SpanTasty/starcups/images/account/defaultUser.jpeg" alt="頭像"
+                    width="300" height="300">
+                </div>
+                <div class="form-group">
+                  <input type="file" id="avatar-input" class="form-control" accept="image/*">
+                </div>
+                <button class="button button-secondary" id="confirm-avatar" style="display:none;">確定更換頭像</button>
+                <button class="button button-secondary" id="remove-avatar">移除頭像</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div th:replace="~{starcups/display/footer}"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const personalInfoSection = document.getElementById('personal-info');
+      const changePasswordSection = document.getElementById('change-password');
+      const changeAvatarSection = document.getElementById('change-avatar');
+
+      const avatarInput = document.getElementById('avatar-input');
+      const confirmAvatarButton = document.getElementById('confirm-avatar');
+      const removeAvatarButton = document.getElementById('remove-avatar');
+
+
+      const personalCurrentAvatar = document.getElementById('personal-current-avatar');
+      const changeCurrentAvatar = document.getElementById('change-current-avatar');
+
+      //個人資訊框內容
+      const memberName = document.getElementById('member-name');
+      const memberEmail = document.getElementById('member-email');
+      const registerDate = document.getElementById('register-date');
+      const birthday = document.getElementById('birthday');
+      const lastLogin = document.getElementById('last-login');
+
+      //按鈕
+      const btnPersonalInfo = document.getElementById('btn-personal-info');
+      const btnChangePassword = document.getElementById('btn-change-password');
+      const btnChangeAvatar = document.getElementById('btn-change-avatar');
+
+      // 修改密碼相關的元素
+      const currentPasswordInput = document.getElementById('current-password');
+      const newPasswordInput = document.getElementById('new-password');
+      const confirmPasswordInput = document.getElementById('confirm-password');
+      const changePasswordForm = changePasswordSection.querySelector('form');
+
+      // 顯示個人資訊
+      btnPersonalInfo.addEventListener('click', function () {
+        personalInfoSection.style.display = 'block';
+        changePasswordSection.style.display = 'none';
+        changeAvatarSection.style.display = 'none';
+      });
+
+      // 顯示修改密碼表單
+      btnChangePassword.addEventListener('click', function () {
+        personalInfoSection.style.display = 'none';
+        changePasswordSection.style.display = 'block';
+        changeAvatarSection.style.display = 'none';
+      });
+
+      // 顯示修改頭像區域
+      btnChangeAvatar.addEventListener('click', function () {
+        personalInfoSection.style.display = 'none';
+        changePasswordSection.style.display = 'none';
+        changeAvatarSection.style.display = 'block';
+
+        getAvatar();
+      });
+
+      // 提交修改密碼請求
+      changePasswordForm.addEventListener('submit', function (event) {
+        event.preventDefault(); // 阻止表單的預設提交行為
+
+        const currentPassword = currentPasswordInput.value;
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        // 驗證新密碼是否一致
+        if (newPassword !== confirmPassword) {
+          alert('新密碼與確認密碼不一致');
+          return;
+        }
+
+        const token = localStorage.getItem('token'); // 從 localStorage 取得 token
+
+        if (token) {
+          // 使用 URLSearchParams 構建請求參數
+          const params = new URLSearchParams();
+          params.append('oldPassword', currentPassword);
+          params.append('newPassword', newPassword);
+          params.append('confirmPassword', confirmPassword);
+
+          // 使用 axios 發送帶有 URL 編碼的請求
+          axios.post('/SpanTasty/member/updatePassword', params, {
+            headers: {
+              'Authorization': `${token}`,
+              'Content-Type': 'application/x-www-form-urlencoded' // 明確指定編碼格式
+            }
+          })
+            .then(response => {
+              if (response.data.success) {
+                alert('密碼修改成功');
+                // 清空輸入欄位
+                currentPasswordInput.value = '';
+                newPasswordInput.value = '';
+                confirmPasswordInput.value = '';
+              } else {
+                alert('密碼修改失敗：' + response.data.message);
+              }
+            })
+            .catch(error => {
+              console.error('修改密碼過程中發生錯誤:', error.response ? error.response.data : error);
+              alert('修改密碼過程中發生錯誤');
+            });
+        } else {
+          alert('請先登入');
+        }
+      });
+
+
+      // 預覽頭像
+      avatarInput.addEventListener('change', function () {
+        const file = avatarInput.files[0];
+
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            // 使用 changeCurrentAvatar 來預覽圖片
+            changeCurrentAvatar.src = e.target.result;
+            confirmAvatarButton.style.display = 'inline-block';
+          };
+          reader.readAsDataURL(file);
+        } else {
+          alert('請選擇有效的圖片文件');
+        }
+      });
+
+      // 更新頭像
+      confirmAvatarButton.addEventListener('click', function () {
+        const file = avatarInput.files[0];
+        const token = localStorage.getItem('token');
+
+        if (file && token) {
+          const formData = new FormData();
+          formData.append('avatar', file);
+
+          axios.post('/SpanTasty/member/updateAvatar', formData, {
+            headers: {
+              'Authorization': `${token}`,
+              'Content-Type': 'multipart/form-data',
+            }
+          })
+            .then(response => {
+              if (response.data.success) {
+                alert('頭像已更新');
+                confirmAvatarButton.style.display = 'none';
+                const imageUrl = URL.createObjectURL(file);
+                personalCurrentAvatar.src = imageUrl;
+                changeCurrentAvatar.src = imageUrl;
+              } else {
+                alert('更新圖片失敗');
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('上傳過程中發生錯誤');
+            });
+        } else {
+          alert('請選擇一張圖片並確保已登入');
+        }
+      });
+
+      // 移除頭像
+      removeAvatarButton.addEventListener('click', function () {
+        const token = localStorage.getItem('token');
+
+        if (token) {
+          axios.post('/SpanTasty/member/removeAvatar', {}, {
+            headers: {
+              'Authorization': `${token}`,
+            }
+          })
+            .then(response => {
+              if (response.data.success) {
+                alert('頭像已成功移除');
+                personalCurrentAvatar.src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+                changeCurrentAvatar.src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+              } else {
+                alert('移除頭像失敗，請稍後再試');
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('移除頭像過程中發生錯誤');
+            });
+        }
+      });
+
+      // 獲取會員頭像
+      function getAvatar() {
+        const token = localStorage.getItem('token'); // 從 localStorage 取得 token
+
+        if (token) {
+          axios.get('/SpanTasty/member/getAvatar', {
+            headers: {
+              'Authorization': `${token}`
+            }
+          })
+            .then(response => {
+              if (response.data.success && response.data.data) {
+                const base64Avatar = response.data.data; // 從響應中獲取 Base64 的圖片數據
+                // 更新「個人資訊」中的頭像
+                personalCurrentAvatar.src = `data:image/jpeg;base64,${base64Avatar}`;
+                // 更新「修改圖片」區域中的頭像
+                changeCurrentAvatar.src = `data:image/jpeg;base64,${base64Avatar}`;
+              } else {
+                // 如果沒有頭像，使用預設圖片
+                personalCurrentAvatar.src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+                changeCurrentAvatar.src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('獲取頭像過程中發生錯誤');
+            });
+        } else {
+          alert('請先登入');
+        }
+      }
+      // 獲取個人資訊
+      function getProfile() {
+        const token = localStorage.getItem('token');
+
+        if (token) {
+          axios.get('/SpanTasty/member/profile', {
+            headers: {
+              'Authorization': `${token}`
+            }
+          })
+            .then(response => {
+              if (response.data.success) {
+                const member = response.data.data;
+                memberName.textContent = member.memberName;
+                memberEmail.textContent = member.email;
+                registerDate.textContent = member.registerDate;
+                birthday.textContent = member.birthday;
+                lastLogin.textContent = member.formattedLoginDate;
+              } else {
+                alert('無法獲取個人資訊');
+              }
+            })
+            .catch(error => {
+              console.error('獲取個人資訊過程中發生錯誤:', error);
+            });
+        } else {
+          alert('請先登入');
+        }
+      }
+
+      // 頁面加載時自動調用
+      getProfile();
+      getAvatar();
+    });
+  </script>
+
+</body>
+
+</html>

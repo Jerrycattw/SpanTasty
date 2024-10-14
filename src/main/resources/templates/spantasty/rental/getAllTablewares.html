@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>環保用具</title>
+<style>
+.body {
+    background-color: #e9f7ef; /* 背景色：淡綠 */
+}
+
+#card {
+    background-color: #c8e6c9; /* 卡片背景色：淡綠 */
+    border-radius: 10px;
+}
+
+.card-header {
+    background-color: #81c784; /* 卡片標題背景色：中綠 */
+    color: white;
+}
+
+#btn-green {
+    background-color: #388e3c; /* 按鈕色：深綠 */
+    color: white;
+}
+
+#btngreen {
+    background-color: #C8FF9E; /* 按鈕色：深綠 */
+    color: black;
+}
+
+#btn-green:hover {
+    background-color: #2e7d32; /* 按鈕懸停色 */
+}
+
+#btn-light-green {
+    background-color: #98c590; /* 輕綠按鈕 */
+    color: white;
+}
+
+#btn-light-green:hover {
+    background-color: #7ca779; /* 輕綠懸停色 */
+}
+
+.table {
+    background-color: #f1f8e9; /* 表格背景：淡綠 */
+}
+
+.table thead {
+    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    color: #1b5e20;
+}
+</style>
+</head>
+<body class="body">
+<div th:replace="~{spantasty/display/navbar}" ></div>
+<div class="content" id="content">
+ <div class="container mt-4" style="font-size:17px">
+  <div class="row justify-content-center">
+   <div class="col-11">
+    <div class="shadow" id="card" >
+	 <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+		<h2 class="mt-2 mb-2 ms-2">環保用具系統</h2>
+		<div class="d-grid gap-2 d-md-block m-2">
+			<a th:href="@{/tableware/getAll}" class="btn btn-sm" id="btngreen" >返回</a>
+			<a th:href="@{/tableware/add}" class="btn btn-sm" id="btngreen">新增餐具</a>
+		</div>
+	 </div>
+	 <div class="input-group input-group-sm mt-0 mb-2 ms-2">
+  		<input type="text" id="input_keyword" class="form-control-sm  border-0 " style="height:15px"  placeholder="請輸入想搜尋環保用具" aria-label="input_keyword" aria-describedby="send_btn">
+ 		<button class="btn btn-success" type="button" id="send_btn">搜尋</button>
+	 </div>
+	 <div class="table-responsive">
+		<table class="table table-striped text-center" id="table">
+		<thead>
+		<tr>
+			<th>用具編號</th>
+			<th>用具名稱</th>
+			<th>押金金額</th>
+			<th>用具圖片</th>
+			<th>用具描述</th>
+			<th>用具狀態</th>
+			<th>更改狀態</th>
+			<th>修改資料</th>
+		</tr>
+		</thead>
+		<tbody>
+		<th:block th:each=" tableware : ${tablewarePages.content}">
+		<tr>
+			<td th:text="${tableware.tablewareId}">用具編號</td>
+			<td th:text="${tableware.tablewareName}">用具名稱</td>
+			<td th:text="${tableware.tablewareDeposit}">押金金額</td>
+			<td><img width="50px" th:src="${tableware.tablewareImage}" /></td>
+			<td th:text="${tableware.tablewareDescription}">用具描述</td>
+			<td class="align-middle">
+				<span th:switch="${tableware.tablewareStatus}">
+				  <span th:case="1" class="badge bg-success text-white">上架中</span>
+				  <span th:case="2" class="badge bg-danger text-white">下架中</span>
+				</span>
+			</td>
+			<td class="align-middle">
+				<form th:action="@{/tableware/setPut2/{id}(id=${tableware.tablewareId})}" th:method="post">
+               		<input type="hidden" name="_method" value="put"/>
+               		<input type="submit" th:value="更改狀態" class="btn btn-sm" id="btn-light-green">
+               	</form>
+			</td>
+			<td class="align-middle">
+				<form th:action="@{/tableware/set/{id}(id=${tableware.tablewareId})}" th:method="get">
+               		<input type="submit" th:value="資料更新" class="btn btn-sm" id="btn-green">
+               	</form>
+			</td>
+		</tr>
+		</th:block>
+		</tbody>
+		</table>
+	 </div>
+    </div>
+    <div>
+      	<ul th:if="${tablewarePages.totalPages != 0}" class="pagination">
+		<th:block th:switch="${tablewarePages.number + 1 == 1}">
+			<li th:case="${false}" class="page-item"><a class="page-link" th:href="@{/tableware/getAll(p=${ tablewarePages.number })}" th:text="上一頁"></a></li>
+			<li th:case="${true}" class="page-item disabled"><a class="page-link" th:href="@{/tableware/getAll(p=${ tablewarePages.number })}" th:text="已經第一頁了"></a></li>
+		</th:block>
+		<th:block th:each=" aNumber : ${#numbers.sequence(1, tablewarePages.totalPages)}">
+			<th:block th:switch="${tablewarePages.number + 1 == aNumber}">
+				<li th:case="${true}" class="page-item active"><a class="page-link"><span th:text="${aNumber}"></span></a></li>
+				<li th:case="${false}" class="page-item"><a class="page-link"  th:href="@{/tableware/getAll(p=${aNumber})}" th:text="${aNumber}"></a></li>
+			</th:block> 
+		</th:block>
+		<th:block th:switch="${tablewarePages.number + 1 == tablewarePages.totalPages}">
+			<li th:case="${true}" class="page-item disabled"><a class="page-link" th:href="@{/tableware/getAll(p=${ tablewarePages.number + 2 })}" th:text="已經最後了"></a></li>
+			<li th:case="${false}" class="page-item"><a class="page-link" th:href="@{/tableware/getAll(p=${ tablewarePages.number + 2 })}" th:text="下一頁"></a></li>
+		</th:block>
+  		</ul>
+    	<div>總共有 <span th:text="${tablewarePages.totalElements}"></span> 筆</div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	showSidebar('rental');
+});
+</script>
+<script>
+const url = 'http://localhost:8080/SpanTasty/tableware/get';
+const sendBtn = document.getElementById('send_btn');
+const table = document.getElementById('table');
+sendBtn.addEventListener('click', (e)=>{
+	sendBtn.disabled = true;
+	const inputKeyword = document.getElementById('input_keyword').value;
+	let dtoObject = {
+		keyword: inputKeyword
+	}
+	axios.post(url,dtoObject)
+	.then(res => {
+		const tablewares = res.data;
+		htmlMaker(tablewares);
+	})
+	.catch(err => {
+		console.error(err); 
+	})
+	.finally(() => {
+		sendBtn.disabled = false; // 请求完成后重新启用按钮
+	});
+})
+
+function changeStatus(event, id) {
+	//event.preventDefault(); // 阻止默认提交行为
+	const statusUrl = `http://localhost:8080/SpanTasty/tableware/setPost/${id}`;
+
+	// 使用 axios 或 fetch 发送异步请求
+	axios.post(statusUrl)
+	.then(response => {
+		console.log("狀態更改成功", response);
+		window.location.reload();
+	})
+	.catch(error => {
+		console.error("狀態更改失敗", error);
+	});
+}
+
+function updateData(event, id) {
+	//event.preventDefault(); // 阻止默认提交行为
+	const updateUrl = `http://localhost:8080/SpanTasty/tableware/set/${id}`;
+	window.location.href = updateUrl;
+}
+
+function htmlMaker(tablewares) {
+	table.innerHTML = '';
+	
+	if (tablewares.length === 0) {
+		table.innerHTML = '<h6>沒有找到相關結果</h6>';
+		return;
+	}
+	const thead = document.createElement('thead');
+	thead.innerHTML = 
+	`
+	<tr>
+		<th>用具編號</th>
+		<th>用具名稱</th>
+		<th>押金金額</th>
+		<th>用具圖片</th>
+		<th>用具描述</th>
+		<th>用具狀態</th>
+		<th>更改狀態</th>
+		<th>修改資料</th>
+	</tr>
+	`;
+	table.appendChild(thead);
+	
+	const tbody = document.createElement('tbody');
+
+	tablewares.forEach(tableware =>{
+		// 如果有機會會使用關鍵字重新查詢一次 更改狀態後可以自動重新查詢回到原頁面
+		//const inputKeyword = document.getElementById('input_keyword').value;
+		//console.log(inputKeyword);
+		// 判斷tablewareStatus為 1 or 2
+		let status = '';
+		if (tableware.tablewareStatus === 1) {
+			status = '<span class="badge bg-success text-white">上架中</span>';
+		} else if (tableware.tablewareStatus === 2) {
+			status = '<span class="badge bg-danger text-white">下架中</span>';
+		}
+		
+		const tr = document.createElement('tr');
+		tr.innerHTML = 
+		`
+		<td>${tableware.tablewareId}</td>
+		<td>${tableware.tablewareName}</td>
+		<td>${tableware.tablewareDeposit}</td>
+		<td><img width="50px" src="${tableware.tablewareImage}" /></td>
+		<td>${tableware.tablewareDescription}</td>
+		<td class="align-middle">${status}</td>
+		<td class="align-middle">
+			<button onclick="changeStatus(event, ${tableware.tablewareId})" class="btn btn-sm" id="btn-light-green">更改狀態</button>
+		</td>
+		<td class="align-middle">
+			<button onclick="updateData(event, ${tableware.tablewareId})" class="btn btn-sm" id="btn-green">資料更新</button>
+		</td>
+		`;
+		tbody.appendChild(tr);
+	});
+	table.appendChild(tbody);
+}
+</script>
+</body>
+</html>

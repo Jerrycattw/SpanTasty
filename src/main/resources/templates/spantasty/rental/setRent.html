@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>更新訂單資料</title>
+<style>
+.h {
+	text-align: center;
+}
+
+form {
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background-color: #c8e6c9;
+}
+
+.table {
+    background-color: #f1f8e9; /* 表格背景：淡綠 */
+}
+
+.table thead {
+    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    color: #1b5e20;
+}
+
+.tableware-input{
+	width: 86%;
+	padding: 5px;
+	margin-bottom: 0px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+.body {
+    background-color: #e9f7ef; /* 背景色：淡綠 */
+}
+</style>
+</head>
+<body class="body">
+<div th:replace="~{spantasty/display/navbar}"></div>
+<div class="content" id="container">
+<h3 class="h">更新訂單資料</h3>
+<form th:action="@{/rent/setPut1}"  method="post">
+<input type="hidden" name="_method" value="put"/>
+<table class="table table-striped" id="table">
+	<tr><td>訂單編號: <input type="text" class="tableware-input" readonly name="rentId" th:value="${rent.rentId}"/></td></tr>
+	<tr><td>租借押金: <input type="text" class="tableware-input" id="rentDeposit" name="rentDeposit" th:value="${rent.rentDeposit}"/></td></tr>
+	<tr><td>租借日期: <input type="date" class="tableware-input" id="rentDate" name="rentDate" th:value="${rent.rentDate}"></td></tr>
+	<tr><td>租借餐廳:
+		<select class="tableware-input" name="restaurantId" id="restaurantId">
+			<option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+		</select>
+	</td></tr>
+	<tr><td>會員編號:
+		<select class="tableware-input" name="memberId" id="memberId">
+			<option th:each="member : ${members}" th:value="${member.memberId}" th:text="${member.account}"></option>
+		</select>
+	</td></tr>
+	<tr><td>預定歸還: <input type="date" class="tableware-input" id="dueDate" name="dueDate" th:value="${rent.dueDate}"></td></tr>
+	<tr><td>實際歸還: <input type="date" class="tableware-input" id="returnDate" name="returnDate" th:value="${rent.returnDate}" readonly></td></tr>
+	<tr><td>租借狀態: 
+		<input type="radio" id="rentStatus" name="rentStatus" value="1" th:value="1" th:checked="${rent.rentStatus == 1}" readonly/> 1:未歸還 
+		<input type="radio" id="rentStatus" name="rentStatus" value="2" th:value="2" th:checked="${rent.rentStatus == 2}" readonly/> 2:歸還 
+	</td></tr>
+	<tr><td>訂單備註: <input type="text" class="tableware-input" id="rentMemo" name="rentMemo" th:value="${rent.rentMemo}" readonly/></td></tr>
+	<tr><td>歸還餐廳:
+		<select class="tableware-input" name="returnRestaurantId" id="returnRestaurantId">
+			<option value="" selected disabled>請選擇租借餐廳</option>
+			<option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}" th:selected="${rent.returnRestaurantId == restaurant.restaurantId}" readonly></option>
+		</select>
+	</td></tr>
+</table>
+<span id="disabledMsg" style="color:red; display: none">訂單已完全歸還，無法再更改。</span>
+<input type="submit" id="submitBtn" value="確定更改">
+</form>
+</div>
+<script>
+window.onload = function() {
+	const rentStatusRadios = document.getElementsByName('rentStatus');
+	let selectedStatus;
+	
+	rentStatusRadios.forEach(radio => {
+		if (radio.checked) {
+			selectedStatus = radio.value;
+		}
+	});
+	
+	if (selectedStatus === '2') {
+		document.getElementById('submitBtn').disabled = true;
+		document.getElementById('returnDate').disabled = true;
+		document.getElementById('returnRestaurantId').disabled = true;
+		document.getElementById('restaurantId').disabled = true;
+		document.getElementById('rentDeposit').disabled = true;
+		document.getElementById('memberId').disabled = true;
+		document.getElementById('rentDate').disabled = true;
+		document.getElementById('dueDate').disabled = true;
+		document.getElementById('rentMemo').disabled = true;
+		document.getElementById('rentStatus').disabled = true;
+		document.getElementById('disabledMsg').style.display = 'block';
+	}
+};
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	showSidebar('rental');
+});
+</script>
+</body>
+</html>

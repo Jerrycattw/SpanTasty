@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+	<meta charset="UTF-8">
+	<title>管理員權限管理</title>
+	<style>
+		#searchType,
+		#searchInput {
+			height: calc(2.25rem + 2px);
+		}
+
+		#searchBtn {
+			height: calc(2.25rem + 2px);
+
+		}
+	</style>
+</head>
+
+<body class="bg-dark text-white">
+	<div th:replace="~{spantasty/display/navbar}"></div>
+	<!-- 主要內容區域 -->
+	<div class="container mt-5" style="padding-left: 270px; padding-top: 80px;">
+		<h4>輸入條件以查詢管理員：</h4>
+		<div class="row mb-3 mt-4">
+			<div class="col-md-3">
+				<select id="searchType" class="form-select bg-dark text-white h-100">
+					<option value="id">ID</option>
+					<option value="name">姓名</option>
+					<option value="account">帳號</option>
+				</select>
+			</div>
+			<div class="col-md-9 d-flex">
+				<input type="text" id="searchInput" class="form-control me-2 h-100" placeholder="輸入搜尋內容" />
+				<button id="searchByConditionBtn" class="btn btn-outline-light"><i
+						class="fa-solid fa-magnifying-glass"></i></button>
+			</div>
+		</div>
+
+		<h4>選擇權限以查詢管理員：</h4>
+		<div class="row">
+			<!-- 權限選擇勾選欄位 -->
+			<div class="col-md-3">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="none" id="permissionNone">
+					<label class="form-check-label" for="permissionNone">無任何權限</label>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="account" id="permissionAccount">
+					<label class="form-check-label" for="permissionAccount">會員管理</label>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="discount" id="permissionDiscount">
+					<label class="form-check-label" for="permissionDiscount">優惠券管理</label>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="order" id="permissionOrder">
+					<label class="form-check-label" for="permissionOrder">外帶訂單管理</label>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="rental" id="permissionRental">
+					<label class="form-check-label" for="permissionRental">餐具租借管理</label>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="reservation" id="permissionReservation">
+					<label class="form-check-label" for="permissionReservation">餐廳預訂管理</label>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" value="store" id="permissionStore">
+					<label class="form-check-label" for="permissionStore">線上商城管理</label>
+				</div>
+			</div>
+		</div>
+		<div>
+			<button id="searchByPermissionBtn" class="btn btn-outline-light mt-3"><i
+					class="fa-solid fa-magnifying-glass"></i></button>
+		</div>
+
+
+		<table id="admin-table" class="table table-dark table-striped mt-4">
+			<thead>
+				<tr>
+					<th>管理員ID</th>
+					<th>管理員名稱</th>
+					<th>帳號</th>
+					<th>權限</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- JavaScript 動態加載資料 -->
+			</tbody>
+		</table>
+
+		<div id="pagination" class="d-flex justify-content-between mt-4">
+			<button id="prevPage" class="btn btn-outline-light">上一頁</button>
+			<button id="nextPage" class="btn btn-outline-light">下一頁</button>
+		</div>
+	</div>
+
+	<!-- 查看權限的模態框 -->
+	<div class="modal fade" id="viewPermissionsModal" tabindex="-1" aria-labelledby="viewPermissionsLabel"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<!-- 使用 modal-dialog-centered 讓模態框置於螢幕中央 -->
+			<div class="modal-content bg-dark text-white">
+				<!-- 使用深色主題樣式 -->
+				<div class="modal-header border-secondary">
+					<h5 class="modal-title" id="viewPermissionsLabel">查看管理員權限</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<ul id="permissionsList" class="list-group list-group-flush">
+						<!-- 權限列表 -->
+					</ul>
+				</div>
+				<div class="modal-footer border-secondary">
+					<button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">關閉</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 修改權限的模態框 -->
+	<div class="modal fade" id="editPermissionsModal" tabindex="-1" aria-labelledby="editPermissionsLabel"
+		aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content bg-dark text-white">
+				<div class="modal-header border-secondary">
+					<h5 class="modal-title" id="editPermissionsLabel">修改管理員權限</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form id="editPermissionsForm">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="account" id="editPermissionAccount">
+							<label class="form-check-label" for="editPermissionAccount">會員管理</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="discount"
+								id="editPermissionDiscount"> <label class="form-check-label"
+								for="editPermissionDiscount">優惠券管理</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="order" id="editPermissionOrder">
+							<label class="form-check-label" for="editPermissionOrder">外帶訂單管理</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="rental" id="editPermissionRental">
+							<label class="form-check-label" for="editPermissionRental">餐具租借管理</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="reservation"
+								id="editPermissionReservation"> <label class="form-check-label"
+								for="editPermissionReservation">餐廳預訂管理</label>
+						</div>
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" value="store" id="editPermissionStore">
+							<label class="form-check-label" for="editPermissionStore">線上商城管理</label>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer border-secondary">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+					<button type="button" id="savePermissionsBtn" class="btn btn-primary">保存修改</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+		
+			showSidebar('admin');
+		
+			let currentPage = 0;
+			const pageSize = 10;
+			let currentAdminId = null;
+
+			// 查詢按鈕監聽事件：根據條件進行查詢（ID、姓名、帳號）
+			document.querySelector('#searchByConditionBtn').addEventListener('click', function () {
+				const searchType = document.querySelector('#searchType').value;
+				const searchInput = document.querySelector('#searchInput').value.trim();
+				searchAdminsByCondition(searchType, searchInput, currentPage);
+			});
+
+			// 查詢按鈕監聽事件：根據權限進行查詢
+			document.querySelector('#searchByPermissionBtn').addEventListener('click', function () {
+				const selectedPermissions = getSelectedPermissions();
+				loadAdminsByPermissions(selectedPermissions, currentPage);
+			});
+
+			// 上一頁按鈕監聽事件
+			document.querySelector('#prevPage').addEventListener('click', function () {
+				if (currentPage > 0) {
+					currentPage--;
+					const searchType = document.querySelector('#searchType').value;
+					const searchInput = document.querySelector('#searchInput').value.trim();
+					if (searchInput) {
+						searchAdminsByCondition(searchType, searchInput, currentPage);
+					} else {
+						loadAdminsByPermissions(getSelectedPermissions(), currentPage);
+					}
+				}
+			});
+
+			// 下一頁按鈕監聽事件
+			document.querySelector('#nextPage').addEventListener('click', function () {
+				currentPage++;
+				const searchType = document.querySelector('#searchType').value;
+				const searchInput = document.querySelector('#searchInput').value.trim();
+				if (searchInput) {
+					searchAdminsByCondition(searchType, searchInput, currentPage);
+				} else {
+					loadAdminsByPermissions(getSelectedPermissions(), currentPage);
+				}
+			});
+
+			function getSelectedPermissions() {
+				const selectedPermissions = [];
+				document.querySelectorAll('.form-check-input:checked').forEach(function (checkbox) {
+					selectedPermissions.push(checkbox.value);
+				});
+				return selectedPermissions;
+			}
+
+			function searchAdminsByCondition(searchType, searchInput, page) {
+				let params = {
+					page: page,
+					size: pageSize
+				};
+				params[searchType] = searchInput;
+
+				axios.get('/SpanTasty/admin/search', {
+					params: params
+				})
+					.then(function (response) {
+						console.log('返回的數據:', response.data);
+						if (response.data && response.data.data) {
+							displayAdminTable(response.data.data);
+						} else {
+							console.error('返回的數據結構有誤:', response.data);
+							alert("查詢失敗，請稍後重試！");
+						}
+					})
+					.catch(function (error) {
+						if (error.response) {
+							console.error('查詢失敗的錯誤:', error.response.data);
+						} else if (error.request) {
+							console.error('未收到服務器響應:', error.request);
+						} else {
+							console.error('設置請求時發生錯誤:', error.message);
+						}
+						alert("查詢失敗，請稍後重試！");
+					});
+			}
+
+			function loadAdminsByPermissions(permissions, page) {
+				axios.post('/SpanTasty/admin/searchAdminsByPermissions', {
+					permissions: permissions,
+					page: page,
+					size: pageSize
+				})
+					.then(function (response) {
+						displayAdminTable(response.data.data);
+					})
+					.catch(function (error) {
+						console.error(error);
+						alert("查詢失敗，請稍後重試！");
+					});
+			}
+
+			function displayAdminTable(admins) {
+				document.querySelector('#admin-table tbody').innerHTML = '';
+				const tbody = document.querySelector('#admin-table tbody');
+				admins.forEach(function (admin) {
+					const row = tbody.insertRow();
+					const permissionsButtonHtml = `<button class="btn btn-info btn-sm" onclick="viewPermissions(${admin.adminId})">查看權限</button>`;
+
+					const editButtonHtml = admin.adminId === 1
+						? '<button class="btn btn-secondary btn-sm" disabled>不可修改</button>'
+						: `<button class="btn btn-primary btn-sm" onclick="editPermissions(${admin.adminId})">修改權限</button>`;
+
+					row.innerHTML = `
+						<td>${admin.adminId}</td>
+						<td>${admin.adminName}</td>
+						<td>${admin.account}</td>
+						<td>${permissionsButtonHtml}</td>
+						<td>${editButtonHtml}</td>
+					`;
+				});
+
+				document.querySelector('#prevPage').disabled = currentPage === 0;
+				document.querySelector('#nextPage').disabled = admins.length < pageSize;
+			}
+
+			// 查看權限的功能
+			window.viewPermissions = function (adminId) {
+				axios.get(`/SpanTasty/admin/${adminId}/permissions`)
+					.then(function (response) {
+						const permissions = response.data.data;
+
+						// 清空權限列表
+						const permissionsList = document.querySelector('#permissionsList');
+						permissionsList.innerHTML = '';
+
+						// 添加權限到列表中
+						permissions.forEach(function (permission) {
+							let permissionText = '';
+							switch (permission.permissionName) {
+								case "discount": permissionText = "優惠券管理"; break;
+								case "reservation": permissionText = "餐廳預訂管理"; break;
+								case "store": permissionText = "線上商城管理"; break;
+								case "account": permissionText = "會員管理"; break;
+								case "order": permissionText = "外帶訂單管理"; break;
+								case "rental": permissionText = "餐具租借管理"; break;
+								default: permissionText = permission.permissionName;
+							}
+							const li = document.createElement('li');
+							li.classList.add('list-group-item');
+							li.style.backgroundColor = "#343a40";
+							li.style.color = "#ffffff";
+							li.textContent = permissionText;
+							permissionsList.appendChild(li);
+						});
+
+						// 打開查看權限的模態框
+						new bootstrap.Modal(document.getElementById('viewPermissionsModal')).show();
+					})
+					.catch(function (error) {
+						console.error(error);
+						alert("無法加載管理員權限！");
+					});
+			}
+
+			// 修改權限按鈕功能
+			window.editPermissions = function (adminId) {
+				currentAdminId = adminId;
+				axios.get(`/SpanTasty/admin/${adminId}/permissions`)
+					.then(function (response) {
+						const permissions = response.data.data;
+
+						// 先清除所有選項
+						document.querySelectorAll('#editPermissionsForm .form-check-input').forEach(function (checkbox) {
+							checkbox.checked = false;
+						});
+
+						// 根據返回的權限資料勾選對應選項
+						permissions.forEach(function (permission) {
+							const checkbox = document.querySelector(`#editPermissionsForm [value="${permission.permissionName}"]`);
+							if (checkbox) {
+								checkbox.checked = true;
+							}
+						});
+
+						// 打開模態框
+						new bootstrap.Modal(document.getElementById('editPermissionsModal')).show();
+					})
+					.catch(function (error) {
+						console.error(error);
+						alert("無法加載管理員權限！");
+					});
+			}
+
+			// 保存修改的權限
+			document.querySelector('#savePermissionsBtn').addEventListener('click', function () {
+				const updatedPermissions = [];
+				document.querySelectorAll('#editPermissionsForm .form-check-input:checked').forEach(function (checkbox) {
+					updatedPermissions.push(checkbox.value);
+				});
+				if (confirm("確定要修改此管理員的權限嗎？")) {
+					axios.post(`/SpanTasty/admin/${currentAdminId}/permissions`, { permissions: updatedPermissions })
+						.then(function () {
+							alert("權限更新成功！");
+							new bootstrap.Modal(document.getElementById('editPermissionsModal')).hide();
+							                // 默認使用 ID 進行查詢
+                const searchType = 'id';
+                const searchInput = currentAdminId; // 使用當前管理員 ID 進行查詢
+
+                // 重新查詢並刷新表格
+                searchAdminsByCondition(searchType, searchInput, currentPage);
+						})
+						.catch(function (error) {
+							console.error(error);
+							alert("更新失敗，請稍後重試！");
+						});
+				}
+			});
+			
+		});
+	</script>
+</body>
+
+</html>

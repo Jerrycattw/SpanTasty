@@ -54,16 +54,28 @@ public class ShoppingOrderController {
         List<Product> products = productService.findAllProduct(); // 獲取所有商品
         model.addAttribute("members", members);
         model.addAttribute("products", products);
-        return "store/shopping/addShoppingOrder"; // 返回新增訂單的視圖
+        return "spantasty/store/shopping/addShoppingOrder"; // 返回新增訂單的視圖
     }
 	
 	
+//    @PostMapping("/addPost")
+//    public String addOrder(@RequestParam Integer memberId,
+//                           @RequestParam Integer productId,
+//                           @RequestParam Integer shoppingItemQuantity,
+//                           Model model) {
+//        
+//        ShoppingOrder order = shoppingOrderService.addShoppingOrder(memberId, productId, shoppingItemQuantity);
+//
+//        return "redirect:/shoppingOrder/findAll";
+//    }
+
+    
+    
     @PostMapping("/addPost")
     public String addOrder(@RequestParam Integer memberId,
-                           @RequestParam Integer productId,
-                           @RequestParam Integer shoppingItemQuantity,
+                           @RequestParam List<Integer> productId,
+                           @RequestParam List<Integer> shoppingItemQuantity,
                            Model model) {
-        
         ShoppingOrder order = shoppingOrderService.addShoppingOrder(memberId, productId, shoppingItemQuantity);
 
         return "redirect:/shoppingOrder/findAll";
@@ -80,7 +92,7 @@ public class ShoppingOrderController {
 	 public String showUpdateForm(@PathVariable("id") Integer shoppingId, Model model) {
         ShoppingOrder order = shoppingOrderService.findShoppingOrderById(shoppingId);
         model.addAttribute("shoppingOrder", order);
-        return "store/shopping/updateShoppingOrder"; 
+        return "spantasty/store/shopping/updateShoppingOrder"; 
     }
 	
 	@PutMapping("/updatePut")
@@ -130,7 +142,7 @@ public class ShoppingOrderController {
 	    List<ShoppingOrder> shoppings = shoppingOrderService.findAllShoppingOrder();
 	    model.addAttribute("shoppings", shoppings);
 
-	    return "store/shopping/searchAllShopping";
+	    return "spantasty/store/shopping/searchAllShopping";
 	}
 
 }

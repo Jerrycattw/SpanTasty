@@ -3,6 +3,7 @@ package com.eatspan.SpanTasty.service.reservation;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,9 +94,11 @@ public class ReserveService {
             // 使用自定義的查詢方法，查詢每個時間段的預訂數量與總桌數
             Integer reservedTableCount = reserveRepository.countReservationsInTimeSlot(restaurantId, tableTypeId, checkDate, timeSlot.getSlotStar(), timeSlot.getSlotEnd());
             Integer totalTableCount = reserveRepository.countAvailableTables(restaurantId, tableTypeId);
-            
+            System.out.println("reservedTableCount1:"+reservedTableCount);
+            System.out.println("totalTableCount1:"+totalTableCount);
             // 設定開放訂位的桌數比例
             totalTableCount = (Integer) (totalTableCount * restaurant.getReservePercent() / 100);
+            System.out.println("totalTableCount2:"+totalTableCount);
             
             ReserveCheckDTO bean = new ReserveCheckDTO(timeSlot.getSlotStar(), timeSlot.getSlotEnd(), totalTableCount, reservedTableCount);
             reserveChecks.add(bean);
@@ -144,27 +147,6 @@ public class ReserveService {
 	}
     
     
-	// 查詢所有餐廳的預約狀況
-//    public Map<String, Integer> getReserveSum(LocalDate slotEndDate, LocalDate slotStartDate) {
-//    	
-//        List<Restaurant> restaurants = restaurantRepository.findAll();
-//        Map<String, Integer> restaurantReserveMap = new HashMap<>();
-//        if(slotStartDate==null) {
-//        	slotStartDate = LocalDate.now();
-//        }
-//        if(slotEndDate==null) {
-//        	slotEndDate = LocalDate.now().minusYears(1);
-//        }
-//        
-//        for(Restaurant restaurant : restaurants) {
-//        	Integer restaurantId = restaurant.getRestaurantId();
-//        	Integer countReservationsInDate = reserveRepository.countReservationsInDateSlot(restaurantId, slotEndDate, slotStartDate);
-//        	restaurantReserveMap.put(restaurant.getRestaurantName(), countReservationsInDate);
-//        }
-//
-//        return restaurantReserveMap;
-//    }
-    
     public Map<String, Integer> getReserveSum(LocalDateTime slotStartDate, LocalDateTime slotEndDate) {
 
         // 如果沒有傳入開始日期，則使用一年前的日期作為開始日期
@@ -189,7 +171,25 @@ public class ReserveService {
         return restaurantReserveMap;
     }
 
-    
+    public List<Integer> getReserveInMonth(Integer year) {
+    	
+    	if (year == null) year = 2024;
+        
+        List<Integer> reservationCounts = new ArrayList<>();
+        // 獲取每個月份的訂位數量
+        for (Month month : Month.values()) {
+            // 計算每個月的第一天和最後一天
+            LocalDate monthStart = LocalDate.of(year, month, 1);
+            LocalDate monthEnd = LocalDate.of(year, month, month.length(year % 4 == 0)); // 考慮閏年
+
+            // 獲取該月的預訂數量
+            Integer count = reserveRepository.countReservationsInMonth(monthStart, monthEnd);
+            reservationCounts.add(count);
+        }
+
+        return reservationCounts;
+
+    }
     
 	
 	

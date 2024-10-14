@@ -30,7 +30,7 @@ public class TableTypeController {
 	public String getAllTableType(Model model) {
 		List<TableType> tableTypes = tableTypeService.findAllTableType();
 		model.addAttribute("tableTypes", tableTypes);
-		return "reservation/getAllTableType";
+		return "spantasty/reservation/getAllTableType";
 	}
 	
 	

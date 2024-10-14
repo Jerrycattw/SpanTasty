@@ -1,11 +1,15 @@
 package com.eatspan.SpanTasty.controller.discount;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +24,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eatspan.SpanTasty.dto.discount.CouponDTO;
 import com.eatspan.SpanTasty.dto.discount.CouponDistributeDTO;
 import com.eatspan.SpanTasty.entity.discount.Coupon;
+import com.eatspan.SpanTasty.entity.discount.CouponSchedule;
+import com.eatspan.SpanTasty.repository.discount.CouponScheduleRepository;
+import com.eatspan.SpanTasty.service.discount.CouponScheduleService;
 import com.eatspan.SpanTasty.service.discount.CouponService;
+import com.eatspan.SpanTasty.utils.discount.DateUtils;
+
+import freemarker.core.ParseException;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+import jakarta.mail.MessagingException;
 
 @Controller
 //@RequestMapping("/coupon")
@@ -29,11 +43,26 @@ public class CouponController {
 	@Autowired
 	private CouponService couponService;
 	
+	@Autowired
+	private CouponScheduleService couponScheduleService;
+	
+	
+	//mail----------------------------------------------
+	//範例
+	@GetMapping("/coupon/test")
+	public String testmail() throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException {
+		couponService.sendMail("奕兆大哥","andy860210@yahoo.com.tw");
+		return "spantasty/discount/coupon/coupon";
+	}
+	//--------------------------------------------------
+	
+
+	
 	
 	//首頁--------------------------------
 	@GetMapping("/coupon")//導向
 	public String couponHome() {
-		return "discount/coupon/coupon";
+		return "spantasty/discount/coupon/coupon";
 	}
 	
 	@GetMapping("/coupon/show")
@@ -45,7 +74,7 @@ public class CouponController {
 	//編輯---------------------------------
 	@GetMapping("/coupon/{id}")//導向
 	public String couponEddit(@PathVariable(value = "id") Integer couponId) {
-		return"discount/coupon/updateCoupon";
+		return"spantasty/discount/coupon/updateCoupon";
 	}
 	
 	@PostMapping("/coupon/{id}/show")
@@ -74,7 +103,7 @@ public class CouponController {
  	//新增---------------------------------
  	@GetMapping("/coupon/add")//導向
  	public String couponAdd() {
- 		return "discount/coupon/insertCoupon";
+ 		return "spantasty/discount/coupon/insertCoupon";
  	}
  	
 // 	@PostMapping("/coupon/preAdd")//生成空input
@@ -107,6 +136,7 @@ public class CouponController {
  	@DeleteMapping("/coupon/{id}")
  	@ResponseBody
  	public ResponseEntity<?> deleteCoupon(@PathVariable(value = "id") Integer couponId) {
+ 		System.out.println("delete");
  		couponService.deleteCouponById(couponId);
  		return ResponseEntity.ok("刪除成功!");
  	}
@@ -138,9 +168,12 @@ public class CouponController {
  		String memberIds =(String) jsonMap.get("memberIds");
  		Integer couponId =Integer.parseInt((String) jsonMap.get("couponId")) ;
  		Integer perMaxCoupon =(Integer) jsonMap.get("perMaxCoupon");
- 		System.out.println("XXXX"+memberIds+" "+couponId+" "+perMaxCoupon);
+ 		String scheduleName =(String) jsonMap.get("scheduleName");
+ 		LocalDateTime scheduleTime = LocalDateTime.parse((String)jsonMap.get("scheduleTime"));
+
+ 		System.out.println("XXXX"+memberIds+" "+couponId+" "+perMaxCoupon+""+scheduleTime);
  		
- 		List<CouponDistributeDTO> distributeResult = couponService.distributeExcute2(memberIds, couponId, perMaxCoupon);
+ 		List<CouponDistributeDTO> distributeResult = couponService.distributeExcute2(memberIds, couponId, perMaxCoupon,scheduleTime,scheduleName);
  		return distributeResult;
  	}
  	

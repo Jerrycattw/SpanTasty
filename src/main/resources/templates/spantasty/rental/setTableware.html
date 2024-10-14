@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>更新環保用具</title>
+<style>
+.h {
+	text-align: center;
+}
+
+form {
+	width: 60%;
+	margin: 0 auto;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	background-color: #c8e6c9;
+}
+
+.table {
+    background-color: #f1f8e9; /* 表格背景：淡綠 */
+}
+
+.table thead {
+    background-color: #a5d6a7; /* 表格標題：淺綠 */
+    color: #1b5e20;
+}
+
+.body {
+    background-color: #e9f7ef; /* 背景色：淡綠 */
+}
+
+.tableware-input{
+	width: 86%;
+	padding: 5px;
+	margin-bottom: 0px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+</style>
+</head>
+<body class="body">
+<div th:replace="~{spantasty/display/navbar}"></div>
+<div class="content" id="container">
+<h3 class="h">修改環保用具資料</h3>
+<form th:action="@{/tableware/setPut1}" th:method="post" enctype="multipart/form-data">
+<input type="hidden" name="_method" value="put"/> 
+<table class="table table-striped" id="table">
+	<tr><td>用具編號:<input class="tableware-input" type="text" name="tablewareId" th:value="${tableware.tablewareId}" readonly/></td></tr>
+	<tr><td>用具名稱:<input class="tableware-input" type="text" name="tablewareName" th:value="${tableware.tablewareName}" /></td></tr>
+	<tr><td>用具押金:<input class="tableware-input" type="text" name="tablewareDeposit" th:value="${tableware.tablewareDeposit}" /></td></tr>
+	<tr><td>用具圖片: 
+		<img width="50px" th:src="${tableware.tablewareImage}" /> 
+		<input type="hidden" name="tablewareImage" th:value="${tableware.tablewareImage}"/>
+		<input type="file" name="timg" />
+	</td></tr>
+	<tr><td>用具描述:<input class="tableware-input" type="text" name="tablewareDescription" th:value="${tableware.tablewareDescription}"/></td></tr>
+	<tr><td>用具狀態: 
+		<input type="radio" name="tablewareStatus" value="1" th:value="1" th:checked="${tableware.tablewareStatus == 1}"/> 1:上架 
+		<input type="radio" name="tablewareStatus" value="2" th:value="2" th:checked="${tableware.tablewareStatus == 2}"/> 2:未上架
+	</td></tr>
+</table>
+<input type="submit" id="submitBtn" value="確定更改">
+</form>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	showSidebar('rental');
+});
+</script>
+</body>
+</html>

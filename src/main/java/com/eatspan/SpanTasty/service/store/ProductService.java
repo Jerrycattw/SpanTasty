@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,57 +33,13 @@ public class ProductService {
 		return productRepo.save(product);
 	}
 	
-	
-//	public Product addProduct(String productName, ProductType productType, Integer productPrice, String productPicture,
-//			Integer productStock, Integer productStatus, String productDescription) {
-//		Product product = new Product();
-//		product.setProductName(productName);
-//		product.setProductType(productType);
-//		product.setProductPrice(productPrice);
-//		product.setProductPicture(productPicture);
-//		product.setProductStock(productStock);
-//		product.setProductStatus(productStatus);
-//		product.setProductDescription(productDescription);
-//
-//		return productRepo.save(product); 
-//	}
 
 	public void deleteProduct(Integer id) {
 		productRepo.deleteById(id);
 	}
 	
 
-//	public Product updateProduct(Product product) {
-//	    Optional<Product> optional = productRepo.findById(product.getProductId());
-//	    if (optional.isPresent()) {
-//	        return productRepo.save(product);
-//	    }
-//	    return null;
-//	}
-	
-//	@Transactional
-//	public Product updateProduct(Product product) {
-//		Optional<Product> optional =productRepo.findById(product.getProductId());
-//		if(optional.isPresent()) {
-//			Product existingProduct = optional.get();
-//	        existingProduct.setProductName(product.getProductName());
-//	        existingProduct.setProductPrice(product.getProductPrice());
-//	        existingProduct.setProductPicture(product.getProductPicture());
-//	        existingProduct.setProductStock(product.getProductStock());
-//	        existingProduct.setProductStatus(product.getProductStatus());
-//	        existingProduct.setProductDescription(product.getProductDescription());
-//	        existingProduct.setProductType(product.getProductType());
-//	        return productRepo.save(existingProduct);
-//		}
-//		return null;
-//	}
-//	
-//	@PersistenceContext 
-//	@Autowired
-//	private EntityManager entityManager;
 
-	
-	
 //	可以更新商品總類
 //	@Transactional
 //	public Product updateProduct(Product product) {
@@ -120,6 +78,15 @@ public class ProductService {
 //	    }
 //	    return null;
 //	}
+
+	public List<Product> findProductsByPage(int page, int pageSize) {
+	    Page<Product> productPage = productRepo.findAll(PageRequest.of(page - 1, pageSize));
+	    return productPage.getContent();
+	}
+
+	public int countAllProducts() {
+	    return (int) productRepo.count();
+	}
 
 
 
@@ -165,7 +132,9 @@ public class ProductService {
         return null;
     }
 	
-
+	public Product findProductByIdU(Integer id) {
+		return productRepo.findById(id).orElse(null);
+	}
 
 	
 	public Product findProductById(Integer id) {

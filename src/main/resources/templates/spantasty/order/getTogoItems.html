@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <meta charset="UTF-8">
+    <title>訂單明細</title>
+</head>
+
+<body>
+    <div th:replace="~{spantasty/display/navbar}"></div>
+    <!-- 主要內容區域 -->
+    <div class="content">
+        <div class="container mt-2">
+            <h1 class="display-6">🍰訂單明細🍰</h1>
+            <div class="row justify-content-center">
+                <div class="col-11">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    	<button id="addTogoItemBtn" class="btn btn-primary">新增明細</button>
+                	</div>
+                    <div class="table-responsive mt-3">
+                        <table id="demoData" class="table table-secondary table-striped table-hover text-center">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">訂單編號</th>
+                                    <th scope="col">餐點名稱</th>
+                                    <th scope="col">單價</th>
+                                    <th scope="col">數量</th>
+                                    <th scope="col">項目總額</th>
+                                    <th scope="col">修改</th>
+                                    <th scope="col">刪除</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <th:block th:each="togoItem : ${togoItems}">
+                                    <tr>
+                                        <td class="align-middle" th:text="${togoItem.togoItemId.togoId}"></td>
+                                        <td class="align-middle" th:text="${togoItem.menu.foodName}"></td>
+                                        <td class="align-middle" th:text="${togoItem.menu.foodPrice}">
+                                        </td>
+                                        <td class="align-middle" th:text="${togoItem.amount}"></td>
+                                        <td class="align-middle" th:text="${togoItem.togoItemPrice}"></td>
+                                        <td><button class="btn btn-warning">修改</button></td>
+                                        <td><button class="btn btn-danger">刪除</button></td>
+                                    </tr>
+                                </th:block>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-12 d-flex justify-content-center">
+                        <a href="http://localhost:8080/SpanTasty/order/togo" class="btn btn-secondary ms-2">返回訂單</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showSidebar('order');
+
+
+        })
+        
+        
+
+
+    </script>
+
+</body>
+
+</html>

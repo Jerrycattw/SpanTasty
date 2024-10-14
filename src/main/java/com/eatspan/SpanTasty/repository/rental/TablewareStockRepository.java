@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.eatspan.SpanTasty.entity.rental.RentItem;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 
 @Repository
@@ -27,4 +28,7 @@ public interface TablewareStockRepository extends JpaRepository<TablewareStock, 
 	@Query("from TablewareStock where tablewareId = :tablewareId AND restaurantId = :restaurantId")
 	TablewareStock findById(@Param("tablewareId") Integer tablewareId, @Param("restaurantId") Integer restaurantId);
 	
+	
+	@Query(value = "from TablewareStock where tablewareId = :tablewareId")
+	List<TablewareStock> findByTablewareId(Integer tablewareId);
 }

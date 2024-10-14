@@ -8,31 +8,31 @@ public class AdminPageController {
 	
     @GetMapping("/admin/member-list")
     public String showMemberListPage() {
-        return "/account/findMembers"; 
+        return "spantasty//account/findMembers"; 
     }
     
     @GetMapping("/admin/admin-list")
     public String showAdminListPage() {
-        return "/account/findAdmins"; 
+        return "spantasty//account/findAdmins"; 
     }
     
     @GetMapping("/admin/loginPage")
     public String showAdminloginPage() {
-        return "/account/login"; 
+        return "spantasty//account/login"; 
     }
     
     @GetMapping("/admin/addAdminPage")
     public String showAddAdminPage() {
-        return "/account/addAdmin"; 
+        return "spantasty//account/addAdmin"; 
     }
     
     @GetMapping("/admin/updateAdminInfoPage")
     public String showUpdateAdminInfoPage() {
-        return "/account/updateAdminInfo"; 
+        return "spantasty//account/updateAdminInfo"; 
     }
     
     @GetMapping("/admin/adminPermissionPage")
     public String showAdminPermissionPage() {
-        return "/account/adminPermission"; 
+        return "spantasty//account/adminPermission"; 
     }
 }

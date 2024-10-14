@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation"
+	lang="en">
+<head>
+<title>Restaurant</title>
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport"
+	content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<!-- Stylesheets-->
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+.ie-panel {
+	display: none;
+	background: #212121;
+	padding: 10px 0;
+	box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
+	clear: both;
+	text-align: center;
+	position: relative;
+	z-index: 1;
+}
+
+html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
+	display: block;
+}
+
+.restaurant-img {
+    width: 450px;
+    height: auto; /* 保持比例 */
+}
+</style>
+
+</head>
+<body>
+	<!-- navbar  th:replace=-->
+	<div th:replace="~{starcups/display/navbar}"></div>
+
+
+	<section class="section breadcrumbs-custom-inset">
+		<div class="breadcrumbs-custom context-dark">
+			<div class="container">
+				<h2 class="breadcrumbs-custom-title">Locations</h2>
+				<ul class="breadcrumbs-custom-path">
+					<li><a href="/SpanTasty/StarCups">Home</a></li>
+					<li class="active">Locations</li>
+				</ul>
+			</div>
+			<div class="box-position novi-bg novi-bg-img"
+				style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+		</div>
+	</section>
+
+	<!-- Classic blog-->
+	<section
+		class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+		<div class="container">
+			<div class="row row-70 row-fix">
+				<div class="col-lg-11 post-classic-wrap">
+
+					<!-- Post Classic-->
+					<article th:each="restaurant : ${restaurantsPage.content}"
+						class="post post-classic">
+						<div class="post-classic-panel d-flex align-items-center">
+						  <a class="badge badge-secondary" th:href="@{/StarCups/restaurant/{id}(id=${restaurant.restaurantId})}">
+						    <img th:src="${restaurant.restaurantImg != null ? restaurant.restaurantImg : 'https://via.placeholder.com/450x400'}" 
+						         alt="" class="restaurant-img img-fluid"/>
+						    <div>詳細資訊</div>
+						  </a>
+						  <!-- 這裡的文字會顯示在圖片右邊 -->
+						  <div class="ms-3">
+							<h4 class="post-classic-title mb-4">
+								<a href="blog-post.html" th:text="${restaurant.restaurantName}"></a>
+							</h4>
+						    <div class="post-classic-time m-3">
+						      <span class="novi-icon icon"><i class=" fa-solid fa-phone"></i> 餐廳電話: </span>
+						      <span class="fs-4" th:text="${restaurant.restaurantPhone}"></span>
+						    </div>
+						    <div class="post-classic-time m-3">
+						      <span class="novi-icon icon"><i class=" fa fa-clock-o"></i> 營業時間: </span>
+						      <span class="fs-4" th:text="${restaurant.restaurantOpentime} + ' - ' + ${restaurant.restaurantClosetime}"></span>
+						    </div>
+						    <div class="post-classic-time m-3">
+						      <span class="novi-icon icon"><i class="fa-solid fa-location-dot"></i> 餐廳地址: </span>
+						      <span class="fs-5" th:text="${restaurant.restaurantAddress}"></span>
+						    </div>
+						    
+						  <div class="button button-md button-icon button-icon-left button-secondary button-pipaluk ms-3 mt-0"><span class="novi-icon icon fa fa-plus"></span>線上訂位</div>
+						  </div>
+						</div>
+					</article>
+
+
+					<div class="pagination-wrap">
+						<!-- Bootstrap Pagination-->
+						<nav aria-label="Page navigation">
+							<ul class="pagination">
+								<!-- Previous Page Link -->
+								<li class="page-item page-item-control"
+									th:classappend="${restaurantsPage.hasPrevious()} ? '' : 'disabled'">
+									<a class="page-link"
+									th:href="@{/StarCups/restaurant(page=${restaurantsPage.number - 1})}"
+									aria-label="Previous"> <span class="icon"
+										aria-hidden="true"></span>
+								</a>
+								</li>
+
+								<!-- Page Numbers -->
+								<li class="page-item"
+									th:each="pageNum : ${#numbers.sequence(1, restaurantsPage.totalPages)}"
+									th:classappend="${pageNum == restaurantsPage.number+1} ? 'active'">
+									<a class="page-link"
+									th:href="@{/StarCups/restaurant(page=${pageNum - 1})}"
+									th:text="${pageNum}"></a>
+								</li>
+
+								<!-- Next Page Link -->
+								<li class="page-item page-item-control"
+									th:classappend="${restaurantsPage.hasNext()} ? '' : 'disabled'">
+									<a class="page-link"
+									th:href="@{/StarCups/restaurant(page=${restaurantsPage.number + 1})}"
+									aria-label="Next"> <span class="icon" aria-hidden="true"></span>
+								</a>
+								</li>
+							</ul>
+						</nav>
+					</div>
+
+				</div>
+				<div class="col-lg-4"></div>
+			</div>
+		</div>
+	</section>
+
+
+
+	<!-- Global Mailform Output-->
+	<div class="snackbars" id="form-output-global"></div>
+	<!-- footer  th:replace=-->
+	<div th:replace="~{starcups/display/footer}"></div>
+
+	<!-- Javascript-->
+	<script src="/SpanTasty/starcups/js/core.min.js"></script>
+	<script src="/SpanTasty/starcups/js/script.js"></script>
+</body>
+</html>

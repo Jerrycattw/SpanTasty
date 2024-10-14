@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>優惠券</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<style>
+	.distributeDiv {
+		position: fixed; /* 确保 DIV 定位相对于视口 */
+		top: 50%; /* 从视口顶部开始 */
+		left: 50%; /* 从视口左边开始 */
+		transform: translate(-50%, -50%); /* 将 DIV 移动到视口中心 */
+		width: 550px; /* 根据需要调整宽度 */
+		max-width: 100%; /* 以确保在小屏幕上不会超出视口 */
+		background-color: white; /* 添加背景色以提高可见性 */
+		border: 1px solid #ddd; /* 添加边框 */
+		box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 添加阴影效果 */
+		padding: 20px; /* 添加内边距 */
+		z-index: 1000; /* 确保 DIV 在其他元素之上 */
+	}
+	.distributeDiv body {
+		font-family: Arial, sans-serif;
+		max-width: 500px;
+		margin: 0 auto;
+		padding: 20px;
+	}
+	.distributeDiv h1 {
+		font-size: 18px;
+		margin-bottom: 20px;
+	}
+	.distributeDiv .close {
+		float: right;
+		font-size: 24px;
+		cursor: pointer;
+	}
+	.distributeDiv select, input[type="datetime-local"] {
+		width: 100%;
+		padding: 8px;
+		margin-bottom: 10px;
+	}
+	.distributeDiv .info {
+		background-color: #f0f0f0;
+		padding: 10px;
+		margin-bottom: 10px;
+	}
+	.distributeDiv .checkbox-group {
+		margin-bottom: 10px;
+	}
+	.distributeDiv .result {
+		border: 1px solid #ccc;
+		padding: 10px;
+		margin-top: 20px;
+	}
+	.distributeDiv .result h3 {
+		margin-top: 0;
+		color: #333;
+	}
+	.distributeDiv button {
+		background-color: #4285f4;
+		color: white;
+		border: none;
+		padding: 10px 20px;
+		cursor: pointer;
+		margin-left:20px;
+		
+	}
+	.distributeDiv .result a{
+		margin-left:20px;
+	   }
+
+	.distributeDiv .button-group {
+		display: flex;
+		justify-content: flex-end; /* 确保按钮靠右对齐 */
+		margin-top: 10px;
+	}
+
+</style>
+</head>
+<div th:replace="~{spantasty//display/navbar}"></div>
+<div class="content"></div>
+	<div class="container">
+		<h1 ><i class="fa-solid fa-ticket me-2"></i>優惠券</h1>
+		<div class="row mb-2">
+			<div class="col">
+				<div class="card">
+					<div class="card-header">
+					  優惠券發送
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-6">
+								<div class="input-group mb-3">
+									<button id="distributebtn" class="btn btn-outline-primary" type="button"><i class="fa-solid fa-arrow-up-from-bracket"></i>&nbsp;發送優惠券</button>
+									<input id="scheduleName" type="text" class="form-control" placeholder="請輸入發送原因" required>
+								</div>
+							</div>
+							<div class="col-2">
+								<button id="scheduleBtn" class="btn btn-outline-primary me-md-2" type="button"><i class="fa-solid fa-list-check"></i>&nbsp;發送排程管理</button>
+							</div>
+						</div>
+					</div>
+				</div>	
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				
+				<div class="card">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<span>優惠券管理</span>
+						<div>	
+							<button id="add" class="btn btn-outline-primary me-md-2" type="button">新增優惠券</button>
+						</div>
+					</div>
+					<div class="card-body">
+						<!-- search bar -->
+						 <div class="row">
+							<div class="col-6">
+								<div class="input-group mb-3">
+									<button class="btn btn-outline-secondary" type="button" id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></button>
+									<input id="searchInput" type="text" class="form-control" placeholder="搜尋優惠券編號、代碼、名稱、使用開始及結束日期等" >
+								</div>
+							</div>
+						 </div>
+						 <!-- 提示文字 -->
+				         <div class="row">
+				         	<div class="col-auto ms-auto">
+				         	<i class="fa-solid fa-circle-question ms-1 me-1"></i>
+				         	標籤 : 
+				         	<span class="badge text-bg-warning">商城</span>
+				         	<span class="badge text-bg-info">訂餐</span>
+				         	</div>
+				         </div>
+						<!-- table -->
+						<table class="table table-striped table-hover" id="couponsTable">
+							<thead>
+								<tr>
+								  <th scope="col">編號</th>
+								  <th scope="col">代碼</th>
+								  <th scope="col">名稱</th>
+								  <th scope="col">開始日期</th>
+								  <th scope="col">結束日期 </th>
+								  <th scope="col">使用規則</th>
+								  <th scope="col">綁定標籤<i class="fa-solid fa-circle-question ms-1 me-1"></i></th>
+								  <th scope="col">已領取</th>
+								  <th scope="col">狀態</th>
+								  <th scope="col">#</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+								  <th scope="row">1</th>
+								  <td>Mark</td>
+								  <td>Otto</td>
+								  <td>@mdo</td>
+								</tr>								
+							</tbody>	
+						</table>
+					</div>
+				  </div>
+			</div>
+		</div>
+	</div>	
+	<div class="distributeDiv" style="visibility:hidden" id="distributeDiv">
+        <p>請輸入愈發送之客戶編號</p>
+        <input type="text" id="member">
+        <p>優惠券將發送給 <label id="memberAmount"></label> 位顧客</p>
+    
+        <input type="text" name="couponInput" list="coupon_list" id="couponInput" placeholder="優惠券編號、代碼、名稱">
+        <datalist id="coupon_list">
+        </datalist>
+    
+        <p>優惠券僅適用「所有顧客」且尚可領取次數大於名單人數</p>
+    
+        <div class="info">
+            <p><strong>優惠券資訊</strong></p>
+            <p>優惠名稱：<label id="couponDescription" class="couponInfo"></label></p>
+            <p>優惠代碼：<label id="couponCode" class="couponInfo"></label></p>
+            <p>使用期間：<label id="couponStartDate" class="couponInfo"></label> - <label id="couponEndDate" class="couponInfo"></label></p>
+            <p>每人可領取次數：<label  id="perMaxCoupon" class="couponInfo"></label></p>
+            <p>狀態：<label id="couponStatus"></label></p>
+        </div>
+        <label></label>
+        <p>預計發送時間</p>
+        <input type="datetime-local" id="scheduleTime">
+        
+        <p>發送時間須設定 1 分鐘後</p>
+        
+
+        <div class="result" id="result" style="visibility:hidden">
+            <h3>優惠券發送結果</h3>
+            <p>共<label id="distribute"></label>筆（成功<label id="success"></label>筆／失敗<label id="fail"></label>筆）<a href="#" id="print"><i class="fa-solid fa-print"></i>下載結果</a></p>
+        </div>
+        <div class="button-group">
+       	<button id="btnCancel">離開</button ><button id="btn">確認</button> 
+        </div>	
+    </div>
+</div>
+
+
+<body>
+	<script>
+	document.addEventListener('DOMContentLoaded',(e)=>{
+		//navbar side
+		showSidebar('points');
+		
+		fetch('/SpanTasty/coupon/show')
+		.then(response => response.json())
+		.then(data => {
+			console.log(data);
+			HtmlMaker(data);
+		})
+
+		function HtmlMaker(data){
+			const tableBody = document.querySelector('#couponsTable tbody');
+			tableBody.innerHTML = '';
+			data.forEach(coupon => {
+				tableBody.innerHTML +=`
+								<tr  data-couponId="${coupon.couponId}">
+								  <th scope="row">${coupon.couponId}</th>
+								  <td>${coupon.couponCode}</td>
+								  <td>${coupon.couponDescription}</td>
+								  <td>${coupon.couponStartDate}</td>
+								  <td>${coupon.couponEndDate}</td>
+								  <td>${coupon.rulesDescription}</td>
+								  <td>${HtmlMakerTags(coupon.tags)}</td>
+								  <td>${coupon.receivedAmount}</td>
+								  <td><span class="badge ${coupon.couponStatus === '上架' ? 'text-bg-success' : 'text-bg-danger'}">${coupon.couponStatus}</span></td>
+								  <td>
+									<button  type="button" class="updateBtn btn btn-outline-primary"><i class="fa-solid fa-file-lines" ></i></button>
+									<button  type="button" class="deleteBtn btn btn-outline-secondary"><i class="fa-solid fa-trash-can-arrow-up" ></i></button
+								  </td>							  
+								  </tr>`	
+			})
+
+			tableBody.addEventListener("click",function(e){
+				const target = e.target.closest('button')
+				if (!target) return;
+				const row = e.target.closest('tr')
+				const couponId = row.dataset.couponid
+				console.log(couponId);
+				
+
+				if(target.classList.contains('updateBtn')){
+					window.location.href = `/SpanTasty/coupon/${couponId}`
+				}
+				if(target.classList.contains('deleteBtn')){
+					if (confirm("您確定執行刪除嗎?刪除後無法復原!")) {
+										axios.delete(`/SpanTasty/coupon/${couponId}`)
+										.then(response=>{		         
+											return response.data;		                       		
+										})
+										.then(message=>{
+											alert(message)
+											window.location.reload();
+										})	
+										.catch(err=>{
+											alert('刪除失敗，請聯繫IT部門')
+											console.error('Error:', error);
+										});   
+									}	
+				}
+			})
+		}
+
+		function HtmlMakerTags(tags){
+			if (!Array.isArray(tags) || tags.length === 0) {
+       		return '';
+    		}
+    
+    		return tags.map(tag => `<span class="badge ${tag.tagType === 'product' ? 'text-bg-warning' : 'text-bg-info'} me-1">${tag.tagName}</span></br>`).join('');	
+		}
+
+
+		//點擊新增
+    	document.getElementById("add").addEventListener('click',function(){
+    		window.location.href = `/SpanTasty/coupon/add`;	
+    	})
+
+		//點擊搜尋
+    	document.getElementById("searchBtn").addEventListener('click',function(){
+    		let keyWord=document.getElementById("searchInput").value
+    		 
+            fetch(`/SpanTasty/coupon/search?search=${keyWord}`, {
+                method: 'GET',
+                headers: {
+                'Content-Type': 'text/plain'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                HtmlMaker(data);
+            })
+    	})
+
+		//點擊任務排程
+		document.getElementById('scheduleBtn').addEventListener('click',function(){
+			window.location.href="/SpanTasty/coupon/schedule"
+		})
+		
+
+	})			
+	</script>
+	<script>
+		//點擊發送
+    	document.getElementById("distributebtn").addEventListener('click',function(e){
+			if(!document.getElementById('scheduleName').value){
+				e.preventDefault()
+				alert('請輸入發送原因')
+				return;
+			}
+            updateDistribute();
+
+    	})
+
+		let memberIds;
+		function updateDistribute(){
+			document.getElementById("distributeDiv").style.visibility="visible"
+			document.getElementById("member").addEventListener('change',function(){
+				memberIds=this.value;
+				fetch('/SpanTasty/coupon/distribute', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'text/plain'
+					},
+					body: memberIds
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log(data);
+					//產生option
+					let couponList=document.getElementById("coupon_list") 
+					couponList.innerHTML=""; 
+					data.forEach(coupon => {
+						let cell=document.createElement('option');
+						cell.textContent=coupon.selectOption
+						cell.value=coupon.couponId
+						couponList.appendChild(cell); 
+					});
+					//label產生發送人數
+					let label=document.getElementById("memberAmount");
+					label.textContent=memberIds.split(",").length;    	
+				})
+			})
+		}
+
+
+		 //更新coupon資訊
+			let perMaxCoupon=0;
+       		document.getElementById("couponInput").addEventListener('change',function(){
+			fetch('/SpanTasty/coupon/distribute/inf', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'text/plain'
+				},
+				body: this.value
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log(data);
+				
+				Object.keys(data).forEach(key => {
+					let element = document.getElementById(key);
+					if (element) {
+						element.textContent = data[key];
+					}
+				});
+				perMaxCoupon=data.perMaxCoupon;
+				
+			})  
+			})
+			
+			 //點擊送出
+			 let resultData;
+       document.getElementById("btn").addEventListener('click',function(event){
+    	   //
+    	   console.log(document.getElementById("member").value)
+    	   console.log(document.getElementById("couponInput").value)
+    	   if(!document.getElementById("member").value || !document.getElementById("couponInput").value){
+    		   event.preventDefault();
+    		   return;
+    	   }
+    	   
+           let couponId=document.getElementById("couponInput").value
+		   let scheduleTime=document.getElementById('scheduleTime').value
+		   let scheduleName=document.getElementById('scheduleName').value
+		   console.log(scheduleTime);
+		   
+           //fetch
+           fetch('/SpanTasty/coupon/distribute/post', {
+               method: 'POST',
+               headers: {
+                   'Content-Type': 'application/json'
+               },
+               body: JSON.stringify({
+                   memberIds : memberIds,
+                   couponId : couponId,
+                   perMaxCoupon : perMaxCoupon,
+				   scheduleName: scheduleName,
+				   scheduleTime : scheduleTime
+				   
+
+               })
+           })
+           .then(response => response.json())
+           .then(data => {
+				console.log("print");
+				
+               console.log(data);
+               resultData=data;//結果賦值給resultData for打印(如需)
+               //計算發放結果
+               let distributeAmount=0;
+               let successAmount=0;
+               let failAmount=0;
+               data.forEach(member=>{
+                   if(member.distributeStatus==="排程成功"){
+                       successAmount++;
+                   }else{
+                       failAmount++;
+                   }
+                   distributeAmount++;
+               })
+               document.getElementById('distribute').textContent=distributeAmount;
+               document.getElementById('success').textContent=successAmount;
+               document.getElementById('fail').textContent=failAmount;	    	
+           })
+           
+           //顯示優惠券result div`,隱藏確認btn
+           const resultDiv=document.getElementById('result');
+              resultDiv.style.visibility="visible";
+              document.getElementById("btn").style.visibility="hidden"
+       })
+       
+       //點擊結果列印
+       document.getElementById('print').addEventListener('click',function(){
+           event.preventDefault();
+            // 通过 SheetJS 创建 Excel 工作簿
+           const worksheet = XLSX.utils.json_to_sheet(resultData);
+           const workbook = XLSX.utils.book_new();
+           XLSX.utils.book_append_sheet(workbook, worksheet, "發放結果");
+
+           // 生成 Excel 文件并触发下载
+           XLSX.writeFile(workbook, "result.xlsx");
+       })
+       
+       //點擊離開
+       document.getElementById('btnCancel').addEventListener('click',function(){
+    	   window.location.reload();
+       })
+	</script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>    <!--  EXCEL CDN -->
+	<script src="js/axios.min.js"></script>
+	<script src="js/bootstrap.bundle.min.js" ></script>
+	<script src="js/jquery-3.7.1.min.js" ></script>
+</body>
+</html>
