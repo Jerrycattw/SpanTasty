@@ -66,8 +66,9 @@
                     width="300" height="300">
                 </div>
                 <p><strong>姓名：</strong> <span id="member-name"></span></p>
-                <p><strong>註冊日期：</strong> <span id="register-date"></span></p>
                 <p><strong>生日：</strong> <span id="birthday"></span></p>
+                <p><strong>信箱：</strong> <span id="member-email"></span></p>
+                <p><strong>註冊日期：</strong> <span id="register-date"></span></p>
                 <p><strong>最近登入日期：</strong> <span id="last-login"></span></p>
               </div>
             </div>
@@ -130,17 +131,27 @@
       const confirmAvatarButton = document.getElementById('confirm-avatar');
       const removeAvatarButton = document.getElementById('remove-avatar');
 
+
       const personalCurrentAvatar = document.getElementById('personal-current-avatar');
       const changeCurrentAvatar = document.getElementById('change-current-avatar');
 
-      const memberName = document.getElementById('member-name'); // 使用 getElementById 替代 querySelector
+      //個人資訊框內容
+      const memberName = document.getElementById('member-name');
+      const memberEmail = document.getElementById('member-email');
       const registerDate = document.getElementById('register-date');
       const birthday = document.getElementById('birthday');
       const lastLogin = document.getElementById('last-login');
 
+      //按鈕
       const btnPersonalInfo = document.getElementById('btn-personal-info');
       const btnChangePassword = document.getElementById('btn-change-password');
       const btnChangeAvatar = document.getElementById('btn-change-avatar');
+
+      // 修改密碼相關的元素
+      const currentPasswordInput = document.getElementById('current-password');
+      const newPasswordInput = document.getElementById('new-password');
+      const confirmPasswordInput = document.getElementById('confirm-password');
+      const changePasswordForm = changePasswordSection.querySelector('form');
 
       // 顯示個人資訊
       btnPersonalInfo.addEventListener('click', function () {
@@ -164,6 +175,58 @@
 
         getAvatar();
       });
+
+      // 提交修改密碼請求
+      changePasswordForm.addEventListener('submit', function (event) {
+        event.preventDefault(); // 阻止表單的預設提交行為
+
+        const currentPassword = currentPasswordInput.value;
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        // 驗證新密碼是否一致
+        if (newPassword !== confirmPassword) {
+          alert('新密碼與確認密碼不一致');
+          return;
+        }
+
+        const token = localStorage.getItem('token'); // 從 localStorage 取得 token
+
+        if (token) {
+          // 使用 URLSearchParams 構建請求參數
+          const params = new URLSearchParams();
+          params.append('oldPassword', currentPassword);
+          params.append('newPassword', newPassword);
+          params.append('confirmPassword', confirmPassword);
+
+          // 使用 axios 發送帶有 URL 編碼的請求
+          axios.post('/SpanTasty/member/updatePassword', params, {
+            headers: {
+              'Authorization': `${token}`,
+              'Content-Type': 'application/x-www-form-urlencoded' // 明確指定編碼格式
+            }
+          })
+            .then(response => {
+              if (response.data.success) {
+                alert('密碼修改成功');
+                // 清空輸入欄位
+                currentPasswordInput.value = '';
+                newPasswordInput.value = '';
+                confirmPasswordInput.value = '';
+              } else {
+                alert('密碼修改失敗：' + response.data.message);
+              }
+            })
+            .catch(error => {
+              console.error('修改密碼過程中發生錯誤:', error.response ? error.response.data : error);
+              alert('修改密碼過程中發生錯誤');
+            });
+        } else {
+          alert('請先登入');
+        }
+      });
+
+
       // 預覽頭像
       avatarInput.addEventListener('change', function () {
         const file = avatarInput.files[0];
@@ -287,6 +350,7 @@
               if (response.data.success) {
                 const member = response.data.data;
                 memberName.textContent = member.memberName;
+                memberEmail.textContent = member.email;
                 registerDate.textContent = member.registerDate;
                 birthday.textContent = member.birthday;
                 lastLogin.textContent = member.formattedLoginDate;
