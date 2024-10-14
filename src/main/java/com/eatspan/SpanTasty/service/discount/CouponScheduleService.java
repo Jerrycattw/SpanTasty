@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import com.eatspan.SpanTasty.config.MailConfig;
 import com.eatspan.SpanTasty.dto.discount.CouponScheduleDTO;
 import com.eatspan.SpanTasty.entity.discount.CouponMember;
 import com.eatspan.SpanTasty.entity.discount.CouponSchedule;
@@ -38,6 +39,9 @@ public class CouponScheduleService {
 	
 	@Autowired
 	private CouponMemberRepository couponMemberRepo;
+	
+	@Autowired
+	private MailConfig mailConfig;// javaMail要注入----------------------------
 	
 	@Autowired
 	private JavaMailSender mailSender;// javaMail要注入----------------------------
@@ -75,7 +79,7 @@ public class CouponScheduleService {
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 		MimeMessageHelper  helper = new MimeMessageHelper(mimeMessage,true);
 		//設置mail
-		helper.setFrom("receipt0210@gmail.com");//誰寄信(application設定的信箱)
+		helper.setFrom(mailConfig.getUserName());//誰寄信(application設定的信箱)
 		helper.setTo(memberEmail);//誰收信
 		helper.setSubject("【☕週年靜加碼】starcups 全館不限享多種折扣");//主旨
 		
