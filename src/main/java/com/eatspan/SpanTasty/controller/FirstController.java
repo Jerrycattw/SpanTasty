@@ -51,8 +51,8 @@ public class FirstController {
 	@GetMapping("/testmail")
 	 public void sendSimpleMail() throws Exception {
 	        SimpleMailMessage message = new SimpleMailMessage();
-	        message.setFrom("@gmail.com");//誰寄信(你設定的信箱)  要修改!
-	        message.setTo("@gmail.com");//寄給誰  要修改!
+	        message.setFrom("zasw0015@gmail.com");//誰寄信(你設定的信箱)  要修改!
+	        message.setTo("spantasty@gmail.com");//寄給誰  要修改!
 	        message.setSubject("主旨：Hello hao");
 	        message.setText("內容：這是一封測試信件，恭喜您成功發送了唷");
 

@@ -1,5 +1,7 @@
 package com.eatspan.SpanTasty.service.reservation;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -11,8 +13,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import com.eatspan.SpanTasty.dto.reservation.ReserveCheckDTO;
 import com.eatspan.SpanTasty.dto.reservation.TimeSlotDTO;
@@ -23,6 +29,13 @@ import com.eatspan.SpanTasty.repository.reservation.ReserveRepository;
 import com.eatspan.SpanTasty.repository.reservation.RestaurantRepository;
 import com.eatspan.SpanTasty.repository.reservation.TableTypeRepository;
 
+import freemarker.core.ParseException;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+
 @Service
 public class ReserveService {
 	
@@ -32,6 +45,12 @@ public class ReserveService {
 	private RestaurantRepository restaurantRepository;
 	@Autowired
 	private TableTypeRepository tableTypeRepository;
+	
+	@Autowired
+	private JavaMailSender mailSender;// javaMail要注入----------------------------
+	
+	@Autowired
+	private freemarker.template.Configuration freemarkerConfig; // javaMail要注入----------------------------
 	
 	// 新增訂位
 	public Reserve addReserve(Reserve reserve) {
@@ -87,19 +106,15 @@ public class ReserveService {
 
         // 根據餐廳的營業時間與每個時間段的用餐限制，計算出時間段
         List<TimeSlotDTO> timeSlots = generateTimeSlots(restaurant);
-
         List<ReserveCheckDTO> reserveChecks = new ArrayList<>();
 
         for (TimeSlotDTO timeSlot : timeSlots) {
             // 使用自定義的查詢方法，查詢每個時間段的預訂數量與總桌數
             Integer reservedTableCount = reserveRepository.countReservationsInTimeSlot(restaurantId, tableTypeId, checkDate, timeSlot.getSlotStar(), timeSlot.getSlotEnd());
             Integer totalTableCount = reserveRepository.countAvailableTables(restaurantId, tableTypeId);
-            System.out.println("reservedTableCount1:"+reservedTableCount);
-            System.out.println("totalTableCount1:"+totalTableCount);
+            if(totalTableCount==null) totalTableCount=0;
             // 設定開放訂位的桌數比例
             totalTableCount = (Integer) (totalTableCount * restaurant.getReservePercent() / 100);
-            System.out.println("totalTableCount2:"+totalTableCount);
-            
             ReserveCheckDTO bean = new ReserveCheckDTO(timeSlot.getSlotStar(), timeSlot.getSlotEnd(), totalTableCount, reservedTableCount);
             reserveChecks.add(bean);
         }
@@ -191,6 +206,34 @@ public class ReserveService {
 
     }
     
+    
+	public void sendMail(Reserve reserve) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		MimeMessageHelper  helper = new MimeMessageHelper(mimeMessage,true);
+		//設置mail
+		helper.setFrom("zasw0015@gmail.com");//誰寄信(application設定的信箱)
+		// helper.setTo(reserve.getMember().getEmail());//誰收信
+		helper.setTo("spantasty@gmail.com");//誰收信
+		helper.setSubject("【☕訂位成功通知】您在 starcups "+ reserve.getRestaurant().getRestaurantName() +" 的預訂已經完成");//主旨
+		
+		//設置模板
+		//設置model
+		Map<String, Object> model = new HashMap<String,Object>();
+		//透過modal傳入的物件("參數名","東西")
+		//model.put("userName",memberName);
+		model.put("reserve",reserve);
+		//get模板，並將modal傳入模板
+		String templateString = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfig.getTemplate("reserveMail.html"), model);
+		
+		//設置mail內文
+		helper.setText(templateString,true);
+		
+		//設置資源，順序要在內文之後
+		FileSystemResource file = new FileSystemResource(new File("src/main/resources/static/images/mail/logo-starcups.png"));
+		helper.addInline("logo",file);
+		
+		mailSender.send(mimeMessage);	
+	}
 	
 	
 
