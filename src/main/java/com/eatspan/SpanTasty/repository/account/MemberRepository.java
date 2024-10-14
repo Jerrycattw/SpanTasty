@@ -20,6 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 	//email是否存在
 	boolean existsByEmail(String email);
 	
+	Member findByEmail(String email);
+	
 	//根據帳號尋找會員
 	Member findByAccount(String account);
 	
@@ -36,6 +38,10 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     // 計算特定年份和月份的註冊會員數，使用 'yyyy-MM' 格式
     @Query("SELECT COUNT(m) FROM Member m WHERE FORMAT(m.registerDate, 'yyyy-MM') = :yearMonth")
     int countMembersByYearMonth(@Param("yearMonth") String yearMonth);
+
+	Member findByProviderId(String googleId);
+
+
     
 
 }
