@@ -51,7 +51,7 @@ public class CouponController {
 	//範例
 	@GetMapping("/coupon/test")
 	public String testmail() throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException {
-		couponService.sendMail("奕兆大哥","andy860210@yahoo.com.tw");
+		couponService.sendMail("奕兆大哥","spantasty@gmail.com");
 		return "spantasty/discount/coupon/coupon";
 	}
 	//--------------------------------------------------

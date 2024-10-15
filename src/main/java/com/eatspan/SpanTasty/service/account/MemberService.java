@@ -17,6 +17,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.eatspan.SpanTasty.config.MailConfig;
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.repository.account.MemberRepository;
 import com.eatspan.SpanTasty.utils.account.JwtUtil;
@@ -37,6 +38,9 @@ public class MemberService {
 
 	@Autowired
 	private JavaMailSender mailSender;
+	
+	@Autowired
+	private MailConfig mailConfig;
 
 	// 新增(註冊)Member
 	public boolean save(Member member) {
@@ -237,8 +241,11 @@ public class MemberService {
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);
 
-		helper.setFrom("chenruuuuu@gmail.com"); // 設置發件人的電子郵件地址
+		helper.setFrom(mailConfig.getUserName()); // 設置發件人的電子郵件地址
+		System.out.println(mailConfig.getUserName());
+		
 		helper.setTo(recipientEmail);
+		System.out.println("寄收者 : " + recipientEmail);
 		helper.setSubject("重設您的 SpanTasty 密碼");
 		helper.setText("<p>您好，</p>" + "<p>請點擊下方連結重設您的密碼：</p>" + "<p><a href=\"" + resetLink + "\">重設密碼</a></p>", true);
 

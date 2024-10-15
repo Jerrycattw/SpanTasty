@@ -30,8 +30,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/member")
 public class MemberController {
 
-//	@Autowired
-//	private BCryptPasswordEncoder passwordEncoder;
 
 	@Autowired
 	private MemberService memberService;
