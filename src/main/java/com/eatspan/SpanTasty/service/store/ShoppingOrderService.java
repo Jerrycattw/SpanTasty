@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.eatspan.SpanTasty.entity.store.Product;
@@ -28,6 +29,7 @@ public class ShoppingOrderService {
 	private ShoppingOrderRepository shoppingOrderRepo;
 
 	@Autowired
+	@Lazy
 	private ShoppingItemService shoppingItemService;
 	
 	@Autowired ShoppingItemRepository shoppingItemRepo;
@@ -37,6 +39,7 @@ public class ShoppingOrderService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	
 
 	public Integer calculateTotalAmount(Integer shoppingId) {
 	    String hql = "SELECT SUM(i.product.productPrice * i.shoppingItemQuantity) "
@@ -206,6 +209,18 @@ public class ShoppingOrderService {
 	@Transactional
 	public List<ShoppingOrder> findOrdersByMemberId(Integer memberId) {
 	    return shoppingOrderRepo.findByMemberId(memberId);
+	}
+
+	// 按照購物日期排序，搜尋最近的一筆訂單
+	@Transactional
+	public ShoppingOrder getLatestShoppingOrderByMemberId(Integer memberId) {
+	    List<ShoppingOrder> orders = shoppingOrderRepo.findByMemberId(memberId);
+	    if (orders != null && !orders.isEmpty()) {
+	        return orders.stream()
+	                     .max((o1, o2) -> o1.getShoppingDate().compareTo(o2.getShoppingDate()))
+	                     .orElse(null);
+	    }
+	    return null; 
 	}
 
 

@@ -3,6 +3,7 @@ package com.eatspan.SpanTasty.controller.store;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,6 +32,7 @@ import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.service.store.ProductService;
 import com.eatspan.SpanTasty.service.store.ShoppingItemService;
 import com.eatspan.SpanTasty.service.store.ShoppingOrderService;
+import com.eatspan.SpanTasty.utils.account.JwtUtil;
 
 @Controller
 @RequestMapping("/shoppingOrder")
@@ -148,5 +151,19 @@ public class ShoppingOrderController {
 
 	    return "spantasty/store/shopping/searchAllShopping";
 	}
+	
+	
+	@GetMapping("/latestShoppingOrder")
+	@ResponseBody
+	public ResponseEntity<?> getLatestShoppingOrder(@RequestHeader(value = "Authorization") String token) {
+	    Map<String, Object> claims = JwtUtil.parseToken(token);
+	    Integer memberId = (Integer) claims.get("memberId");
+	    
+	    ShoppingOrder latestOrder = shoppingOrderService.getLatestShoppingOrderByMemberId(memberId);
+	    
+	    return ResponseEntity.ok(latestOrder);
+	}
+
+	
 
 }

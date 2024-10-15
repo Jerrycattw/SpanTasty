@@ -2,6 +2,8 @@ package com.eatspan.SpanTasty.entity.store;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,7 +34,7 @@ public class ProductType {
 	@Column(name = "product_type_name", unique = true)
 	private String productTypeName;
 
-	
+	@JsonIgnore
 	@OneToMany(fetch= FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="productType")
 	private Set<Product> products;
 
