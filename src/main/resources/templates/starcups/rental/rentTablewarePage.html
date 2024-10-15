@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+<head>
+<title>Rent</title>
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<!-- Stylesheets-->
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+<style>
+.ie-panel {
+	display: none;
+	background: #212121;
+	padding: 10px 0;
+	box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
+	clear: both;
+	text-align: center;
+	position: relative;
+	z-index: 1;
+}
+
+html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
+	display: block;
+}
+
+.restaurant-img {
+    width: 250px;
+    height: auto; /* 保持比例 */
+}
+
+p.global-primary.dark-primary.section-title::after {
+    content: '';
+    display: block;
+    width: 25px; /* 設定線條的寬度 */
+    height: 3px; /* 設定線條的高度 */
+    background-color: darkgrey; /* 設定線條的顏色 */
+    margin: 20px auto 0; /* 調整線條與文字之間的距離 */
+}
+
+form {
+    width: 60%;
+    margin: 0 auto;
+    padding: 10px;
+    padding-bottom: 0;
+}
+
+.restaurant-input {
+    width: 80%;
+    padding: 0;
+    margin-bottom: 0px;
+    border: 1px solid grey;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+
+.section-title {
+    font-size: 20px; /* 調整文字大小 */
+    color: #333; /* 調整文字顏色 */
+    text-align: center; /* 文字居中 */
+    font-weight: bold;
+}
+
+.Grid-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 讓每個項目占據最少250px寬度，並自動填充 */
+    gap: 20px; /* 產品之間的間距 */
+}
+
+.Grid-products-item {
+    padding: 10px;
+    border-radius: 8px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.Grid-products-item:hover {
+    transform: translateY(-5px); /* 在懸停時使產品項目上移 */
+}
+</style>
+</head>
+<body>
+<!-- navbar  th:replace=-->
+<div th:replace="~{starcups/display/navbar}" ></div>
+<!-- 選單下方圖片及連結 -->
+    <section class="section breadcrumbs-custom-inset">
+      <div class="breadcrumbs-custom context-dark">
+        <div class="container">
+          <h2 class="breadcrumbs-custom-title">Rent Tableware Now</h2>
+          <ul class="breadcrumbs-custom-path">
+            <li><a href="/SpanTasty/StarCups">Home</a></li>
+            <li class="active">Rent Tableware</li>
+          </ul>
+        </div>
+        <!-- 圖片-->
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+      </div>
+    </section>
+	
+	<section class="section pt-4 novi-bg novi-bg-img section-xl bg-default text-md-start pb-3">
+    <div class="container">
+        <div class="row row-90 row-fix justify-content-center">
+        <div class="Grid-item Grid-products-item" style="margin-bottom: 20px;">
+		    <p class="global-primary dark-primary section-title">
+		        <span> R E N T </span>
+		    </p>
+		</div>
+            <div class="col-lg-11 post-classic-wrap">
+            <div class="content" id="container">
+<form th:action="@{/rent/addPost}" method="post">
+<h5 class="text-center mb-3" >請先選擇租借餐廳 再選擇租借品項</h5>
+<table class="table w-100 table-striped mb-0" >
+    <tr>
+    <td>租借餐廳:
+        <select name="restaurantId" id="restaurantId" class="restaurant-input" required onchange="changeRestaurant()">
+            <option value="" selected disabled>請選擇租借餐廳</option>
+            <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}" ></option>
+        </select>
+    </td>
+    </tr>
+</table>
+</form>
+				<div class="" id="show-restaurant"></div>
+			</div>
+		</div>
+		</div>
+		</div>
+	</section>
+  <section class="section novi-bg novi-bg-img section-xl bg-default">
+    <div class="container">
+      <div class="row row-40" >
+        <div class="col-sm-6 col-lg-4" th:each="tableware : ${tablewares}">
+          <article class="box-icon-classic p-3" >
+            <div class="unit box-icon-classic-body flex-column flex-md-row text-md-left flex-lg-column text-lg-center flex-xl-row text-xl-left">
+              <div class="unit-left mb-0">
+                <span class="product-title " th:text="${tableware.tablewareName}" ></span>
+                <br/>
+                <br/>
+                <span>NT$</span><span class="box-icon-classic-title " th:text="${tableware.tablewareDeposit}" ></span>
+              </div>
+              <div class="unit-body ms-5 ps-5">
+                <img th:src="${tableware.tablewareImage != null ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}" alt="" width="100" height="100" />
+                
+                <span style="position: absolute; bottom: 10px; right: 10px; color:red;" th:id="'stock' + ${tableware.tablewareId}"></span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+      </div>
+    </section>
+
+<h5 class="ms-4">租借須知</h5>
+<div class="mt-2 ms-4 mb-5">
+  <ul class="">
+    <li>租借用具歸還時間為：七天內。</li>
+  </ul>
+</div>
+<!-- Global Mailform Output-->
+<div class="snackbars" id="form-output-global"></div>
+
+<!-- footer  th:replace=-->
+<div th:replace="~{starcups/display/footer}" ></div>
+
+<!-- Javascript-->
+<script src="/SpanTasty/starcups/js/core.min.js"></script>
+<script src="/SpanTasty/starcups/js/script.js"></script>
+<script>
+function changeRestaurant(){
+	const url = 'http://localhost:8080/SpanTasty/StarCups/rent/get';
+    const restaurantId = document.getElementById("restaurantId").value;
+    let dtoObject = {
+        restaurantId: restaurantId
+    };
+    axios.post(url, dtoObject)
+    .then(function(response) {
+        htmlMaker(response.data);
+    })
+    .catch(function(error) {
+        console.log(error);
+    });
+}
+
+function updateStock(stocks) {
+  stocks.forEach(stock => {
+        // 根據 tablewareId 查找對應的 span 標籤
+        const stockElement = document.getElementById(`stock${stock.tablewareId}`);
+		console.log(stockElement);
+        
+        if (stockElement) {
+            // 插入剩餘庫存資料
+            stockElement.innerHTML = `剩${stock.stock}件`;
+        } else {
+            console.log(`Element with id stock${stock.tablewareId} not found`);
+        }
+    });
+}
+
+function htmlMaker(data){
+  const restaurant = data.restaurant;
+  const stocks = data.stocks;
+  const showRestaurant = document.getElementById("show-restaurant");
+
+	showRestaurant.innerHTML=`
+        <section class="section novi-bg novi-bg-img section-xl bg-default pt-0">
+        <div class="container">
+          <div class="row row-50 justify-content-center align-items-xl-center" style="height: 280px">
+            <div class="col-md-4 col-lg-4 col-xl-7" style="width: 280px">
+              <div class="offset-right-xl-4 " >
+				<img src="${restaurant.restaurantImg != null ? restaurant.restaurantImg : 'https://via.placeholder.com/450x400'}" alt="" class="restaurant-img img-fluid"/>
+              </div>
+            </div>
+            <div class="col-md-4 col-lg-4 col-xl-5">
+              <div class="single-project">
+                <h4>${restaurant.restaurantName}</h4>
+                <p class="text-gray-500">${restaurant.restaurantDesc}</p>
+                <div class="divider divider-30"></div>
+                <ul class="list list-description d-inline-block d-md-block">
+                  <li><span>Phone:</span><span>${restaurant.restaurantPhone}</span></li>
+                  <li><span>Time:</span><span>${restaurant.restaurantOpentime} - ${restaurant.restaurantClosetime}</span></li>
+                  <li><span>Location:</span><span>${restaurant.restaurantAddress}</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+      setTimeout(() => {
+      updateStock(stocks);
+  }, 100); 
+}
+
+</script>
+</body>
+</html>
