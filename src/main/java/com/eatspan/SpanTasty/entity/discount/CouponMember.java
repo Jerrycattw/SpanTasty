@@ -2,6 +2,8 @@ package com.eatspan.SpanTasty.entity.discount;
 
 import java.io.Serializable;
 
+import com.eatspan.SpanTasty.entity.account.Member;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -31,19 +33,19 @@ public class CouponMember implements Serializable{
 	@Column(name = "usage_amount")
 	private int usageAmount;
 	
+	@ManyToOne
+	@JoinColumn(name = "coupon_id", insertable = false, updatable = false)
+	private Coupon coupon;
+	
+	@ManyToOne
+	@JoinColumn(name = "member_id", insertable = false, updatable = false)
+	private Member member;
 	
 	public CouponMember(CouponMemberId couponMemberId, int totalAmount, int usageAmount) {
 		this.couponMemberId = couponMemberId;
 		this.totalAmount = totalAmount;
 		this.usageAmount = usageAmount;
 	}
-
-
-	@ManyToOne
-	@JoinColumn(name = "coupon_id", insertable = false, updatable = false)
-	private Coupon coupon;
-	
-	
 	
 	public void incrementAmounts() {
         this.totalAmount++;

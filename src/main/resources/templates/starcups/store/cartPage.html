@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+<head>
+    <title>Home</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+    <style>
+        .ie-panel { display: none; background: #212121; padding: 10px 0; box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3); clear: both; text-align:center; position: relative; z-index: 1; }
+        html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel { display: block; }
+
+        .cart-icon {
+            position: fixed; 
+            top: 100px; 
+            right: 50px; 
+            z-index: 1000; 
+            font-size: 2rem; 
+            cursor: pointer; 
+            color: #AD5A5A; 
+        }
+    </style>
+</head>
+<body>
+    <!-- navbar th:replace=-->
+    <div th:replace="~{starcups/display/navbar}"></div>
+    
+    <!-- Breadcrumbs -->
+    <section class="section breadcrumbs-custom-inset">
+        <div class="breadcrumbs-custom context-dark">
+            <div class="container">
+                <h2 class="breadcrumbs-custom-title">Checkout</h2>
+                <ul class="breadcrumbs-custom-path">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Shop</a></li>
+                    <li class="active">Checkout</li>
+                </ul>
+            </div>
+            <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+        </div>
+    </section>
+
+    <!-- Shopping Cart -->
+    <section class="section novi-bg novi-bg-img section-xl bg-default">
+        <div class="container">
+            <div class="table-custom-responsive">
+                <table class="table-custom table-cart">
+                    <thead>
+                        <tr>
+                            <th>Product name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${items}">
+                            <td>
+                                <a class="table-cart-figure" th:href="@{/shop/single-product(id=${item.product.productId})}">
+                                    <img th:src="${item.product.productPicture}" alt="" width="146" height="132"/>
+                                </a>
+                                <a class="table-cart-link" th:href="@{/shop/single-product(id=${item.product.productId})}" th:text="${item.product.productName}"></a>
+                            </td>
+                            <td th:text="'$' + ${item.product.productPrice}"></td>
+                            <td>
+                                <div class="table-cart-stepper">
+                                    <input class="form-input" type="number" data-zeros="true" th:value="${item.shoppingItemQuantity}" min="0" max="1000" onchange="updateTotal(this)">
+                                </div>
+                            </td>
+                            <td class="itemTotal" th:text="'$' + ${item.product.productPrice * item.shoppingItemQuantity}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="group-xl group-lg-justify">
+                <div>
+                    <form class="rd-form rd-mailform rd-form-inline rd-form-coupon">
+                        <div class="form-wrap">
+                            <input class="form-input form-input-inverse" id="coupon-code" type="text" name="email">
+                            <label class="form-label" for="coupon-code">Coupon code</label>
+                        </div>
+                        <div class="form-button">
+                            <button class="button button-secondary button-pipaluk" type="submit">Apply coupon</button>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <div class="group-xmd group-middle">
+                        <div>
+                            <div class="group-xmd group-middle">
+                                <h6 class="text-gray-500">Total</h6>
+                                <h3 class="cart-product-price" id="totalPrice"><sup>$</sup><span th:text="${totalAmount}"}></span></h3>
+                            </div>
+                        </div>
+                        <a class="button button-primary button-pipaluk" href="checkout.html">Proceed to checkout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <div class="snackbars" id="form-output-global"></div>
+    
+    <div th:replace="~{starcups/display/footer}"></div>
+
+    <script src="/SpanTasty/starcups/js/core.min.js"></script>
+    <script src="/SpanTasty/starcups/js/script.js"></script>
+
+    <script>
+        function updateTotal(input) {
+            const row = input.closest('tr');
+            const price = parseFloat(row.cells[1].innerText.replace('$', ''));
+            const quantity = parseInt(input.value);
+            const itemTotal = row.querySelector('.itemTotal');
+            const total = price * quantity;
+
+            itemTotal.innerText = '$' + total;
+            updateCartTotal();
+        }
+
+        function updateCartTotal() {
+            const itemTotals = document.querySelectorAll('.itemTotal');
+            let grandTotal = 0;
+
+            itemTotals.forEach(total => {
+                grandTotal += parseFloat(total.innerText.replace('$', ''));
+            });
+
+            document.getElementById('totalPrice').innerText = '$' + grandTotal;
+        }
+    </script>
+</body>
+</html>

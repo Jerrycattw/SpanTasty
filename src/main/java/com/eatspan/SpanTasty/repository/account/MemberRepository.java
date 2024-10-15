@@ -26,20 +26,21 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 	Member findByAccount(String account);
 	
 	// 尋找會員
-    Page<Member> findByMemberNameContainingOrAccountContaining(String memberName, String account, Pageable pageable);
+  Page<Member> findByMemberNameContainingOrAccountContaining(String memberName, String account, Pageable pageable);
 
-    
-    @Query("SELECT FUNCTION('FORMAT', registerDate, 'yyyy-MM') AS month, COUNT(m) FROM Member m GROUP BY FUNCTION('FORMAT', registerDate, 'yyyy-MM')")
-    List<Object[]> findMonthlyRegistrationCounts();
 
-    @Query("SELECT m.status, COUNT(m) FROM Member m GROUP BY m.status")
-    List<Object[]> findMemberStatusCounts();
-    
-    // 計算特定年份和月份的註冊會員數，使用 'yyyy-MM' 格式
-    @Query("SELECT COUNT(m) FROM Member m WHERE FORMAT(m.registerDate, 'yyyy-MM') = :yearMonth")
-    int countMembersByYearMonth(@Param("yearMonth") String yearMonth);
+  @Query("SELECT FUNCTION('FORMAT', registerDate, 'yyyy-MM') AS month, COUNT(m) FROM Member m GROUP BY FUNCTION('FORMAT', registerDate, 'yyyy-MM')")
+  List<Object[]> findMonthlyRegistrationCounts();
 
-	Member findByProviderId(String googleId);
+  @Query("SELECT m.status, COUNT(m) FROM Member m GROUP BY m.status")
+  List<Object[]> findMemberStatusCounts();
+
+  // 計算特定年份和月份的註冊會員數，使用 'yyyy-MM' 格式
+  @Query("SELECT COUNT(m) FROM Member m WHERE FORMAT(m.registerDate, 'yyyy-MM') = :yearMonth")
+  int countMembersByYearMonth(@Param("yearMonth") String yearMonth);
+
+
+  Member findByProviderId(String googleId);
 
 
     

@@ -78,7 +78,7 @@ public class RentController {
 	}
 	
 	
-	//
+	// 篩選掉庫存為0的用具
 	@PostMapping("/filter")
 	@ResponseBody
 	public List<Tableware> getTablewaresByFilter(@RequestBody TablewareFilterDTO tablewareFilterDTO) {
@@ -178,7 +178,16 @@ public class RentController {
 	@DeleteMapping("/del/{id}")
 	public String deleteRentAndRentItems(@PathVariable("id") Integer rentId, Model model) {
 		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+		Rent rent = rentService.findRentById(rentId);
+		Integer restaurantId = rent.getRestaurantId();
 		for(RentItem rentItem: rentItems) {
+			Integer tablewareId = rentItem.getTablewareId();
+			TablewareStock tablewareStock = tablewareStockService.findStockById(tablewareId, restaurantId);
+			Integer stock = tablewareStock.getStock();
+			stock += rentItem.getRentItemQuantity();
+			tablewareStock.setStock(stock);
+			tablewareStockService.addStock(tablewareStock);
+			
 			rentItemService.deleteRentItem(rentItem);
 		}
 		rentService.deleteRent(rentId);
@@ -235,8 +244,24 @@ public class RentController {
 		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rent.getRentId());
 		for(RentItem rentItem: rentItems) {
 			rentItem.setReturnStatus(2);
-			rentItem.setReturnMemo("完全歸還");
+			String returnMemo = rentItem.getReturnMemo();
+			
+			// 解析 returnMemo 得到歸還數量和破損數量
+	        String[] memoParts = returnMemo.replace("租借", "").replace("歸還", ",").replace("破損", ",").split(",");
+	        int rentItemQuantity = Integer.parseInt(memoParts[0]); // 總數量
+	        int returnedQuantity = Integer.parseInt(memoParts[1]); // 歸還數量
+	        int damagedQuantity = Integer.parseInt(memoParts[2]); // 破損數量
+			
+			rentItem.setReturnMemo(returnMemo);
 			rentItemService.addRentItem(rentItem);
+			
+			// 更新庫存
+	        int stockChange = returnedQuantity - damagedQuantity;
+	        TablewareStock tablewareStock = tablewareStockService.findStockById(rentItem.getTablewareId(), rent.getRestaurantId());
+	        Integer stock = tablewareStock.getStock();
+	        stock += stockChange;
+	        tablewareStock.setStock(stock);
+	        tablewareStockService.addStock(tablewareStock);
 		}
 		return "redirect:/rent/getAll";
 	}

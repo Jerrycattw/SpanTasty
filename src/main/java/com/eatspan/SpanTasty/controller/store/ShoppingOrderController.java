@@ -113,15 +113,20 @@ public class ShoppingOrderController {
 	
 	
 	
-	@GetMapping("/find/{id}")
-	public ResponseEntity<?> findByShoppingOrderId(@PathVariable("id") Integer shoppingOrderId){
-		ShoppingOrder shoppingOrder = shoppingOrderService.findShoppingOrderById(shoppingOrderId);
-		if(shoppingOrder != null) {
-			return new ResponseEntity<>(shoppingOrder,HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	}
+//	@GetMapping("/find/{id}")
+//	public ResponseEntity<?> findByShoppingOrderId(@PathVariable("id") Integer shoppingOrderId){
+//		ShoppingOrder shoppingOrder = shoppingOrderService.findShoppingOrderById(shoppingOrderId);
+//		if(shoppingOrder != null) {
+//			return new ResponseEntity<>(shoppingOrder,HttpStatus.OK);
+//		}
+//		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//	}
 	
+	@GetMapping("/find/{id}")
+	@ResponseBody
+	public ShoppingOrder findShoppingOrderById(@PathVariable Integer id) {
+		return shoppingOrderService.findShoppingOrderById(id);
+	}
 	
 	
 	@GetMapping("/findAll")
@@ -132,7 +137,6 @@ public class ShoppingOrderController {
 	            model.addAttribute("member", memberOptional.get());
 	        } else {
 	            model.addAttribute("member", null);
-	            // 這裡可以記錄一些日誌
 	            System.out.println("找不到會員，memberId: " + memberId);
 	        }
 	    } else {

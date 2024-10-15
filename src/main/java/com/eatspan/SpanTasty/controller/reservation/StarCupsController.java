@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -35,6 +37,8 @@ import com.eatspan.SpanTasty.service.reservation.ReserveService;
 import com.eatspan.SpanTasty.service.reservation.RestaurantService;
 import com.eatspan.SpanTasty.service.reservation.RestaurantTableService;
 import com.eatspan.SpanTasty.service.reservation.TableTypeService;
+import com.eatspan.SpanTasty.utils.account.JwtUtil;
+import com.eatspan.SpanTasty.utils.account.Result;
 
 @Controller
 @RequestMapping("/StarCups")
@@ -57,15 +61,20 @@ public class StarCupsController {
 	// 導向到訂位頁面
     @GetMapping("/reserve")
     public String showReserve(Model model) {
-        List<Restaurant> restaurants = restaurantService.findAllRestaurants();
+    	
+        List<Restaurant> restaurants = restaurantService.findAllRestaurants()
+                .stream()
+                .filter(restaurant -> restaurant.getRestaurantStatus() == 1)
+                .collect(Collectors.toList());
+        
         model.addAttribute("restaurants", restaurants);
         return "starcups/reservation/reservePage";
     }
     
-    // 導向到所有餐廳頁面
+    // 導向到所有餐廳頁面(營業中)
     @GetMapping("/restaurant")
     public String showAllRestaurant(Model model, @RequestParam(defaultValue = "0") Integer page) {
-    	Page<Restaurant> restaurantsPage = restaurantService.findAllRestaurantsPage(page+1, 4);
+    	Page<Restaurant> restaurantsPage = restaurantService.findAllActiveRestaurantsPage(page+1, 4);
     	model.addAttribute("restaurantsPage", restaurantsPage);
     	return "starcups/reservation/allRestaurantPage";
     }
@@ -81,21 +90,29 @@ public class StarCupsController {
     
     
     @PostMapping("/reserve/add")
-    public ResponseEntity<String> addReserve(@RequestBody ReserveDTO reserveDTO) {
-        
+    public ResponseEntity<String> addReserve(@RequestHeader("Authorization") String token,
+    										 @RequestBody ReserveDTO reserveDTO) {
         try {
             Reserve reserve = new Reserve();
-            
-            System.out.println(reserveDTO.getCheckDate());
-            System.out.println(reserveDTO.getStartTime());
             
             reserve.setReserveSeat(reserveDTO.getReserveSeat());
             reserve.setReserveTime(reserveDTO.getCheckDate().atTime(reserveDTO.getStartTime()));
             
             // token取得memberId
+    	    // 解析 JWT token 取得 claims
+    	    Map<String, Object> claims = JwtUtil.parseToken(token);
+
+    	    // 取得會員 ID
+    	    Integer memberId = (Integer) claims.get("memberId");
+    	    System.out.println(memberId);
+    	    if (memberId == null) {
+    	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("無法從 Token 中取得會員 ID");
+    	    }
+            
             // 設定member外鍵關聯
-            Member member = memberService.findMemberById(reserveDTO.getMemberId()).orElse(null);
+            Member member = memberService.findMemberById(memberId).orElse(null);
             if (member == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Member not found");
+            reserve.setMember(member);
             
             // 設定restaurant外鍵關聯
             Restaurant restaurant = restaurantService.findRestaurantById(reserveDTO.getRestaurantId());
@@ -111,6 +128,10 @@ public class StarCupsController {
             
             // 保存訂位
             reserveService.addReserve(reserve);
+            
+            // 寄訂位成功信
+//            reserveService.sendMail(member.getMemberName(), "spantasty@gmail.com");
+            reserveService.sendMail(reserve);
             
             // 回傳成功訊息和狀態碼201 (Created)
             return ResponseEntity.status(HttpStatus.CREATED).body("Reserve added successfully");

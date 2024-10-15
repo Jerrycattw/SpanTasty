@@ -2,6 +2,7 @@ package com.eatspan.SpanTasty.service.rental;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,7 +12,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.eatspan.SpanTasty.entity.rental.Tableware;
+import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.repository.rental.TablewareRepository;
+import com.eatspan.SpanTasty.repository.rental.TablewareStockRepository;
 
 @Service
 public class TablewareService {
@@ -19,7 +22,8 @@ public class TablewareService {
 	
 	@Autowired
 	private TablewareRepository tablewareRepository;
-	
+	@Autowired
+	private TablewareStockRepository tablewareStockRepository;
 	
 	// 新增餐具
 	public Tableware addTableware(Tableware tableware) {
@@ -94,5 +98,15 @@ public class TablewareService {
 	public Page<Tableware> findAllTablewarePages(Integer page){
 		Pageable pageable = PageRequest.of(page-1, 10, Sort.Direction.ASC, "tablewareId");
  		return tablewareRepository.findAll(pageable);
+	}
+	
+	
+	//
+	public List<Tableware> findByRestaurantId(Integer restaurantId) {
+	    List<TablewareStock> stockItems = tablewareStockRepository.findByRestaurantId(restaurantId);
+	    return stockItems.stream()
+	            .map(TablewareStock::getTableware)
+	            .filter(tableware -> tableware.getTablewareStatus() != 2) // 過濾掉 tablewareStatus == 2 的餐具
+	            .collect(Collectors.toList());
 	}
 }
