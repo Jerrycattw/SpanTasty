@@ -54,7 +54,7 @@
                 <a class="button button-icon button-icon-left button-twitter button-pipaluk" href="#">
                   <span class="icon fa fa-twitter"></span>Twitter
                 </a>
-                <a class="button button-icon button-icon-left button-google button-pipaluk" href="#">
+                <a class="button button-icon button-icon-left button-google button-pipaluk" href="javascript:void(0)" onclick="loginWithGoogle()">
                   <span class="icon fa fa-google-plus"></span>Google+
                 </a>
               </div>
@@ -97,7 +97,7 @@
                     class="icon fa fa-facebook"></span>Facebook
                 </a> <a class="button button-icon button-icon-left button-twitter button-pipaluk" href="#"> <span
                     class="icon fa fa-twitter"></span>Twitter
-                </a> <a class="button button-icon button-icon-left button-google button-pipaluk" href="#"> <span
+                </a> <a class="button button-icon button-icon-left button-google button-pipaluk" href="javascript:void(0)" onclick="loginWithGoogle()"> <span
                     class="icon fa fa-google-plus"></span>Google+
                 </a>
               </div>
@@ -243,6 +243,22 @@
           alert('註冊過程中發生錯誤，請稍後再試');
         });
     }
+    
+function loginWithGoogle() {
+  axios.get('/SpanTasty/login/google')  // 向後端請求 Google 授權 URL
+    .then(function (response) {
+      if (response.data.success) {
+        // 重定向用戶到 Google 授權 URL
+        window.location.href = response.data.data;
+      } else {
+        alert('Google 登入流程發生錯誤');
+      }
+    })
+    .catch(function (error) {
+      console.error('Error:', error);
+      alert('登入過程中發生錯誤，請稍後再試');
+    });
+}
   </script>
 </body>
 
