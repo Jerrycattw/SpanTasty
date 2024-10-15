@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
   <head>
-    <title>Home</title>
+    <title>點數總攬</title>
     <meta name="format-detection" content="telephone=no">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -37,27 +37,28 @@
             <div class="col-12">
               <!-- Quote Creative-->
               <article class="quote-creative"><a class="quote-creative-figure" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/pointlogo.jpg" alt="" width="87" height="87"/></a>
-                <div class="quote-creative-text">
-                  <span class="h3 quote-creative-cite">500</span><span>點 可用點數</span></div></br>
-                  <span>125 點 到期日 2023/01/01</span>
+                <div class="quote-creative-text" id="totalPointDiv">
+                  <span>需要登入才能繼續</span>
+                  <!-- <span class="h3 quote-creative-cite">500</span><span>點 可用點數</span></div></br>
+                  <span>125 點 到期日 2023/01/01</span> -->
                 </div>
               </article>
               <!-- table -->
-              <div class="col-12">
+              <div class="col-12 mt-3">
                 <!-- Bootstrap tabs-->
                 <div class="tabs-custom tabs-horizontal tabs-corporate" id="tabs-3">
                   <!-- Nav tabs-->
                   <ul class="nav nav-tabs">
                     <li class="nav-item" role="presentation"><a class="nav-link active" href="#tabs-3-1" data-bs-toggle="tab">所有紀錄</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-2" data-bs-toggle="tab">已獲得</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-3" data-bs-toggle="tab">已使用</a></li>
+                    <!-- <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-2" data-bs-toggle="tab">已獲得</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-3" data-bs-toggle="tab">已使用</a></li> -->
                   </ul>
                   <!-- Tab panes-->
                   <div class="tab-content">
                     <!-- 1 -->
                     <div class="tab-pane fade show active" id="tabs-3-1">
                         <!-- row -->
-                      <div class="row">
+                      <!-- <div class="row">
                         <div class="col-2">
                           <a class="" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/coinget.jpg" alt="" width="87" height="87"/></a>
                         </div>
@@ -71,9 +72,9 @@
                         <div class="col-2 d-flex align-items-center">
                           <h4>+100</h4>
                         </div>
-                      </div>
+                      </div> -->
                       <!-- row -->
-                      <div class="row">
+                      <!-- <div class="row">
                         <div class="col-2">
                           <a class="" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/coinuse.jpg" alt="" width="87" height="87"/></a>
                         </div>
@@ -87,13 +88,13 @@
                         <div class="col-2 d-flex lign-items-center">
                           <h4>-100</h4>
                         </div>
-                      </div>
+                      </div> -->
                       <!-- row -->
                     </div>
                     <!-- 2 -->
-                    <div class="tab-pane fade" id="tabs-3-2">
+                    <!-- <div class="tab-pane fade" id="tabs-3-2"> -->
                       <!-- row -->
-                      <div class="row">
+                      <!-- <div class="row">
                         <div class="col-2">
                           <a class="" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/coinuse.jpg" alt="" width="87" height="87"/></a>
                         </div>
@@ -108,17 +109,30 @@
                           <h4>-100</h4>
                         </div>
                       </div>                
-                    </div>  
+                    </div>   -->
                     <!-- 3 -->
-                    <div class="tab-pane fade" id="tabs-3-3">
+                    <!-- <div class="tab-pane fade" id="tabs-3-3">
                       <p>We use only trusted, verified content, so you can believe every word we are saying. We are always happy to greet the new visitors on our site. Our blog and social media accounts are available to encourage communication and connection between clients and personnel and tell you more about us in the informal environments where we can have a dialogue instead of just a narrative like that.</p>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
+        </div>
+        <div class="pagination-wrap" >
+          <!-- Bootstrap Pagination-->
+          <nav aria-label="Page navigation" id="pointPagination">
+            <ul class="pagination">
+              <li class="page-item page-item-control disabled"><a class="page-link" href="#" aria-label="Previous"><span class="icon" aria-hidden="true"></span></a></li>
+              <li class="page-item active"><span class="page-link">1</span></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">4</a></li>
+              <li class="page-item page-item-control"><a class="page-link" href="#" aria-label="Next"><span class="icon" aria-hidden="true"></span></a></li>
+            </ul>
+          </nav>
         </div>
       </section>
     <!-- Global Mailform Output-->
@@ -133,6 +147,198 @@
     <script src="/SpanTasty/starcups/js/core.min.js"></script>
     <script src="/SpanTasty/starcups/js/script.js"></script>
 
+    <script>
+      //memberInfo
+    //   function memberInfo(){
+    //     const token = localStorage.getItem('token')
+    //     if(token){
+    //       axios.get('/SpanTasty/member/profile',{
+    //         headers:{
+    //           'Authorization':`${token}`
+    //         }
+    //       })
+    //       .then(res =>{
+    //         if(res.data.success){
+    //           console.log(res.data.data);
+    //           return res.data.data
+    //         }else{
+    //           alert('無法獲取個人資訊');
+    //         }            
+    //       }) 
+    //       .catch(err=>{
+    //         console.error('獲取個人資訊過程中發生錯誤',err)
+    //       }) 
+    //     }
+    //   }
 
+      
+    //   //初次加載
+    //   document.addEventListener('DOMContentLoaded',(e)=>{
+    //     axios.get('/SpanTasty/StarCups/point/show',{
+    //       headers:{
+    //         'Content-Type':'text/plain'
+    //       },
+    //       body: `${memberInfo().memberId}`           
+    //     })
+    //     .then(res=>{
+    //       console.log(res.data);
+    //     })
+    //     .then(err=>{
+    //       console.err('錯誤',err)
+    //     })
+    // })
+
+    </script>
+    <script>
+      let pageData;
+      let memberId;
+      document.addEventListener('DOMContentLoaded',(e)=>{
+        const token = localStorage.getItem('token');
+        if(!token){
+          console.error('Notoken found')
+          alert('需要登入才能繼續')
+          window.location.href='/SpanTasty/StarCups/loginRegister'
+          return;
+        }
+
+        //第一次axios
+        axios.get('/SpanTasty/member/profile',{
+          headers:{
+            'Authorization':`${token}`
+          }
+        })
+        .then(response=>{
+          if(response.data.success){
+            const memberData = response.data.data
+            memberId = memberData.memberId
+            console.log('會員資訊:',memberData);
+
+            //第二次axios
+            return axios.get('/SpanTasty/StarCups/point/show',{
+              headers:{
+                'Content-Type':'application/json'
+              },
+              params:{
+                memberId:memberData.memberId
+              }
+            })
+          } else{
+            throw new Error('無法獲取會員資訊')
+          }
+        })
+        .then(pointsResponse=>{
+          console.log(pointsResponse.data);
+          HtmlMaker(pointsResponse.data)
+          pageData=pointsResponse.data.pointsById
+        })
+        .catch(err=>{
+          console.err('發生錯誤',error)
+        })
+      })
+
+      const getCoinURL ='/SpanTasty/starcups/images/point/coinget.jpg'
+      const useCoinURL =`/SpanTasty/starcups/images/point/coinuse.jpg`   
+      function HtmlMaker(data){
+
+        //點數總攬
+        document.getElementById('totalPointDiv').innerHTML=`
+          <span class="h3 quote-creative-cite">${data.pointMemberTotalPoint}</span><span>點 可用點數</span></div></br>
+          <span>${data.pointMember.expiringPoints} 點 到期日 ${data.pointMember.expiryDate}</span>`
+        //點數紀錄
+        pointHtmlMaker(data.pointsById)
+        //點數page
+        paginationHtmlMaker(data.pointsById)
+        
+        
+      }      
+      function pointHtmlMaker(data){
+        const pointDiv = document.getElementById('tabs-3-1')
+        const points = data.content
+        pointDiv.innerHTML=''
+        points.forEach(point => {
+          pointDiv.innerHTML +=`
+            <div class="row">
+              <div class="col-2">
+                <a class="" href="#"><img class="img-circles" src=${point.pointChange>0 ? getCoinURL : useCoinURL} alt="" width="87" height="87"/></a>
+              </div>
+              <div class="col-4 me-auto">
+                <ul class="">
+                  <li><span>${point.transactionType}</span><span></span></li>
+                  <li><span>${point.createDate}</span><span></span></li>
+                  ${point.expiryDate? `<li><span>到期日:</span><span>${point.expiryDate}</span></li>` : ''}
+                </ul>
+              </div>
+              <div class="col-2 d-flex align-items-center">
+                <h4>${point.pointChange}</h4>
+              </div>
+            </div>`
+        });
+        
+      }
+      function paginationHtmlMaker(data){
+        const pagination = document.getElementById('pointPagination')
+        pagination.innerHTML=`
+          <ul class="pagination">
+            <li class="page-item page-item-control ${data.first ? 'disabled' : ''}"><a class="page-link pagePrevious" href="#" aria-label="Previous"><span class="icon" aria-hidden="true"></span></a></li>
+            ${paginationLi(data)}
+            <li class="page-item page-item-control ${data.last ? 'disabled' : ''}"><a class="page-link pageNext" href="#" aria-label="Next"><span class="icon" aria-hidden="true"></span></a></li>
+          </ul>`
+
+        pagination.removeEventListener('click',paginationClickHandler)                       
+        pagination.addEventListener('click',paginationClickHandler)
+      }
+      function paginationLi(data){
+        const pages = data.totalPages
+        let paginationLi='';
+        for (let index = 0; index < pages; index++) {
+          paginationLi += `<li class="page-item ${index === data.number  ? 'active' : ''}"><a class="page-link pageBtn" data-page=${index} href="#">${index+1}</a></li>`    
+        }
+        
+        return paginationLi
+      }
+      function paginationClickHandler(){
+        event.preventDefault();
+        const pageItem = event.target.closest('a')
+          if (!pageItem) return;
+          console.log('pageData',pageData);
+          
+          let newPage;
+          
+          if(pageItem.classList.contains('pageBtn')){
+            url=`/SpanTasty/StarCups/point/showAll?p=${pageItem.dataset.page}`
+            newPage=pageItem.dataset.page
+          }
+          if(pageItem.classList.contains('pagePrevious') && !pageData.first){
+              console.log("previous");
+              newPage=pageData.number-1//1 2 3 4  0 1 2 3  //  2 3 4 5   1 2 3 4  
+
+          }
+          if(pageItem.classList.contains('pageNext') && !pageData.last){
+              console.log("next");
+              newPage=pageData.number+1 //0 1 2 3  1 2 3 4   //1 2 3 4  2 3 4 5        
+
+          }
+
+          axios.get(`/SpanTasty/StarCups/point/showAll?p=${newPage}`,{
+            headers:{
+                'Content-Type':'application/json'
+              },
+              params:{
+                memberId:memberId
+              }
+          })
+          .then(res=>{
+            console.log(res.data)
+
+            pointHtmlMaker(res.data)           
+            paginationHtmlMaker(res.data);            
+            pageData=res.data
+            })
+            .catch(err=>{
+              console.log("err :" + err);
+            })  
+       }
+       //-----------------------------------------------------------------------------------------------
+    </script>
   </body>
 </html>

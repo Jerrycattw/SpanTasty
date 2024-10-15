@@ -70,4 +70,14 @@ public class CouponSchedule {
 	        createTime = LocalDateTime.now();
 	    }
 	}
+
+
+	@Override
+	public String toString() {
+		return "CouponSchedule [scheduleId=" + scheduleId + ", scheduleName=" + scheduleName + ", couponMember="
+				+ couponMember + ", scheduleTime=" + scheduleTime + ", createTime=" + createTime + ", processTime="
+				+ processTime + ", status=" + status + "]";
+	}
+	
+	
 }

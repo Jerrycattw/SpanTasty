@@ -26,6 +26,7 @@ public class CouponScheduleController {
 	@GetMapping("/coupon/schedule/show")
 	@ResponseBody
 	public List<CouponScheduleDTO> getAllCouponSchedule() {
+		System.out.println("contorller");
 		return couponScheduleService.findAllCouponSchedules();
 	}
 }

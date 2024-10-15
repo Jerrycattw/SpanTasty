@@ -106,6 +106,7 @@ public class CouponScheduleService {
 	}
 	
 	private CouponScheduleDTO convertDTO(CouponSchedule couponSchedule) {
+		System.out.println(couponSchedule);
 		return new CouponScheduleDTO(
 				couponSchedule.getScheduleId(),
 				couponSchedule.getScheduleName(),
@@ -123,6 +124,8 @@ public class CouponScheduleService {
 	
 	
 	public List<CouponScheduleDTO> findAllCouponSchedules(){
+		System.out.println("service");
+		System.out.println(couponScheduleRepo.findAll());
 		return convertDTO(couponScheduleRepo.findAll());
 	}
 	

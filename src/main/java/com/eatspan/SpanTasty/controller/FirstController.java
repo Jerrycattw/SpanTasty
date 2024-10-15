@@ -40,10 +40,10 @@ public class FirstController {
 	 * for大家測試email
 	 * 可以先去看群組的記事本
 	 * 
-	 * 1.application.properties設置mail config(username,password)
+	 * 1.環境變數設置 MAIL_USERNAME MAIL_PASSWORD
 	 * 2.方法內改成自己的email
 	 * 3.直接/SpanTasty/testmail即可 收到信!
-	 * 會跳500是因為沒有return路徑，但信會成功寄出去
+	 * 會跳500是因為沒有return路徑，但信會成功寄出去(除非是授權失敗表示帳密有錯)
 	 * 
 	 * 我有寫好發信的模板，可以套用模板發信只需設置內文，可以參考我couponService
 	 * 如果只是想簡單可以修改setText就好
