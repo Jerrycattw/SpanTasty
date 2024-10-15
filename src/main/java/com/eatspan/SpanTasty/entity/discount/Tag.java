@@ -3,6 +3,8 @@ package com.eatspan.SpanTasty.entity.discount;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
@@ -37,6 +39,7 @@ public class Tag implements Serializable {
 	@EmbeddedId
 	private TagId tagId;
 
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "coupon_id", insertable = false, updatable = false)
 	private Coupon coupon;

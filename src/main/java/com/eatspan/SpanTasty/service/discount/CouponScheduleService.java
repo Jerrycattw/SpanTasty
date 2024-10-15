@@ -124,7 +124,6 @@ public class CouponScheduleService {
 	
 	
 	public List<CouponScheduleDTO> findAllCouponSchedules(){
-		System.out.println("service");
 		System.out.println(couponScheduleRepo.findAll());
 		return convertDTO(couponScheduleRepo.findAll());
 	}

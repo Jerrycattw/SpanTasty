@@ -3,6 +3,7 @@ package com.eatspan.SpanTasty.entity.discount;
 import java.io.Serializable;
 
 import com.eatspan.SpanTasty.entity.account.Member;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -33,10 +34,12 @@ public class CouponMember implements Serializable{
 	@Column(name = "usage_amount")
 	private int usageAmount;
 	
+	
 	@ManyToOne
 	@JoinColumn(name = "coupon_id", insertable = false, updatable = false)
 	private Coupon coupon;
 	
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "member_id", insertable = false, updatable = false)
 	private Member member;
