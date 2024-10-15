@@ -29,5 +29,10 @@ public class StarCupsPageController {
 	public String showrForgetPasswordPage() {
 		return "starcups/account/forgetPassword"; 
 	}
+	
+	@GetMapping("/StarCups/callbackPage")
+	public String showrCallbackPage() {
+		return "starcups/account/callback"; 
+	}
 
 }

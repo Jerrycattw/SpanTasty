@@ -92,6 +92,13 @@ public class RestaurantService {
 		return restaurantRepository.findAll(pageAble);
 	}
 	
+	// 查詢所有營業中餐廳(Page)
+	public Page<Restaurant> findAllActiveRestaurantsPage(Integer pageNumber, Integer itemNumber) {
+		if(itemNumber == null) itemNumber=10;
+		Pageable pageAble = PageRequest.of(pageNumber-1, itemNumber, Sort.Direction.DESC, "restaurantId");
+		return restaurantRepository.findByRestaurantStatus(1, pageAble);
+	}
+	
 
 
 }

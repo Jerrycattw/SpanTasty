@@ -40,7 +40,7 @@ public class ShoppingItemController {
     private ProductService productService;
     
 
-    
+    //查詢單筆
     @GetMapping("/itemDetail/{id}")
     public String toShoppingItem(@PathVariable Integer id, Model model) {
         ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(id);

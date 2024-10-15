@@ -31,4 +31,7 @@ public interface TablewareStockRepository extends JpaRepository<TablewareStock, 
 	
 	@Query(value = "from TablewareStock where tablewareId = :tablewareId")
 	List<TablewareStock> findByTablewareId(Integer tablewareId);
+	
+	
+	List<TablewareStock> findByRestaurantId(Integer restaurantId);
 }

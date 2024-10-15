@@ -49,39 +49,39 @@ public class ShoppingOrderService {
 	}
 	
 	
-//	@Transactional
-//	public ShoppingOrder addShoppingOrder(Integer memberId, Integer productId, Integer shoppingItemQuantity) {
-//	    
-//	    ShoppingOrder shoppingOrder = new ShoppingOrder();
-//	    shoppingOrder.setMemberId(memberId);
-//	    shoppingOrder.setShoppingDate(LocalDateTime.now());
-//	    shoppingOrder.setShoppingStatus(1);
-//	    shoppingOrder.setShoppingTotal(0); 
-//
-//	    ShoppingOrder savedOrder = shoppingOrderRepo.save(shoppingOrder);
-//
-//	    Optional<Product> productOpt = productService.findProductByIdS(productId);
-//	    if (!productOpt.isPresent()) {
-//	        throw new RuntimeException("Product not found with ID: " + productId);
-//	    }
-//	    
-//	    Product product = productOpt.get();
-//	    Integer price = product.getProductPrice(); 
-//	    
-//	    // 創建複合主鍵
-//	    ShoppingItemId itemId = new ShoppingItemId(savedOrder.getShoppingId(), productId); // 使用已保存的訂單 ID
-//
-//	    ShoppingItem shoppingItem = new ShoppingItem(itemId, shoppingItemQuantity, price);
-//
-//	    shoppingItem.setShoppingOrder(savedOrder);
-//	    
-//	    shoppingItemRepo.save(shoppingItem); 
-//
-//	    shoppingOrder.setShoppingTotal(shoppingOrder.getShoppingTotal() + (price * shoppingItemQuantity));
-//	    shoppingOrderRepo.save(shoppingOrder);
-//
-//	    return savedOrder; 
-//	}
+	@Transactional
+	public ShoppingOrder addShoppingOrder(Integer memberId, Integer productId, Integer shoppingItemQuantity) {
+	    
+	    ShoppingOrder shoppingOrder = new ShoppingOrder();
+	    shoppingOrder.setMemberId(memberId);
+	    shoppingOrder.setShoppingDate(LocalDateTime.now());
+	    shoppingOrder.setShoppingStatus(1);
+	    shoppingOrder.setShoppingTotal(0); 
+
+	    ShoppingOrder savedOrder = shoppingOrderRepo.save(shoppingOrder);
+
+	    Optional<Product> productOpt = productService.findProductByIdS(productId);
+	    if (!productOpt.isPresent()) {
+	        throw new RuntimeException("Product not found with ID: " + productId);
+	    }
+	    
+	    Product product = productOpt.get();
+	    Integer price = product.getProductPrice(); 
+	    
+	    // 創建複合主鍵
+	    ShoppingItemId itemId = new ShoppingItemId(savedOrder.getShoppingId(), productId); // 使用已保存的訂單 ID
+
+	    ShoppingItem shoppingItem = new ShoppingItem(itemId, shoppingItemQuantity, price);
+
+	    shoppingItem.setShoppingOrder(savedOrder);
+	    
+	    shoppingItemRepo.save(shoppingItem); 
+
+	    shoppingOrder.setShoppingTotal(shoppingOrder.getShoppingTotal() + (price * shoppingItemQuantity));
+	    shoppingOrderRepo.save(shoppingOrder);
+
+	    return savedOrder; 
+	}
 
 	@Transactional
 	public ShoppingOrder addShoppingOrder(Integer memberId, List<Integer> productId, List<Integer> shoppingItemQuantity) {
@@ -202,5 +202,13 @@ public class ShoppingOrderService {
 	public List<ShoppingOrder> findAllShoppingOrder() {
 		return shoppingOrderRepo.findAll();
 	}
+	
+	@Transactional
+	public List<ShoppingOrder> findOrdersByMemberId(Integer memberId) {
+	    return shoppingOrderRepo.findByMemberId(memberId);
+	}
+
+
+
 
 }

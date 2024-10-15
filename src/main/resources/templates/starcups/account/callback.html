@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth Callback</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+    <h1>正在處理 Google 登入...</h1>
+    <!-- 將 JWT Token 放在一個隱藏的元素中，從後端傳遞過來 -->
+    <span id="token" style="display:none;">[[${token}]]</span>
+    
+    <script>
+      window.onload = function() {
+        // 使用 textContent 來獲取 JWT Token，避免格式化問題
+        const token = document.getElementById('token').textContent;
+        console.log('已登入，Token:', token);
+
+        if (token && token !== 'undefined' && token.trim() !== '') {
+          // 檢查 Token 是否為有效值
+          localStorage.setItem('token', token);  // 儲存 JWT Token 到 localStorage
+          window.location.href = '/SpanTasty/StarCups';  // 跳轉到首頁
+        } else {
+          alert('未能獲取授權碼，可能是授權失敗');
+        }
+      }
+    </script>
+    
+</body>
+</html>
+</html>
