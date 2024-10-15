@@ -134,6 +134,14 @@ public class ProductController {
 			updateProduct.setProductPicture(productImg);
 		}
 		
+
+	    // 設定商品類別
+	    if (productTypeId != null) {
+	        Optional<ProductType> typeOptional = productTypeService.findProductTypeByIdP(productTypeId);
+	        if (typeOptional.isPresent()) {
+	            updateProduct.setProductType(typeOptional.get());
+	        }
+	    }
 		
 		productService.updateProduct(updateProduct);
 
