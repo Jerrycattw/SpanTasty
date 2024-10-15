@@ -12,47 +12,58 @@
 <div class="content">
 	
     
-    <h2 class="mb-4 d-flex justify-content-center">餐 廳 桌 位 種 類</h2>
+    <h2 class="mb-4 d-flex justify-content-center mt-5">餐 廳 桌 位 管 理</h2>
     
-    <div class="row justify-content-center">
-        <div class="col-8">
-            <div class="mb-2 d-flex justify-content-end">
-                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTableTypeModal">+新增餐廳桌位種類</button>
-            </div>
-            <table class="table table-bordered table-striped">
-                <thead class="thead-light">
-                    <tr>
-                        <th>餐廳名稱</th>
-                        <th>桌位種類代碼</th>
-                        <th>桌位種類座位數</th>
-                        <th>桌位數量</th>
-                        <th>修改桌位數量</th>
-                        <th>刪除桌位種類</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <th:block th:each="table : ${tables}">
-                        <tr>
-                            <td th:text="${restaurant.restaurantName}"></td>
-                            <td th:text="${table.tableType.tableTypeId}"></td>
-                            <td th:text="${table.tableType.tableTypeName} + '人桌'"></td>
-                            <td th:text="${table.tableTypeNumber}"></td>
-                            <td>
-                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#setTableModal" 
-                                        th:data-tabletypeid="${table.tableType.tableTypeId}" th:data-tabletypename="${table.tableType.tableTypeName}" 
-                                        th:data-tabletypenumber="${table.tableTypeNumber}">修改</button>
-                            </td>
-                            
-							<td id="delRestaurantTableBtn" class="align-middle">
-							    <button th:data-table-type-id="${table.tableType.tableTypeId}" th:data-restaurant-id="${restaurant.restaurantId}" 
-							            class="btn btn-danger btn-sm" onclick="confirmDelete(this)">刪除</button>
-							</td>
-                        </tr>
-                    </th:block>
-                </tbody>
-            </table>
-        </div>
-    </div>
+	<div class="container mt-4">
+	    <div class="row justify-content-center">
+	        <div class="col-9">
+	            <div class="card bg-white shadow">
+	                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+	                    <h3 class="mb-0">桌位種類管理</h3>
+	                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTableTypeModal">+新增餐廳桌位種類</button>
+	                </div>
+	                <div class="table-responsive">
+	                    <table class="table table-white table-striped table-hover text-center">
+	                        <thead>
+	                            <tr>
+	                                <th scope="col">餐廳名稱</th>
+	                                <th scope="col">桌位種類代碼</th>
+	                                <th scope="col">桌位種類座位數</th>
+	                                <th scope="col">桌位數量</th>
+	                                <th scope="col">修改桌位數量</th>
+	                                <th scope="col">刪除桌位種類</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody>
+	                            <th:block th:each="table : ${tables}">
+	                                <tr>
+	                                    <td th:text="${restaurant.restaurantName}"></td>
+	                                    <td th:text="${table.tableType.tableTypeId}"></td>
+	                                    <td th:text="${table.tableType.tableTypeName} + '人桌'"></td>
+	                                    <td th:text="${table.tableTypeNumber}"></td>
+	                                    <td>
+	                                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#setTableModal" 
+	                                                th:data-tabletypeid="${table.tableType.tableTypeId}" th:data-tabletypename="${table.tableType.tableTypeName}" 
+	                                                th:data-tabletypenumber="${table.tableTypeNumber}">修改</button>
+	                                    </td>
+	                                    <td id="delRestaurantTableBtn" class="align-middle">
+	                                        <button th:data-table-type-id="${table.tableType.tableTypeId}" th:data-restaurant-id="${restaurant.restaurantId}" 
+	                                                class="btn btn-danger btn-sm" onclick="confirmDelete(this)">刪除</button>
+	                                    </td>
+	                                </tr>
+	                            </th:block>
+	                        </tbody>
+	                    </table>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	
+
+
+
 
     <!-- 新增桌位種類的模態框 -->
     <div class="modal fade" id="addTableTypeModal" tabindex="-1" aria-labelledby="addTableTypeModalLabel" aria-hidden="true">

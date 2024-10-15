@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+  <head>
+    <title>Reserve</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <!-- Stylesheets-->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+
+    <style>
+    .ie-panel{
+	    display: none;
+	    background: #212121;
+	    padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);
+	    clear: both;
+	    text-align:center;
+	    position: relative;
+	    z-index: 1;
+    } 
+    html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
+	    display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <!-- navbar  th:replace=-->
+    <div th:replace="~{starcups/display/navbar}" ></div>
+      
+      
+    <!-- 選單下方圖片及連結 -->
+    <section class="section breadcrumbs-custom-inset">
+      <div class="breadcrumbs-custom context-dark">
+        <div class="container">
+          <h2 class="breadcrumbs-custom-title">ReserveRecord</h2>
+          <ul class="breadcrumbs-custom-path">
+            <li><a href="/SpanTasty/StarCups">Home</a></li>
+            <li><a href="/SpanTasty/StarCups/memberCenter">MemberCenter</a></li>
+            <li class="active">ReserveRecord</li>
+          </ul>
+        </div>
+        <!-- 圖片-->
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+      </div>
+    </section>
+    
+    <!-- content -->
+    <div class="container">
+    	
+		<div class="booking-records my-5">
+		  <h2 class="heading-5 my-3">訂位紀錄</h2>
+		  <table class="table-custom table-custom-striped table-custom-bordered">
+
+		  </table>
+		
+		  <div class="pagination">
+		  </div>
+		</div>    	
+    
+	  </div>
+
+
+    <!-- Global Mailform Output-->
+    <div class="snackbars" id="form-output-global"></div>
+    <!-- footer  th:replace=-->
+    <div th:replace="~{starcups/display/footer}" ></div>
+
+    <template>
+      <thead>
+        <tr>
+          <th>訂單編號</th>
+          <th>餐廳名稱</th>
+          <th>餐廳地址</th>
+          <th>餐廳電話</th>
+          <th>訂位時間</th>
+          <th>人數</th>
+          <th>狀態</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </template>
+    
+     <!-- Javascript-->
+    <script src="/SpanTasty/starcups/js/core.min.js"></script>
+    <script src="/SpanTasty/starcups/js/script.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+    <script src="/SpanTasty/js/axios.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+			    reserveRecord();
+      });
+      
+      // 查詢訂位的AJAX函數
+      function reserveRecord() {
+
+          const token = localStorage.getItem('token');
+          if (!token) {
+            alert('未登入');
+            window.location.href = '/SpanTasty/StarCups/loginRegister';
+          }
+
+		      axios.get(`http://localhost:8080/SpanTasty/StarCups/get/reserveRecord`,{
+            headers: {
+              'Authorization': `${token}`,
+            }
+          })
+          .then(res => {
+              console.log(res.data);
+              htmlMaker(res.data);
+          })
+          .catch(err => {
+              console.error(err);
+              alert("查詢訂位失敗，請稍後再試。");
+          });
+      }
+
+      let htmlMaker = function(data) {
+        // 取得 <template> 標籤
+        let template = document.querySelector('template');
+        
+        // 複製 <template> 的內容
+        let tableHead = template.content.querySelector('thead').cloneNode(true);
+        let tableBody = template.content.querySelector('tbody').cloneNode(true);
+        
+        // 填充資料到表格
+        let tbody = '';
+        data.forEach(record => {
+          let row = `
+            <tr>
+              <td>${record.reserveId}</td>
+              <td>${record.restaurant.restaurantName}</td>
+              <td>${record.restaurant.restaurantAddress}</td>
+              <td>${record.restaurant.restaurantPhone}</td>
+              <td>${record.reserveTime}</td>
+              <td>${record.reserveSeat}</td>
+              <td>${getStatusText(record.reserveStatus)}</td>
+            </tr>
+          `;
+          tbody += row;
+        });
+
+        // 將生成的資料放入表格
+        document.querySelector('.table-custom').appendChild(tableHead);
+        document.querySelector('.table-custom').innerHTML += tbody;
+      };
+
+      // 狀態轉換函數
+      function getStatusText(status) {
+        switch(status) {
+          case 1:
+            return '未完成';
+          case 2:
+            return '已完成';
+          default:
+            return '已取消';
+        }
+      }
+
+    	
+    	
+    </script>
+  </body>
+</html>

@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
     <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
 
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+  	<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
 
     <style>
     .ie-panel{
@@ -173,6 +173,7 @@
     <script src="/SpanTasty/starcups/js/core.min.js"></script>
     <script src="/SpanTasty/starcups/js/script.js"></script>
     <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+    <script src="/SpanTasty/js/axios.min.js"></script>
     <script>
 
       $(function(){
@@ -256,6 +257,11 @@
           const reserveSeat = document.getElementById('addReserveSeat').value;
           const checkDate = document.getElementById('addCheckDate').value;
           const restaurantId = document.getElementById('addRestaurantId').value;
+
+          console.log(reserveSeat);
+          console.log(restaurantId);
+          console.log(checkDate);
+          
 
           // 找出選中的時間按鈕
           const selectedTimeButton = document.querySelector('input[name="reserveTime"].active');
