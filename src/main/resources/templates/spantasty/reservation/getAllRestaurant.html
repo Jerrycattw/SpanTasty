@@ -12,14 +12,16 @@
 <!-- 主要內容區域 -->
 <div class="content">
 
+<h2 class="ms-3 mb-0"><i class="fa-solid fa-utensils"></i> 餐廳分店管理</h2>
   <!-- Dark table -->
-  <div class="container mt-5">
+  <div class="container mt-4">
     <div class="row justify-content-center">
-      <div class="col-11">
+      <div class="col-12">
         <div class="card bg-dark text-white shadow">
 		  <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
 		    <h3 class="mb-0">餐廳資料</h3>
-		    <a th:href="@{/restaurant/add}" class="btn btn-primary btn-sm">+新增餐廳</a>
+		    <!-- <a th:href="@{/restaurant/add}" class="btn btn-primary btn-sm">+新增餐廳</a> -->
+		    <a class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addRestaurantModal">+新增餐廳</a>
 		  </div>
           <div class="table-responsive">
             <table class="table table-dark table-striped table-hover text-center">
@@ -30,9 +32,10 @@
                   <th scope="col">餐廳電話</th>
                   <th scope="col">營業時間</th>
                   <th scope="col">餐廳狀態</th>
-                  <th scope="col">查看資料</th>
-                  <th scope="col">修改資料</th>
-                  <th scope="col">刪除資料</th>
+                  <th scope="col">檢視</th>
+                  <th scope="col">修改</th>
+                  <th scope="col">刪除</th>
+                  <th scope="col">桌位管理</th>
                 </tr>
               </thead>
               <tbody>
@@ -56,6 +59,7 @@
 					    <span th:case="* " class="badge bg-warning text-dark">籌備中</span>
 					  </span>
 					</td>
+					
                   <td class="align-middle">
                     <a th:href="@{/restaurant/get/{id}(id=${restaurant.restaurantId})}" class="btn btn-info btn-sm">檢視</a>
                   </td>
@@ -65,6 +69,10 @@
                   <td id="delRestaurantBtn_td" class="align-middle">
 				      <button th:onclick="confirmDelete([[${restaurant.restaurantId}]])" class="btn btn-danger btn-sm">刪除</button>
 				  </td>
+				  
+                  <td class="align-middle">
+                  	<a th:href="@{/table/getAll(restaurantId=${restaurant.restaurantId})}" class="btn btn-outline-light btn-sm">桌位管理</a>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -99,6 +107,86 @@
     </div>
   </div>
   <!-- Dark table End -->
+  
+  
+<!-- 新增餐廳的模態框 -->
+<div class="modal fade" id="addRestaurantModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRestaurantModalLabel">新增分店</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+
+                <form method="post" th:action="@{/restaurant/addPost}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <!-- 餐廳名稱 -->
+                    <div class="mb-3">
+                        <label for="rname" class="form-label">輸入餐廳名稱 : <span id="rnamespan"></span></label>
+                        <input type="text" name="restaurantName" id="rname" class="form-control" required />
+                        <div class="invalid-feedback">請輸入餐廳名稱</div>
+                    </div>
+
+                    <!-- 餐廳地址 -->
+                    <div class="mb-3">
+                        <label for="raddress" class="form-label">輸入餐廳地址 : <span id="raddressspan"></span></label>
+                        <input type="text" name="restaurantAddress" id="raddress" class="form-control" required />
+                        <div class="invalid-feedback">請輸入餐廳地址</div>
+                    </div>
+
+                    <!-- 餐廳電話 -->
+                    <div class="mb-3">
+                        <label for="rphone" class="form-label">輸入餐廳電話 : <span id="rphonespan"></span></label>
+                        <input type="text" name="restaurantPhone" id="rphone" class="form-control" required />
+                        <div class="invalid-feedback">請輸入餐廳電話</div>
+                    </div>
+
+                    <!-- 餐廳營業時間 -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="restaurantOpentime" class="form-label">開始營業時間 :</label>
+                            <input type="text" name="restaurantOpentime" id="restaurantOpentime" class="form-control timepicker" required />
+                        </div>
+                        <div class="col">
+                            <label for="restaurantClosetime" class="form-label">結束營業時間 :</label>
+                            <input type="text" name="restaurantClosetime" id="restaurantClosetime" class="form-control timepicker" required />
+                        </div>
+                    </div>
+
+                    <!-- 用餐時間限制 -->
+                    <div class="mb-3">
+                        <label for="eattime" class="form-label">用餐時間限制 (分鐘) :</label>
+                        <input type="number" name="eattime" id="eattime" class="form-control" min="30" max="180" step="10" required />
+                    </div>
+
+                    <!-- 餐廳介紹 -->
+                    <div class="mb-3">
+                        <label for="restaurantDesc" class="form-label">餐廳介紹 :</label>
+                        <textarea name="restaurantDesc" id="restaurantDesc" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <!-- 餐廳照片上傳 -->
+                    <div class="mb-3">
+                        <label for="rimg" class="form-label">上傳餐廳照片 :</label>
+                        <input type="file" name="rimg" id="rimg" class="form-control" />
+                    </div>
+
+                    <!-- 按鈕 -->
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success me-3">確定</button>
+                        <button type="button" id="inputDefaultBtn" class="btn btn-primary">一鍵輸入</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+  
+  
+  
+  
 </div>
 <script>
      document.addEventListener("DOMContentLoaded", function() {
@@ -140,7 +228,77 @@
 	        }
 	    });
 	}
-     
+    
+    
+        $(function () {
+
+            $(document).ready(function () {
+                $('.timepicker').timepicker({
+                    timeFormat: 'HH:mm',
+                    interval: 30,
+                    dynamic: false,
+                    dropdown: true,
+                    scrollbar: true
+                });
+            });
+
+            const inputDefaultBtn = document.getElementById('inputDefaultBtn');
+            inputDefaultBtn.addEventListener('click',function(e){
+                document.getElementById('rname').value='測試餐廳';
+                document.getElementById('raddress').value='桃園市桃園區測試路123號';
+                document.getElementById('rphone').value='033681234';
+                document.getElementById('restaurantOpentime').value='10:30';
+                document.getElementById('restaurantClosetime').value='22:30';
+                document.getElementById('eattime').value='100';
+                document.getElementById('restaurantDesc').value='餐廳環境佳，餐點美味!';
+            })
+
+
+
+            $('#rname').on('blur', function () {
+                let theNameVal = $(this).val();
+                let $rnameSpan = $('#rnamespan');
+
+                if (theNameVal.length == 0) {
+                    $rnameSpan.text("餐廳名稱不能空白").css({ "color": "red", "font-style": "italic" });
+                } else if (theNameVal.length < 3) {
+                    $rnameSpan.text("餐廳名稱長度須大於3").css({ "color": "red", "font-style": "italic" });
+                } else {
+                    $rnameSpan.text("輸入正確").css({ "color": "green", "font-style": "italic" });
+                }
+            });
+
+
+            $('#raddress').on('blur', function () {
+                let theAddressVal = $(this).val();
+                let $raddressSpan = $('#raddressspan');
+                let addressRegex = /(?<city>\D+?[縣市])(?<district>\D+?[鄉鎮市區])(?<others>.+)/;
+
+                if (theAddressVal.length == 0) {
+                    $raddressSpan.text("餐廳地址不能空白").css({ "color": "red", "font-style": "italic" });
+                } else if (!addressRegex.test(theAddressVal)) {
+                    $raddressSpan.text("餐廳地址格式不正確，請包含城市、區域和其他部分").css({ "color": "red", "font-style": "italic" });
+                } else {
+                    $raddressSpan.text("輸入正確").css({ "color": "green", "font-style": "italic" });
+                }
+            });
+
+
+            $('#rphone').on('blur', function () {
+                let thePhoneVal = $(this).val();
+                let $rphoneSpan = $('#rphonespan');
+                let phoneRegex = /^(\d{2,3}-?\d{7,8}|\d{10})$/;
+
+                if (thePhoneVal.length == 0) {
+                    $rphoneSpan.text("餐廳電話不能空白").css({ "color": "red", "font-style": "italic" });
+                } else if (!phoneRegex.test(thePhoneVal)) {
+                    $rphoneSpan.text("餐廳電話格式不正確").css({ "color": "red", "font-style": "italic" });
+                } else {
+                    $rphoneSpan.text("輸入正確").css({ "color": "green", "font-style": "italic" });
+                }
+            });
+
+        })
 
 </script>
 </body>

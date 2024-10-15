@@ -20,8 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import com.eatspan.SpanTasty.config.MailConfig;
 import com.eatspan.SpanTasty.dto.reservation.ReserveCheckDTO;
 import com.eatspan.SpanTasty.dto.reservation.TimeSlotDTO;
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.entity.reservation.TableType;
@@ -45,6 +47,9 @@ public class ReserveService {
 	private RestaurantRepository restaurantRepository;
 	@Autowired
 	private TableTypeRepository tableTypeRepository;
+	
+	@Autowired
+	private MailConfig mailConfig;// javaMail要注入----------------------------
 	
 	@Autowired
 	private JavaMailSender mailSender;// javaMail要注入----------------------------
@@ -89,6 +94,13 @@ public class ReserveService {
 	public List<Reserve> findAllReserves() {
 		return reserveRepository.findAll();
 	}
+	
+	
+	// 查詢所有訂位
+	public List<Reserve> findByMember(Member member) {
+		return reserveRepository.findByMemberOrderByReserveTimeDesc(member);
+	}
+	
 	
 	
 	// 查詢訂位by可變條件
@@ -211,9 +223,9 @@ public class ReserveService {
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 		MimeMessageHelper  helper = new MimeMessageHelper(mimeMessage,true);
 		//設置mail
-		helper.setFrom("zasw0015@gmail.com");//誰寄信(application設定的信箱)
-		// helper.setTo(reserve.getMember().getEmail());//誰收信
-		helper.setTo("spantasty@gmail.com");//誰收信
+		helper.setFrom(mailConfig.getUserName3());//誰寄信(application設定的信箱)
+		helper.setTo(reserve.getMember().getEmail());//誰收信
+//		helper.setTo("spantasty@gmail.com");//誰收信
 		helper.setSubject("【☕訂位成功通知】您在 starcups "+ reserve.getRestaurant().getRestaurantName() +" 的預訂已經完成");//主旨
 		
 		//設置模板

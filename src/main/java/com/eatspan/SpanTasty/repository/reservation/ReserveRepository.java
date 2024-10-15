@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.eatspan.SpanTasty.entity.reservation.Reserve;
+import com.eatspan.SpanTasty.entity.account.Member;
+
 
 public interface ReserveRepository extends JpaRepository<Reserve, Integer> {
 	
@@ -70,8 +72,8 @@ public interface ReserveRepository extends JpaRepository<Reserve, Integer> {
                                  @Param("tableTypeId") String tableTypeId);
 
 	
-	
-	
+	// 查詢會員所有訂位紀錄
+	List<Reserve> findByMemberOrderByReserveTimeDesc(Member member);
 	
 	
 
