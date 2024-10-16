@@ -14,6 +14,8 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
 	
 	Coupon findByCouponId(Integer couponId);
 	
+	Coupon findByCouponCode(String couponCode);
+	
 	@Query("SELECT c from Coupon c WHERE c.couponId = :couponId "
 			+ "OR c.couponCode LIKE %:keyWord% OR c.couponDescription LIKE %:keyWord% "
 			+ "OR c.couponStatus LIKE %:keyWord% OR c.rulesDescription LIKE %:keyWord% "

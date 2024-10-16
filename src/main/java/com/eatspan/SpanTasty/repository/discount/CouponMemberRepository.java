@@ -15,4 +15,7 @@ public interface CouponMemberRepository extends JpaRepository<CouponMember, Coup
 	
 	@Query("SELECT cm FROM CouponMember cm WHERE cm.couponMemberId.memberId = :memberId")
 	List<CouponMember> findByMemberId(@Param(value = "memberId") Integer memberId);
+	
+	@Query("SELECT cm FROM CouponMember cm WHERE cm.couponMemberId.memberId= :memberId AND cm.couponMemberId.couponId= :couponId")
+	CouponMember findByMemberIdAndCouponId(@Param(value = "memberId")Integer memberId, @Param(value = "couponId") Integer couponId);
 }
