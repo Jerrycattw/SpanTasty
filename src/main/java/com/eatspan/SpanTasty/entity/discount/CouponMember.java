@@ -29,10 +29,10 @@ public class CouponMember implements Serializable{
 	private CouponMemberId couponMemberId;
 	
 	@Column(name = "total_amount")
-	private int totalAmount;
+	private Integer totalAmount;
 	
 	@Column(name = "usage_amount")
-	private int usageAmount;
+	private Integer usageAmount;
 	
 	
 	@ManyToOne
@@ -48,7 +48,7 @@ public class CouponMember implements Serializable{
 		this.couponMemberId = couponMemberId;
 		this.totalAmount = totalAmount;
 		this.usageAmount = usageAmount;
-	}
+	}		
 	
 	public void incrementAmounts() {
         this.totalAmount++;

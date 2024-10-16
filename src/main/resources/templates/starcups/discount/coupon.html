@@ -211,7 +211,51 @@
           console.error('發生錯誤', err)
         })
 
-      document.addEventListener('click', function (event) {
+        document.getElementById('addCoupon').addEventListener('click',function(){
+          const couponCode = document.getElementById('coupon-code').value
+          console.log('memberId',memberId);
+          console.log('couponId',couponCode);
+          
+          //新增優惠券
+          axios.post('/SpanTasty/StarCups/coupon/add',{           
+              memberId:memberId,
+              couponCode:couponCode
+          })
+          .then(res=>{
+                console.log(res.data);
+                alert(res.data)
+                //刷新優惠券DIV
+                axios.get('/SpanTasty/StarCups/coupon/show', {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  params: {
+                    memberId:memberId
+                  }
+                })
+                .then(couponResponse => {
+                  console.log(couponResponse.data);
+                  htmlMaker(couponResponse.data.all, 'couponAllDiv', 'tabsAll')
+                  htmlMaker(couponResponse.data.shop, 'couponShopDiv', 'tabsShop')
+                  htmlMaker(couponResponse.data.togo, 'couponTogoDiv', 'tabsTogo')
+                })
+                .catch(err => {
+                  console.error('發生錯誤', err)
+                })
+        
+          })
+          .catch(err=>{
+            console.log(err.response.data);
+            alert(err.response.data)
+          })
+        })
+
+
+
+
+
+
+       document.addEventListener('click', function (event) {
         //去逛逛
         if (event.target.classList.contains('goshopping')) {
           window.location.href = '/SpanTasty/StarCups';
@@ -246,13 +290,12 @@
             .then(err => {
               console.error
             })
-
-
-
-
-
         }
       });
+
+
+
+
 
     })
     function getTagTextFinal(data){
