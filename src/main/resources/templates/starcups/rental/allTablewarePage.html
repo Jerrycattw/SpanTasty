@@ -13,9 +13,51 @@
 <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
 <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
 <style>
-.tableware-img {
-    width: 150px;
-    height: auto; /* 保持比例 */
+.ie-panel{
+    display: none;
+    background: #212121;
+    padding: 10px 0;
+    box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);
+    clear: both;
+    text-align:center;
+    position: relative;
+    z-index: 1;
+}
+
+html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
+    display: block;
+}
+
+p.global-primary.dark-primary.section-title::after {
+    content: '';
+    display: block;
+    width: 25px; /* 設定線條的寬度 */
+    height: 3px; /* 設定線條的高度 */
+    background-color: darkgrey; /* 設定線條的顏色 */
+    margin: 20px auto 0; /* 調整線條與文字之間的距離 */
+}
+
+.section-title {
+    font-size: 20px; /* 調整文字大小 */
+    color: #333; /* 調整文字顏色 */
+    text-align: center; /* 文字居中 */
+    font-weight: bold;
+}
+
+.Grid-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 讓每個項目占據最少250px寬度，並自動填充 */
+    gap: 20px; /* 產品之間的間距 */
+}
+
+.Grid-products-item {
+    padding: 10px;
+    border-radius: 8px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.Grid-products-item:hover {
+    transform: translateY(-5px); /* 在懸停時使產品項目上移 */
 }
 </style>
 </head>
@@ -26,10 +68,10 @@
     <section class="section breadcrumbs-custom-inset">
       <div class="breadcrumbs-custom context-dark">
         <div class="container">
-          <h2 class="breadcrumbs-custom-title">Rent Tableware Now</h2>
+          <h2 class="breadcrumbs-custom-title">Look Tableware Now</h2>
           <ul class="breadcrumbs-custom-path">
             <li><a href="/SpanTasty/StarCups">Home</a></li>
-            <li class="active">Rental</li>
+            <li class="active">Tableware Lookbook</li>
           </ul>
         </div>
         <!-- 圖片-->
@@ -37,70 +79,60 @@
       </div>
     </section>
 	
-	<section
-		class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
-		<div class="container">
-			<div class="row row-70 row-fix">
-				<div class="col-lg-11 post-classic-wrap">
+	<section class="section pt-4 novi-bg novi-bg-img section-xl bg-default text-md-start">
+    <div class="container">
+        <div class="row row-90 row-fix justify-content-center">
+            <div class="Grid-item Grid-products-item" style="margin-bottom: 10px;">
+                <p class="global-primary dark-primary section-title">
+                    <span> L O O K B O O K </span>
+                </p>
+            </div>
+            <div class="product-top-panel group-lg pe-0">
+                <div class="product-top-panel-title">Showing 1–10 of <span th:text="${totalTablewares}"></span> results</div>
+                <div class="form-wrap">
+                    <label class="form-label" for="search-form">用具搜尋</label>
+                    <input class="form-input " id="search-form" type="text" name="s" autocomplete="off">
+                    <button class="button-search fl-bigmug-line-search74" id="search" type="submit"></button>
+                  </div>
+            </div>
+            <div class="row row-lg row-40" id="resultContainer">
+                <div class="col-sm-6 col-md-3" th:each="tableware : ${tablewarePages.content}">
+                <!-- Product-->
+                <article  class="product">
+                    <div class="product-figure">
+                        <img th:src="${tableware.tablewareImage != null ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}" alt="" width="255" height="255" />
+                        <div class="product-button">
+                            <a class="button button-bt button-white button-ujarak" href="cart-page.html">查看庫存</a></div>
+                        </div>
+                    <h6 class="product-title" th:text="${tableware.tablewareName}" ></h6>
+                    <div class="product-price-wrap">
+                    <div class="product-price"><span>NT$</span><span th:text="${tableware.tablewareDeposit}"></span></div>
+                    </div>
+                </article>
+                </div>
+            </div>
 
-					<!-- Post Classic-->
-					<article th:each="tableware : ${tablewaresPage.content}"
-						class="post post-classic">
-						<div class="post-classic-panel d-flex align-items-center">
-						 <!-- <a class="badge badge-secondary" th:href="@{/StarCups/restaurant/{id}(id=${restaurant.restaurantId})}"> -->
-						    <img th:src="${tableware.tablewareImage != null ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}" 
-						         alt="" class="tableware-img img-fluid"/>
-						  </a>
-						  <!-- 這裡的文字會顯示在圖片右邊 -->
-						  <div class="ms-3">
-							<h4 class="post-classic-title mb-4 fs-5">
-								<a href="blog-post.html" th:text="${tableware.tablewareName}"></a>
-							</h4>
-						    <div class="post-classic-time m-3 ">
-						      <span class="novi-icon icon fs-6"> 押金金額: </span>
-						      <span class="fs-5" th:text="${tableware.tablewareDeposit}"></span>
-						    </div>
-						    <div class="post-classic-time m-3 ">
-						      <span class="novi-icon icon fs-6"> 用具描述: </span>
-						      <span class="fs-6" th:text="${tableware.tablewareDescription}"></span>
-						    </div>
-						  <div class=" button button-md button-icon button-icon-left button-secondary button-pipaluk ms-3 mt-0"><span class="novi-icon icon fa fa-plus"></span>租借用具</div>
-						  </div>
-						</div>
-					</article>
-
+        
 
 					<div class="pagination-wrap">
 						<!-- Bootstrap Pagination-->
 						<nav aria-label="Page navigation">
-							<ul class="pagination">
+							<ul class="pagination" th:if="${tablewarePages.totalPages != 0}">
 								<!-- Previous Page Link -->
-								<li class="page-item page-item-control"
-									th:classappend="${tablewaresPage.hasPrevious()} ? '' : 'disabled'">
-									<a class="page-link"
-									th:href="@{/StarCups/tableware(page=${tablewaresPage.number - 1})}"
-									aria-label="Previous"> <span class="icon"
-										aria-hidden="true"></span>
-								</a>
-								</li>
-
+								<th:block th:switch="${tablewarePages.number + 1 == 1}">
+									<li th:case="${false}" class="page-item page-item-control"><a class="page-link" th:href="@{/StarCups/tableware(p=${ tablewarePages.number })}"><span class="icon" aria-hidden="true"></span></a></li>
+									<li th:case="${true}" class="page-item page-item-control disabled"><a class="page-link" th:href="@{/StarCups/tableware(p=${ tablewarePages.number })}"><span class="icon" aria-hidden="true"></span></a></li>
+								</th:block>
 								<!-- Page Numbers -->
-								<li class="page-item"
-									th:each="pageNum : ${#numbers.sequence(1, tablewaresPage.totalPages)}"
-									th:classappend="${pageNum == tablewaresPage.number+1} ? 'active'">
-									<a class="page-link"
-									th:href="@{/StarCups/tableware(page=${pageNum - 1})}"
-									th:text="${pageNum}"></a>
+								<li class="page-item" th:each="pageNum : ${#numbers.sequence(1, tablewarePages.totalPages)}" th:classappend="${pageNum == tablewarePages.number+1} ? 'active'">
+									<a class="page-link" th:href="@{/StarCups/tableware(page=${pageNum})}"th:text="${pageNum}"></a>
 								</li>
 
 								<!-- Next Page Link -->
-								<li class="page-item page-item-control"
-									th:classappend="${tablewaresPage.hasNext()} ? '' : 'disabled'">
-									<a class="page-link"
-									th:href="@{/StarCups/tableware(page=${tablewaresPage.number + 1})}"
-									aria-label="Next"> <span class="icon" aria-hidden="true"></span>
-								</a>
-								</li>
+								<th:block th:switch="${tablewarePages.number + 1 == tablewarePages.totalPages}">
+									<li th:case="${true}" class="page-item page-item-control disabled"><a class="page-link" th:href="@{/StarCups/tableware(page=${ tablewarePages.number + 2 })}"><span class="icon" aria-hidden="true"></span></a></li>
+									<li th:case="${false}" class="page-item page-item-control "><a class="page-link" th:href="@{/StarCups/tableware(page=${ tablewarePages.number + 2 })}"><span class="icon" aria-hidden="true"></span></a></li>
+								</th:block>
 							</ul>
 						</nav>
 					</div>
@@ -109,23 +141,74 @@
 				<div class="col-lg-4"></div>
 			</div>
 		</div>
+		</div>
 	</section>
 	
 
 
-	<h5 class="ms-4">租借須知</h5>
-	<div class="mt-2 ms-4 mb-5">
-	  <ul class="">
-	    <li>租借用具歸還時間為：七天內。</li>
-	  </ul>
-	</div>
-		<!-- Global Mailform Output-->
-    <div class="snackbars" id="form-output-global"></div>
-    <!-- footer  th:replace=-->
-    <div th:replace="~{starcups/display/footer}" ></div>
-    
-     <!-- Javascript-->
-    <script src="/SpanTasty/starcups/js/core.min.js"></script>
-    <script src="/SpanTasty/starcups/js/script.js"></script>
+<h5 class="ms-4">租借須知</h5>
+<div class="mt-2 ms-4 mb-5">
+  <ul class="">
+    <li>租借用具歸還時間為：租借時間開始往後算七天內。</li>
+  </ul>
+</div>
+<!-- Global Mailform Output-->
+ <div class="snackbars" id="form-output-global"></div>
+ <!-- footer  th:replace=-->
+ <div th:replace="~{starcups/display/footer}" ></div>
+ 
+<!-- Javascript-->
+<script src="/SpanTasty/starcups/js/core.min.js"></script>
+<script src="/SpanTasty/starcups/js/script.js"></script>
+<script>
+const url = 'http://localhost:8080/SpanTasty/tableware/get';
+const sendBtn = document.getElementById('search');
+sendBtn.addEventListener('click', (e)=>{
+	sendBtn.disabled = true;
+	const inputKeyword = document.getElementById('search-form').value;
+	let dtoObject = {
+		keyword: inputKeyword
+	}
+	axios.post(url,dtoObject)
+	.then(res => {
+		const tablewares = res.data;
+		htmlMaker(tablewares);
+	})
+	.catch(err => {
+		console.error(err); 
+	})
+	.finally(() => {
+		sendBtn.disabled = false; // 请求完成后重新启用按钮
+	});
+})
+
+function htmlMaker(tablewares) {
+	const resultContainer = document.getElementById('resultContainer');
+  
+  // 清空之前的搜尋結果
+  resultContainer.innerHTML = '';
+
+  // 動態插入每個搜尋結果
+  tablewares.forEach(tableware => {
+    resultContainer.innerHTML += `
+      <div class="col-sm-6 col-md-3">
+        <!-- Product-->
+        <article class="product">
+          <div class="product-figure">
+            <img src="${tableware.tablewareImage ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}" alt="" width="255" height="255" />
+            <div class="product-button">
+              <a class="button button-bt button-white button-ujarak" href="cart-page.html">查看庫存</a>
+            </div>
+          </div>
+          <h6 class="product-title">${tableware.tablewareName}</h6>
+          <div class="product-price-wrap">
+            <div class="product-price"><span>NT$</span><span>${tableware.tablewareDeposit}</span></div>
+          </div>
+        </article>
+      </div>
+    `;
+  });
+}
+</script>
 </body>
 </html>
