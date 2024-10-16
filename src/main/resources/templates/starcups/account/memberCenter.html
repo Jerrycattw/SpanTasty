@@ -13,12 +13,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 300px;
-      height: 300px;
+      width: 275px;
+      height: 275px;
       background-color: #f0f0f0;
       border-radius: 50%;
       border: 2px solid #ccc;
       overflow: hidden;
+      margin: 0 auto;
     }
 
     /* 確保圖片可以完整填滿容器 */
@@ -27,12 +28,51 @@
       height: 100%;
       object-fit: cover;
     }
+    
+    .personal-info-table {
+      width: 100%;
+      margin: 20px auto;
+      font-size: 18px;
+    }
+
+    .personal-info-table th,
+    .personal-info-table td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .personal-info-table th {
+      width: 40%;
+      font-weight: bold;
+      text-align: right;
+    }
+    
+        .card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
   </style>
 </head>
 
 <body>
 
   <div th:replace="~{/starcups/display/navbar}"></div>
+  
+  
+      <section class="section breadcrumbs-custom-inset">
+      <div class="breadcrumbs-custom context-dark">
+        <div class="container">
+          <h2 class="breadcrumbs-custom-title">會員中心</h2>
+          <ul class="breadcrumbs-custom-path">
+            <li><a href="/SpanTasty/StarCups">Home</a></li>
+            <li><a href="/SpanTasty/StarCups/memberCenter">會員中心</a></li>
+            <li class="active">帳戶管理</li>
+          </ul>
+        </div>
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+      </div>
+    </section>  
 
   <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
     <div class="container">
@@ -47,6 +87,9 @@
             <button class="button button-block button-secondary button-ujarak" id="btn-change-password">
               <span class="icon fa fa-key"></span> 修改密碼
             </button>
+            <button class="button button-block button-secondary button-ujarak" id="btn-change-contact">
+              <span class="icon fa fa-address-book"></span> 修改聯絡資訊
+            </button>
             <button class="button button-block button-secondary button-ujarak" id="btn-change-avatar">
               <span class="icon fa fa-image"></span> 修改頭像
             </button>
@@ -57,19 +100,46 @@
         <div class="col-md-8">
           <!-- 個人資訊 -->
           <div id="personal-info" class="content-section">
-            <h4 class="text-spacing-50">個人資訊</h4>
-            <div class="card">
-              <div class="card-body text-center">
+            <h4 class="text-spacing-50 text-center mb-2">個人資訊</h4>
+            <div class="card mx-auto">
+              <div class="card-body">
                 <!-- 頭像顯示區域 -->
-                <div class="user-avatar mb-3" id="personal-preview-avatar">
+                <div class="user-avatar mb-4" id="personal-preview-avatar">
                   <img id="personal-current-avatar" src="/SpanTasty/starcups/images/account/defaultUser.jpeg" alt="頭像"
-                    width="300" height="300">
+                    class="rounded-circle border">
                 </div>
-                <p><strong>姓名：</strong> <span id="member-name"></span></p>
-                <p><strong>生日：</strong> <span id="birthday"></span></p>
-                <p><strong>信箱：</strong> <span id="member-email"></span></p>
-                <p><strong>註冊日期：</strong> <span id="register-date"></span></p>
-                <p><strong>最近登入日期：</strong> <span id="last-login"></span></p>
+                <div class="personal-info-details">
+                  <table class="personal-info-table">
+                    <tr>
+                      <th>姓名：</th>
+                      <td><span id="member-name">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>生日：</th>
+                      <td><span id="birthday">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>電話：</th>
+                      <td><span id="memberPhone">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>聯絡地址：</th>
+                      <td><span id="memberAddress">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>信箱：</th>
+                      <td><span id="member-email">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>註冊日期：</th>
+                      <td><span id="register-date">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>最近登入：</th>
+                      <td><span id="last-login">未設定</span></td>
+                    </tr>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
@@ -91,6 +161,26 @@
                 <input class="form-control" id="confirm-password" type="password" required>
               </div>
               <button class="button button-block button-secondary" type="submit">修改密碼</button>
+            </form>
+          </div>
+          
+          <!-- 修改聯絡方式 -->
+          <div id="change-contact" class="content-section" style="display:none;">
+            <h4 class="text-spacing-50">修改聯絡資訊</h4>
+            <form>
+              <div class="form-group">
+                <label for="contact-phone">電話</label>
+                <input class="form-control" id="contact-phone" type="text">
+              </div>
+              <div class="form-group">
+                <label for="contact-email">信箱</label>
+                <input class="form-control" id="contact-email" type="email">
+              </div>
+              <div class="form-group">
+                <label for="contact-address">地址</label>
+                <input class="form-control" id="contact-address" type="text">
+              </div>
+              <button class="button button-block button-secondary" type="button" id="update-contact-button">更新聯絡資訊</button>
             </form>
           </div>
 
@@ -123,13 +213,71 @@
   <script src="/SpanTasty/starcups/js/script.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const token = localStorage.getItem('token');
+
+    // 在頁面加載時先檢查是否有 token，如果沒有則跳轉到首頁
+    if (!token) {
+      alert('請先登入');
+      window.location.href = '/SpanTasty/StarCups';
+    } else {
+      // 若有 token，則繼續執行其他功能
+      getProfile();
+      getAvatar();
+    }
+    
+      const urlParams = new URLSearchParams(window.location.search);
+      const section = urlParams.get('section');
+      
       const personalInfoSection = document.getElementById('personal-info');
       const changePasswordSection = document.getElementById('change-password');
+      const changeContactSection = document.getElementById('change-contact');
       const changeAvatarSection = document.getElementById('change-avatar');
+      
+      const breadcrumbPath = document.querySelector('.breadcrumbs-custom-path .active');
+      
+      if (section === 'info') {
+        personalInfoSection.style.display = 'block';
+        changePasswordSection.style.display = 'none';
+        changeAvatarSection.style.display = 'none';
+        changeContactSection.style.display = 'none';
+        breadcrumbPath.textContent = '個人資訊';
+    } else if (section === 'password') {
+        personalInfoSection.style.display = 'none';
+        changePasswordSection.style.display = 'block';
+        changeAvatarSection.style.display = 'none';
+        changeContactSection.style.display = 'none';
+        breadcrumbPath.textContent = '修改密碼';
+    }else if (section === 'contact') {
+          personalInfoSection.style.display = 'none';
+          changePasswordSection.style.display = 'none';
+          changeAvatarSection.style.display = 'none';
+          changeContactSection.style.display = 'block';
+          breadcrumbPath.textContent = '修改聯絡方式';
+     }else if (section === 'avatar') {
+        personalInfoSection.style.display = 'none';
+        changePasswordSection.style.display = 'none';
+        changeAvatarSection.style.display = 'block';
+        changeContactSection.style.display = 'none';
+        breadcrumbPath.textContent = '更新頭像';
+    } else {
+        // 默認顯示個人資訊
+        personalInfoSection.style.display = 'block';
+        changePasswordSection.style.display = 'none';
+        changeAvatarSection.style.display = 'none';
+        changeContactSection.style.display = 'none';
+        breadcrumbPath.textContent = '個人資訊';
+    }
 
       const avatarInput = document.getElementById('avatar-input');
       const confirmAvatarButton = document.getElementById('confirm-avatar');
       const removeAvatarButton = document.getElementById('remove-avatar');
+
+      
+      //修改聯絡方式內容
+      const contactPhoneInput = document.getElementById('contact-phone');
+      const contactEmailInput = document.getElementById('contact-email');
+      const contactAddressInput = document.getElementById('contact-address');
+      const updateContactButton = document.getElementById('update-contact-button');
 
 
       const personalCurrentAvatar = document.getElementById('personal-current-avatar');
@@ -141,11 +289,14 @@
       const registerDate = document.getElementById('register-date');
       const birthday = document.getElementById('birthday');
       const lastLogin = document.getElementById('last-login');
+      const memberPhone = document.getElementById('memberPhone');
+      const memberAddress= document.getElementById('memberAddress');
 
       //按鈕
       const btnPersonalInfo = document.getElementById('btn-personal-info');
       const btnChangePassword = document.getElementById('btn-change-password');
       const btnChangeAvatar = document.getElementById('btn-change-avatar');
+      const btnChangeContact = document.getElementById('btn-change-contact');
 
       // 修改密碼相關的元素
       const currentPasswordInput = document.getElementById('current-password');
@@ -158,6 +309,9 @@
         personalInfoSection.style.display = 'block';
         changePasswordSection.style.display = 'none';
         changeAvatarSection.style.display = 'none';
+        changeContactSection.style.display = 'none';
+        breadcrumbPath.textContent = '個人資訊';
+        getProfile();
       });
 
       // 顯示修改密碼表單
@@ -165,13 +319,27 @@
         personalInfoSection.style.display = 'none';
         changePasswordSection.style.display = 'block';
         changeAvatarSection.style.display = 'none';
+        changeContactSection.style.display = 'none';
+        breadcrumbPath.textContent = '修改密碼';
       });
+      
+            // 顯示修改聯絡資訊
+      btnChangeContact.addEventListener('click', function () {
+        personalInfoSection.style.display = 'none';
+        changePasswordSection.style.display = 'none';
+        changeAvatarSection.style.display = 'none';
+        changeContactSection.style.display = 'block';
+        breadcrumbPath.textContent = '修改聯絡資訊';
+      });
+      
 
       // 顯示修改頭像區域
       btnChangeAvatar.addEventListener('click', function () {
         personalInfoSection.style.display = 'none';
         changePasswordSection.style.display = 'none';
         changeAvatarSection.style.display = 'block';
+        changeContactSection.style.display = 'none';
+        breadcrumbPath.textContent = '更新頭像';
 
         getAvatar();
       });
@@ -223,8 +391,39 @@
             });
         } else {
           alert('請先登入');
+          window.location.href = '/SpanTasty/StarCups';
         }
       });
+      
+      // 更新聯絡方式
+    updateContactButton.addEventListener('click', function () {
+      const phone = contactPhoneInput.value;
+      const email = contactEmailInput.value;
+      const address = contactAddressInput.value;
+
+      const params = new URLSearchParams();
+      if (phone) params.append('phone', phone);
+      if (email) params.append('email', email);
+      if (address) params.append('address', address);
+
+      axios.post('/SpanTasty/member/updateContactInfo', params, {
+        headers: {
+          'Authorization': `${token}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
+      })
+      .then(response => {
+        if (response.data.success) {
+          alert('聯絡資訊更新成功');
+        } else {
+          alert('聯絡資訊更新失敗：' + response.data.message);
+        }
+      })
+      .catch(error => {
+        console.error('更新聯絡資訊過程中發生錯誤:', error.response ? error.response.data : error);
+        alert('更新聯絡資訊過程中發生錯誤');
+      });
+    });
 
 
       // 預覽頭像
@@ -333,7 +532,7 @@
               alert('獲取頭像過程中發生錯誤');
             });
         } else {
-          alert('請先登入');
+          window.location.href = '/SpanTasty/StarCups';
         }
       }
       // 獲取個人資訊
@@ -351,6 +550,8 @@
                 const member = response.data.data;
                 memberName.textContent = member.memberName;
                 memberEmail.textContent = member.email;
+                memberPhone.textContent = member.phone;
+                memberAddress.textContent = member.address;
                 registerDate.textContent = member.registerDate;
                 birthday.textContent = member.birthday;
                 lastLogin.textContent = member.formattedLoginDate;
@@ -363,13 +564,41 @@
             });
         } else {
           alert('請先登入');
+          window.location.href = '/SpanTasty/StarCups';
         }
       }
-
-      // 頁面加載時自動調用
-      getProfile();
-      getAvatar();
     });
+    
+        document.addEventListener('DOMContentLoaded', function () {
+      const memberCenterTitle = document.querySelector('.breadcrumbs-custom-title');
+      const breadcrumbPath = document.querySelector('.breadcrumbs-custom-path .active');
+
+      // 對每個連結添加點擊事件
+      document.getElementById('member-info-link').addEventListener('click', function () {
+        // 更新標題與麵包屑
+        memberCenterTitle.textContent = '個人資訊';
+        breadcrumbPath.textContent = '個人資訊';
+      });
+
+      document.getElementById('change-password-link').addEventListener('click', function () {
+        // 更新標題與麵包屑
+        memberCenterTitle.textContent = '修改密碼';
+        breadcrumbPath.textContent = '修改密碼';
+      });
+
+      document.getElementById('change-avatar-link').addEventListener('click', function () {
+        // 更新標題與麵包屑
+        memberCenterTitle.textContent = '更換頭像';
+        breadcrumbPath.textContent = '更換頭像';
+      });
+      
+      document.getElementById('change-contact-link').addEventListener('click', function () {
+        // 更新標題與麵包屑
+        memberCenterTitle.textContent = '修改聯絡資訊';
+        breadcrumbPath.textContent = '修改聯絡資訊';
+      });
+    });
+    
   </script>
 
 </body>
