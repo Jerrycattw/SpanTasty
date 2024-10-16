@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.eatspan.SpanTasty.entity.store.Product;
@@ -17,15 +18,22 @@ import com.eatspan.SpanTasty.repository.store.ShoppingOrderRepository;
 
 @Service
 public class ShoppingItemService {
-	
 	@Autowired
 	private ShoppingItemRepository shoppingItemRepo;
 	
 	@Autowired
 	private ShoppingOrderRepository shoppingOrderRepo;
 	
+    @Autowired
+    @Lazy
+    private ShoppingOrderService shoppingOrderService;
+    
 	@Autowired
 	private ProductRepository productRepo;
+	
+//    @Autowired
+//    public ShoppingItemService(ShoppingOrderService shoppingOrderService) {
+//        this.shoppingOrderService = shoppingOrderService;
 	
 	
 	public Integer getProductPriceById(Integer productId) {
@@ -38,6 +46,22 @@ public class ShoppingItemService {
 		return shoppingItemRepo.save(shoppingItem);
 	}
 	
+	public void addShoppingItemToExistingOrder(Integer shoppingId, Integer productId, Integer shoppingItemQuantity) {
+	    // 實作將商品添加到已有訂單的邏輯
+	    ShoppingItem newItem = new ShoppingItem();
+	    newItem.setId(new ShoppingItemId(shoppingId, productId));
+	    newItem.setShoppingItemQuantity(shoppingItemQuantity);
+
+	    Integer productPrice = getProductPriceById(productId);
+	    Integer totalPrice = productPrice != null ? productPrice * shoppingItemQuantity : 0;
+	    newItem.setShoppingItemPrice(totalPrice);
+	    
+	    addShoppingItem(newItem);
+	    ShoppingOrder shoppingOrder = shoppingOrderService.findShoppingOrderById(shoppingId);
+	    shoppingOrder.setShoppingTotal(shoppingOrderService.calculateTotalAmount(shoppingId));
+	    shoppingOrderService.updateShoppingOrder(shoppingOrder);
+	}
+
 	
 //	public ShoppingItem addShoppingItem(ShoppingItem shoppingItem) {
 //	    // 獲取產品

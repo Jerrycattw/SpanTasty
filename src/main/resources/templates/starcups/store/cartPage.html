@@ -29,6 +29,7 @@
 <body>
     <!-- navbar th:replace=-->
     <div th:replace="~{starcups/display/navbar}"></div>
+    <input type="hidden" th:value="${session.shoppingId}" id="shoppingId">
     
     <!-- Breadcrumbs -->
     <section class="section breadcrumbs-custom-inset">
@@ -49,7 +50,7 @@
     <section class="section novi-bg novi-bg-img section-xl bg-default">
         <div class="container">
             <div class="table-custom-responsive">
-                <table class="table-custom table-cart">
+                <table class="table-custom table-cart" id="cartTable">
                     <thead>
                         <tr>
                             <th>Product name</th>
@@ -59,7 +60,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="item : ${items}">
+                        <tr th:each="item : ${items}" th:data-productid="${item.product.productId}">
                             <td>
                                 <a class="table-cart-figure" th:href="@{/shop/single-product(id=${item.product.productId})}">
                                     <img th:src="${item.product.productPicture}" alt="" width="146" height="132"/>
@@ -69,7 +70,8 @@
                             <td th:text="'$' + ${item.product.productPrice}"></td>
                             <td>
                                 <div class="table-cart-stepper">
-                                    <input class="form-input" type="number" data-zeros="true" th:value="${item.shoppingItemQuantity}" min="0" max="1000" onchange="updateTotal(this)">
+                                    <input class="form-input updateCart" type="number" data-zeros="true" th:value="${item.shoppingItemQuantity}" 
+                                    		min="0" max="1000" onchange="updateTotal(this)" />
                                 </div>
                             </td>
                             <td class="itemTotal" th:text="'$' + ${item.product.productPrice * item.shoppingItemQuantity}"></td>
@@ -94,7 +96,7 @@
                         <div>
                             <div class="group-xmd group-middle">
                                 <h6 class="text-gray-500">Total</h6>
-                                <h3 class="cart-product-price" id="totalPrice"><sup>$</sup><span th:text="${totalAmount}"}></span></h3>
+                                <h3 class="cart-product-price" id="totalPrice"><sup>$</sup><span th:text="${totalAmount}"></span></h3>
                             </div>
                         </div>
                         <a class="button button-primary button-pipaluk" href="checkout.html">Proceed to checkout</a>
@@ -110,18 +112,55 @@
 
     <script src="/SpanTasty/starcups/js/core.min.js"></script>
     <script src="/SpanTasty/starcups/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        function updateTotal(input) {
-            const row = input.closest('tr');
-            const price = parseFloat(row.cells[1].innerText.replace('$', ''));
-            const quantity = parseInt(input.value);
-            const itemTotal = row.querySelector('.itemTotal');
-            const total = price * quantity;
 
-            itemTotal.innerText = '$' + total;
-            updateCartTotal();
+
+let debounceTimeout;
+
+function updateTotal(input) {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+        const quantity = parseInt(input.value);
+        const productId = input.closest('tr').getAttribute('data-productid'); 
+        const shoppingId = document.getElementById('shoppingId').value;
+
+        const token = localStorage.getItem('token');
+
+        if (token) {
+            axios.post(`http://localhost:8080/SpanTasty/StarCups/updateItem`, null, {
+                params: {
+                    shoppingId: shoppingId, 
+                    productId: productId,
+                    shoppingItemQuantity: quantity 
+                },
+                headers: {
+                    'Authorization': `${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log(response.data);
+                if (response.status === 200) {
+                    const row = input.closest('tr');
+                    const price = parseFloat(row.cells[1].innerText.replace('$', ''));
+                    const itemTotal = row.querySelector('.itemTotal');
+                    itemTotal.innerText = '$' + (price * quantity);
+                    updateCartTotal(); // 更新總計
+
+
+                } else {
+                    alert('數量更新失敗，請稍後再試');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('發生錯誤，請檢查控制台');
+            });
         }
+    }, 200); // 設定防抖延遲時間
+}
 
         function updateCartTotal() {
             const itemTotals = document.querySelectorAll('.itemTotal');
@@ -133,6 +172,9 @@
 
             document.getElementById('totalPrice').innerText = '$' + grandTotal;
         }
+        
+        
+        
     </script>
 </body>
 </html>

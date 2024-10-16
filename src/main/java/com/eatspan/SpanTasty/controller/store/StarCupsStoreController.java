@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eatspan.SpanTasty.entity.store.Product;
 import com.eatspan.SpanTasty.entity.store.ProductType;
 import com.eatspan.SpanTasty.entity.store.ShoppingItem;
+import com.eatspan.SpanTasty.entity.store.ShoppingItemId;
 import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
 import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.service.store.ProductService;
@@ -30,6 +31,8 @@ import com.eatspan.SpanTasty.service.store.ShoppingItemService;
 import com.eatspan.SpanTasty.service.store.ShoppingOrderService;
 import com.eatspan.SpanTasty.utils.account.JwtUtil;
 import com.eatspan.SpanTasty.utils.account.Result;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/StarCups")
@@ -46,39 +49,29 @@ public class StarCupsStoreController {
 
 	@Autowired
 	private ProductTypeService productTypeService;
+	
+	@Autowired
+	private HttpSession session;
 
-//	@Autowired
-//	private MemberService memberService;
-
-//	@GetMapping("/cartDetail")
-//	public String toShoppingItem2(@PathVariable Integer id, Model model) {
-//		ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(id);
-//		model.addAttribute("shopping", shopping);
-//		List<ShoppingItem> items = shoppingItemService.findShoppingItemById(id);
-//		model.addAttribute("items", items);
-//		List<Product> productList = productService.findAllProduct();
-//		model.addAttribute("productList", productList);
-//		Integer totalAmount = shoppingOrderService.calculateTotalAmount(id);
-//		model.addAttribute("totalAmount", totalAmount);
-//		System.out.println();
-//		return "starcups/store/cartPage";
-//	}
-
+	
 	// 查詢單筆
-	@GetMapping("/cartDetail/{id}")
-	public String toShoppingItem(@PathVariable Integer id, Model model) {
-		ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(id);
+	@GetMapping("/cartDetail")
+	public String toShoppingItem(Model model) {
+		Integer shoppingId = (Integer) session.getAttribute("shoppingId");
+		ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+		
 		model.addAttribute("shopping", shopping);
-		List<ShoppingItem> items = shoppingItemService.findShoppingItemById(id);
+		List<ShoppingItem> items = shoppingItemService.findShoppingItemById(shoppingId);
 		model.addAttribute("items", items);
 		List<Product> productList = productService.findAllProduct();
 		model.addAttribute("productList", productList);
-		Integer totalAmount = shoppingOrderService.calculateTotalAmount(id);
+		Integer totalAmount = shoppingOrderService.calculateTotalAmount(shoppingId);
 		model.addAttribute("totalAmount", totalAmount);
-		System.out.println();
+		System.out.println(shoppingId);
 		return "starcups/store/cartPage";
 	}
 
+	
 	@GetMapping("/allProduct")
 	public String findAllProduct(@RequestHeader(value = "Authorization", required = false) String token,
 			@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
@@ -97,31 +90,78 @@ public class StarCupsStoreController {
 		return "starcups/store/allProduct";
 	}
 
+	
+	
 	@PostMapping("/addPost")
 	@ResponseBody
 	public ResponseEntity<?> addOrder(@RequestHeader(value = "Authorization") String token,
-			@RequestParam Integer productId,
-			@RequestParam Integer shoppingItemQuantity
-			) {
-		
-		
-//		@RequestBody ShoppingItem shoppingItem
-		
-//		ShoppingItem
-		// 解析 JWT token 取得 claims
-		Map<String, Object> claims = JwtUtil.parseToken(token);
-		Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
-		
-		// 將會員 ID 添加到模型中
-//      model.addAttribute("memberId", memberId);
+	                                   @RequestParam Integer productId,
+	                                   @RequestParam Integer shoppingItemQuantity) {
+	    try {
+	        // 解析 JWT token 取得 claims
+	        Map<String, Object> claims = JwtUtil.parseToken(token);
+	        Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
 
-		ShoppingOrder order = shoppingOrderService.addShoppingOrder(memberId, productId, shoppingItemQuantity);
-//		ShoppingOrder order = shoppingOrderService.addShoppingOrder(memberId, shoppingItem.getProduct().getProductId(), shoppingItem.getShoppingItemQuantity());
+	        Integer shoppingId = (Integer) session.getAttribute("shoppingId");
+	        ShoppingOrder order;
+//	        System.out.println("Add Item");
+	        if (shoppingId == null) {
+	            order = shoppingOrderService.addShoppingOrder(memberId, productId, shoppingItemQuantity);
+	            session.setAttribute("shoppingId", order.getShoppingId()); 
+	        } else {
+	            shoppingItemService.addShoppingItemToExistingOrder(shoppingId, productId, shoppingItemQuantity);
+	            order = shoppingOrderService.findShoppingOrderById(shoppingId); 
+	        }
+	        
+	        return ResponseEntity.status(HttpStatus.OK).body(order);
+	    } catch (Exception e) {
+	        // 日誌記錄錯誤
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("發生錯誤：" + e.getMessage());
+	    }
+	}
 
-		return ResponseEntity.status(HttpStatus.OK).body(order);
+	@PostMapping("/updateItem")
+	@ResponseBody
+	public ResponseEntity<?> updateShoppingItem(
+	        @RequestHeader(value = "Authorization") String token,
+	        @RequestParam Integer shoppingId,
+	        @RequestParam Integer productId,
+	        @RequestParam Integer shoppingItemQuantity) {
+
+	    try {
+	        // 解析 JWT token 取得 claims
+	        Map<String, Object> claims = JwtUtil.parseToken(token);
+	        Integer memberId = (Integer) claims.get("memberId"); 
+	        System.out.println("updateItem=HIHI");
+	        ShoppingItemId shoppingItemId = new ShoppingItemId(shoppingId, productId);
+	        ShoppingItem existingItem = shoppingItemService.findShoppingItemById(shoppingItemId);
+	        System.out.println("update");
+	        if (existingItem != null) {
+	            existingItem.setShoppingItemQuantity(shoppingItemQuantity);
+	            
+	            Integer productPrice = shoppingItemService.getProductPriceById(productId);
+	            Integer totalPrice = productPrice != null ? productPrice * shoppingItemQuantity : 0;
+	            existingItem.setShoppingItemPrice(totalPrice);
+	            shoppingItemService.updateShoppingItem(existingItem);
+	            
+	            ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+	            shopping.setShoppingTotal(shoppingOrderService.calculateTotalAmount(shoppingId));
+	            shoppingOrderService.updateShoppingOrder(shopping);
+	            
+	            return ResponseEntity.status(HttpStatus.OK).body(existingItem);
+	        } else {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("購物項目未找到");
+	        }
+	    } catch (Exception e) {
+	        // 日誌記錄錯誤
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("發生錯誤：" + e.getMessage());
+	    }
 	}
 
 	
+   
 	
 	
 }
