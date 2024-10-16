@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -83,6 +84,7 @@ public class Coupon implements Serializable {
 	@OneToMany(fetch = FetchType.LAZY,cascade=CascadeType.ALL,mappedBy = "coupon",orphanRemoval=true)
 	private List<Tag> tags=new ArrayList<Tag>();	
 	
+	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "coupon")
 	private Set<CouponMember> couponMember = new HashSet<CouponMember>();
 }

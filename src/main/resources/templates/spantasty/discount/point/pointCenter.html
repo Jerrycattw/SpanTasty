@@ -411,14 +411,18 @@
                           `*/
       pointMemberTable.innerHTML +=`
                           <tr>
-                            <th scope="row"><input name="selectedMembers" class="form-check-input" type="checkbox" value="${e.memberId}"  data-memberName="${e.memberName}" id="flexCheckDefault"></th>
+                            <th scope="row"><input name="selectedMembers" class="form-check-input" type="checkbox" value="${e.memberId}"  data-memberName="${e.memberName}"   id="flexCheckDefault"></th>
                             <td>${e.memberId}</td>
                             <td>${e.memberName}</td>
                             <td>${e.phone}</td>
-                            <td>${e.totalPointBalance}</td>
-                            <td>${(e.totalPointBalance != 0 && e.expiringPoints==0)? '已過期' : e.expiringPoints}</td>
+                            <td>${e.totalPointBalance==null? '-' : e.totalPointBalance}</td>
+                            <td>${pointText(e.totalPointBalance,e.expiringPoints)}</td>
                             <td>${e.expiryDate? e.expiryDate : "-"}</td>
-                            <td><i class="fa-solid fa-image-portrait fa-xl edit-button" data-memberId="${e.memberId}"></i></td>
+                            <td>
+                            	${e.totalPointBalance !== null?
+                            	`<i class="fa-solid fa-image-portrait fa-xl edit-button" data-memberId="${e.memberId}" data-point="${e.totalPointBalance}"></i>` :
+                            	""}
+                            </td>
                           </tr> 
                           `                                 
 
@@ -427,12 +431,27 @@
       pointMemberTable.addEventListener('click', function(event) {
         if (event.target.classList.contains('edit-button')) {
             const memberId = event.target.getAttribute('data-memberId');
-            window.location.href = `/SpanTasty/point/member/${memberId}`;
+            const historyPoint = event.target.getAttribute('data-point');
+            console.log(historyPoint)
+            if(historyPoint == null || historyPoint === ""){
+            	event.preventDefault();
+            	alert('尚未有點數紀錄')
+            }else{
+            	window.location.href = `/SpanTasty/point/member/${memberId}`;
+            }
         }
     });
     }
-
-
+	function pointText(totalPointBalance,expiringPoints){
+		if(totalPointBalance==null){
+			return '-'
+		}else if (totalPointBalance!== 0 && expiringPoints===0){
+			return '已過期'
+		}else{
+			return expiringPoints
+		}		
+	}
+	
     function paginationHtmlMaker(data){
       const pagination = document.getElementById('paginationPM')
       pagination.innerHTML=`<nav aria-label="Page navigation example">   

@@ -93,11 +93,14 @@ public class PointService {
 	
 	//convertDTO ponintMeberDTO(會員紀錄總攬使用)
 	private PointMemberDTO convertToDTO(PointMemberProjection projection) {
+		if(projection==null) {
+			return null;
+		}
 		return new PointMemberDTO(	
 			projection.getMemberId(),
             projection.getMemberName(),
             projection.getPhone(),
-            projection.getTotalPointBalance()==null? 0 : projection.getTotalPointBalance(),
+            projection.getTotalPointBalance(),
             projection.getExpiringPoints()==null? 0 :projection.getExpiringPoints(),
             projection.getExpiryDate()
 	        );
@@ -318,4 +321,15 @@ public class PointService {
         return page;
 	}
 	
+	
+	public Page<Point> StarCupsPoint(Integer memberId,Integer pageNumber){
+		Pageable pageable =PageRequest.of(pageNumber,5);
+		return pointRepo.findByMemberIdOrderByPointIdDesc(memberId, pageable);		
+	}
+	
+	
+	public Page<Point> StarCupsPointGet(Integer memberId,Integer pageNumber){
+		Pageable pageable =PageRequest.of(pageNumber,5);
+		return pointRepo.findByMemberIdOrderByPointIdDescGet(memberId, pageable);		
+	}
 }
