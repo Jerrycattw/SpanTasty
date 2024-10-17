@@ -30,9 +30,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/member")
 public class MemberController {
 
-//	@Autowired
-//	private BCryptPasswordEncoder passwordEncoder;
-
 	@Autowired
 	private MemberService memberService;
 
@@ -82,48 +79,92 @@ public class MemberController {
 		return Result.success("登入成功", token);
 	}
 
+	// 獲取資訊
 	@GetMapping("/profile")
 	public Result<Member> getMemberProfile(@RequestHeader("Authorization") String token) {
 
-	    // 解析 JWT token 取得 claims
-	    Map<String, Object> claims = JwtUtil.parseToken(token);
+		// 解析 JWT token 取得 claims
+		Map<String, Object> claims = JwtUtil.parseToken(token);
 
-	    // 取得會員 ID
-	    Integer memberId = (Integer) claims.get("memberId");
+		// 取得會員 ID
+		Integer memberId = (Integer) claims.get("memberId");
 
-	    if (memberId == null) {
-	        return Result.failure("無法從 Token 中取得會員 ID");
-	    }
+		if (memberId == null) {
+			return Result.failure("無法從 Token 中取得會員 ID");
+		}
 
-	    // 根據會員 ID 查詢個人資訊
-	    Optional<Member> memberOpt = memberService.findMemberById(memberId);
+		// 根據會員 ID 查詢個人資訊
+		Optional<Member> memberOpt = memberService.findMemberById(memberId);
 
-	    if (memberOpt.isPresent()) {
-	        Member member = memberOpt.get();
-	        
-	        // 格式化日期為 "yyyy-MM-dd a hh:mm"
-	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm");
-	        
-	        // 如果 loginDate 不為 null，進行格式化處理
-	        if (member.getLoginDate() != null) {
-	            member.setFormattedLoginDate(member.getLoginDate().format(formatter)); // 格式化登入日期
-	        }
+		if (memberOpt.isPresent()) {
+			Member member = memberOpt.get();
 
-	        return Result.success("個人資訊查詢成功", member);
-	    } else {
-	        return Result.failure("無法找到該會員的個人資訊");
-	    }
+			// 格式化日期為 "yyyy-MM-dd a hh:mm"
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm");
+
+			// 如果 loginDate 不為 null，進行格式化處理
+			if (member.getLoginDate() != null) {
+				member.setFormattedLoginDate(member.getLoginDate().format(formatter)); // 格式化登入日期
+			}
+
+			return Result.success("個人資訊查詢成功", member);
+		} else {
+			return Result.failure("無法找到該會員的個人資訊");
+		}
 	}
-	
-	//更新密碼
+
+	// 修改會員聯絡方式
+	@PostMapping("/updateContactInfo")
+	public Result<String> updateContactInfo(@RequestHeader("Authorization") String token,
+			@RequestParam(required = false) String phone, @RequestParam(required = false) String email,
+			@RequestParam(required = false) String address) {
+		// 解析 JWT Token 並取得會員 ID
+		Map<String, Object> claims = JwtUtil.parseToken(token);
+		Integer memberId = (Integer) claims.get("memberId");
+
+		// 根據會員 ID 查詢會員
+		Optional<Member> memberOpt = memberService.findMemberById(memberId);
+		if (memberOpt.isEmpty()) {
+			return Result.failure("無法找到該會員的個人資訊");
+		}
+
+		// 更新聯絡方式
+		Member member = memberOpt.get();
+		if (phone != null) {
+			member.setPhone(phone);
+		}
+		if (email != null) {
+			
+			if ("Google".equals(member.getProvider())) {
+			    return Result.failure("Google 登入的用戶無法修改信箱");
+			}
+			
+			if (memberService.existsByEmail(email)) {
+				return Result.failure("此信箱已被使用");
+			}
+			member.setEmail(email);
+		}
+		if (address != null) {
+			member.setAddress(address);
+		}
+
+		// 保存修改後的會員資料
+		boolean isSuccess = memberService.save(member);
+		if (isSuccess) {
+			return Result.success("聯絡方式更新成功");
+		} else {
+			return Result.failure("聯絡方式更新失敗，請重試");
+		}
+	}
+
+	// 更新密碼
 	@PostMapping("/updatePassword")
-	public Result<String> updateMemberPassword(@RequestHeader("Authorization") String token, @RequestParam String oldPassword,
-			@RequestParam String newPassword, @RequestParam String confirmPassword) {
+	public Result<String> updateMemberPassword(@RequestHeader("Authorization") String token,
+			@RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam String confirmPassword) {
 		// 解析 JWT token 來獲取 memberId
 		Map<String, Object> claims = JwtUtil.parseToken(token);
 		Integer memberId = (Integer) claims.get("memberId");
-		
-		
+
 		// 檢查新密碼和確認密碼是否一致
 		if (!newPassword.equals(confirmPassword)) {
 			return Result.failure("兩次輸入的密碼不一致");
@@ -139,102 +180,102 @@ public class MemberController {
 		}
 	}
 
-	//更新頭像
+	// 更新頭像
 	@PostMapping("/updateAvatar")
 	public Result<String> updateMemberAvatar(@RequestParam("avatar") MultipartFile avatarFile,
 			@RequestHeader("Authorization") String token) {
-        try {
-            // 解析 JWT Token 並取得會員 ID
-            Map<String, Object> claims = JwtUtil.parseToken(token);
-            Integer memberId = (Integer) claims.get("memberId");
+		try {
+			// 解析 JWT Token 並取得會員 ID
+			Map<String, Object> claims = JwtUtil.parseToken(token);
+			Integer memberId = (Integer) claims.get("memberId");
 
-            // 取得圖片的 byte[] 數據
-            byte[] avatarBytes = avatarFile.getBytes();
+			// 取得圖片的 byte[] 數據
+			byte[] avatarBytes = avatarFile.getBytes();
 
-            // 更新會員頭像並取得操作結果
-            boolean isSuccess = memberService.updateMemberAvatar(memberId, avatarBytes);
+			// 更新會員頭像並取得操作結果
+			boolean isSuccess = memberService.updateMemberAvatar(memberId, avatarBytes);
 
-            // 根據操作結果回傳相應的 Result
-            if (isSuccess) {
-                return Result.success("更新圖片成功");
-            } else {
-                return Result.failure("更新圖片失敗");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Result.failure("頭像更新失敗，IO錯誤");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.failure("頭像更新失敗");
-        }
+			// 根據操作結果回傳相應的 Result
+			if (isSuccess) {
+				return Result.success("更新圖片成功");
+			} else {
+				return Result.failure("更新圖片失敗");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Result.failure("頭像更新失敗，IO錯誤");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Result.failure("頭像更新失敗");
+		}
 	}
 
-	
-	//獲得頭像
+	// 獲得頭像
 	@GetMapping("/getAvatar")
 	public Result<String> getAvatar(@RequestHeader("Authorization") String token) {
 		Map<String, Object> claims = JwtUtil.parseToken(token);
 		Integer memberId = (Integer) claims.get("memberId");
-		
+
 		byte[] avatarBytes = memberService.getMemberAvatar(memberId);
-		
-        if (avatarBytes == null) {
-            // 如果頭像為 null，回傳告知前端使用預設圖片
-            return Result.success("用戶未設定頭像", null);
-        }
-        
-        String base64Avatar = Base64.getEncoder().encodeToString(avatarBytes);
-        
-        return Result.success("頭像取得成功", base64Avatar);
-		
+
+		if (avatarBytes == null) {
+			// 如果頭像為 null，回傳告知前端使用預設圖片
+			return Result.success("用戶未設定頭像", null);
+		}
+
+		String base64Avatar = Base64.getEncoder().encodeToString(avatarBytes);
+
+		return Result.success("頭像取得成功", base64Avatar);
+
 	}
-	//刪除頭像
+
+	// 刪除頭像
 	@PostMapping("/removeAvatar")
 	public Result<String> removeAvatar(@RequestHeader("Authorization") String token) {
 		Map<String, Object> claims = JwtUtil.parseToken(token);
 		Integer memberId = (Integer) claims.get("memberId");
-		
+
 		boolean isDeleted = memberService.removeMemberAvatar(memberId);
-		
-        if (isDeleted) {
-            return Result.success("頭像已成功刪除");
-        } else {
-            return Result.failure("刪除頭像失敗");
-        }
+
+		if (isDeleted) {
+			return Result.success("頭像已成功刪除");
+		} else {
+			return Result.failure("刪除頭像失敗");
+		}
 	}
-	
-    // 忘記密碼請求
-    @PostMapping("/forgot-password")
-    public Result<String> forgotPassword(@RequestParam String email, HttpServletRequest request) {
-        try {
-            // 調用服務層生成 token 並發送郵件
-            memberService.createPasswordResetToken(email, request);
-            return Result.success("重設密碼的連結已經發送至您的電子郵箱");
-        } catch (Exception e) {
-            return Result.failure(e.getMessage());
-        }
-    }
 
- // 重設密碼請求
-    @PostMapping("/reset-password")
-    public Result<String> resetPassword(@RequestBody Map<String, String> passwordResetRequest) {
-        String token = passwordResetRequest.get("token");
-        String newPassword = passwordResetRequest.get("newPassword");
-        String confirmPassword = passwordResetRequest.get("confirmPassword");
-        System.out.println(token);
+	// 忘記密碼請求
+	@PostMapping("/forgot-password")
+	public Result<String> forgotPassword(@RequestParam String email, HttpServletRequest request) {
+		try {
+			// 調用服務層生成 token 並發送郵件
+			memberService.createPasswordResetToken(email, request);
+			return Result.success("重設密碼的連結已經發送至您的電子郵箱");
+		} catch (Exception e) {
+			return Result.failure(e.getMessage());
+		}
+	}
 
-        // 檢查兩次密碼是否一致
-        if (!newPassword.equals(confirmPassword)) {
-            return Result.failure("兩次輸入的密碼不一致");
-        }
+	// 重設密碼請求
+	@PostMapping("/reset-password")
+	public Result<String> resetPassword(@RequestBody Map<String, String> passwordResetRequest) {
+		String token = passwordResetRequest.get("token");
+		String newPassword = passwordResetRequest.get("newPassword");
+		String confirmPassword = passwordResetRequest.get("confirmPassword");
+		System.out.println(token);
 
-        try {
-            // 調用服務層進行密碼重設
-            memberService.resetPassword(token, newPassword);
-            return Result.success("您的密碼已經成功更新");
-        } catch (Exception e) {
-            return Result.failure(e.getMessage());
-        }
-    }
+		// 檢查兩次密碼是否一致
+		if (!newPassword.equals(confirmPassword)) {
+			return Result.failure("兩次輸入的密碼不一致");
+		}
+
+		try {
+			// 調用服務層進行密碼重設
+			memberService.resetPassword(token, newPassword);
+			return Result.success("您的密碼已經成功更新");
+		} catch (Exception e) {
+			return Result.failure(e.getMessage());
+		}
+	}
 
 }

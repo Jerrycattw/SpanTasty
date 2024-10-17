@@ -14,6 +14,10 @@ public class MailConfig {
 	@Value("${userName}")
 	private String userName;
 	
+	@Value("${userName2}")
+	private String userName2;
+	
 	@Value("${userName3}")
 	private String userName3;
+  
 }
