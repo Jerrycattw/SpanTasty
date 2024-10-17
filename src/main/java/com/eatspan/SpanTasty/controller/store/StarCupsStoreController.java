@@ -221,6 +221,12 @@ public class StarCupsStoreController {
 //	        return "starcups/store/error"; // 處理錯誤頁面
 //	    }
 //	}
-
+	
+	@GetMapping("/findItem")
+	@ResponseBody
+	public List<ShoppingItem> findItemAjax(@RequestParam Integer shoppingId) {
+		return shoppingItemService.findShoppingItemById(shoppingId);
+	}
+	
 	
 }

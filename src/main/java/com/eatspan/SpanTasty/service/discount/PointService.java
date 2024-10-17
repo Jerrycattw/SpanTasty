@@ -186,6 +186,7 @@ public class PointService {
 			pointRepo.save(point);
 		}else {
 			System.out.println("insert +");
+			point.setPointUsage(point.getPointChange());
 			//增加點數 依設定判斷到期日
 			String createDateStr = DateUtils.getStringFromDate(point.getCreateDate());		
 			currentPointSet = pointSetService.findAllPointSet();// 取得點數設定		

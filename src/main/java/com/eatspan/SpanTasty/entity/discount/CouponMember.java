@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,6 +35,8 @@ public class CouponMember implements Serializable{
 	@Column(name = "usage_amount")
 	private Integer usageAmount;
 	
+	@Transient
+	private Boolean canUse;
 	
 	@ManyToOne
 	@JoinColumn(name = "coupon_id", insertable = false, updatable = false)

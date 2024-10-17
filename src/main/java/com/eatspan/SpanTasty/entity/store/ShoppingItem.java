@@ -61,6 +61,12 @@ public class ShoppingItem {
 	    this.shoppingItemPrice = shoppingItemPrice; // 設置價格
 	}
 
+	@Override
+	public String toString() {
+		return "ShoppingItem [id=" + id + ", shoppingItemQuantity=" + shoppingItemQuantity + ", shoppingItemPrice="
+				+ shoppingItemPrice + ", product=" + product + ", shoppingOrder=" + shoppingOrder + "]";
+	}
+
     
     
 

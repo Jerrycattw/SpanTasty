@@ -87,7 +87,7 @@
                             <label class="form-label" for="coupon-code">Coupon code</label>
                         </div>
                         <div class="form-button">
-                            <button class="button button-secondary button-pipaluk" type="submit">Apply coupon</button>
+                            <button class="button button-secondary button-pipaluk" type="submit" id="addCoupon">Apply coupon</button>
                         </div>
                     </form>
                 </div>
@@ -116,10 +116,14 @@
     <script src="/SpanTasty/starcups/js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <script>
+    <script th:inline="javascript">
 
 
 let debounceTimeout;
+let finalItems = [[${items}]]  //edit by hao
+let finalTotal = [[${totalAmount}]] //edit by hao
+console.log('old',finalItems);
+
 
 function updateTotal(input) {
     clearTimeout(debounceTimeout);
@@ -163,7 +167,7 @@ function updateTotal(input) {
         }
     }, 200); // 設定防抖延遲時間
 }
-
+        
         function updateCartTotal() {
             const itemTotals = document.querySelectorAll('.itemTotal');
             let grandTotal = 0;
@@ -172,11 +176,54 @@ function updateTotal(input) {
                 grandTotal += parseFloat(total.innerText.replace('$', ''));
             });
 
+            finalTotal=grandTotal;
             document.getElementById('totalPrice').innerText = '$' + grandTotal;
+
+
+            //get shoppingItem after update  賦值給finalItems    edit by hao
+            const shoppingId =document.getElementById('shoppingId').value;
+            finalItems = axios.get(`http://localhost:8080/SpanTasty/StarCups/findItem`,{
+                params:{
+                    shoppingId: shoppingId    
+                }
+            })
+            .then(res=>{             
+                return res.data
+            })
+          
         }
         
         
         
+    </script>
+    <script> //edit by hao
+        document.getElementById('addCoupon').addEventListener('click',function(){
+            event.preventDefault()
+            const token = localStorage.getItem('token');
+            console.log('123',token);
+            console.log(finalTotal);
+            
+            
+            axios.post('http://localhost:8080/SpanTasty/StarCups/coupon/checkout',{
+                    shoppingItems: finalItems,
+                    totalAmount: finalTotal
+                },
+                {
+                    headers: {
+                        'Authorization': `${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res=>{
+                    console.log(res.data);
+                    
+                })
+
+        })
+
+        
+                
+
     </script>
 </body>
 </html>
