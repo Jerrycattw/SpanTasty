@@ -120,9 +120,10 @@ public class RentService {
 	
 	//
 	@Transactional
-	public Rent addRentOrder(Integer memberId, Integer tablewareId, Integer rentItemQuantity) {
+	public Rent addRentOrder(Integer memberId, Integer tablewareId, Integer rentItemQuantity, Integer restaurantId) {
 		Rent rent = new Rent();
 		rent.setMemberId(memberId);
+		rent.setRestaurantId(restaurantId);
 		Date rentDate = new Date();
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(rentDate);

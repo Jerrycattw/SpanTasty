@@ -27,7 +27,9 @@ public class StarCupsOrderController {
 	@GetMapping("/order")
 	public String starcupsAddTogoPage(Model model) {
 		List<MenuEntity> foodList = menuService.getAllFoods();
+		List<FoodKindEntity> foodKindList = foodKindService.getAllFoodKind();
 		model.addAttribute("foodList", foodList);
+		model.addAttribute("foodKindList", foodKindList);
 		return "starcups/order/addTogo";
 	}
 	

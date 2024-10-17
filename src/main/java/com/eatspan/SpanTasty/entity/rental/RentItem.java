@@ -2,6 +2,8 @@ package com.eatspan.SpanTasty.entity.rental;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,10 +46,12 @@ public class RentItem implements Serializable {
 	private Integer returnStatus;
 	
 	
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rent_id", insertable = false, updatable = false)
     private Rent rent;
 
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tableware_id", insertable = false, updatable = false)
 	private Tableware tableware;

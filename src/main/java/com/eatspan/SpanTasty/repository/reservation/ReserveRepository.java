@@ -23,7 +23,7 @@ public interface ReserveRepository extends JpaRepository<Reserve, Integer> {
 	        + "AND (:tableTypeId IS NULL OR r.tableType.tableTypeId = :tableTypeId) "
 	        + "AND (:reserveTimeStart IS NULL OR r.reserveTime >= :reserveTimeStart) "
 	        + "AND (:reserveTimeEnd IS NULL OR r.reserveTime <= :reserveTimeEnd)"
-	        + "ORDER BY r.reserveTime DESC")
+	        + "ORDER BY r.reserveId DESC")
 	List<Reserve> findReserveByCriteria(
 	        @Param("memberName") String memberName,
 	        @Param("phone") String phone,
@@ -32,6 +32,15 @@ public interface ReserveRepository extends JpaRepository<Reserve, Integer> {
 	        @Param("reserveTimeStart") LocalDateTime reserveTimeStart,
 	        @Param("reserveTimeEnd") LocalDateTime reserveTimeEnd
 	);
+	
+	
+	//查詢訂位資料by可變條件
+	@Query("SELECT r FROM Reserve r JOIN r.restaurant rt JOIN r.member m WHERE 1=1 "
+			+ "AND r.restaurant.id = :restaurantId "
+			+ "AND CAST(r.reserveTime AS DATE) = CAST(:checkDate AS DATE) "
+			+ "ORDER BY r.reserveTime DESC")
+	List<Reserve> findReserveByRestaurantAndDate(@Param("restaurantId") Integer restaurantId,
+												 @Param("checkDate") LocalDate checkDate);
 	
 	
 

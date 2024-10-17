@@ -17,6 +17,7 @@ import com.eatspan.SpanTasty.dto.rental.RestaurantStockDTO;
 import com.eatspan.SpanTasty.dto.rental.TablewareFilterDTO;
 import com.eatspan.SpanTasty.dto.rental.TablewareKeywordDTO;
 import com.eatspan.SpanTasty.entity.rental.Rent;
+import com.eatspan.SpanTasty.entity.rental.RentItem;
 import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
@@ -114,23 +115,25 @@ public class StarCupsRentController {
 	
 	// 加入購物車
 	@ResponseBody
-	@PostMapping("/rental/addToCart")
-	public ResponseEntity<?> addToCart(@RequestHeader(value = "Authorization") String token, @RequestBody CartRequestDTO request) {
+	@PostMapping("/rental/addCart")
+	public ResponseEntity<?> addToCart(@RequestHeader(value = "Authorization") String token, @RequestBody CartRequestDTO cartRequestDTO) {
 		try {
+			System.out.println(token);
+			System.out.println(cartRequestDTO);
 			// 解析 JWT token 取得 claims
 			Map<String, Object> claims = JwtUtil.parseToken(token);
 			Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
 			
 			Integer rentId = (Integer) session.getAttribute("rentId");
-			CartRequestDTO cartRequestDTO = new CartRequestDTO();
 			Integer tablewareId = cartRequestDTO.getTablewareId();
 			Integer rentItemQuantity = cartRequestDTO.getRentItemQuantity();
+			Integer restaurantId = cartRequestDTO.getRestaurantId();
 			Rent rent;
 			if(rentId == null) {
-				rent = rentService.addRentOrder(memberId, tablewareId, rentItemQuantity);
+				rent = rentService.addRentOrder(memberId, tablewareId, rentItemQuantity, restaurantId);
 				session.setAttribute("rentId", rent.getRentId());
 			}else {
-				rentItemService.addRentItemToOrder(memberId, tablewareId, rentItemQuantity);
+				rentItemService.addRentItemToOrder(rentId, tablewareId, rentItemQuantity);
 				rent = rentService.findRentById(rentId);
 			}
 			return ResponseEntity.status(HttpStatus.OK).body(rent);
@@ -139,5 +142,25 @@ public class StarCupsRentController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("發生錯誤：" + e.getMessage());
 		}
 	}
+	
+	
+	// 導向結帳畫面
+	@GetMapping("/rental/cart")
+	public String getMethodName(Model model) {
+		Integer rentId = (Integer) session.getAttribute("rentId");
+		Rent rent = rentService.findRentById(rentId);
+		model.addAttribute("rent", rent);
+		
+		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+		model.addAttribute("rentItems", rentItems);
+		
+		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		model.addAttribute("tablewares", tablewares);
+		
+		Integer totalDeposit = rentService.calculateTotalDeposit(rentId);
+		model.addAttribute("totalDeposit",totalDeposit);
+		return "starcups/rental/checkoutTablewarePage";
+	}
+	
 
 }

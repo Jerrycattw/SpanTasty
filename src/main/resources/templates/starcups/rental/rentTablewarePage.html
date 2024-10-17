@@ -65,13 +65,44 @@ p.global-primary.dark-primary.section-title::after {
 }
 
 .cart{
-	position: fixed;
 	top: 100px;
 	right: 50px;
 	z-index: 1000; 
 	font-size: 2rem; 
 	cursor: pointer;
 	color: #f3c6a1;
+}
+
+.stepper-arrow {
+    font-size: 10px; /* 調整字體大小 */
+    padding: 0; /* 確保內邊距為 0 */
+    line-height: 30px; /* 如果需要固定高度 */
+    display: inline-block; /* 確保它是行內塊元素，方便調整大小 */
+}
+span.stepper-arrow {
+	width:20px;
+	height:20px;
+}
+.table-cart-stepper .stepper-arrow {
+    line-height: 20px !important; /* 強制覆蓋行高 */
+    border-radius: 2px !important; /* 強制覆蓋邊角圓度 */
+    border: 1px solid #ccc !important; /* 強制覆蓋邊框 */
+}
+.stepper{
+	height: 25px;
+	padding-top: 0;
+}
+
+.table-cart-stepper input[type="number"]{
+	font-size: 15px !important;
+	line-height:20px !important;
+}
+
+.stepper-input {
+    padding-top: 0; /* 更小的內邊距 */
+    font-size: 10px; /* 調整字體大小以適應高度 */
+    width:20px;
+    
 }
 </style>
 </head>
@@ -80,9 +111,9 @@ p.global-primary.dark-primary.section-title::after {
 <div th:replace="~{starcups/display/navbar}" ></div>
 
 <form th:action="@{/StarCups/rental/cart(rentId=${session['rentId']})}" method="get" style="display: inline;">
-<button style="border: none; background: none;">
+<button style="border: none; background: none; position: relative; left:1200px; top:480px;">
 	<i class="fa-solid fa-cart-arrow-down cart"></i>
-  <span id="cart-count" style="position: absolute; top: 10px; right: 10px; background: red; color: white; border-radius: 50%; padding: 5px 10px;">0</span>
+  <span id="cart-count" style="position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 100%; padding: 5px 10px; font-size: 10px;">0</span>
 </button>
 </form>
 <!-- 選單下方圖片及連結 -->
@@ -141,17 +172,17 @@ p.global-primary.dark-primary.section-title::after {
                 <br/>
                 <span>NT$</span><span class="box-icon-classic-title " th:text="${tableware.tablewareDeposit}" ></span>
               </div>
-              <div class="unit-body ms-5 ps-5">
+              <div class="unit-body ms-5 ps-5 mb-4">
                 <img th:src="${tableware.tablewareImage != null ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}" alt="" width="100" height="100" />
                 
                 <span style="position: absolute; bottom: 10px; right: 10px; color:red;" th:id="'stock' + ${tableware.tablewareId}"></span>
                 
-              <div class="quantity-selector">
-		        <button class="btn btn-sm pb-0 pt-0" style="border:none; position: absolute; bottom: 60px; right: 30px;"  th:onclick="'decreaseQuantity(' + ${tableware.tablewareId} + ')'"><i class="fa-solid fa-circle-down" style="font-size:12px;"></i></button>
-		        	<span class="text-center" style="font-size:10px; position: absolute; bottom: 63px; right: 23px; color:black;" th:id="'quantity' + ${tableware.tablewareId}">1</span>
-		        <button class="btn btn-sm pb-0 pt-0" style="border:none; position: absolute; bottom: 60px; right: 2px;" th:onclick="'increaseQuantity(' + ${tableware.tablewareId} + ')'"><i class="fa-solid fa-circle-up" style="font-size:12px;"></i></button>
+              <div class="quantity-selector d-inline-flex justify-content-center align-center" style="position: absolute; bottom:50px; right: 13px;" >
+		        <div class="table-cart-stepper d-inline-flex justify-content-center align-center" style="padding-top:0; padding-bottom:0;line-height: 20px;">
+                  <input class="form-input d-inline-flex pt-0 ps-1 pe-1 pb-0" th:id="'rentItemQuantity'+${tableware.tablewareId}" style="min-height:1px; position: relative; top:-5px;" type="number" data-zeros="true" value="1" min="1" max="1000">
+                </div>
 		      </div>
-		      <button class="btn btn-primary btn-sm pb-0 pt-0" style="position: absolute; bottom: 40px; right: 10px;" th:onclick="'addToCart(' + ${tableware.tablewareId} + ')'"><i class="fa-solid fa-cart-arrow-down" style="font-size:12px;"></i></button>
+		      <button class="btn btn-primary btn-sm pb-0 pt-0" style="position: absolute; bottom: 32px; right: 15px;" th:data-tablewareId="${tableware.tablewareId}" onclick="addToCart(this)"><i class="fa-solid fa-cart-arrow-down" style="font-size:12px;"></i></button>
               </div>
             </div>
           </article>
@@ -176,43 +207,40 @@ p.global-primary.dark-primary.section-title::after {
 <!-- Javascript-->
 <script src="/SpanTasty/starcups/js/core.min.js"></script>
 <script src="/SpanTasty/starcups/js/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-function increaseQuantity(tablewareId) {
-  const quantityElement = document.getElementById(`quantity${tablewareId}`);
-  let currentQuantity = parseInt(quantityElement.textContent, 10);
-  quantityElement.textContent = currentQuantity + 1;
-}
 
-function decreaseQuantity(tablewareId) {
-  const quantityElement = document.getElementById(`quantity${tablewareId}`);
-  let currentQuantity = parseInt(quantityElement.textContent, 10);
-  if (currentQuantity > 1) {
-    quantityElement.textContent = currentQuantity - 1;
-  }
-}
 
-function addToCart(tablewareId) {
+function addToCart(button) {
 	let cartItemCount = 0; 
 	const token = localStorage.getItem('token');
-	const rentItemQuantity = parseInt(document.getElementById(`quantity${tablewareId}`).textContent, 10);
+	const tablewareId = button.getAttribute('data-tablewareid');
+	const rentItemQuantity = document.getElementById(`rentItemQuantity${tablewareId}`).value;
+    const restaurantId = document.getElementById("restaurantId").value;
+	console.log("Tableware ID:", tablewareId);
+    console.log("Quantity:", rentItemQuantity);
+    console.log("Restaurant ID:", restaurantId);
+    console.log("token:", token);
 	const stockElement = document.getElementById(`stock${tablewareId}`);
 	let stock = parseInt(stockElement.innerHTML.replace('剩', '').replace('件', ''), 10);
-	const url = 'http://localhost:8080/SpanTasty/StarCups/rental/addToCart';
-	let dtoObject = {
-		tablewareId: tablewareId,
-		rentItemQuantity: rentItemQuantity
-	};
-	let headers = {
-       'Authorization': `${token}`,
-       'Content-Type': 'application/json'
-    };
-    
+	
   if (stock >= rentItemQuantity) {
     stock -= rentItemQuantity;
     stockElement.innerHTML = `剩${stock}件`;
     
+	let dtoObject = {
+		tablewareId: tablewareId,
+		rentItemQuantity: rentItemQuantity,
+		restaurantId: restaurantId
+	};
+	    
+    axios.post(`http://localhost:8080/SpanTasty/StarCups/rental/addCart`, dtoObject, {
+	     headers: {
+	         'Authorization': `${token}`,
+	         'Content-Type': 'application/json'
+	     }
+	 })
     // 發送加入購物車的請求到後端
-    axios.post(url, dtoObject, headers)
     .then(function(response) {
 	    if (response.status === 200) {
 	        cartItemCount++; // 增加商品數量
