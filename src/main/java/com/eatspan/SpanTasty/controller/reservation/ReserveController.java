@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eatspan.SpanTasty.dto.reservation.ReserveCenterDTO;
 import com.eatspan.SpanTasty.dto.reservation.ReserveCheckDTO;
 import com.eatspan.SpanTasty.dto.reservation.ReserveDTO;
 import com.eatspan.SpanTasty.entity.account.Member;
@@ -62,12 +63,33 @@ public class ReserveController {
         return "spantasty/reservation/getAllReserve";
     }
 	
-    // 導向到訂位中心頁面
-    @GetMapping("/reserveCenter")
-    public String showReserveCenter(Model model) {
+    // 導向到訂位統計頁面
+    @GetMapping("/reserveStatic")
+    public String showReserveStatic(Model model) {
     	List<Restaurant> restaurants = restaurantService.findAllRestaurants();
     	model.addAttribute("restaurants", restaurants);
+    	return "spantasty/reservation/reserveStatic";
+    }
+    
+    // 導向到餐廳訂位中心頁面
+    @GetMapping("/reserveCenter/{id}")
+    public String showReserveCenter(Model model, @PathVariable Integer id) {
+    	model.addAttribute("restaurant", restaurantService.findRestaurantById(id));
     	return "spantasty/reservation/reserveCenter";
+    }
+    
+    // 查詢餐廳訂位顯示在訂位中心頁面
+    @GetMapping("/reserveCenter/api/{id}")
+    public ResponseEntity<?> showReserveCenterApi(@PathVariable Integer id,
+    											  @RequestParam(required = false) LocalDate checkDate) {
+        // 檢查餐廳ID的有效性
+        if (id == null || id <= 0) return ResponseEntity.badRequest().body("RestaurantId Not Found");
+    	if(checkDate == null) checkDate = LocalDate.now();
+    	List<Reserve> reserves = reserveService.findReserveByRestaurantAndDate(id, checkDate);
+    	List<RestaurantTable> restaurantTables = restaurantTableService.findAllRestaurantTable(id);
+    	ReserveCenterDTO reserveCenterDTO = new ReserveCenterDTO(reserves, restaurantTables);
+    	
+    	return ResponseEntity.ok(reserveCenterDTO);
     }
     
     

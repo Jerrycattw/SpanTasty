@@ -4,6 +4,41 @@
     <meta charset="UTF-8">
     <title>Restaurant</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .table-container {
+            overflow-x: auto; /* 水平滾動條 */
+            white-space: nowrap; /* 讓內容不自動換行 */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            white-space: nowrap; /* 保證單元格內容不換行 */
+        }
+        th {
+            position: sticky;
+            top: 0; /* 讓時間欄固定在頂部 */
+            background-color: #fff;
+            z-index: 2;
+        }
+        th:first-child, td:first-child {
+            position: sticky;
+            left: 0; /* 讓桌號欄固定在左邊 */
+            background-color: #fff;
+            z-index: 3;
+        }
+        .reserved {
+            background-color: #ff9900;
+            color: white;
+        }
+        .available {
+            background-color: #c7ffd6;
+        }
+    </style>
 </head>
 <body>
     <div th:replace="~{spantasty/display/navbar}"></div>
@@ -11,288 +46,61 @@
     <div class="content">
 
         <!-- 訂位參數表單 -->
+        <input type="hidden" name="restaurantId" id="restaurantId" th:value="${restaurant.restaurantId}">
         <div class="container mt-1 mb-4">
             <form id="searchForm" class="bg-primary-subtle">
                 <div class="row g-3  d-flex justify-content-center">
                     <div class="col-3 d-flex align-items-center">
-                        <label for="restaurantId" class="form-label mb-0 text-nowrap">選擇餐廳:</label>
-                        <select name="restaurantId" id="restaurantId" class="form-select ms-2">
-                            <option value="" selected>請選擇餐廳</option>
-                            <th:block th:each="restaurant : ${restaurants}">
-                                <option th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
-                            </th:block>
-                        </select>
+                        <label for="restaurantName" class="form-label mb-0 text-nowrap">餐廳名稱:</label>
+				        <input type="text" name="restaurantName" id="restaurantName" class="form-control ms-2" th:value="${restaurant.restaurantName}">
                     </div>
 
                     <div class="col-3 d-flex align-items-center">
-                        <label for="reservePercent" class="form-label mb-0 text-nowrap">開放訂位比例(%):</label>
-                        <input type="number" name="reservePercent" id="reservePercent" class="form-control ms-2" min="0" max="100" step="10" />
-                    </div>
-
-                    <div class="col-3 d-flex align-items-center">
-                        <label for="reserveTimeScale" class="form-label mb-0 text-nowrap">訂位間距設定(分):</label>
-                        <input type="number" name="reserveTimeScale" id="reserveTimeScale" class="form-control ms-2" min="15" max="180" step="30"/>
+                        <label for="checkDate" class="form-label mb-0 text-nowrap">日期:</label>
+                        <input type="Date" name="checkDate" id="checkDate" class="form-control ms-2" />
                     </div>
 
                     <div class="col-1 d-flex align-items-center justify-content-center">
-                        <button type="button" id="setReserveCenterbtn" class="btn btn-success btn-sm">確認修改</button>
+                        <button type="button" id="showRestaurantReserveBtn" class="btn btn-success btn-sm">查看</button>
                     </div>
                 </div>
             </form>
         </div>
         <!-- 訂位參數表單 -->
+        
+    
 
 
-        <div class="container mt-5">
-            <div class="row gap-3 d-flex justify-content-center">
-                <div class="col-9">
-                    <canvas id="myChart3" height="100"></canvas>
-                </div>
-                <div class="col-9">
-                    <canvas id="myChart4" height="100"></canvas>
-                </div>
-            </div>
-        </div>
+        
+        
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('reservation');
-            document.getElementById('restaurantId').addEventListener('change', getRestaurant);
-            document.getElementById('setReserveCenterbtn').addEventListener('click', setReserveCenter);
-            
-            getReserveSum()
-            getReserveMonth()
-            
+            document.getElementById('showRestaurantReserveBtn').addEventListener('click', getRestaurantReserve);
+            getRestaurantReserve();
         });
+        
+        function getRestaurantReserve() {
+            let restaurantId = document.getElementById('restaurantId').value;
+            let checkDate = document.getElementById('checkDate').value;
 
-        function setReserveCenter() {
-            const restaurantId = document.getElementById('restaurantId').value;
-            const reservePercent = document.getElementById('reservePercent').value;
-            const reserveTimeScale = document.getElementById('reserveTimeScale').value;
-
-            let params = {
-                restaurantId: restaurantId,
-                reservePercent: reservePercent,
-                reserveTimeScale: reserveTimeScale
+            if (!checkDate) {
+                let today = new Date();
+                checkDate = today.toISOString().split('T')[0]; // 格式化為 YYYY-MM-DD
             }
-
-            axios.put("http://localhost:8080/SpanTasty/reserve/setReserveCenter", params)
+            axios.get(`http://localhost:8080/SpanTasty/reserve/reserveCenter/api/${restaurantId}?checkDate=${checkDate}`)
             .then(res => {
-                console.log(res.data)
-                alert("訂位參數修改成功!")
-                document.getElementById('restaurantId').value = '';
-                document.getElementById('reservePercent').value = '';
-                document.getElementById('reserveTimeScale').value = '';
-            })
-            .catch(err => {
-                console.error(err);
-                alert("訂位參數修改失敗，請稍後再試")
-            })
-        }
-
-        function getRestaurant() {
-            const restaurantId = document.getElementById('restaurantId').value;
-
-            axios.get(`http://localhost:8080/SpanTasty/restaurant/getapi/${restaurantId}`)
-            .then(res => {
-                console.log(res.data)
-                document.getElementById('reservePercent').value = res.data.reservePercent;
-                document.getElementById('reserveTimeScale').value = res.data.reserveTimeScale;
+                console.log(res.data);
             })
             .catch(err => {
                 console.error(err);
             })
         }
+		
+		
 
-
-        // 查詢餐廳訂位訂單統計
-        function getReserveSum() {
-
-            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveSum`)
-            .then(res => {
-                console.log(res.data)
-                
-                
-	            // 將餐廳名稱和對應的訂位數量分別提取到 labels 和 data 陣列
-	            const labels = Object.keys(res.data); // 餐廳名稱
-	            const data = Object.values(res.data); // 訂位數量
-	
-	            // 更新圖表
-	            updateChart(myChart3, labels, data);
-	                
-	            })
-	            .catch(err => {
-	                console.error(err);
-	            })
-        }
-
-
-        // 查詢每月訂位訂單統計
-        function getReserveMonth() {
-            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveMonth`)
-                .then(res => {
-                    console.log(res.data);
-                    
-                    // 假設 res.data 是一個數組，包含每個月的訂位數量
-                    const data = res.data; // 訂位數量
-
-                    // 生成對應的月份標籤
-                    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-                    // 更新圖表
-                    updateChart(myChart4, labels, data); // 更新 myChart4
-                    
-                })
-                .catch(err => {
-                    console.error(err);
-                });
-        }
-        
-        
-        // 更新圖表的資料
-		function updateChart(chart, labels, data) {
-		    chart.data.labels = labels; // 更新餐廳名稱（x 軸）
-		    chart.data.datasets[0].data = data; // 更新訂位數量（y 軸）
-		    chart.update(); // 重新繪製圖表
-		}
-
-
-        const ctx3 = document.getElementById('myChart3').getContext('2d');
-        const myChart3 = new Chart(ctx3, {
-            type: 'bar',
-            data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                    label: '訂位狀況',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 柔和顏色
-                    borderColor: 'rgba(75, 192, 192, 1)', // 边框顏色
-                    borderWidth: 2,
-                    borderRadius: 5, // 圓角
-                    hoverBackgroundColor: 'rgba(75, 192, 192, 0.8)', // 懸停顏色
-                    hoverBorderColor: 'rgba(75, 192, 192, 1)', // 懸停邊框顏色
-                }]
-            },
-            options: {
-                responsive: true, // 自適應
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(200, 200, 200, 0.3)', // 網格顏色
-                        },
-                        title: {
-                            display: true,
-                            text: '訂位數量',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: '餐廳名稱',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            font: {
-                                size: 14,
-                                family: 'Arial',
-                                weight: 'bold'
-                            },
-                            boxWidth: 20 // 圖例方塊的寬度
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return tooltipItem.dataset.label + ': ' + tooltipItem.raw; // 自定義顯示數據標籤
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        const ctx4 = document.getElementById('myChart4').getContext('2d');
-        const myChart4 = new Chart(ctx4, {
-            type: 'line',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                datasets: [{
-                    label: '訂位狀況',
-                    data: [10, 20, 15, 25, 30],
-                    fill: false,
-                    borderColor: 'rgba(75, 192, 192, 1)', // 線條顏色
-                    borderWidth: 2,
-                    pointBackgroundColor: 'rgba(75, 192, 192, 1)', // 點的背景顏色
-                    pointBorderColor: '#fff', // 點的邊框顏色
-                    pointBorderWidth: 2, // 點的邊框寬度
-                    pointRadius: 5, // 點的半徑
-                    pointHoverRadius: 7, // 懸停時點的半徑
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(200, 200, 200, 0.3)',
-                        },
-                        title: {
-                            display: true,
-                            text: '訂位狀況',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: '月份',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            font: {
-                                size: 14,
-                                family: 'Arial',
-                                weight: 'bold'
-                            },
-                            boxWidth: 20
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
-                            }
-                        }
-                    }
-                }
-            }
-        });
 
 
 
