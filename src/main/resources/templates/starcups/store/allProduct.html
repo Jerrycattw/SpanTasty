@@ -30,7 +30,7 @@
     <div th:replace="~{starcups/display/navbar}"></div>
 
     <!-- Cart Icon -->
-   <form th:action="@{/StarCups/cartDetail(shoppingId=${session['shoppingId']})}" method="get" style="display: inline;">
+   <form th:action="@{/StarCups/cartDetail(shoppingId=${session['shoppingId']})}" method="post" style="display: inline;">
 
         <button type="submit" style="border: none; background: none;">
             <i class="fa-solid fa-cart-plus cart-icon"></i>
