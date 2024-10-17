@@ -32,6 +32,14 @@
     html.lt-ie-10 .ie-panel {
       display: block;
     }
+
+    #cartContainer {
+      display: none;
+    }
+
+    #cartContainer.active {
+      display: block;
+    }
   </style>
 </head>
 
@@ -73,7 +81,7 @@
       <div class="container">
         <div class="row row-90 row-fix justify-content-center">
           <div class="col-lg-8 col-xl-9">
-             <div class="product-top-panel group-lg">
+            <div class="product-top-panel group-lg">
               <div class="product-top-panel-title">Showing 1–12 of 18 results</div>
               <div class="product-top-panel-select">
                 <!--Select 2-->
@@ -84,16 +92,91 @@
                   <option value="3">Sort by rating</option>
                 </select>
               </div>
+              <!-- 購物車 -->
+              <div class="rd-navbar-basket-wrap">
+                <div>
+                  <button id="cartIcon" class="rd-navbar-basket rd-navbar-basket-mobile fl-bigmug-line-shopping198"
+                    data-rd-navbar-toggle=".cart-inline">
+                    <!-- 動態更新數量 -->
+                    <span id="showCartAmount"></span></button>
+                </div>
+                <div class="cart-inline toggle-original-elements" id="cartContainer">
+                  <!-- 動態插入資訊 -->
+                  <div class="cart-inline-header" id="cartHeaderContainer">
+                    <h5 class="cart-inline-title">In cart: <span id="showAmount">0</span> Products</h5>
+                    <h6 class="cart-inline-title">Total price: <span id="showTotalPrice">$524</span></h6>
+                  </div>
+                  <div class="cart-inline-body">
+                    <!-- 動態插入購物車內容 -->
+                    <div class="cart-inline-item" id="cartItemsContainer">
+                      <div class="unit align-items-center">
+                        <div class="unit-left">
+                          <div>
+                            <a href="single-product.html">
+                              <img src="/SpanTasty/upload/order/americano.jpeg" alt="" width="100" height="100" /></a>
+                          </div>
+                        </div>
+                        <div class="unit-body">
+                          <h6 class="cart-inline-name"><a href="single-product.html">Burdur Pearl</a></h6>
+                          <div>
+                            <div class="group-xs group-middle-2">
+                              <div class="table-cart-stepper">
+                                <div class="stepper">
+                                  <input id="amountInput" class="form-input stepper-input" type="number"
+                                    data-zeros="true" value="1" min="1" max="1000" />
+                                  <span id="increaseBtn" class="stepper-arrow up"></span>
+                                  <span id="decreaseBtn" class="stepper-arrow down"></span>
+                                </div>
+                              </div>
+                              <h6 class="cart-inline-title" id="itemPrice">$289</h6>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="cart-inline-footer">
+                    <div class="group-sm">
+                      <a class="button button-md button-default-outline button-wapasha" href="cart-page.html">Go to
+                        cart</a>
+                      <a class="button button-md button-secondary button-pipaluk" href="checkout.html">Checkout</a>
+                    </div>
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+
+            <div class="isotope-filters isotope-filters-horizontal">
+              <button
+                class="isotope-filters-toggle button button-md button-icon button-icon-right button-default-outline button-wapasha"
+                data-custom-toggle="#isotope-1" data-custom-toggle-hide-on-blur="true"><span
+                  class="icon fa fa-caret-down"></span>Filter</button>
+              <ul class="isotope-filters-list" id="isotope-1">
+                <li><a class="active" href="#" data-isotope-filter="*" data-isotope-group="gallery">全部</a></li>
+                <li th:each="kind : ${foodKindList}">
+                  <a href="#" th:attr="data-isotope-filter='Type ' + ${kind.foodKindId}" data-isotope-group="gallery"
+                    th:text="${kind.foodKindName}"></a>
+                </li>
+              </ul>
             </div>
             <!-- 點餐 -->
-            <div class="row row-lg row-40">
+            <div class="row row-lg row-40" id="menuContainer">
               <!-- 單一餐點顯示框 -->
-              <div class="col-sm-6 col-md-4" th:each="food : ${foodList}">
+              <div class="col-sm-6 col-md-4 " th:attr="data-filter='Type ' + ${food.foodKind.foodKindId}"
+                th:each="food : ${foodList}">
                 <!-- Product-->
                 <article class="product">
-                  <div class="product-figure"><img th:src="${food.foodPicture}" th:alt="${food.foodName}" width="270" height="280" />
-                    <div class="product-button"><a class="button button-md button-white button-ujarak"
-                        href="#">Add to cart</a></div>
+                  <div class="product-figure"><img th:src="${food.foodPicture}" th:alt="${food.foodName}" width="270"
+                      height="280" />
+                    <div class="product-button">
+                      <input type="hidden" class="foodId" th:value="${food.foodId}" />
+
+                      <button class="button button-md button-white button-ujarak addToCartBtn">Add to cart</button>
+                    </div>
+
                   </div>
                   <h5 class="product-title"><a th:text="${food.foodName}" href="#"></a></h5>
                   <div class="product-price-wrap">
@@ -101,9 +184,9 @@
                   </div>
                 </article>
               </div>
-              
+
             </div>
-            
+
             <div class="pagination-wrap">
               <!-- Bootstrap Pagination-->
               <nav aria-label="Page navigation">
@@ -131,15 +214,15 @@
               </div>
             </form>
              -->
-             <!-- 查詢輸入框 -->
+            <!-- 查詢輸入框 -->
             <div class="form-search rd-search form-product-search">
               <div class="form-wrap">
                 <label class="form-label" for="search-form">Search..</label>
                 <input class="form-input" id="nameSearch" type="text" name="s" autocomplete="off">
-                <button class="button-search fl-bigmug-line-search74" id="nameSerchBtn"></button>
+                <button class="button-search fl-bigmug-line-search74" id="nameSearchBtn"></button>
               </div>
             </div>
-            
+
             <div class="row row-lg row-50 product-sidebar">
               <div class="col-md-6 col-lg-12">
                 <h5>Popular categories</h5>
@@ -371,12 +454,246 @@
   <div class="snackbars" id="form-output-global"></div>
   <!-- footer th:replace -->
   <div th:replace="~{starcups/display/footer}"></div>
-  
-  <!-- 名稱搜尋 -->
+
   <script>
-    
+    document.addEventListener("DOMContentLoaded", function () {
+
+      // 名稱搜尋
+      document.getElementById("nameSearchBtn").addEventListener("click", function () {
+        getMenuByName();
+      })
+
+      // 顯示購物車內容
+      document.getElementById("cartIcon").addEventListener("click", function () {
+        console.log("購物車圖示被點擊");
+        document.getElementById("cartContainer").classList.toggle("active");
+        // displayCartItems();
+      });
+
+      reloadCartItems(); // 頁面加載時載入購物車
+      // const inputField = document.getElementById("amountInput");
+      // //購物車數量增加
+      // document.getElementById("increaseBtn").addEventListener("click", function () {
+      //   console.log("增加")
+      //   updateQuantity(cartItem.foodId, 1);
+      //   // let currentValue = parseInt(inputField.value);
+      //   // if (currentValue < parseInt(inputField.max)) {
+      //   //   inputField.value = currentValue + 1;
+      //   // }
+      // });
+
+      // //購物車數量減少
+      // document.getElementById("decreaseBtn").addEventListener("click", function () {
+      //   console.log("減少")
+      //   updateQuantity(cartItem.foodId, -1);
+      //   // let currentValue = parseInt(inputField.value);
+      //   // if (currentValue > parseInt(inputField.min)) {
+      //   //   inputField.value = currentValue - 1;
+      //   // }
+      // });
+
+      const addToCartButtons = document.querySelectorAll(".addToCartBtn");
+      // 加入購物車
+      addToCartButtons.forEach(button => {
+        button.addEventListener("click", function () {
+          // 取得與當前按鈕相鄰的隱藏 input (foodId)
+          const foodId = this.previousElementSibling.value;
+
+          // 顯示 foodId 或進行其他操作
+          console.log("加入購物車的餐點 ID:", foodId);
+
+          addToCartById(foodId)
+        });
+      });
+
+
+    })
+
+    function getMenuByName() {
+      const foodName = document.getElementById("nameSearch").value;
+      if (!foodName) {
+        alert("請輸入餐點名稱！");
+        return;
+      }
+      const params = {
+        foodName: foodName
+      };
+
+      axios.get('http://localhost:8080/SpanTasty/order/menu/name', { params })
+        .then(function (response) {
+          console.log(response.data)
+          const menuList = response.data;
+          const menuContainer = document.getElementById("menuContainer");
+
+          //清空結果
+          menuContainer.innerHTML = "";
+
+          //結果顯示
+          menuList.forEach(function (food) {
+            const menuItem = `
+          <div class="col-sm-6 col-md-4">
+            <article class="product">
+              <div class="product-figure">
+                <img src="${food.foodPicture}" alt="${food.foodName}" width="270" height="280" />
+                <div class="product-button">
+                  <input type="hidden" class="foodId" th:value="${food.foodId}" />
+                  <button class="button button-md button-white button-ujarak addToCartBtn">Add to cart</button>
+                </div>
+              </div>
+              <h5 class="product-title"><a href="#">${food.foodName}</a></h5>
+              <div class="product-price-wrap">
+                <div class="product-price">$${food.foodPrice}</div>
+              </div>
+            </article>
+          </div>
+        `;
+            menuContainer.insertAdjacentHTML("beforeend", menuItem);
+            document.getElementById("nameSearch").value = "";
+
+          })
+
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+
+    // 加入購物車
+    function addToCartById(foodId) {
+      axios.get(`http://localhost:8080/SpanTasty/order/menu/${foodId}`)
+        .then(function (response) {
+          console.log(response.data)
+          const foodData = response.data;
+          // 建立新的購物車項目
+          const cartItem = {
+            foodId: foodData.foodId,
+            foodName: foodData.foodName,
+            foodPicture: foodData.foodPicture,
+            foodPrice: foodData.foodPrice,
+            quantity: 1 // 默認數量為 1
+          };
+          // 保存到 localStorage
+          saveCartItemToLocalStorage(cartItem);
+          // 更新購物車顯示
+          addCartItemToDOM(cartItem);
+        })
+        .catch(function (error) {
+          console.error("加入購物車失敗:", error);
+        });
+    }
+
+    // 保存購物車項目到 LocalStorage
+    function saveCartItemToLocalStorage(cartItem) {
+      // 從 LocalStorage 中獲取現有的購物車數據
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      // 檢查購物車中是否已經有該商品
+      const existingItemIndex = cart.findIndex(item => item.foodId === cartItem.foodId);
+
+      if (existingItemIndex !== -1) {
+        // 如果已有該商品，則增加數量
+        cart[existingItemIndex].quantity += cartItem.quantity;
+      } else {
+        // 如果沒有該商品，則新增一個
+        cart.push(cartItem);
+      }
+
+      // 將更新後的購物車數據保存回 LocalStorage
+      localStorage.setItem('cart', JSON.stringify(cart));
+
+      // 更新購物車顯示
+      updateCartDisplay(cart);
+    }
+
+    // 動態更新購物車數量和總價
+    function updateCartDisplay(cart) {
+      const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+      const totalPrice = cart.reduce((acc, item) => acc + item.foodPrice * item.quantity, 0);
+
+      // 更新顯示購物車圖示上的數量
+      document.getElementById("showCartAmount").textContent = totalItems;
+      // 更新購物車內 In cart 的數量
+      document.getElementById("showAmount").textContent = totalItems;
+      // 更新總價
+      document.getElementById("showTotalPrice").textContent = `$${totalPrice}`;
+    }
+
+    // 更新購物車商品數量
+    function updateQuantity(foodId, delta) {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const item = cart.find(i => i.foodId === foodId);
+
+      if (item) {
+        // 更新商品數量
+        let newQuantity = item.quantity + delta;
+        if (newQuantity >= 1 && newQuantity <= 1000) {
+          item.quantity = newQuantity;
+          localStorage.setItem('cart', JSON.stringify(cart));
+
+          // 更新數量顯示
+          document.getElementById(`amountInput-${foodId}`).value = item.quantity;
+
+          // 重新計算並更新總價和數量
+          updateCartDisplay(cart);
+        }
+      }
+    }
+
+    // 將購物車項目動態添加到 DOM
+    function addCartItemToDOM(cartItem) {
+      const cartItemHtml = `
+      <div class="cart-inline-item" id="cartItem-${cartItem.foodId}">
+        <div class="unit align-items-center">
+          <div class="unit-left">
+            <a href="single-product.html"><img src="${cartItem.foodPicture}" alt="" width="100" height="100" /></a>
+          </div>
+          <div class="unit-body">
+            <h6 class="cart-inline-name"><a href="single-product.html">${cartItem.foodName}</a></h6>
+            <div>
+              <div class="group-xs group-middle-2">
+                <div class="table-cart-stepper">
+                  <div class="stepper">
+                    <input id="amountInput-${cartItem.foodId}" class="form-input stepper-input" type="number" value="${cartItem.quantity}" min="1" max="1000" />
+                    <span class="stepper-arrow up" id="increaseBtn-${cartItem.foodId}" data-id="${cartItem.foodId}"></span>
+                    <span class="stepper-arrow down" id="decreaseBtn-${cartItem.foodId}" data-id="${cartItem.foodId}"></span>
+                  </div>
+                </div>
+                <h6 class="cart-inline-title" id="itemPrice">$${cartItem.foodPrice}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+      const cartContainer = document.getElementById("cartItemsContainer");
+      cartContainer.insertAdjacentHTML("beforeend", cartItemHtml);
+
+      // 綁定數量增加事件
+      document.getElementById(`increaseBtn-${cartItem.foodId}`).addEventListener("click", function () {
+        console.log("數量增加")
+        updateQuantity(cartItem.foodId, 1);
+      });
+
+      // 綁定數量減少事件
+      document.getElementById(`decreaseBtn-${cartItem.foodId}`).addEventListener("click", function () {
+        console.log("數量減少")
+        updateQuantity(cartItem.foodId, -1);
+      });
+    }
+
+    // 頁面加載時初始化購物車內容
+    function reloadCartItems() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const cartContainer = document.getElementById("cartItemsContainer");
+      cartContainer.innerHTML = ''; // 清空現有的購物車項目
+      cart.forEach(item => {
+        addCartItemToDOM(item);
+      });
+      updateCartDisplay(cart); // 初始化顯示
+    }
+
   </script>
-  
+
   <!-- Javascript-->
   <script src="/SpanTasty/starcups/js/core.min.js"></script>
   <script src="/SpanTasty/starcups/js/script.js"></script>
