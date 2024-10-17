@@ -25,6 +25,6 @@ public interface TablewareRepository extends JpaRepository<Tableware, Integer> {
 	Integer countTableware();
 	
 	
-	@Query(value = "SELECT tableware_deposit FROM tableware WHERE tableware_id= :tableware_id", nativeQuery = true)
-	Integer findTablewareDeposit();
+	@Query(value = "SELECT tableware_deposit FROM tableware WHERE tableware_id= :tablewareId", nativeQuery = true)
+	Integer findTablewareDeposit(Integer tablewareId);
 }
