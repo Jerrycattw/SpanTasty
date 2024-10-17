@@ -102,6 +102,8 @@ public class GoogleOauthService {
         String email = (String) userInfo.get("email");
         String googleId = (String) userInfo.get("sub");  // Google 的唯一用戶 ID
         String name = (String) userInfo.get("name");
+        String birthday = (String) userInfo.get("birthday");  // 獲取用戶的生日
+        
 
         // 檢查用戶是否已經存在
         Member existingMember = memberRepository.findByProviderId(googleId);
@@ -113,6 +115,7 @@ public class GoogleOauthService {
             newMember.setEmail(email);
             newMember.setMemberName(name);
             newMember.setProvider("Google");
+            newMember.setStatus('A');
             newMember.setProviderId(googleId);
             newMember.setRegisterDate(LocalDate.now());
 
