@@ -96,7 +96,7 @@ public class ReserveService {
 	}
 	
 	
-	// 查詢所有訂位
+	// 查詢會員所有訂位
 	public List<Reserve> findByMember(Member member) {
 		return reserveRepository.findByMemberOrderByReserveTimeDesc(member);
 	}
@@ -106,6 +106,12 @@ public class ReserveService {
 	// 查詢訂位by可變條件
 	public List<Reserve> findReserveByCriteria(String memberName, String phone, Integer restaurantId, String tableTypeId, LocalDateTime reserveTimeStart, LocalDateTime reserveTimeEnd){
 		return reserveRepository.findReserveByCriteria(memberName, phone, restaurantId, tableTypeId, reserveTimeStart, reserveTimeEnd);
+	}
+	
+	
+	// 查詢餐廳某日所有訂位
+	public List<Reserve> findReserveByRestaurantAndDate(Integer restaurantId, LocalDate checkDate){
+		return reserveRepository.findReserveByRestaurantAndDate(restaurantId, checkDate);
 	}
 	
 	
