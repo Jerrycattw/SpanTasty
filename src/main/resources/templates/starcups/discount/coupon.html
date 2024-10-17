@@ -83,11 +83,11 @@
               <!-- Nav tabs-->
               <ul class="nav nav-tabs">
                 <li class="nav-item" role="presentation"><a class="nav-link active" href="#tabs-3-1"
-                    data-bs-toggle="tab" id="tabsAll">全部(1)</a></li>
+                    data-bs-toggle="tab" id="tabsAll">全部(0)</a></li>
                 <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-2" data-bs-toggle="tab"
-                    id="tabsShop">商城</a></li>
+                    id="tabsShop">商城(0)</a></li>
                 <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-3" data-bs-toggle="tab"
-                    id="tabsTogo">訂餐</a></li>
+                    id="tabsTogo">訂餐(0)</a></li>
               </ul>
               <!-- Tab panes-->
               <div class="tab-content">
@@ -328,6 +328,18 @@
 
     function htmlMaker(coupons, area, tab) {
       const couponDiv = document.getElementById(area)
+      console.log(coupons);
+      
+      if(coupons.length===0){
+        couponDiv.innerHTML=`
+          <div class="d-flex justify-content-center">
+            <span class="h6 quote-creative-cite">目前沒有可用的優惠券。</span>
+          </div>  `
+        return
+      }
+
+      
+
       let count = 0;
       couponDiv.innerHTML = ''
       coupons.forEach(coupon => {
@@ -363,6 +375,8 @@
           document.getElementById(tab).innerHTML = `訂餐(${count})`
           break;
       }
+
+      
     }
   </script>
 </body>

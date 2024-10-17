@@ -51,7 +51,7 @@ public class StarCupsPointController {
 		return JsonMap;
 	}
 	
-	@GetMapping("/point/showAll")
+	@GetMapping("/point/showPage")
 	@ResponseBody
 	public Page<Point> showAllPointPage(@RequestParam Integer memberId,@RequestParam(value = "p") Integer pageNumber) {
 		Page<Point> starCupsPoint = pointService.StarCupsPoint(memberId,pageNumber);//點數紀錄				
@@ -60,11 +60,26 @@ public class StarCupsPointController {
 	
 	@GetMapping("/point/showGet")
 	@ResponseBody
+	public Map<String, Object> showGetPoint(@RequestParam Integer memberId) {
+//		Page<Point> starCupsPoint = pointService.StarCupsPointGet(memberId,0);//點數紀錄				
+//		return starCupsPoint;
+		PointMemberDTO pointMember = pointService.getPointMember(memberId);//彙總點數
+		Integer pointMemberTotalPoint = pointService.getPointMemberExpiryPoint(memberId);//未含過期總點數
+		Page<Point> starCupsPoint = pointService.StarCupsPointGet(memberId,0);//點數紀錄
+		
+		Map<String, Object> JsonMap = new HashMap<String,Object>();		
+		JsonMap.put("pointMember", pointMember);
+		JsonMap.put("pointMemberTotalPoint", pointMemberTotalPoint);
+		JsonMap.put("pointsById", starCupsPoint);
+		
+		return JsonMap;
+	}
+	
+	@GetMapping("/point/showGetPage")
+	@ResponseBody
 	public Page<Point> showGetPointPage(@RequestParam Integer memberId,@RequestParam(value = "p") Integer pageNumber) {
 		Page<Point> starCupsPoint = pointService.StarCupsPointGet(memberId,pageNumber);//點數紀錄				
 		return starCupsPoint;
 	}
-	
-	
 
 }
