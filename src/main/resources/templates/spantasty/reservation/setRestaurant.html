@@ -17,7 +17,7 @@
 <!-- 主要內容區域 -->
 <div class="content">
 
-    <h2 class="text-center text-warning-emphasis">餐 廳 資 料</h2>
+    <h2 class="text-center text-warning-emphasis mt-5">修 改 餐 廳 資 料</h2>
 
     <form th:method="PUT" th:action="@{/restaurant/setPut}" enctype="multipart/form-data">
     <div class="row justify-content-center restaurant-info">
@@ -34,6 +34,7 @@
                       <input name="restaurantId" type="hidden" th:value="${restaurant.restaurantId}">
                       <input name="reservePercent" type="hidden" th:value="${restaurant.reservePercent}">
                       <input name="reserveTimeScale" type="hidden" th:value="${restaurant.reserveTimeScale}">
+                      <!-- <input name="restaurantStatus" type="hidden" th:value="${restaurant.restaurantStatus}">  -->
                       
                       <label class="form-label mb-0">餐廳名稱 :</label><span style="float: right;" id="rnamespan"></span>
                       <input name="restaurantName" type="text" id="rname" class="form-control text-dark mb-1" th:value="${restaurant.restaurantName}">
@@ -55,7 +56,6 @@
 
                       <label class="form-label mb-0">餐廳描述 :</label>
                       <textarea name="restaurantDesc" class="form-control text-dark mb-1" th:text="${restaurant.restaurantDesc}"></textarea>
-					  
 					  
 					  <label>餐廳狀態 :</label>
 					   <input type="radio" name="restaurantStatus" value="1" th:checked="${restaurant.restaurantStatus == 1}"> 營業中

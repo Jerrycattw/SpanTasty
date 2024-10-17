@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,12 +39,14 @@ public class TablewareStock implements Serializable {
 	
 	
 //	@MapsId("tablewareId")
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tableware_id", insertable = false, updatable = false)
 	private Tableware tableware;
 	
 	
 //	@MapsId("restaurantId")
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "restaurant_id", insertable = false, updatable = false)
 	private Restaurant restaurant;

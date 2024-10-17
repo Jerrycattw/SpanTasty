@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,12 +80,37 @@ public class StarCupsController {
     	return "starcups/reservation/allRestaurantPage";
     }
 	
-    
+    // 導向到單一餐廳頁面
     @GetMapping("/restaurant/{id}")
     public String getRestaurant(Model model, @PathVariable(name = "id") Integer restaurantId) {
         Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
         model.addAttribute("restaurant", restaurant);
         return "starcups/reservation/restaurantPage";
+    }
+    
+    // 導向到訂位紀錄頁面
+    @GetMapping("/reserveRecord")
+    public String reserveRecord() {
+    	return "starcups/reservation/reserveRecordPage";
+    }
+    
+    // 導向到訂位紀錄頁面
+    @GetMapping("/get/reserveRecord")
+    public ResponseEntity<?> getReserveRecord(@RequestHeader("Authorization") String token) {
+    	
+	    // 解析 JWT token 取得 claims
+	    Map<String, Object> claims = JwtUtil.parseToken(token);
+
+	    // 取得會員 ID
+	    Integer memberId = (Integer) claims.get("memberId");
+	    if (memberId == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("無法從 Token 中取得會員 ID");
+	    
+	    Member member = memberService.findMemberById(memberId).orElse(null);
+        if (member == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Member not found");
+        
+        List<Reserve> reserves = reserveService.findByMember(member);
+    	
+    	return ResponseEntity.ok(reserves);
     }
     
     
@@ -131,7 +157,11 @@ public class StarCupsController {
             
             // 寄訂位成功信
 //            reserveService.sendMail(member.getMemberName(), "spantasty@gmail.com");
-            reserveService.sendMail(reserve);
+            try {
+            	reserveService.sendMail(reserve);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
             
             // 回傳成功訊息和狀態碼201 (Created)
             return ResponseEntity.status(HttpStatus.CREATED).body("Reserve added successfully");

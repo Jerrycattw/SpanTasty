@@ -66,6 +66,12 @@ public class TablewareStockService {
 	public List<TablewareStock> findStockByTablewareId(Integer tablewareId) {
 		return tablewareStockRepository.findByTablewareId(tablewareId);
 	}
+	
+	
+	//
+	public List<TablewareStock> findStockByRestaurantId(Integer restaurantId) {
+		return tablewareStockRepository.findByRestaurantId(restaurantId);
+	}
 
 	
 //	查詢所有庫存(Page)

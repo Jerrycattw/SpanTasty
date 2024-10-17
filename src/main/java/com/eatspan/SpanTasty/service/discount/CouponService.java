@@ -31,6 +31,7 @@ import com.eatspan.SpanTasty.entity.discount.CouponMemberId;
 import com.eatspan.SpanTasty.entity.discount.CouponSchedule;
 import com.eatspan.SpanTasty.entity.discount.Tag;
 import com.eatspan.SpanTasty.entity.discount.TagId;
+import com.eatspan.SpanTasty.repository.account.MemberRepository;
 import com.eatspan.SpanTasty.repository.discount.CouponMemberRepository;
 import com.eatspan.SpanTasty.repository.discount.CouponRepository;
 import com.eatspan.SpanTasty.repository.discount.CouponScheduleRepository;
@@ -63,6 +64,9 @@ public class CouponService {
 	
 	@Autowired
 	private ProductTypeRepository productTypeRepo;
+	
+	@Autowired
+	private MemberRepository memberRepo;
 	
 	@Autowired
 	private MailConfig mailConfig;// javaMail要注入----------------------------
@@ -327,5 +331,46 @@ public class CouponService {
 	    }
 
 	    return results;
+	}
+	
+	
+	public Boolean canGetCoupon(Integer memberId,String couponCode) {		
+		 Coupon coupon = CouponRepo.findByCouponCode(couponCode);
+		    if (coupon == null) {
+		        return false;
+		    }
+
+		    CouponMember couponMember = couponMemberRepo.findByMemberIdAndCouponId(memberId, coupon.getCouponId());
+		    
+		    // 最大優惠券數量
+		    Integer couponMaxAmount = coupon.getMaxCoupon();
+		    if (couponMaxAmount != null) {
+		        int couponReceivedAmount = coupon.getCouponMember().stream()
+		            .mapToInt(CouponMember::getTotalAmount)
+		            .sum();
+		        if (couponReceivedAmount >= couponMaxAmount) {
+		            return false;
+		        }
+		    }
+
+		    // 每人限制數量
+		    Integer couponPerMaxAmount = coupon.getPerMaxCoupon();
+		    if (couponPerMaxAmount != null && couponMember != null) {
+		        int perAmount = couponMember.getTotalAmount();
+		        if (perAmount >= couponPerMaxAmount) {
+		            return false;
+		        }
+		    }		    		   
+		    return true;
+	}
+	
+	public void getCoupon(Integer memberId,String couponCode) {
+		Coupon coupon = CouponRepo.findByCouponCode(couponCode);
+		CouponMemberId couponMemberId = new CouponMemberId(coupon.getCouponId(), memberId);
+		Optional<CouponMember> optional = couponMemberRepo.findById(couponMemberId);
+		CouponMember couponMember = optional.orElseGet(() -> new CouponMember(couponMemberId, 0, 0));
+		couponMember.incrementAmounts();
+		couponMemberRepo.save(couponMember);
+		
 	}
 }

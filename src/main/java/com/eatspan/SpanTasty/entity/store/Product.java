@@ -2,6 +2,8 @@ package com.eatspan.SpanTasty.entity.store;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,6 +58,7 @@ public class Product {
 		@JoinColumn(name="product_type_id")
 		private ProductType productType;
 		
+		@JsonIgnore
 	    @OneToMany(fetch= FetchType.LAZY, cascade=CascadeType.ALL, mappedBy = "product")
 	    private List<ShoppingItem> items;
 	

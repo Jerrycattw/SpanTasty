@@ -151,9 +151,11 @@ public class PointController {
 	@GetMapping("/member/{memberId}")
 	public String getPointsMember(@PathVariable Integer memberId, Model model) {
 		model.addAttribute("point_pointMember", memberId);//
+		
 		PointMemberDTO pointMember = pointService.getPointMember(memberId);
 		Integer pointMemberTotalPoint = pointService.getPointMemberExpiryPoint(memberId);
 		List<Point> pointsById = pointService.getAllRecord(memberId);
+		
 		model.addAttribute("pointMember", pointMember);
 		model.addAttribute("pointMemberTotalPoint", pointMemberTotalPoint);
 		model.addAttribute("pointsById", pointsById);

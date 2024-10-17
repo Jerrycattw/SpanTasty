@@ -109,4 +109,10 @@ public class TablewareService {
 	            .filter(tableware -> tableware.getTablewareStatus() != 2) // 過濾掉 tablewareStatus == 2 的餐具
 	            .collect(Collectors.toList());
 	}
+	
+	
+	//
+	public Integer countTableware() {
+		return tablewareRepository.countTableware();
+	}
 }
