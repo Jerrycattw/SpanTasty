@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.chrono.MinguoChronology;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,9 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.metrics.StartupStep.Tags;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -31,6 +34,8 @@ import com.eatspan.SpanTasty.entity.discount.CouponMemberId;
 import com.eatspan.SpanTasty.entity.discount.CouponSchedule;
 import com.eatspan.SpanTasty.entity.discount.Tag;
 import com.eatspan.SpanTasty.entity.discount.TagId;
+import com.eatspan.SpanTasty.entity.store.ProductType;
+import com.eatspan.SpanTasty.entity.store.ShoppingItem;
 import com.eatspan.SpanTasty.repository.account.MemberRepository;
 import com.eatspan.SpanTasty.repository.discount.CouponMemberRepository;
 import com.eatspan.SpanTasty.repository.discount.CouponRepository;
@@ -333,7 +338,7 @@ public class CouponService {
 	    return results;
 	}
 	
-	
+	//會員領取優惠券判斷能不能領
 	public Boolean canGetCoupon(Integer memberId,String couponCode) {		
 		 Coupon coupon = CouponRepo.findByCouponCode(couponCode);
 		    if (coupon == null) {
@@ -364,6 +369,7 @@ public class CouponService {
 		    return true;
 	}
 	
+	//會員領取優惠券
 	public void getCoupon(Integer memberId,String couponCode) {
 		Coupon coupon = CouponRepo.findByCouponCode(couponCode);
 		CouponMemberId couponMemberId = new CouponMemberId(coupon.getCouponId(), memberId);
@@ -372,5 +378,57 @@ public class CouponService {
 		couponMember.incrementAmounts();
 		couponMemberRepo.save(couponMember);
 		
+	}
+	
+	//結帳判斷優惠券
+	public List<CouponMember> couponCanUse(List<ShoppingItem> shoppingItems,Integer totalAmount, Integer memberId){
+		//購物車明細的種類 productNames
+		List<String> productNames = shoppingItems.stream()
+				.map(shoppingItem->shoppingItem.getProduct().getProductType().getProductTypeName())
+				.collect(Collectors.toList());
+
+		//取得會員擁有優惠券 coupons
+		List<CouponMember> couponMembers = couponMemberRepo.findByMemberId(memberId);
+
+		//判斷每個優惠券是否可以使用   1.低消 2.是否包含一種購物車明細的種類
+		couponMembers.stream().forEach(couponMember->{
+			Coupon coupon = couponMember.getCoupon();
+			
+			//1.低消判斷(null表示無限制)
+			//2.下架不能用
+			//3.過期
+			Integer minOrderDiscount = coupon.getMinOrderDiscount()==null ? 0:coupon.getMinOrderDiscount();
+			if((totalAmount<=minOrderDiscount && minOrderDiscount!=null) ||  
+					coupon.getCouponStatus()=="下架" ||
+					coupon.getCouponEndDate().isBefore(LocalDate.now()) ) {
+				couponMember.setCanUse(false);
+				return;
+			}
+			
+			//去得優惠券的tags
+			List<String> couponTagNames = coupon.getTags().stream()
+				.filter(tag->"product".equals(tag.getTagId().getTagType()))
+				.map(tag->tag.getTagId().getTagName())
+				.collect(Collectors.toList());		
+					
+			//有標籤>是否包含一種購物車明細的種類>true 可折扣
+			boolean canUseCoupon = couponTagNames.stream().anyMatch(productNames::contains);
+			if(canUseCoupon) {
+				couponMember.setCanUse(true);
+				return;
+			}
+			//無標籤>無折扣限制
+			if(coupon.getTags().isEmpty()) {
+				couponMember.setCanUse(true);
+				return;
+			}
+			couponMember.setCanUse(false);
+		});	
+		
+		List<CouponMember> couponMemberCanUse = couponMembers.stream()
+			.filter(couponMember->couponMember.getCanUse()==true)
+			.collect(Collectors.toList());
+		
+		return couponMemberCanUse;
 	}
 }

@@ -81,6 +81,9 @@ public class Coupon implements Serializable {
 	@Transient
 	private Integer receivedAmount;
 	
+	@Transient
+	private Boolean canUse;
+	
 	@OneToMany(fetch = FetchType.LAZY,cascade=CascadeType.ALL,mappedBy = "coupon",orphanRemoval=true)
 	private List<Tag> tags=new ArrayList<Tag>();	
 	

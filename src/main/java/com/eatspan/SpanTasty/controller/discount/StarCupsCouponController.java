@@ -10,13 +10,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eatspan.SpanTasty.dto.store.ShoppingItemDTO;
+import com.eatspan.SpanTasty.entity.discount.Coupon;
 import com.eatspan.SpanTasty.entity.discount.CouponMember;
+import com.eatspan.SpanTasty.entity.store.ShoppingItem;
 import com.eatspan.SpanTasty.service.discount.CouponMemberService;
 import com.eatspan.SpanTasty.service.discount.CouponService;
+import com.eatspan.SpanTasty.utils.account.JwtUtil;
 
 
 @Controller
@@ -56,4 +61,15 @@ public class StarCupsCouponController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("處理請求時發生錯誤，請稍後再試。");
 		}
 	}
+	
+	@PostMapping("/coupon/checkout")
+	@ResponseBody
+	public List<CouponMember> getMethodName(@RequestHeader(value = "Authorization") String token,@RequestBody ShoppingItemDTO shoppingItemDTO) {
+		Map<String, Object> claims = JwtUtil.parseToken(token);
+        Integer memberId = (Integer) claims.get("memberId"); 
+        
+        return couponService.couponCanUse(shoppingItemDTO.getShoppingItems(), shoppingItemDTO.getTotalAmount(), memberId);
+
+	}
+	
 }

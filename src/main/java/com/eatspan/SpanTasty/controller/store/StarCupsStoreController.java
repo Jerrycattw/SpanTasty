@@ -204,6 +204,13 @@ public class StarCupsStoreController {
 //	public String ecpayCheckout(HttpServletRequest request) {
 //	    return shoppingOrderService.ecpayCheckout(request);
 //	}
+	
+	@GetMapping("/findItem")
+	@ResponseBody
+	public List<ShoppingItem> findItemAjax(@RequestParam Integer shoppingId) {
+		return shoppingItemService.findShoppingItemById(shoppingId);
+	}
+	
 
 	@PostMapping("/ecpayCheckout")
 	@ResponseBody
