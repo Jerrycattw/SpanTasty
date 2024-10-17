@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+<head>
+<title>Rent</title>
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<!-- Stylesheets-->
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+<style>
+.ie-panel{
+    display: none;
+    background: #212121;
+    padding: 10px 0;
+    box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);
+    clear: both;
+    text-align:center;
+    position: relative;
+    z-index: 1;
+}
+
+html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
+    display: block;
+}
+
+p.global-primary.dark-primary.section-title::after {
+    content: '';
+    display: block;
+    width: 25px; /* 設定線條的寬度 */
+    height: 3px; /* 設定線條的高度 */
+    background-color: darkgrey; /* 設定線條的顏色 */
+    margin: 20px auto 0; /* 調整線條與文字之間的距離 */
+}
+
+.section-title {
+    font-size: 20px; /* 調整文字大小 */
+    color: #333; /* 調整文字顏色 */
+    text-align: center; /* 文字居中 */
+    font-weight: bold;
+}
+
+.Grid-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 讓每個項目占據最少250px寬度，並自動填充 */
+    gap: 20px; /* 產品之間的間距 */
+}
+
+.Grid-products-item {
+    padding: 10px;
+    border-radius: 8px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.Grid-products-item:hover {
+    transform: translateY(-5px); /* 在懸停時使產品項目上移 */
+}
+</style>
+</head>
+<body>
+<!-- navbar  th:replace=-->
+<div th:replace="~{starcups/display/navbar}" ></div>
+<!-- 選單下方圖片及連結 -->
+    <section class="section breadcrumbs-custom-inset">
+      <div class="breadcrumbs-custom context-dark">
+        <div class="container">
+          <h2 class="breadcrumbs-custom-title">Single Tableware</h2>
+          <ul class="breadcrumbs-custom-path">
+            <li><a href="/SpanTasty/StarCups">Home</a></li>
+            <li class="active">Single Tableware</li>
+          </ul>
+        </div>
+        <!-- 圖片-->
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+      </div>
+    </section>
+	
+<section class="section pt-4 novi-bg novi-bg-img section-xl bg-default text-md-start">
+	<div class="container">
+	    <div class="row row-90 row-fix justify-content-center">
+	        <div class="Grid-item Grid-products-item" style="margin-bottom: 10px;">
+	            <p class="global-primary dark-primary section-title">
+	                <span> SINGLE  TABLEWARE </span>
+	            </p>
+	        </div>
+		</div>
+	</div>
+</section>
+<section class="section novi-bg novi-bg-img section-xl bg-default">
+        <div class="container">
+          <div class="row row-50">
+            <div class="col-lg-6">
+              <div class="slick-product">
+                <!-- Slick Carousel-->
+                <div class="slick-slider carousel-parent" data-swipe="true" data-items="1" data-child="#child-carousel" data-for="#child-carousel">
+                  <div class="item">
+                    <div class="slick-product-figure"><img th:src="${tableware.tablewareImage != null ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}" alt="" width="530" height="480"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="single-product">
+                <h3 th:text="${tableware.tablewareName}" ></h3>
+                <div class="group-md group-middle">
+                  <div class="single-product-price"><span>NT$</span><span th:text="${tableware.tablewareDeposit}"></span></div>
+                  <div class="box-rating"><span class="novi-icon icon fa fa-star"></span><span class="novi-icon icon fa fa-star"></span><span class="novi-icon icon fa fa-star"></span><span class="novi-icon icon fa fa-star"></span><span class="novi-icon icon fa fa-star-half-o"></span></div>
+                </div>
+                <p th:text="${tableware.tablewareDescription}"></p>
+                <div class="divider divider-30"></div>
+                <ul class="list list-description d-inline-block d-md-block">
+                  <li><span>材質:</span><span>鐵</span></li>
+                  <li><span>重量:</span><span>2 kg</span></li>
+                  <li><span>容量:</span><span>500 ml</span></li>
+                </ul>
+                <div class="group-sm group-middle">
+                  <div><a class="button button-secondary button-pipaluk" href="/SpanTasty/StarCups/rental/rent">查看庫存</a></div>
+                </div>
+                <div class="divider divider-40"></div>
+                <div class="group-md group-middle"><span class="social-title">Share</span>
+                  <div>
+                    <ul class="list-inline list-inline-sm social-list">
+                      <li><a class="novi-icon icon fa fa-facebook" href="#"></a></li>
+                      <li><a class="novi-icon icon fa fa-twitter" href="#"></a></li>
+                      <li><a class="novi-icon icon fa fa-google-plus" href="#"></a></li>
+                      <li><a class="novi-icon icon fa fa-instagram" href="#"></a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+         </div>
+	</section>
+
+
+<!-- Global Mailform Output-->
+ <div class="snackbars" id="form-output-global"></div>
+ <!-- footer  th:replace=-->
+ <div th:replace="~{starcups/display/footer}" ></div>
+ 
+<!-- Javascript-->
+<script src="/SpanTasty/starcups/js/core.min.js"></script>
+<script src="/SpanTasty/starcups/js/script.js"></script>
+
+  </body>
+</html>

@@ -6,14 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eatspan.SpanTasty.entity.rental.Rent;
 import com.eatspan.SpanTasty.entity.rental.RentItem;
 import com.eatspan.SpanTasty.repository.rental.RentItemRepository;
+import com.eatspan.SpanTasty.repository.rental.RentRepository;
 
 @Service
 public class RentItemService {
 	
 	@Autowired
 	private RentItemRepository rentItemRepository;
+	@Autowired
+	private TablewareService tablewareService;
+	@Autowired
+	private RentService rentService;
 	
 	
 	//新增訂單明細
@@ -95,6 +101,23 @@ public class RentItemService {
 	}
 	
 	
-	
+	//
+	public void addRentItemToOrder(Integer rentId, Integer tablewareId, Integer rentItemQuantity) {
+		RentItem rentItem = new RentItem();
+		rentItem.setRentId(rentId);
+		rentItem.setTablewareId(tablewareId);
+		rentItem.setRentItemQuantity(rentItemQuantity);
+		
+		Integer tablewareDeposit = tablewareService.findTablewareDeposit(tablewareId);
+		Integer rentItemDeposit = tablewareDeposit != null ? tablewareDeposit * rentItemQuantity : 0 ;
+		rentItem.setRentItemDeposit(rentItemDeposit);
+		rentItem.setReturnStatus(1);
+		rentItem.setReturnMemo("未歸還");
+		addRentItem(rentItem);
+		
+		Rent rent = rentService.findRentById(rentId);
+		rent.setRentDeposit(rentService.calculateTotalDeposit(rentId));
+		rentService.addRent(rent);
+	}
 	
 }
