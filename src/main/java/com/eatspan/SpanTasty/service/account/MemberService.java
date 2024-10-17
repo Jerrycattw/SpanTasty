@@ -74,6 +74,10 @@ public class MemberService {
 	public Optional<Member> findMemberById(Integer memberId) {
 		return memberRepository.findById(memberId);
 	}
+	
+    public List<Member> findMemberByShoppingId(Integer shoppingId) {
+        return memberRepository.findMemberByShoppingId(shoppingId);
+    }
 
 	// 登入方法
 	public Member login(String account, String rawPassword) {

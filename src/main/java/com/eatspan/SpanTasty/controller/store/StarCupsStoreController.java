@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.store.Product;
 import com.eatspan.SpanTasty.entity.store.ProductType;
 import com.eatspan.SpanTasty.entity.store.ShoppingItem;
@@ -51,25 +53,10 @@ public class StarCupsStoreController {
 	private ProductTypeService productTypeService;
 	
 	@Autowired
-	private HttpSession session;
-
+	private MemberService memberService;
 	
-	// 查詢單筆
-	@GetMapping("/cartDetail")
-	public String toShoppingItem(Model model) {
-		Integer shoppingId = (Integer) session.getAttribute("shoppingId");
-		ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
-		
-		model.addAttribute("shopping", shopping);
-		List<ShoppingItem> items = shoppingItemService.findShoppingItemById(shoppingId);
-		model.addAttribute("items", items);
-		List<Product> productList = productService.findAllProduct();
-		model.addAttribute("productList", productList);
-		Integer totalAmount = shoppingOrderService.calculateTotalAmount(shoppingId);
-		model.addAttribute("totalAmount", totalAmount);
-		System.out.println(shoppingId);
-		return "starcups/store/cartPage";
-	}
+	@Autowired
+	private HttpSession session;
 
 	
 	@GetMapping("/allProduct")
@@ -160,8 +147,80 @@ public class StarCupsStoreController {
 	    }
 	}
 
+
+	// 查詢單筆
+	@PostMapping("/cartDetail")
+	public String toShoppingItem(Model model) {
+		
+		Integer shoppingId = (Integer) session.getAttribute("shoppingId");
+		
+		 if (shoppingId == null) {
+		        return "starcups/store/page505"; // 
+		    }
 	
-   
-	
+		 ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+			model.addAttribute("shopping", shopping);
+			List<ShoppingItem> items = shoppingItemService.findShoppingItemById(shoppingId);
+			model.addAttribute("items", items);
+			List<Product> productList = productService.findAllProduct();
+			model.addAttribute("productList", productList);
+			Integer totalAmount = shoppingOrderService.calculateTotalAmount(shoppingId);
+			model.addAttribute("totalAmount", totalAmount);
+			System.out.println(shoppingId);
+			return "starcups/store/cartPage";
+			
+
+	}
+
+
+	@PostMapping("/checkOut")
+	public String checkOut(Model model) {
+		Integer shoppingId = (Integer) session.getAttribute("shoppingId");
+		ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+		
+		model.addAttribute("shopping", shopping);
+		List<ShoppingItem> items = shoppingItemService.findShoppingItemById(shoppingId);
+		model.addAttribute("items", items);
+		List<Product> productList = productService.findAllProduct();
+		model.addAttribute("productList", productList);
+		Integer totalAmount = shoppingOrderService.calculateTotalAmount(shoppingId);
+		model.addAttribute("totalAmount", totalAmount);
+		List<Member> members = memberService.findMemberByShoppingId(shoppingId);
+		model.addAttribute("members",members);
+		return "starcups/store/checkOut";
+	}
+
+
+//	@PostMapping("/checkOut")
+//	@ResponseBody
+//	public String checkOut(@RequestHeader(value = "Authorization") String token, Model model) {
+//	    try {
+//	        // 解析 JWT token 取得 claims
+//	        Map<String, Object> claims = JwtUtil.parseToken(token);
+//	        Integer memberId = (Integer) claims.get("memberId");
+//
+//	        // 根據 memberId 獲取會員資料
+//	        Optional<Member> optionalMember = memberService.findMemberById(memberId);
+//            Member member = optionalMember.get();
+//	        model.addAttribute("member", member);
+//
+//	        Integer shoppingId = (Integer) session.getAttribute("shoppingId");
+//	        ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+//	        
+//	        model.addAttribute("shopping", shopping);
+//	        List<ShoppingItem> items = shoppingItemService.findShoppingItemById(shoppingId);
+//	        model.addAttribute("items", items);
+//	        List<Product> productList = productService.findAllProduct();
+//	        model.addAttribute("productList", productList);
+//	        Integer totalAmount = shoppingOrderService.calculateTotalAmount(shoppingId);
+//	        model.addAttribute("totalAmount", totalAmount);
+//	        
+//	        return "starcups/store/checkOut";
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        return "starcups/store/error"; // 處理錯誤頁面
+//	    }
+//	}
+
 	
 }

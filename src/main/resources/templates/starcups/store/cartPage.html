@@ -42,8 +42,8 @@
                     <li class="active">Checkout</li>
                 </ul>
             </div>
-            <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
-        </div>
+             <div class="box-position novi-bg novi-bg-img" style="background-image: url(/images/store/bg-503.jpg);"></div>
+			</div>
     </section>
 
     <!-- Shopping Cart -->
@@ -99,7 +99,9 @@
                                 <h3 class="cart-product-price" id="totalPrice"><sup>$</sup><span th:text="${totalAmount}"></span></h3>
                             </div>
                         </div>
-                        <a class="button button-primary button-pipaluk" href="checkout.html">Proceed to checkout</a>
+                        <form th:action= "@{/StarCups/checkOut(shoppingId=${session['shoppingId']})}" method="post">
+                        	<button type="submit" class="button button-primary button-pipaluk" >Proceed to checkout</button>
+						</form>
                     </div>
                 </div>
             </div>

@@ -42,7 +42,8 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 
   Member findByProviderId(String googleId);
 
-
+  @Query("SELECT m FROM Member m JOIN ShoppingOrder s ON m.id = s.member.id WHERE s.id = :shoppingId")
+  List<Member> findMemberByShoppingId(@Param("shoppingId") Integer shoppingId);
     
 
 }
