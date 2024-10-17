@@ -1,6 +1,7 @@
 package com.eatspan.SpanTasty.service.store;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.SessionScope;
 
 import com.eatspan.SpanTasty.entity.store.Product;
 import com.eatspan.SpanTasty.entity.store.ShoppingItem;
@@ -17,10 +19,14 @@ import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
 import com.eatspan.SpanTasty.repository.store.ShoppingItemRepository;
 import com.eatspan.SpanTasty.repository.store.ShoppingOrderRepository;
 
+import ecpay.payment.integration.AllInOne;
+import ecpay.payment.integration.domain.AioCheckOutALL;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class ShoppingOrderService {
@@ -32,10 +38,14 @@ public class ShoppingOrderService {
 	@Lazy
 	private ShoppingItemService shoppingItemService;
 	
-	@Autowired ShoppingItemRepository shoppingItemRepo;
+	@Autowired 
+	ShoppingItemRepository shoppingItemRepo;
 	
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+	private HttpSession session;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -223,6 +233,54 @@ public class ShoppingOrderService {
 	    return null; 
 	}
 
+//	public String ecpayCheckout() {
+//
+//		AllInOne all = new AllInOne("");
+//
+//		AioCheckOutALL obj = new AioCheckOutALL();
+//		obj.setMerchantTradeNo("testCompany0004");
+//		obj.setMerchantTradeDate("2017/01/01 08:05:23");
+//		obj.setTotalAmount("50");
+//		obj.setTradeDesc("test Description");
+//		obj.setItemName("TestItem");
+//		// 交易結果回傳網址，只接受 https 開頭的網站，可以使用 ngrok
+////		obj.setReturnURL("<http://211.23.128.214:5000>");
+//		obj.setReturnURL("<http://localhost:8080/SpanTasty/StarCups>");
+//		obj.setNeedExtraPaidInfo("N");
+//		// 商店轉跳網址 (Optional)
+////		obj.setClientBackURL("<http://192.168.1.37:8080/>");
+//		obj.setClientBackURL("<http://localhost:8080/SpanTasty/StarCups>");
+//		String form = all.aioCheckOut(obj, null);
+//
+//		return form;
+//	}
+
+	
+
+	    // 取得購物訂單
+	    public String ecpayCheckout(Integer shoppingId) {
+	        // 获取当前时间
+	        String currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+	        
+	        // 计算总金额
+	        Integer totalAmount = calculateTotalAmount(shoppingId);
+
+	        // 设置 ECPay 结账信息
+	        AllInOne all = new AllInOne("");
+	        AioCheckOutALL obj = new AioCheckOutALL();
+//	        obj.setMerchantTradeNo(String.valueOf(shoppingId)); // 使用 shoppingId 作為交易編號
+	        obj.setMerchantTradeNo("Spend" + System.currentTimeMillis()); // 使用 shoppingId 作為交易編號
+	        obj.setMerchantTradeDate(currentDateTime); // 使用當前時間
+	        obj.setTotalAmount(String.valueOf(totalAmount)); // 使用總金額
+	        obj.setItemName("商品名稱"); // 可根據需要設定商品名稱
+	        obj.setTradeDesc("test Description");
+	        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/allProduct");
+	        obj.setNeedExtraPaidInfo("N");
+	        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/allProduct");
+
+	        // 生成 ECPay 表单
+	        return all.aioCheckOut(obj, null);
+	    }
 
 
 

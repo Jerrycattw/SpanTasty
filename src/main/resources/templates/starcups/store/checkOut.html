@@ -172,7 +172,11 @@
             </div>
             </div>
           </div>
-          <div class="button-wrap text-center"><a class="button button-secondary button-pipaluk" href="#">Proceed to checkout</a></div>
+          <div class="button-wrap text-center">
+          	<form th:action= "@{/StarCups/ecpayCheckout(shoppingId=${session['shoppingId']})}" method="post">
+          		<button type="submit" class="button button-secondary button-pipaluk">Proceed to checkout</button>
+          	</form>
+       	 </div>
       </section>
       
             <!-- Section checkout form-->
@@ -182,7 +186,7 @@
           </div>
         </div>
       </section>
-    
+      <div id="ppoo"></div>
     <!-- Global Mailform Output-->
     <div class="snackbars" id="form-output-global"></div>
     
@@ -193,6 +197,18 @@
     <i class="fa-solid fa-cart-plus cart-icon"></i>-->
 
     <!-- Javascript-->
+     <script>
+      axios.post(`http://localhost:8080/SpanTasty//StarCups/ecpayCheckout`)
+      .then(res => {
+        console.log(res)
+        // document.querySelector("#ppoo").innerHTML += res
+        // document.querySelector("#ppoo form").submit()
+      })
+      .catch(err => {
+        console.error(err); 
+      })
+     </script>
+     <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
     <script src="/SpanTasty/starcups/js/core.min.js"></script>
     <script src="/SpanTasty/starcups/js/script.js"></script>
 </body>
