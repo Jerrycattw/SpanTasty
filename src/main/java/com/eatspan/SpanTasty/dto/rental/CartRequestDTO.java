@@ -12,5 +12,8 @@ public class CartRequestDTO {
 	
 	@JsonProperty("rentItemQuantity")
 	private Integer rentItemQuantity;
+	
+	@JsonProperty("restaurantId")
+	private Integer restaurantId;
 
 }

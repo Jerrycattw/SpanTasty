@@ -120,6 +120,6 @@ public class TablewareService {
 	
 	//
 	public Integer findTablewareDeposit(Integer tablewareId) {
-		return tablewareRepository.findTablewareDeposit();
+		return tablewareRepository.findTablewareDeposit(tablewareId);
 	}
 }
