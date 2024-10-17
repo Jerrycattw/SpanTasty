@@ -134,6 +134,11 @@ public class MemberController {
 			member.setPhone(phone);
 		}
 		if (email != null) {
+			
+			if ("Google".equals(member.getProvider())) {
+			    return Result.failure("Google 登入的用戶無法修改信箱");
+			}
+			
 			if (memberService.existsByEmail(email)) {
 				return Result.failure("此信箱已被使用");
 			}

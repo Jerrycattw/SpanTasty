@@ -112,7 +112,7 @@ public class GoogleOauthService {
             newMember.setAccount(email);  // 使用 email 作為賬號
             newMember.setEmail(email);
             newMember.setMemberName(name);
-            newMember.setProvider("google");
+            newMember.setProvider("Google");
             newMember.setProviderId(googleId);
             newMember.setRegisterDate(LocalDate.now());
 
