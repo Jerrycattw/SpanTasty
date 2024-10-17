@@ -12,21 +12,10 @@
 <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
 <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
 <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-.ie-panel {
-	display: none;
-	background: #212121;
-	padding: 10px 0;
-	box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
-	clear: both;
-	text-align: center;
-	position: relative;
-	z-index: 1;
-}
-
-html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
-	display: block;
-}
+.ie-panel { display: none; background: #212121; padding: 10px 0; box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3); clear: both; text-align:center; position: relative; z-index: 1; }
+html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel { display: block; }
 
 .restaurant-img {
     width: 250px;
@@ -42,15 +31,8 @@ p.global-primary.dark-primary.section-title::after {
     margin: 20px auto 0; /* 調整線條與文字之間的距離 */
 }
 
-form {
-    width: 60%;
-    margin: 0 auto;
-    padding: 10px;
-    padding-bottom: 0;
-}
-
 .restaurant-input {
-    width: 80%;
+    width: 500px;
     padding: 0;
     margin-bottom: 0px;
     border: 1px solid grey;
@@ -81,11 +63,28 @@ form {
 .Grid-products-item:hover {
     transform: translateY(-5px); /* 在懸停時使產品項目上移 */
 }
+
+.cart{
+	position: fixed;
+	top: 100px;
+	right: 50px;
+	z-index: 1000; 
+	font-size: 2rem; 
+	cursor: pointer;
+	color: #f3c6a1;
+}
 </style>
 </head>
 <body>
 <!-- navbar  th:replace=-->
 <div th:replace="~{starcups/display/navbar}" ></div>
+
+<form th:action="@{/StarCups/rental/cart(rentId=${session['rentId']})}" method="get" style="display: inline;">
+<button style="border: none; background: none;">
+	<i class="fa-solid fa-cart-arrow-down cart"></i>
+  <span id="cart-count" style="position: absolute; top: 10px; right: 10px; background: red; color: white; border-radius: 50%; padding: 5px 10px;">0</span>
+</button>
+</form>
 <!-- 選單下方圖片及連結 -->
     <section class="section breadcrumbs-custom-inset">
       <div class="breadcrumbs-custom context-dark">
@@ -106,14 +105,14 @@ form {
         <div class="row row-90 row-fix justify-content-center">
         <div class="Grid-item Grid-products-item" style="margin-bottom: 20px;">
 		    <p class="global-primary dark-primary section-title">
-		        <span> R E N T </span>
+		        <span> RENT </span>
 		    </p>
 		</div>
+		
             <div class="col-lg-11 post-classic-wrap">
-            <div class="content" id="container">
-<form th:action="@{/rent/addPost}" method="post">
 <h5 class="text-center mb-3" >請先選擇租借餐廳 再選擇租借品項</h5>
-<table class="table w-100 table-striped mb-0" >
+            <div class="content d-flex justify-content-center" id="container">
+<table class="table table-striped mb-0 " style="width: 600px;" >
     <tr>
     <td>租借餐廳:
         <select name="restaurantId" id="restaurantId" class="restaurant-input" required onchange="changeRestaurant()">
@@ -123,9 +122,8 @@ form {
     </td>
     </tr>
 </table>
-</form>
-				<div class="" id="show-restaurant"></div>
 			</div>
+		<div class="" id="show-restaurant"></div>
 		</div>
 		</div>
 		</div>
@@ -134,7 +132,8 @@ form {
     <div class="container">
       <div class="row row-40" >
         <div class="col-sm-6 col-lg-4" th:each="tableware : ${tablewares}">
-          <article class="box-icon-classic p-3" >
+          <a  class="disable-link" th:id="'single' + ${tableware.tablewareId}">
+          <article class="box-icon-classic p-3">
             <div class="unit box-icon-classic-body flex-column flex-md-row text-md-left flex-lg-column text-lg-center flex-xl-row text-xl-left">
               <div class="unit-left mb-0">
                 <span class="product-title " th:text="${tableware.tablewareName}" ></span>
@@ -146,9 +145,17 @@ form {
                 <img th:src="${tableware.tablewareImage != null ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}" alt="" width="100" height="100" />
                 
                 <span style="position: absolute; bottom: 10px; right: 10px; color:red;" th:id="'stock' + ${tableware.tablewareId}"></span>
+                
+              <div class="quantity-selector">
+		        <button class="btn btn-sm pb-0 pt-0" style="border:none; position: absolute; bottom: 60px; right: 30px;"  th:onclick="'decreaseQuantity(' + ${tableware.tablewareId} + ')'"><i class="fa-solid fa-circle-down" style="font-size:12px;"></i></button>
+		        	<span class="text-center" style="font-size:10px; position: absolute; bottom: 63px; right: 23px; color:black;" th:id="'quantity' + ${tableware.tablewareId}">1</span>
+		        <button class="btn btn-sm pb-0 pt-0" style="border:none; position: absolute; bottom: 60px; right: 2px;" th:onclick="'increaseQuantity(' + ${tableware.tablewareId} + ')'"><i class="fa-solid fa-circle-up" style="font-size:12px;"></i></button>
+		      </div>
+		      <button class="btn btn-primary btn-sm pb-0 pt-0" style="position: absolute; bottom: 40px; right: 10px;" th:onclick="'addToCart(' + ${tableware.tablewareId} + ')'"><i class="fa-solid fa-cart-arrow-down" style="font-size:12px;"></i></button>
               </div>
             </div>
           </article>
+        </a>
         </div>
       </div>
       </div>
@@ -170,34 +177,100 @@ form {
 <script src="/SpanTasty/starcups/js/core.min.js"></script>
 <script src="/SpanTasty/starcups/js/script.js"></script>
 <script>
-function changeRestaurant(){
-	const url = 'http://localhost:8080/SpanTasty/StarCups/rent/get';
-    const restaurantId = document.getElementById("restaurantId").value;
-    let dtoObject = {
-        restaurantId: restaurantId
+function increaseQuantity(tablewareId) {
+  const quantityElement = document.getElementById(`quantity${tablewareId}`);
+  let currentQuantity = parseInt(quantityElement.textContent, 10);
+  quantityElement.textContent = currentQuantity + 1;
+}
+
+function decreaseQuantity(tablewareId) {
+  const quantityElement = document.getElementById(`quantity${tablewareId}`);
+  let currentQuantity = parseInt(quantityElement.textContent, 10);
+  if (currentQuantity > 1) {
+    quantityElement.textContent = currentQuantity - 1;
+  }
+}
+
+function addToCart(tablewareId) {
+	let cartItemCount = 0; 
+	const token = localStorage.getItem('token');
+	const rentItemQuantity = parseInt(document.getElementById(`quantity${tablewareId}`).textContent, 10);
+	const stockElement = document.getElementById(`stock${tablewareId}`);
+	let stock = parseInt(stockElement.innerHTML.replace('剩', '').replace('件', ''), 10);
+	const url = 'http://localhost:8080/SpanTasty/StarCups/rental/addToCart';
+	let dtoObject = {
+		tablewareId: tablewareId,
+		rentItemQuantity: rentItemQuantity
+	};
+	let headers = {
+       'Authorization': `${token}`,
+       'Content-Type': 'application/json'
     };
-    axios.post(url, dtoObject)
+    
+  if (stock >= rentItemQuantity) {
+    stock -= rentItemQuantity;
+    stockElement.innerHTML = `剩${stock}件`;
+    
+    // 發送加入購物車的請求到後端
+    axios.post(url, dtoObject, headers)
     .then(function(response) {
-        htmlMaker(response.data);
+	    if (response.status === 200) {
+	        cartItemCount++; // 增加商品數量
+	        document.getElementById('cart-count').textContent = cartItemCount; // 更新購物車數量顯示
+	        alert('成功加入購物車');
+	    } else {
+	        alert('加入購物車失敗，請稍後再試');
+	    }
     })
     .catch(function(error) {
-        console.log(error);
+      console.log(error);
+      alert('加入購物車失敗，請稍後再試');
     });
+  } else {
+    alert('庫存不足，無法加入購物車');
+  }
+}
+
+
+function changeRestaurant(){
+	const url = 'http://localhost:8080/SpanTasty/StarCups/rental/showRestaurantStock';
+  const restaurantId = document.getElementById("restaurantId").value;
+  let dtoObject = {
+      restaurantId: restaurantId
+  };
+  axios.post(url, dtoObject)
+  .then(function(response) {
+      htmlMaker(response.data);
+  })
+  .catch(function(error) {
+      console.log(error);
+  });
 }
 
 function updateStock(stocks) {
+	document.querySelectorAll('[id^="single"]').forEach(link => {
+	   link.classList.remove('disabled');
+	   link.style.pointerEvents = 'auto'; // 恢復點擊事件
+	   link.style.opacity = '1'; // 恢復樣式到正常狀態
+	});
   stocks.forEach(stock => {
-        // 根據 tablewareId 查找對應的 span 標籤
-        const stockElement = document.getElementById(`stock${stock.tablewareId}`);
-		console.log(stockElement);
+    // 根據 tablewareId 查找對應的 span 標籤
+    const stockElement = document.getElementById(`stock${stock.tablewareId}`);
         
-        if (stockElement) {
-            // 插入剩餘庫存資料
-            stockElement.innerHTML = `剩${stock.stock}件`;
-        } else {
-            console.log(`Element with id stock${stock.tablewareId} not found`);
+    if (stockElement) {
+	    const linkElement = document.getElementById(`single${stock.tablewareId}`);
+        // 插入剩餘庫存資料
+        stockElement.innerHTML = `剩${stock.stock}件`;
+        console.log(`stock: ${stock.stock}, type: ${typeof stock.stock}`);
+        if(Number(stock.stock) === 0){
+          linkElement.classList.add('disabled');
+          linkElement.style.pointerEvents = 'none'; // 禁用點擊事件
+          linkElement.style.opacity = '0.5'; // 改變樣式表示禁用狀態
         }
-    });
+    } else {
+        console.log(`Element with id stock${stock.tablewareId} not found`);
+    }
+  });
 }
 
 function htmlMaker(data){
@@ -230,9 +303,7 @@ function htmlMaker(data){
         </div>
       </section>
     `;
-      setTimeout(() => {
       updateStock(stocks);
-  }, 100); 
 }
 
 </script>

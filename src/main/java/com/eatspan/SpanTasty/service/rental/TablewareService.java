@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.eatspan.SpanTasty.entity.rental.RentItem;
 import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.repository.rental.TablewareRepository;
@@ -114,5 +115,11 @@ public class TablewareService {
 	//
 	public Integer countTableware() {
 		return tablewareRepository.countTableware();
+	}
+	
+	
+	//
+	public Integer findTablewareDeposit(Integer tablewareId) {
+		return tablewareRepository.findTablewareDeposit();
 	}
 }

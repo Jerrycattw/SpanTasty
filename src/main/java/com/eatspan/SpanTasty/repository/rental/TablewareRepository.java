@@ -21,6 +21,10 @@ public interface TablewareRepository extends JpaRepository<Tableware, Integer> {
 	List<Tableware> findByKeyword(@Param("keyword") String keyword);
 	
 	
-	@Query(value = "SELECT COUNT(*) FROM Tableware", nativeQuery = true)
+	@Query(value = "SELECT COUNT(*) FROM tableware", nativeQuery = true)
 	Integer countTableware();
+	
+	
+	@Query(value = "SELECT tableware_deposit FROM tableware WHERE tableware_id= :tableware_id", nativeQuery = true)
+	Integer findTablewareDeposit();
 }

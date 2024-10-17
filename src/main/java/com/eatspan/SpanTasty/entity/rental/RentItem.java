@@ -48,6 +48,9 @@ public class RentItem implements Serializable {
     @JoinColumn(name = "rent_id", insertable = false, updatable = false)
     private Rent rent;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tableware_id", insertable = false, updatable = false)
+	private Tableware tableware;
 	
 	@Data
 	public static class RentItemId implements Serializable {

@@ -1,5 +1,7 @@
 package com.eatspan.SpanTasty.service.rental;
 
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +15,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eatspan.SpanTasty.entity.rental.Rent;
+import com.eatspan.SpanTasty.entity.rental.RentItem;
+import com.eatspan.SpanTasty.entity.rental.Tableware;
+import com.eatspan.SpanTasty.repository.rental.RentItemRepository;
 import com.eatspan.SpanTasty.repository.rental.RentRepository;
+import com.eatspan.SpanTasty.repository.rental.TablewareRepository;
 
 @Service
 public class RentService {
 	
 	@Autowired
 	private RentRepository rentRepository;
+	@Autowired
+	private RentItemRepository rentItemRepository;
+	@Autowired
+	private TablewareRepository tablewareRepository;
 	
 	
 	//新增訂單
@@ -99,4 +109,53 @@ public class RentService {
 		Pageable pageable = PageRequest.of(page-1, 10, Sort.Direction.ASC, "rentId");
 		return rentRepository.findAll(pageable);
 	}
+	
+	
+	//
+	public Integer calculateTotalDeposit(Integer rentId) {
+        Integer totalDeposit = rentRepository.countRentDeposit(rentId);
+        return (totalDeposit != null) ? totalDeposit : 0;  // 處理 null 的情況
+    }
+	
+	
+	//
+	@Transactional
+	public Rent addRentOrder(Integer memberId, Integer tablewareId, Integer rentItemQuantity) {
+		Rent rent = new Rent();
+		rent.setMemberId(memberId);
+		Date rentDate = new Date();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(rentDate);
+		calendar.add(Calendar.DAY_OF_YEAR, 7);
+		Date dueDate = calendar.getTime();
+		rent.setRentDate(rentDate);
+		rent.setDueDate(dueDate);
+		rent.setRentStatus(1);
+		rent.setRentMemo("未歸還");
+		rent.setRentDeposit(0);
+		Rent rentOrder = rentRepository.save(rent);
+		
+		Optional<Tableware> optional = tablewareRepository.findById(tablewareId);
+		if(!optional.isPresent()) {
+			throw new RuntimeException("Tableware not found with ID: " + tablewareId);
+		}
+		Tableware tableware = optional.get();
+		Integer tablewareDeposit = tableware.getTablewareDeposit();
+		
+		RentItem rentItem = new RentItem();
+		rentItem.setRentId(rent.getRentId());
+		rentItem.setTablewareId(tablewareId);
+		rentItem.setRentItemQuantity(rentItemQuantity);
+		Integer rentItemDeposit = tablewareDeposit * rentItemQuantity;
+		rentItem.setRentItemDeposit(rentItemDeposit);
+		rentItem.setReturnStatus(1);
+		rentItem.setReturnMemo("未歸還");
+		rentItemRepository.save(rentItem);
+		
+		rent.setRentDeposit(rent.getRentDeposit() + rentItemDeposit);
+		rentRepository.save(rent);
+		
+		return rentOrder;
+	}
 }
+
