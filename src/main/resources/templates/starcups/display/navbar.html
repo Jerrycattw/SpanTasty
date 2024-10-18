@@ -254,7 +254,7 @@
     const token = localStorage.getItem('token');
     if (token) {
       memberCenterLink.href = '/SpanTasty/StarCups/memberCenter';
-      console.log('已登入，Token:', token);
+      console.log('已登入，Token:', token);    
     } else {
       memberCenterLink.href = '/SpanTasty/StarCups/loginRegister';
       console.log('未登入');
@@ -267,6 +267,7 @@
       authLink.addEventListener('click', function () {
         // 清除 token，登出
         localStorage.removeItem('token');
+        localStorage.removeItem('cart');
         alert('已登出');
         window.location.href = '/SpanTasty/StarCups';
       });

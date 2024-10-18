@@ -231,14 +231,12 @@ public class ReserveService {
 		//設置mail
 		helper.setFrom(mailConfig.getUserName3());//誰寄信(application設定的信箱)
 		helper.setTo(reserve.getMember().getEmail());//誰收信
-//		helper.setTo("spantasty@gmail.com");//誰收信
 		helper.setSubject("【☕訂位成功通知】您在 starcups "+ reserve.getRestaurant().getRestaurantName() +" 的預訂已經完成");//主旨
 		
 		//設置模板
 		//設置model
 		Map<String, Object> model = new HashMap<String,Object>();
-		//透過modal傳入的物件("參數名","東西")
-		//model.put("userName",memberName);
+		//透過model傳入的物件("參數名","東西")
 		model.put("reserve",reserve);
 		//get模板，並將modal傳入模板
 		String templateString = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfig.getTemplate("reserveMail.html"), model);
