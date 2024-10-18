@@ -1,37 +1,502 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>會員中心</title>
-<link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
-<link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
-<link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
-<style>
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員中心</title>
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <style>
+    .user-avatar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 275px;
+      height: 275px;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .personal-info-table {
+      width: 100%;
+      margin: 20px auto;
+      font-size: 18px;
+    }
+
+    .personal-info-table th,
+    .personal-info-table td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .personal-info-table th {
+      width: 40%;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .button-custom {
+      border: none;
+      color: white;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      width: 80%;
+      margin-bottom: 10px;
+      background-color: #efc4a3;
+    }
+
+    .button-custom:hover {
+      background-color: #efc4a3;
+      transform: scale(1.05);
+    }
+
+    .button-custom:active {
+      background-color: #b3876a;
+      transform: scale(0.98);
+    }
+
+    .button-red {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .button-red:hover {
+      background-color: #c82333;
+      transform: scale(1.05);
+    }
+
+    .button-red:active {
+      background-color: #bd2130;
+      transform: scale(0.98);
+    }
+
+    .button-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .mleft10 {
+      margin-left: 10px;
+    }
+
+    .mb10 {
+      margin-bottom: 10px;
+    }
+
+    .post-sidebar-item {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .list-categories li {
+      list-style: none;
+      margin-bottom: 8px;
+    }
+
+    .list-categories a {
+      color: #007bff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .list-categories a:hover {
+      color: #0056b3;
+    }
+    .bcf7 {
+   	  background-color: #F7F7F7;    
+    }
+  </style>
 </head>
 
 <body>
+  <div th:replace="~{/starcups/display/navbar}"></div>
 
-	<div th:replace="~{starcups/display/navbar}"></div>
+  <section class="section breadcrumbs-custom-inset">
+    <div class="breadcrumbs-custom context-dark">
+      <div class="container">
+        <h2 class="breadcrumbs-custom-title">會員中心</h2>
+        <ul class="breadcrumbs-custom-path">
+          <li><a href="/SpanTasty/StarCups">Home</a></li>
+          <li><a href="/SpanTasty/StarCups/memberCenter">會員中心</a></li>
+          <li class="active">帳戶管理</li>
+        </ul>
+      </div>
+      <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+    </div>
+  </section>
 
-	<section class="section breadcrumbs-custom-inset">
-		<div class="breadcrumbs-custom context-dark">
-			<div class="container">
-				<h2 class="breadcrumbs-custom-title">Privacy Policy</h2>
-				<ul class="breadcrumbs-custom-path">
-					<li><a href="/SpanTasty/StarCups">Home</a></li>
-					<li class="active">LOGIN</li>
-				</ul>
-			</div>
-			<!-- 圖片-->
-			<div class="box-position novi-bg novi-bg-img"
-				style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
-		</div>
-	</section>
+  <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+    <div class="container">
+      <div class="row row-50 justify-content-md-center">
+        <div class="col-md-4">
+          <div class="post-sidebar-item">
+            <h5>帳戶管理</h5>
+            <div class="post-sidebar-item-inset">
+              <ul class="list list-categories">
+                <li><button class="button-custom" id="btn-personal-info"><span class="icon fa fa-user"></span> 個人資訊</button></li>
+                <li><button class="button-custom" id="btn-change-password"><span class="icon fa fa-key"></span> 修改密碼</button></li>
+                <li><button class="button-custom" id="btn-change-contact"><span class="icon fa fa-address-book"></span> 修改聯絡資訊</button></li>
+                <li><button class="button-custom" id="btn-change-avatar"><span class="icon fa fa-image"></span> 修改頭像</button></li>
+                <li><button class="button-custom" id="btn-delete-account"><span class="icon fa fa-trash"></span> 刪除帳號</button></li>
+              </ul>
+            </div>
+            <h5>點數管理</h5>
+            <div class="post-sidebar-item-inset">
+              <ul class="list list-categories">
+                <li><button class="button-custom" id="btn-personal-info"><span class="icon fa fa-user"></span> 個人資訊</button></li>
+                <li><button class="button-custom" id="btn-change-password"><span class="icon fa fa-key"></span> 修改密碼</button></li>
+                <li><button class="button-custom" id="btn-change-contact"><span class="icon fa fa-address-book"></span> 修改聯絡資訊</button></li>
+                <li><button class="button-custom" id="btn-change-avatar"><span class="icon fa fa-image"></span> 修改頭像</button></li>
+                <li><button class="button-custom" id="btn-delete-account"><span class="icon fa fa-trash"></span> 刪除帳號</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
 
-    <script src="/SpanTasty/starcups/js/core.min.js"></script>
-    <script src="/SpanTasty/starcups/js/script.js"></script>
+        <div class="col-md-8">
+          <div id="personal-info" class="content-section">
+            <div class="card mx-auto">
+              <div class="card-body bcf7">
+            <h4 class="text-spacing-50 text-center mb10">個人資訊</h4>
+                <div class="user-avatar mb-4" id="personal-preview-avatar">
+                  <img id="personal-current-avatar" src="/SpanTasty/starcups/images/account/defaultUser.jpeg" alt="頭像" class="rounded-circle border">
+                </div>
+                <div class="personal-info-details">
+                  <table class="personal-info-table">
+                    <tr>
+                      <th>姓名：</th>
+                      <td><span id="member-name">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>生日：</th>
+                      <td><span id="birthday">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>電話：</th>
+                      <td><span id="memberPhone">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>聯絡地址：</th>
+                      <td><span id="memberAddress">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>信箱：</th>
+                      <td><span id="member-email">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>註冊日期：</th>
+                      <td><span id="register-date">未設定</span></td>
+                    </tr>
+                    <tr>
+                      <th>最近登入：</th>
+                      <td><span id="last-login">未設定</span></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="change-password" class="content-section" style="display:none;">
+            <h4 class="text-spacing-50 text-center mb10">修改密碼</h4>
+                        <div class="card mx-auto">
+              <div class="card-body bcf7">
+            <form class="bcf7">
+              <div class="form-group">
+                <label for="current-password">原密碼</label>
+                <input class="form-control" id="current-password" type="password" required>
+              </div>
+              <div class="form-group">
+                <label for="new-password">新密碼</label>
+                <input class="form-control" id="new-password" type="password" required>
+              </div>
+              <div class="form-group">
+                <label for="confirm-password">確認新密碼</label>
+                <input class="form-control" id="confirm-password" type="password" required>
+              </div>
+              <button class="button button-block button-secondary" type="submit">修改密碼</button>
+            </form>
+          </div></div></div>
+
+          <div id="change-contact" class="content-section" style="display:none;">
+            <h4 class="text-spacing-50 text-center mb10">修改聯絡資訊</h4>
+                        <div class="card mx-auto">
+              <div class="card-body bcf7">
+            <form class="bcf7">
+              <div class="form-group">
+                <label for="contact-phone">電話</label>
+                <input class="form-control" id="contact-phone" type="text">
+              </div>
+              <div class="form-group">
+                <label for="contact-email">信箱</label>
+                <input class="form-control" id="contact-email" type="email">
+              </div>
+              <div class="form-group">
+                <label for="contact-address">地址</label>
+                <input class="form-control" id="contact-address" type="text">
+              </div>
+              <button class="button button-block button-secondary" type="button" id="update-contact-button">更新聯絡資訊</button>
+            </form>
+          </div></div></div>
+
+          <div id="change-avatar" class="content-section" style="display:none;">
+            <h4 class="text-spacing-50 text-center mb10">修改頭像</h4>
+            <div class="card">
+              <div class="card-body text-center bcf7">
+                <div class="user-avatar mb-3" id="change-preview-avatar">
+                  <img id="change-current-avatar" src="/SpanTasty/starcups/images/account/defaultUser.jpeg" alt="頭像" width="300" height="300">
+                </div>
+                <button class="button button-secondary button-custom" id="confirm-avatar" style="display:none;">確定更換頭像</button>
+                <div class="form-group">
+                  <div class="button-container">
+                    <input type="file" id="avatar-input" class="form-control-file" accept="image/*" style="display: none;">
+                    <button class="button button-green mleft10" id="avatar-upload-button">選擇圖片</button>
+                    <button class="button button-red mleft10" id="remove-avatar">移除頭像</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div th:replace="~{starcups/display/footer}"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        alert('請先登入');
+        window.location.href = '/SpanTasty/StarCups';
+      } else {
+        getProfile();
+        getAvatar();
+      }
+
+      document.querySelectorAll('.button-custom').forEach(button => {
+        button.addEventListener('click', function () {
+          const sectionId = this.id.replace('btn-', '');
+          getAvatar();
+          showSection(sectionId);        
+        });
+      });
+
+      function showSection(sectionId) {
+        document.querySelectorAll('.content-section').forEach(section => section.style.display = 'none');
+        document.getElementById(sectionId).style.display = 'block';
+      }
+    });
+    
+          //修改聯絡方式內容
+      const contactPhoneInput = document.getElementById('contact-phone');
+      const contactEmailInput = document.getElementById('contact-email');
+      const contactAddressInput = document.getElementById('contact-address');
+      const updateContactButton = document.getElementById('update-contact-button');
+    
+    
+          // 更新聯絡方式
+    updateContactButton.addEventListener('click', function () {
+      const phone = contactPhoneInput.value;
+      const email = contactEmailInput.value;
+      const address = contactAddressInput.value;
+      
+      const token = localStorage.getItem('token');
+
+      const params = new URLSearchParams();
+      if (phone) params.append('phone', phone);
+      if (email) params.append('email', email);
+      if (address) params.append('address', address);
+
+      axios.post('/SpanTasty/member/updateContactInfo', params, {
+        headers: {
+          'Authorization': `${token}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
+      })
+      .then(response => {
+        if (response.data.success) {
+          alert('聯絡資訊更新成功');
+        } else {
+          alert('聯絡資訊更新失敗：' + response.data.message);
+        }
+      })
+      .catch(error => {
+        console.error('更新聯絡資訊過程中發生錯誤:', error.response ? error.response.data : error);
+        alert('更新聯絡資訊過程中發生錯誤');
+      });
+    });
+    
+	
+	//確認更改頭像
+    document.getElementById('avatar-upload-button').addEventListener('click', function (event) {
+      event.preventDefault();
+      document.getElementById('avatar-input').click();
+    });
+	
+	//預覽頭像
+    document.getElementById('avatar-input').addEventListener('change', function () {
+      const file = this.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById('change-current-avatar').src = e.target.result;
+          document.getElementById('confirm-avatar').style.display = 'inline-block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('請選擇有效的圖片檔案');
+      }
+    });
+	
+	//更新頭像
+    document.getElementById('confirm-avatar').addEventListener('click', function () {
+      const file = document.getElementById('avatar-input').files[0];
+      const token = localStorage.getItem('token');
+
+      if (file && token) {
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        axios.post('/SpanTasty/member/updateAvatar', formData, {
+          headers: {
+            'Authorization': `${token}`,
+            'Content-Type': 'multipart/form-data',
+          }
+        })
+          .then(response => {
+            if (response.data.success) {
+              alert('頭像已更新');
+              document.getElementById('personal-current-avatar').src = URL.createObjectURL(file);
+              document.getElementById('change-current-avatar').src = URL.createObjectURL(file);
+              document.getElementById('confirm-avatar').style.display = 'none';
+            } else {
+              alert('更新圖片失敗');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('上傳過程中發生錯誤');
+          });
+      } else {
+        alert('請選擇一張圖片並確保已登入');
+      }
+    });
+	
+	//移除頭像
+    document.getElementById('remove-avatar').addEventListener('click', function () {
+      const token = localStorage.getItem('token');
+
+      if (token) {
+        axios.post('/SpanTasty/member/removeAvatar', {}, {
+          headers: {
+            'Authorization': `${token}`,
+          }
+        })
+          .then(response => {
+            if (response.data.success) {
+              alert('頭像已成功移除');
+              document.getElementById('personal-current-avatar').src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+              document.getElementById('change-current-avatar').src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+            } else {
+              alert('移除頭像失敗，請稍後再試');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('移除頭像過程中發生錯誤');
+          });
+      }
+    });
+	
+	//獲取頭像
+    function getAvatar() {
+      const token = localStorage.getItem('token');
+
+      if (token) {
+        axios.get('/SpanTasty/member/getAvatar', {
+          headers: {
+            'Authorization': `${token}`
+          }
+        })
+          .then(response => {
+            if (response.data.success && response.data.data) {
+              const base64Avatar = response.data.data;
+              document.getElementById('personal-current-avatar').src = `data:image/jpeg;base64,${base64Avatar}`;
+              document.getElementById('change-current-avatar').src = `data:image/jpeg;base64,${base64Avatar}`;
+            } else {
+              document.getElementById('personal-current-avatar').src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+              document.getElementById('change-current-avatar').src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('獲取頭像過程中發生錯誤');
+          });
+      } else {
+        window.location.href = '/SpanTasty/StarCups';
+      }
+    }
+	
+	//獲取個人訊息
+    function getProfile() {
+      const token = localStorage.getItem('token');
+
+      if (token) {
+        axios.get('/SpanTasty/member/profile', {
+          headers: {
+            'Authorization': `${token}`
+          }
+        })
+          .then(response => {
+            if (response.data.success) {
+              const member = response.data.data;
+              document.getElementById('member-name').textContent = member.memberName;
+              document.getElementById('member-email').textContent = member.email;
+              document.getElementById('memberPhone').textContent = member.phone;
+              document.getElementById('memberAddress').textContent = member.address;
+              document.getElementById('register-date').textContent = member.registerDate;
+              document.getElementById('birthday').textContent = member.birthday;
+              document.getElementById('last-login').textContent = member.formattedLoginDate;
+            } else {
+              alert('無法獲取個人資訊');
+            }
+          })
+          .catch(error => {
+            console.error('獲取個人資訊過程中發生錯誤:', error);
+          });
+      } else {
+        alert('請先登入');
+        window.location.href = '/SpanTasty/StarCups';
+      }
+    }
+  </script>
 </body>
 
 </html>

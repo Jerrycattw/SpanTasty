@@ -5,7 +5,7 @@
 <title>搜尋管理員</title>
 <style>
 body {
-	background-color: #1c1c1c;
+	background-color: #f0f0f0;
 	color: #f0f0f0;
 	font-family: Arial, sans-serif;
 	margin: 0;
@@ -27,7 +27,7 @@ main {
 	padding: 2rem;
 	border-radius: 8px;
 	box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-	width: 300px;
+	width: 450px;
 	text-align: center;
 }
 
@@ -76,13 +76,27 @@ button {
 button:hover {
 	background-color: #666;
 }
+
+#autoFillButton {
+	margin-top: 10px;
+	background-color: #28a745; /* 一鍵輸入按鈕顏色設為綠色 */
+	font-size: 1.2rem; /* 增加一鍵輸入按鈕字體大小 */
+}
+
+#autoFillButton:hover {
+	background-color: #218838; /* 一鍵輸入按鈕懸停顏色 */
+}
+
+#errorMessage {
+    color: red; /* 顯示錯誤訊息的顏色 */
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
 	<main id="contentArea">
 		<header>
-			<h1>登入頁面</h1>
+			<h1>SpanTasty 後臺登入</h1>
 		</header>
 
 		<h2>請登入</h2>
@@ -95,6 +109,8 @@ button:hover {
 				<button type="submit">登入</button>
 			</form>
 			<div id="errorMessage" class="error-message"></div>
+			<br>
+			<button id="autoFillButton">一鍵輸入</button>
 		</div>
 	</main>
 
@@ -138,6 +154,12 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         console.error('登入請求失敗:', error);
         alert('登入失敗，請稍後再試');
     });
+});
+
+// 一鍵輸入功能
+document.getElementById('autoFillButton').addEventListener('click', function() {
+    document.getElementById('account').value = 'test'; // 預設帳號
+    document.getElementById('password').value = '1234'; // 預設密碼
 });
     </script>
 </body>
