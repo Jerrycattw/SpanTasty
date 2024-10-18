@@ -120,10 +120,9 @@ public class RentService {
 	
 	//
 	@Transactional
-	public Rent addRentOrder(Integer memberId, Integer tablewareId, Integer rentItemQuantity, Integer restaurantId) {
+	public Rent addRentOrder(Integer memberId) {
 		Rent rent = new Rent();
 		rent.setMemberId(memberId);
-		rent.setRestaurantId(restaurantId);
 		Date rentDate = new Date();
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(rentDate);
@@ -134,29 +133,8 @@ public class RentService {
 		rent.setRentStatus(1);
 		rent.setRentMemo("未歸還");
 		rent.setRentDeposit(0);
-		Rent rentOrder = rentRepository.save(rent);
-		
-		Optional<Tableware> optional = tablewareRepository.findById(tablewareId);
-		if(!optional.isPresent()) {
-			throw new RuntimeException("Tableware not found with ID: " + tablewareId);
-		}
-		Tableware tableware = optional.get();
-		Integer tablewareDeposit = tableware.getTablewareDeposit();
-		
-		RentItem rentItem = new RentItem();
-		rentItem.setRentId(rent.getRentId());
-		rentItem.setTablewareId(tablewareId);
-		rentItem.setRentItemQuantity(rentItemQuantity);
-		Integer rentItemDeposit = tablewareDeposit * rentItemQuantity;
-		rentItem.setRentItemDeposit(rentItemDeposit);
-		rentItem.setReturnStatus(1);
-		rentItem.setReturnMemo("未歸還");
-		rentItemRepository.save(rentItem);
-		
-		rent.setRentDeposit(rent.getRentDeposit() + rentItemDeposit);
 		rentRepository.save(rent);
-		
-		return rentOrder;
+		return rent;
 	}
 }
 

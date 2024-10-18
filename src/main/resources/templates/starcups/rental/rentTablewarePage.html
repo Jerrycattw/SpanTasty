@@ -1,338 +1,479 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+
 <head>
-<title>Rent</title>
-<meta name="format-detection" content="telephone=no">
-<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta charset="utf-8">
-<link rel="icon" href="images/favicon.ico" type="image/x-icon">
-<!-- Stylesheets-->
-<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
-<link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
-<link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
-<link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-.ie-panel { display: none; background: #212121; padding: 10px 0; box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3); clear: both; text-align:center; position: relative; z-index: 1; }
-html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel { display: block; }
+  <title>Order Online</title>
+  <meta name="format-detection" content="telephone=no">
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <!-- Stylesheets-->
+  <!-- 更改樣式 -->
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <style>
+    .ie-panel {
+      display: none;
+      background: #212121;
+      padding: 10px 0;
+      box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
+      clear: both;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
 
-.restaurant-img {
-    width: 250px;
-    height: auto; /* 保持比例 */
-}
+    html.ie-10 .ie-panel,
+    html.lt-ie-10 .ie-panel {
+      display: block;
+    }
 
-p.global-primary.dark-primary.section-title::after {
-    content: '';
-    display: block;
-    width: 25px; /* 設定線條的寬度 */
-    height: 3px; /* 設定線條的高度 */
-    background-color: darkgrey; /* 設定線條的顏色 */
-    margin: 20px auto 0; /* 調整線條與文字之間的距離 */
-}
+    #cartContainer {
+      display: none;
+    }
 
-.restaurant-input {
-    width: 500px;
-    padding: 0;
-    margin-bottom: 0px;
-    border: 1px solid grey;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-
-.section-title {
-    font-size: 20px; /* 調整文字大小 */
-    color: #333; /* 調整文字顏色 */
-    text-align: center; /* 文字居中 */
-    font-weight: bold;
-}
-
-.Grid-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 讓每個項目占據最少250px寬度，並自動填充 */
-    gap: 20px; /* 產品之間的間距 */
-}
-
-.Grid-products-item {
-    padding: 10px;
-    border-radius: 8px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.Grid-products-item:hover {
-    transform: translateY(-5px); /* 在懸停時使產品項目上移 */
-}
-
-.cart{
-	top: 100px;
-	right: 50px;
-	z-index: 1000; 
-	font-size: 2rem; 
-	cursor: pointer;
-	color: #f3c6a1;
-}
-
-.stepper-arrow {
-    font-size: 10px; /* 調整字體大小 */
-    padding: 0; /* 確保內邊距為 0 */
-    line-height: 30px; /* 如果需要固定高度 */
-    display: inline-block; /* 確保它是行內塊元素，方便調整大小 */
-}
-span.stepper-arrow {
-	width:20px;
-	height:20px;
-}
-.table-cart-stepper .stepper-arrow {
-    line-height: 20px !important; /* 強制覆蓋行高 */
-    border-radius: 2px !important; /* 強制覆蓋邊角圓度 */
-    border: 1px solid #ccc !important; /* 強制覆蓋邊框 */
-}
-.stepper{
-	height: 25px;
-	padding-top: 0;
-}
-
-.table-cart-stepper input[type="number"]{
-	font-size: 15px !important;
-	line-height:20px !important;
-}
-
-.stepper-input {
-    padding-top: 0; /* 更小的內邊距 */
-    font-size: 10px; /* 調整字體大小以適應高度 */
-    width:20px;
-    
-}
-</style>
+    #cartContainer.active {
+      display: block;
+    }
+  </style>
 </head>
-<body>
-<!-- navbar  th:replace=-->
-<div th:replace="~{starcups/display/navbar}" ></div>
 
-<form th:action="@{/StarCups/rental/cart(rentId=${session['rentId']})}" method="get" style="display: inline;">
-<button style="border: none; background: none; position: relative; left:1200px; top:480px;">
-	<i class="fa-solid fa-cart-arrow-down cart"></i>
-  <span id="cart-count" style="position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 100%; padding: 5px 10px; font-size: 10px;">0</span>
-</button>
-</form>
-<!-- 選單下方圖片及連結 -->
+<body>
+  <!-- navbar  th:replace=-->
+  <div th:replace="~{starcups/display/navbar}"></div>
+  <div class="ie-panel"><a href="http://windows.microsoft.com/en-US/internet-explorer/"><img
+        src="images/ie8-panel/warning_bar_0000_us.jpg" height="42" width="820"
+        alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today."></a>
+  </div>
+  <div class="preloader">
+    <div class="preloader-body">
+      <div class="cssload-container"><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+    <!-- Page Header-->
+    <header class="section page-header">
+      <!-- RD Navbar-->
+      <!-- delete 55-433 -->
+    </header>
+    <!-- Breadcrumbs -->
     <section class="section breadcrumbs-custom-inset">
       <div class="breadcrumbs-custom context-dark">
         <div class="container">
-          <h2 class="breadcrumbs-custom-title">Rent Tableware Now</h2>
+          <h2 class="breadcrumbs-custom-title">Order Online</h2>
           <ul class="breadcrumbs-custom-path">
             <li><a href="/SpanTasty/StarCups">Home</a></li>
-            <li class="active">Rent Tableware</li>
+            <!-- <li><a href="grid-gallery.html">Menu</a></li> -->
+            <li class="active">Order Online</li>
           </ul>
         </div>
-        <!-- 圖片-->
-        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url('/SpanTasty/StarCups/images/bg-breadcrumbs.jpg');"></div>
       </div>
     </section>
-	
-	<section class="section pt-4 novi-bg novi-bg-img section-xl bg-default text-md-start pb-3">
-    <div class="container">
+    <!-- Shop-->
+    <section class="section novi-bg novi-bg-img section-xl bg-default">
+      <div class="container">
         <div class="row row-90 row-fix justify-content-center">
-        <div class="Grid-item Grid-products-item" style="margin-bottom: 20px;">
-		    <p class="global-primary dark-primary section-title">
-		        <span> RENT </span>
-		    </p>
-		</div>
-		
-            <div class="col-lg-11 post-classic-wrap">
-<h5 class="text-center mb-3" >請先選擇租借餐廳 再選擇租借品項</h5>
-            <div class="content d-flex justify-content-center" id="container">
-<table class="table table-striped mb-0 " style="width: 600px;" >
-    <tr>
-    <td>租借餐廳:
-        <select name="restaurantId" id="restaurantId" class="restaurant-input" required onchange="changeRestaurant()">
-            <option value="" selected disabled>請選擇租借餐廳</option>
-            <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}" ></option>
-        </select>
-    </td>
-    </tr>
-</table>
-			</div>
-		<div class="" id="show-restaurant"></div>
-		</div>
-		</div>
-		</div>
-	</section>
-  <section class="section novi-bg novi-bg-img section-xl bg-default">
-    <div class="container">
-      <div class="row row-40" >
-        <div class="col-sm-6 col-lg-4" th:each="tableware : ${tablewares}">
-          <a  class="disable-link" th:id="'single' + ${tableware.tablewareId}">
-          <article class="box-icon-classic p-3">
-            <div class="unit box-icon-classic-body flex-column flex-md-row text-md-left flex-lg-column text-lg-center flex-xl-row text-xl-left">
-              <div class="unit-left mb-0">
-                <span class="product-title " th:text="${tableware.tablewareName}" ></span>
-                <br/>
-                <br/>
-                <span>NT$</span><span class="box-icon-classic-title " th:text="${tableware.tablewareDeposit}" ></span>
-              </div>
-              <div class="unit-body ms-5 ps-5 mb-4">
-                <img th:src="${tableware.tablewareImage != null ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}" alt="" width="100" height="100" />
-                
-                <span style="position: absolute; bottom: 10px; right: 10px; color:red;" th:id="'stock' + ${tableware.tablewareId}"></span>
-                
-              <div class="quantity-selector d-inline-flex justify-content-center align-center" style="position: absolute; bottom:50px; right: 13px;" >
-		        <div class="table-cart-stepper d-inline-flex justify-content-center align-center" style="padding-top:0; padding-bottom:0;line-height: 20px;">
-                  <input class="form-input d-inline-flex pt-0 ps-1 pe-1 pb-0" th:id="'rentItemQuantity'+${tableware.tablewareId}" style="min-height:1px; position: relative; top:-5px;" type="number" data-zeros="true" value="1" min="1" max="1000">
-                </div>
-		      </div>
-		      <button class="btn btn-primary btn-sm pb-0 pt-0" style="position: absolute; bottom: 32px; right: 15px;" th:data-tablewareId="${tableware.tablewareId}" onclick="addToCart(this)"><i class="fa-solid fa-cart-arrow-down" style="font-size:12px;"></i></button>
-              </div>
+          <div class="col-lg-8 col-xl-9">
+            <div class="product-top-panel group-lg">
+              <h5 class="">請先選擇租借餐廳 再選擇租借品項</h5>
+            <div class="content" id="container">
+              <table class="table table-striped mb-0 " style="width: 600px;">
+                <tr>
+                  <td>租借餐廳:
+                    <select name="restaurantId" id="restaurantId" style="width: 500px;" required
+                      onchange="changeRestaurant()">
+                      <option value="" selected disabled>請選擇租借餐廳</option>
+                      <option th:each="restaurant : ${restaurants}" th:value="${restaurant.restaurantId}"
+                        th:text="${restaurant.restaurantName}"></option>
+                    </select>
+                  </td>
+                </tr>
+              </table>
             </div>
-          </article>
-        </a>
+                  <!-- 購物車 -->
+              <div class="rd-navbar-basket-wrap">
+                <div>
+                  <button id="cartIcon" class="rd-navbar-basket rd-navbar-basket-mobile "
+                    data-rd-navbar-toggle=".cart-inline">
+                    <i class="fa-solid fa-cart-arrow-down"></i>
+                    <!-- 動態更新數量 -->
+                    <span id="showCartAmount"></span></button>
+                </div>
+                <div class="cart-inline toggle-original-elements" id="cartContainer">
+                  <!-- 動態插入資訊 -->
+                  <div class="cart-inline-header" id="cartHeaderContainer">
+                    <h5 class="cart-inline-title">In cart: <span id="showAmount">0</span> Products</h5>
+                  </div>
+                  <div class="cart-inline-body">
+                    <!-- 動態插入購物車內容 -->
+                    <div class="cart-inline-item" id="cartItemsContainer">
+                      <div class="unit align-items-center">
+                        <div class="unit-left">
+                          <div>
+                            <a href="single-product.html">
+                              <img src="/SpanTasty/upload/order/americano.jpeg" alt="" width="100" height="100" /></a>
+                          </div>
+                        </div>
+                        <div class="unit-body">
+                          <h6 class="cart-inline-name"><a href="single-product.html">Burdur Pearl</a></h6>
+                          <div>
+                            <div class="group-xs group-middle-2">
+                              <h6 class="cart-inline-title" id="itemPrice">$289</h6>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="cart-inline-footer pb-3 pt-3">
+                    <div class="group-sm ">
+                      <a class="button button-md button-primary button-pipaluk" onclick="submitCart()">結帳</a>
+                      <h6 class="ms-5 ps-4  cart-inline-title position-absolute top-15 end-10">總金額: <span id="showTotalPrice">$524</span></h6>
+                    </div>
+                  </div>
+                </div>
+                </div>
+                </div>
+                </div>
+                </div>
+
+
+
+    <section class="section pt-4 novi-bg novi-bg-img section-xl bg-default text-md-start pb-3">
+      <div class="container">
+        <div class="row row-90 row-fix justify-content-center">
+          <div class="col-lg-11 post-classic-wrap">
+            
+            <div class="" id="show-restaurant"></div>
+          </div>
         </div>
       </div>
+    </section>
+    <section class="section novi-bg novi-bg-img section-xl bg-default">
+      <div class="container">
+        <div class="row row-40">
+          <div class="col-sm-6 col-lg-4" th:each="tableware : ${tablewares}">
+            <a class="disable-link" th:id="'single' + ${tableware.tablewareId}">
+              <article class="box-icon-classic p-3">
+                <div
+                  class="unit box-icon-classic-body flex-column flex-md-row text-md-left flex-lg-column text-lg-center flex-xl-row text-xl-left">
+                  <div class="unit-left mb-0">
+                    <span class="product-title " th:text="${tableware.tablewareName}"></span>
+                    <br />
+                    <br />
+                    <span>NT$</span><span class="box-icon-classic-title "
+                      th:text="${tableware.tablewareDeposit}"></span>
+                  </div>
+                  <div class="unit-body ms-5 ps-5 mb-4">
+                    <img
+                      th:src="${tableware.tablewareImage != null ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}"
+                      alt="" width="100" height="100" />
+
+                    <span style="position: absolute; bottom: 10px; right: 10px; color:red;"
+                      th:id="'stock' + ${tableware.tablewareId}"></span>
+
+                    <div class="quantity-selector d-inline-flex justify-content-center align-center"
+                      style="position: absolute; bottom:50px; right: 13px;">
+                      <div class="table-cart-stepper d-inline-flex justify-content-center align-center"
+                        style="padding-top:0; padding-bottom:0;line-height: 20px;">
+                        <input class="form-input d-inline-flex pt-0 ps-1 pe-1 pb-0"
+                          th:id="'rentItemQuantity'+${tableware.tablewareId}"
+                          style="min-height:1px; position: relative; top:-5px;" type="number" data-zeros="true"
+                          value="1" min="1" max="1000">
+                      </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm pb-0 pt-0"
+                      style="position: absolute; bottom: 32px; right: 15px;"
+                      th:data-tablewareId="${tableware.tablewareId}" onclick="addToCart(this)"><i
+                        class="fa-solid fa-cart-arrow-down" style="font-size:12px;"></i></button>
+                  </div>
+                </div>
+              </article>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
 
-<h5 class="ms-4">租借須知</h5>
-<div class="mt-2 ms-4 mb-5">
-  <ul class="">
-    <li>租借用具歸還時間為：七天內。</li>
-  </ul>
-</div>
+    <h5 class="ms-4">租借須知</h5>
+    <div class="mt-2 ms-4 mb-5">
+      <ul class="">
+        <li>租借用具歸還時間為：七天內。</li>
+      </ul>
+    </div>
 <!-- Global Mailform Output-->
 <div class="snackbars" id="form-output-global"></div>
 
 <!-- footer  th:replace=-->
-<div th:replace="~{starcups/display/footer}" ></div>
+<div th:replace="~{starcups/display/footer}"></div>
 
 <!-- Javascript-->
 <script src="/SpanTasty/starcups/js/core.min.js"></script>
 <script src="/SpanTasty/starcups/js/script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+    
+    
+      // 顯示購物車內容
+document.addEventListener("DOMContentLoaded", function () {
+  // 顯示購物車內容
+  document.getElementById("cartIcon").addEventListener("click", function () {
+    console.log("購物車圖示被點擊");
+    document.getElementById("cartContainer").classList.toggle("active");
+  });
 
+  reloadCartItems(); // 頁面加載時載入購物車
+})
+
+function updateCartCount(count) {
+  document.getElementById('showCartAmount').textContent = count; // 更新購物車數量顯示
+}
+
+// 頁面加載時從 localStorage 讀取購物車資料
+window.onload = function () {
+  let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+  updateCartCount(cartItems.length); // 初始化購物車數量
+}
 
 function addToCart(button) {
-	let cartItemCount = 0; 
 	const token = localStorage.getItem('token');
-	const tablewareId = button.getAttribute('data-tablewareid');
-	const rentItemQuantity = document.getElementById(`rentItemQuantity${tablewareId}`).value;
+	if (!token) {
+	    alert('請先登入才能結帳');
+	    window.location.href = "login.html"; // 跳轉到登入頁面
+	    return;
+	}
+    const tablewareId = button.getAttribute('data-tablewareid'); // 正確獲取 tablewareId
+    const rentItemQuantity = parseInt(document.getElementById(`rentItemQuantity${tablewareId}`).value, 10);
     const restaurantId = document.getElementById("restaurantId").value;
-	console.log("Tableware ID:", tablewareId);
-    console.log("Quantity:", rentItemQuantity);
-    console.log("Restaurant ID:", restaurantId);
-    console.log("token:", token);
-	const stockElement = document.getElementById(`stock${tablewareId}`);
-	let stock = parseInt(stockElement.innerHTML.replace('剩', '').replace('件', ''), 10);
+	const url = 'http://localhost:8080/SpanTasty/StarCups/rental/tableware';
+    let dtoObject = {
+      tablewareId: tablewareId
+    };
+    // 透過 axios 從後端抓取商品資料
+    axios.post(url, dtoObject) // 使用正確的 tablewareId 發送請求
+        .then(function (response) {
+			console.log(response);
+            const itemData = response.data; // 從後端獲取的商品資料，假設包含名稱、圖片、價格、庫存
+			console.log(itemData);
+			
+            const stockElement = document.getElementById(`stock${tablewareId}`);
+            let stock = parseInt(stockElement.innerHTML.replace('剩', '').replace('件', ''), 10);
+
+            // 檢查庫存是否足夠
+            if (stock < rentItemQuantity) {
+                alert('庫存不足，無法加入購物車');
+                return;
+            }
+
+            // 從 localStorage 中獲取當前的購物車資料
+            let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+            // 檢查購物車是否已有此商品
+            let existingItem = cartItems.find(item => item.tablewareId === tablewareId);
+            if (existingItem) {
+                const newQuantity = parseInt(existingItem.rentItemQuantity) + rentItemQuantity;
+
+                // 檢查新數量是否超過庫存
+                if (newQuantity > stock) {
+                    alert('庫存不足，無法增加更多商品');
+                    return;
+                }
+
+                // 更新商品數量
+                existingItem.rentItemQuantity = newQuantity;
+            } else {
+                // 如果是新的商品，則新增到購物車
+                cartItems.push({
+                    tablewareId: tablewareId,
+                    rentItemQuantity: rentItemQuantity,
+                    restaurantId: restaurantId,
+                    itemName: itemData.tablewareName, // 從後端獲取的名稱
+                    itemImage: itemData.tablewareImage, // 從後端獲取的圖片
+                    itemPrice: itemData.tablewareDeposit // 從後端獲取的價格
+                });
+            }
+			console.log(cartItems);
+            // 更新 localStorage
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
 	
-  if (stock >= rentItemQuantity) {
-    stock -= rentItemQuantity;
-    stockElement.innerHTML = `剩${stock}件`;
-    
-	let dtoObject = {
-		tablewareId: tablewareId,
-		rentItemQuantity: rentItemQuantity,
-		restaurantId: restaurantId
-	};
-	    
-    axios.post(`http://localhost:8080/SpanTasty/StarCups/rental/addCart`, dtoObject, {
-	     headers: {
-	         'Authorization': `${token}`,
-	         'Content-Type': 'application/json'
-	     }
-	 })
-    // 發送加入購物車的請求到後端
-    .then(function(response) {
-	    if (response.status === 200) {
-	        cartItemCount++; // 增加商品數量
-	        document.getElementById('cart-count').textContent = cartItemCount; // 更新購物車數量顯示
-	        alert('成功加入購物車');
-	    } else {
-	        alert('加入購物車失敗，請稍後再試');
-	    }
-    })
-    .catch(function(error) {
-      console.log(error);
-      alert('加入購物車失敗，請稍後再試');
-    });
-  } else {
-    alert('庫存不足，無法加入購物車');
-  }
+            // 更新購物車顯示
+            updateCartUI(cartItems);
+
+            // 更新庫存顯示
+            stock -= rentItemQuantity;
+            stockElement.innerHTML = `剩${stock}件`;
+
+            alert('成功加入購物車');
+        })
+        .catch(function (error) {
+            console.error(error);
+            alert('無法獲取商品資料');
+        });
 }
 
+// 更新購物車 UI
+function updateCartUI(cartItems) {
+    const cartContainer = document.getElementById('cartItemsContainer');
+    const showAmount = document.getElementById('showAmount');
+    const showTotalPrice = document.getElementById('showTotalPrice');
+    let totalPrice = 0;
 
-function changeRestaurant(){
-	const url = 'http://localhost:8080/SpanTasty/StarCups/rental/showRestaurantStock';
-  const restaurantId = document.getElementById("restaurantId").value;
-  let dtoObject = {
-      restaurantId: restaurantId
-  };
-  axios.post(url, dtoObject)
-  .then(function(response) {
-      htmlMaker(response.data);
-  })
-  .catch(function(error) {
-      console.log(error);
-  });
-}
+    // 清空購物車內容
+    cartContainer.innerHTML = '';
 
-function updateStock(stocks) {
-	document.querySelectorAll('[id^="single"]').forEach(link => {
-	   link.classList.remove('disabled');
-	   link.style.pointerEvents = 'auto'; // 恢復點擊事件
-	   link.style.opacity = '1'; // 恢復樣式到正常狀態
-	});
-  stocks.forEach(stock => {
-    // 根據 tablewareId 查找對應的 span 標籤
-    const stockElement = document.getElementById(`stock${stock.tablewareId}`);
+    // 更新購物車顯示
+    cartItems.forEach(item => {
+        const itemTotalPrice = parseInt(item.itemPrice) * parseInt(item.rentItemQuantity);
+        totalPrice += itemTotalPrice;
+
+        const cartItemHtml = `
+        <div class="cart-inline-item">
+          <div class="unit align-items-center">
+            <div class="unit-left">
+              <img src="${item.itemImage}" alt="" width="100" height="100" />
+            </div>
+            <div class="unit-body">
+              <span class="fs-6">${item.itemName}</span>
+            </div>
+                  <span class="fs-5">${item.rentItemQuantity}</span>
+              <div class="unit-right">
+                  <h6 >金額: NT$${itemTotalPrice}</h6>
+                </div>
+          </div>
+        </div>`;
         
-    if (stockElement) {
-	    const linkElement = document.getElementById(`single${stock.tablewareId}`);
+        cartContainer.insertAdjacentHTML("beforeend", cartItemHtml);
+    });
+
+    // 更新總數和總價
+    showAmount.textContent = cartItems.length;
+    showTotalPrice.textContent = `NT$${totalPrice}`;
+}
+
+function submitCart() {
+    const token = localStorage.getItem('token');
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+    if (cartItems.length === 0) {
+        alert('購物車是空的');
+        return;
+    }
+
+    axios.post(`/SpanTasty/StarCups/rental/addCart`, cartItems, {
+        headers: {
+            'Authorization': `${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(function (response) {
+        if (response.status === 200) {
+            alert('購物車提交成功');
+            localStorage.removeItem('cartItems'); // 清空購物車
+            updateCartCount(0); // 重置購物車顯示
+            window.location.href = "/SpanTasty/StarCups/rental/cart"; 
+        } else {
+            alert('提交購物車失敗');
+        }
+    })
+    .catch(function (error) {
+        console.log(error);
+        alert('提交購物車失敗');
+    });
+}
+      
+function reloadCartItems() {
+    let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    updateCartUI(cartItems); // 初始化顯示
+    updateCartCount(cartItems.length); // 更新購物車數量
+}
+      
+      
+      
+      
+
+  function changeRestaurant() {
+    localStorage.removeItem('cartItems'); // 清空購物車
+    updateCartCount(0); // 更新購物車顯示為 0
+    const restaurantId = document.getElementById("restaurantId").value;
+    const url = 'http://localhost:8080/SpanTasty/StarCups/rental/showRestaurantStock';
+    let dtoObject = {
+      restaurantId: restaurantId
+    };
+    axios.post(url, dtoObject)
+      .then(function (response) {
+        htmlMaker(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  function updateStock(stocks) {
+    document.querySelectorAll('[id^="single"]').forEach(link => {
+      link.classList.remove('disabled');
+      link.style.pointerEvents = 'auto'; // 恢復點擊事件
+      link.style.opacity = '1'; // 恢復樣式到正常狀態
+    });
+    stocks.forEach(stock => {
+      // 根據 tablewareId 查找對應的 span 標籤
+      const stockElement = document.getElementById(`stock${stock.tablewareId}`);
+
+      if (stockElement) {
+        const linkElement = document.getElementById(`single${stock.tablewareId}`);
         // 插入剩餘庫存資料
         stockElement.innerHTML = `剩${stock.stock}件`;
         console.log(`stock: ${stock.stock}, type: ${typeof stock.stock}`);
-        if(Number(stock.stock) === 0){
+        if (Number(stock.stock) === 0) {
           linkElement.classList.add('disabled');
           linkElement.style.pointerEvents = 'none'; // 禁用點擊事件
           linkElement.style.opacity = '0.5'; // 改變樣式表示禁用狀態
         }
-    } else {
+      } else {
         console.log(`Element with id stock${stock.tablewareId} not found`);
-    }
-  });
-}
+      }
+    });
+  }
 
-function htmlMaker(data){
-  const restaurant = data.restaurant;
-  const stocks = data.stocks;
-  const showRestaurant = document.getElementById("show-restaurant");
+  function htmlMaker(data) {
+    const restaurant = data.restaurant;
+    const stocks = data.stocks;
+    const showRestaurant = document.getElementById("show-restaurant");
 
-	showRestaurant.innerHTML=`
-        <section class="section novi-bg novi-bg-img section-xl bg-default pt-0">
-        <div class="container">
-          <div class="row row-50 justify-content-center align-items-xl-center" style="height: 280px">
-            <div class="col-md-4 col-lg-4 col-xl-7" style="width: 280px">
-              <div class="offset-right-xl-4 " >
-				<img src="${restaurant.restaurantImg != null ? restaurant.restaurantImg : 'https://via.placeholder.com/450x400'}" alt="" class="restaurant-img img-fluid"/>
-              </div>
-            </div>
-            <div class="col-md-4 col-lg-4 col-xl-5">
-              <div class="single-project">
-                <h4>${restaurant.restaurantName}</h4>
-                <p class="text-gray-500">${restaurant.restaurantDesc}</p>
-                <div class="divider divider-30"></div>
-                <ul class="list list-description d-inline-block d-md-block">
-                  <li><span>Phone:</span><span>${restaurant.restaurantPhone}</span></li>
-                  <li><span>Time:</span><span>${restaurant.restaurantOpentime} - ${restaurant.restaurantClosetime}</span></li>
-                  <li><span>Location:</span><span>${restaurant.restaurantAddress}</span></li>
-                </ul>
-              </div>
-            </div>
+    showRestaurant.innerHTML = `
+    <section class="section novi-bg novi-bg-img section-xl bg-default pt-0">
+    <div class="container">
+      <div class="row row-50 justify-content-center align-items-xl-center" style="height: 280px">
+        <div class="col-md-4 col-lg-4 col-xl-7" style="width: 280px">
+          <div class="offset-right-xl-4 " >
+<img src="${restaurant.restaurantImg != null ? restaurant.restaurantImg : 'https://via.placeholder.com/450x400'}" alt="" class="restaurant-img img-fluid"/>
           </div>
         </div>
-      </section>
-    `;
-      updateStock(stocks);
-}
+        <div class="col-md-4 col-lg-4 col-xl-5">
+          <div class="single-project">
+            <h4>${restaurant.restaurantName}</h4>
+            <p class="text-gray-500">${restaurant.restaurantDesc}</p>
+            <div class="divider divider-30"></div>
+            <ul class="list list-description d-inline-block d-md-block">
+              <li><span>Phone:</span><span>${restaurant.restaurantPhone}</span></li>
+              <li><span>Time:</span><span>${restaurant.restaurantOpentime} - ${restaurant.restaurantClosetime}</span></li>
+              <li><span>Location:</span><span>${restaurant.restaurantAddress}</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+`;
+    updateStock(stocks);
+  }
 
 </script>
 </body>

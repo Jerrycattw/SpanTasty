@@ -1,5 +1,7 @@
 package com.eatspan.SpanTasty.controller.rental;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import com.eatspan.SpanTasty.dto.rental.CartRequestDTO;
 import com.eatspan.SpanTasty.dto.rental.RestaurantStockDTO;
 import com.eatspan.SpanTasty.dto.rental.TablewareFilterDTO;
+import com.eatspan.SpanTasty.dto.rental.TablewareIdDTO;
 import com.eatspan.SpanTasty.dto.rental.TablewareKeywordDTO;
 import com.eatspan.SpanTasty.entity.rental.Rent;
 import com.eatspan.SpanTasty.entity.rental.RentItem;
@@ -113,29 +116,52 @@ public class StarCupsRentController {
 	}
 	
 	
+	//
+	@ResponseBody
+	@PostMapping("/rental/tableware")
+	public ResponseEntity<Tableware> getOneTableware(@RequestBody TablewareIdDTO tablewareIdDTO) {
+		Tableware tableware = tablewareService.findTablewareById(tablewareIdDTO.getTablewareId());
+		return ResponseEntity.ok(tableware);
+	}
+	
+	
 	// 加入購物車
 	@ResponseBody
 	@PostMapping("/rental/addCart")
-	public ResponseEntity<?> addToCart(@RequestHeader(value = "Authorization") String token, @RequestBody CartRequestDTO cartRequestDTO) {
+	public ResponseEntity<?> addToCart(@RequestHeader(value = "Authorization") String token, @RequestBody List<CartRequestDTO> cartRequestDTOList) {
 		try {
-			System.out.println(token);
-			System.out.println(cartRequestDTO);
 			// 解析 JWT token 取得 claims
 			Map<String, Object> claims = JwtUtil.parseToken(token);
 			Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
 			
 			Integer rentId = (Integer) session.getAttribute("rentId");
-			Integer tablewareId = cartRequestDTO.getTablewareId();
-			Integer rentItemQuantity = cartRequestDTO.getRentItemQuantity();
-			Integer restaurantId = cartRequestDTO.getRestaurantId();
-			Rent rent;
-			if(rentId == null) {
-				rent = rentService.addRentOrder(memberId, tablewareId, rentItemQuantity, restaurantId);
-				session.setAttribute("rentId", rent.getRentId());
-			}else {
-				rentItemService.addRentItemToOrder(rentId, tablewareId, rentItemQuantity);
-				rent = rentService.findRentById(rentId);
-			}
+			Rent rent = rentService.findRentById(rentId);
+			session.setAttribute("rentId", rent.getRentId());
+			Integer rentDeposit = 0;
+			Integer restaurantId = null;
+			for(CartRequestDTO cartRequestDTO : cartRequestDTOList) {
+	            Integer tablewareId = cartRequestDTO.getTablewareId();
+	            Integer rentItemQuantity = cartRequestDTO.getRentItemQuantity();
+	            restaurantId = cartRequestDTO.getRestaurantId();
+	            // 新增每個租借項目
+	            RentItem rentItem = rentItemService.addRentItemToOrder(rentId, tablewareId, rentItemQuantity);
+	            rentDeposit += rentItem.getRentItemDeposit();
+	        }
+			
+			Date rentDate = new Date();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(rentDate);
+			calendar.add(Calendar.DAY_OF_YEAR, 7);
+			Date dueDate = calendar.getTime();
+			rent.setRestaurantId(restaurantId);
+			rent.setRentDeposit(rentDeposit);
+			rent.setMemberId(memberId);
+			rent.setRentDate(rentDate);
+			rent.setDueDate(dueDate);
+			rent.setRentStatus(1);
+			rent.setRentMemo("未歸還");
+			rent.setRentDeposit(0);
+			
 			return ResponseEntity.status(HttpStatus.OK).body(rent);
 		} catch (Exception e) {
 			e.printStackTrace();
