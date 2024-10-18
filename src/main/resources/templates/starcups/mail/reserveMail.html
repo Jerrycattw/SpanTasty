@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Cups 訂位成功通知</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f0f0f0;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #E6C7B3;">
+        <tr>
+            <td align="center" style="padding: 20px;">
+                <img src="cid:logo" alt="Star Cups Logo" style="width: 300px; max-width: 100%; height: auto;">
+                
+                <div style="width: 100%; max-width: 300px; background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;">
+                    <p>親愛的，${reserve.member.memberName} 您好</p>
+                    <p>非常感謝您的預訂，您的訂位資訊如下</p>
+                    <p>餐廳名稱: ${reserve.restaurant.restaurantName}</p>
+                    <p>餐廳地址: ${reserve.restaurant.restaurantAddress}</p>
+                    <p>用餐日期: ${reserve.reserveTime}</p>
+                    <p>用餐餐人數: ${reserve.reserveSeat}</p>
+                    <a href="http://localhost:8080/SpanTasty/StarCups" style="display: inline-block; padding: 10px 20px; background-color: #87461A; color: white; text-decoration: none; border-radius: 5px;">Check Now</a>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
