@@ -24,6 +24,29 @@
             cursor: pointer; 
             color: 	#AD5A5A; 
         }
+
+        .point{
+          letter-spacing: .1em;
+          color: #9b9b9b;
+        }
+
+        .pointText{
+          font-size: 20px;
+        }
+        
+        .box-sportlight-badge {
+          top: 0 !important;
+          font-size: 15px !important;
+        }
+        
+        .addBtn{
+          width: 60px;
+          height: 36px;
+          border: 0;
+          background-color: #efc4a3;
+          border-radius: 3px;
+        }
+
     </style>
 </head>
 <body>
@@ -79,9 +102,46 @@
               </tbody>
             </table>
           </div>
+          
+          <!-- discount -->
+          <div class="table-custom-responsive border p-3">
+            <!-- coupon -->
+            <div class="row">
+              <span class="point" style="font-size: 16px;">優惠券</span>
+              <div class="col">
+                <div class="form-wrap">
+                  <input class="form-input form-input-inverse" id="coupon-code" type="text" name="email" disabled>
+                  <label class="form-label" for="coupon-code">Coupon code</label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-button">
+                  <button class="button button-secondary button-pipaluk" type="submit" id="addCoupon">新增優惠券</button>
+                </div>
+              </div>
+              <div class="col"></div>
+            </div>
+            <!-- point -->
+            <div class="row mt-3">
+              <div class="col">
+                <span class="point" style="font-size: 16px;">點數折抵</span>
+                <div class="form-wrap text-align-center">
+                  <input class="form-input form-input-inverse pointText" id="coupon-code" type="number" name="email" max="910" style="font-size: 20px;">
+                  <label class="form-label" for="coupon-code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Point</label>
+                </div>
+              </div>
+              <div class="col d-flex align-items-end">
+                <ul class="point" id="">
+                  <li class="active" style="font-size: 16px;">可用點數 : 910點(1點折抵1元)</li>
+                  <li class="active" style="font-size: 16px;">您有 45點將於 2024/13/31到期</li>
+                </ul>  
+              </div>
+              <div class="col"></div>
+            </div>       
+          </div>
+
         </div>
       </section>
-
       <!-- Section payment-->
       <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
         <div class="container" th:each="member : ${members}">
@@ -126,20 +186,27 @@
                 <table class="table-custom table-custom-primary table-checkout">
                  
                   <tbody>
-                    <!-- <tr>
+                    <tr>
                       <td>Cart Subtotal</td>
                       <td>$524</td>
                     </tr>
                     <tr>
-                      <td>Shipping</td>
-                      <td>Free</td>
-                    </tr>-->
+                      <td>Coupon Discount</td>
+                      <td>-100</td>
+                    </tr>
+                    <tr>
+                      <td>Point Discount</td>
+                      <td>-15</td>
+                    </tr>
                     <tr> 
                       <td><h5>Total</h5></td>
                       <td><h5 th:text="'$' + ${totalAmount}"></h5></td>
                     </tr>
                   </tbody>
                 </table>
+                <div class="d-flex justify-content-end point mt-1 me-1" style="font-size: 17px;">
+                  <span >訂單完成後獲得   +14 點</span>
+                </div>
               </div>
             	<br>
               <h4 class="text-spacing-50">Payment methods</h4>
@@ -187,6 +254,91 @@
         </div>
       </section>
       <div id="ppoo"></div>
+
+      <!-- Modal click select coupon jump out by hao-->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">選擇優惠券</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row ms-1 me-1 " style="background-color: #F7F7F7;height: 70px;">
+                  <div class="col-3 d-flex justify-content-end align-items-center">新增優惠券</div>       
+                  <div class="col-6 d-flex align-items-center"><input type="text" class="form-control" ></div>       
+                  <div class="col-3 d-flex align-items-center"><button class="addBtn" >使用</button></div>       
+                </div>
+                <!--  -->
+                <!-- <div class="col-6 d-flex mb-3">
+                  <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
+                  <div class="border w-100 d-flex justify-content-between">
+                    <div class="ms-1 mt-1">                                                        
+                      <ul class="">
+                        <li><span>${coupon.coupon.rulesDescription}</span><span></span></li>
+                        <li><span>低消 </span><span>$${coupon.coupon.minOrderDiscount != null ? coupon.coupon.minOrderDiscount : '-'}</span></li>
+                        <li><span>最多折抵 </span><span>$${coupon.coupon.maxDiscount != null ? coupon.coupon.maxDiscount : '-'}</span></li>
+                        <li><span>有效日期: </span><span>${coupon.coupon.couponEndDate}</span><a href="#" class="ms-2 rule" data-couponid=${coupon.coupon.couponId}>使用規則</a></li>
+                      </ul>
+                    </div>                                                           
+                    <div class="d-flex align-items-center me-3">
+                      <button class="button button-md button-secondary button-pipaluk goshopping">去逛逛</button>
+                    </div>
+                    ${coupon.usageAmount > 1 ? `<div class="box-sportlight-badge box-sportlight-sale mb-3">x ${coupon.usageAmount}</div>` : ''}               
+                  </div>
+                </div> -->
+
+                  <!--  -->
+                  <div class="row">
+                    <div class="col d-flex mb-3">
+                      <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
+                      <div class="border w-100 d-flex justify-content-between">
+                        <div class="ms-1 mt-1">                                                        
+                          <ul class="">
+                            <li><span>歡慶三周年</span><span></span></li>
+                            <li><span>低消 </span><span>$100</span></li>
+                            <li><span>最多折抵 </span><span>$10</span></li>
+                            <li><span>有效日期: </span><span>2024/12/31</span><a href="#" class="ms-2 rule" data-couponid=${coupon.coupon.couponId}>使用規則</a></li>
+                          </ul>
+                        </div>
+                        <div class="d-flex align-items-center me-3">
+                          <input type="radio"  name="selectCoupon">  
+                        </div>                                                       
+                        <div class="box-sportlight-badge box-sportlight-sale mb-3">x 3</div>      
+                      </div>
+                    </div>
+                  </div>                  
+                  <!--  -->
+                  <div class="row mt-1">
+                    <div class="col d-flex mb-3">
+                      <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
+                      <div class="border w-100 d-flex justify-content-between">
+                        <div class="ms-1 mt-1">                                                        
+                          <ul class="">
+                            <li><span>歡慶三周年</span><span></span></li>
+                            <li><span>低消 </span><span>$100</span></li>
+                            <li><span>最多折抵 </span><span>$10</span></li>
+                            <li><span>有效日期: </span><span>2024/12/31</span><a href="#" class="ms-2 rule" data-couponid=${coupon.coupon.couponId}>使用規則</a></li>
+                          </ul>
+                        </div>
+                        <div class="d-flex align-items-center me-3">
+                          <input type="radio" name="selectCoupon">  
+                        </div>                                                       
+                        <div class="box-sportlight-badge box-sportlight-sale mb-3">x 5</div>      
+                      </div>
+                    </div>
+                  </div>
+                  
+              
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+              <button type="button" class="btn btn-primary">使用</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
     <!-- Global Mailform Output-->
     <div class="snackbars" id="form-output-global"></div>
     
@@ -211,5 +363,13 @@
      <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
     <script src="/SpanTasty/starcups/js/core.min.js"></script>
     <script src="/SpanTasty/starcups/js/script.js"></script>
+
+    <script>//edit by hao
+      document.getElementById('addCoupon').addEventListener('click',()=>{
+        var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+        myModal.show();
+      })
+
+    </script>
 </body>
 </html>
