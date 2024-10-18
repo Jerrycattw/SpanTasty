@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+<head>
+<meta charset="UTF-8">
+<title>Demo</title>
+<style>
+/* 切換按鈕的樣式 */
+.switch-button {
+	background-color: #f0f0f0;
+	border: 1px solid #ccc;
+	padding: 10px 20px;
+	margin: 10px;
+	cursor: pointer;
+}
+
+.switch-button.active {
+	background-color: #efc4a3;
+	border-color: #efc4a3;
+	color: #fff;
+}
+
+/* 統計區塊樣式 */
+.stat-section {
+	display: none;
+	padding: 20px;
+	margin-top: 20px;
+	background-color: #f8f9fa;
+	border: 1px solid #ccc;
+}
+
+.stat-section.active {
+	display: block;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="~{spantasty/display/navbar}"></div>
+	<!-- 主要內容區域 -->
+	<div class="content mt-5">
+		<h2 class="text-center">會員統計</h2>
+
+		<!-- 會員統計數據展示區域 -->
+		<div class="row mt-4">
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="card-title">總會員數</h5>
+						<p class="card-text" id="totalMembers"></p>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="card-title">當月新會員</h5>
+						<p class="card-text" id="newMembersThisMonth"></p>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="card-title">當月登入會員</h5>
+						<p class="card-text" id="activeMembersThisMonth"></p>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-3">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="card-title">停權會員數</h5>
+						<p class="card-text" id="suspendedMembers"></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 切換按鈕區域 -->
+		<div class="d-flex justify-content-center mt-4">
+			<div class="switch-button" id="totalMembersBtn">年度會員目標</div>
+			<div class="switch-button" id="newMembersBtn">當月會員目標</div>
+			<div class="switch-button" id="activeMembersBtn">當月活耀會員數</div>
+			<div class="switch-button" id="suspendedMembersBtn">停權會員主因</div>
+			<div class="switch-button" id="ageDistributionBtn">年齡分佈</div>
+		</div>
+
+		<button id="barChartBtn">顯示年齡分佈長條圖</button>
+		<button id="pieChartBtn">顯示年齡分佈圓餅圖</button>
+
+		<div class="stat-section active" id="totalMembersSection">
+			<h4>總會員數</h4>
+			<p>顯示總會員數的數據...</p>
+		</div>
+
+		<div class="stat-section" id="newMembersSection">
+			<h4>當月新會員</h4>
+			<p>顯示當月新會員的數據...</p>
+		</div>
+
+		<div class="stat-section" id="activeMembersSection">
+			<h4>當月登入會員</h4>
+			<p>顯示當月登入會員的數據...</p>
+		</div>
+
+		<div class="stat-section" id="suspendedMembersSection">
+			<h4>停權會員</h4>
+			<p>顯示停權會員的數據...</p>
+		</div>
+
+		<div class="stat-section" id="ageDistributionSection">
+			<h4>年齡分佈</h4>
+			<p>顯示年齡分佈的數據...</p>
+		</div>
+
+		<!-- 圖表區域 -->
+		<div class="row mt-5">
+			<div class="col-md-12">
+				<canvas id="memberChart" style="width: 100%; height: 300px;"></canvas>
+			</div>
+		</div>
+
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/progressbar.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+    // 通用函數來更新 DOM 元素的內容
+    function updateTextContent(elementId, content) {
+      document.getElementById(elementId).textContent = content;
+    }
+
+    let currentChart = null;  // 用來存放當前顯示的圖表
+    // 清除當前的圖表（如果存在）
+
+    function clearCurrentChart() {
+      if (currentChart) {
+        currentChart.destroy();  // 銷毀現有圖表
+        currentChart = null;     // 重置變數
+      }
+
+      // 重置 canvas
+      const canvas = document.getElementById('memberChart');
+      const parent = canvas.parentNode;
+      parent.removeChild(canvas);  // 移除 canvas 元素
+      const newCanvas = document.createElement('canvas');  // 創建新的 canvas 元素
+      newCanvas.id = 'memberChart';  // 設置新 canvas 的 ID
+      newCanvas.style.width = '100%';  // 固定寬度 100%
+      newCanvas.style.height = '300px'; // 固定高度 300px
+
+      parent.appendChild(newCanvas);  // 將新 canvas 添加到原本的位置
+    }
+
+    // 獲取總會員數資料
+    function fetchTotalMembers() {
+      axios.get('/SpanTasty/api/statistics/total')
+        .then(function (response) {
+          if (response.data.success) {
+            updateTextContent('totalMembers', response.data.data);
+          } else {
+            updateTextContent('totalMembers', '查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('查詢過程中發生錯誤:', error);
+          updateTextContent('totalMembers', '錯誤');
+        });
+    }
+
+    // 獲取當月新會員數資料
+    function fetchNewMembersThisMonth() {
+      axios.get('/SpanTasty/api/statistics/new-this-month')
+        .then(function (response) {
+          if (response.data.success) {
+            updateTextContent('newMembersThisMonth', response.data.data);
+          } else {
+            updateTextContent('newMembersThisMonth', '查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('查詢過程中發生錯誤:', error);
+          updateTextContent('newMembersThisMonth', '錯誤');
+        });
+    }
+
+    // 獲取當月登入會員數資料
+    function fetchActiveMembersThisMonth() {
+      axios.get('/SpanTasty/api/statistics/active-this-month')
+        .then(function (response) {
+          if (response.data.success) {
+            updateTextContent('activeMembersThisMonth', response.data.data);
+          } else {
+            updateTextContent('activeMembersThisMonth', '查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('查詢過程中發生錯誤:', error);
+          updateTextContent('activeMembersThisMonth', '錯誤');
+        });
+    }
+
+    // 獲取停權會員數資料
+    function fetchSuspendedMembers() {
+      axios.get('/SpanTasty/api/statistics/suspended')
+        .then(function (response) {
+          if (response.data.success) {
+            updateTextContent('suspendedMembers', response.data.data);
+          } else {
+            updateTextContent('suspendedMembers', '查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('查詢過程中發生錯誤:', error);
+          updateTextContent('suspendedMembers', '錯誤');
+        });
+    }
+
+    async function showAgeDistributionBarChart() {
+      clearCurrentChart();
+      try {
+        // 發送 Axios 請求獲取年齡分佈資料
+        const response = await axios.get('/SpanTasty/api/statistics/age-distribution');
+
+        // 假設後端回傳的資料結構是 { success: true, data: {...} }
+        if (response.data.success) {
+          const ageDistribution = response.data.data; // 獲取後端返回的年齡分佈資料
+
+
+          const canvas = document.getElementById('memberChart');
+          canvas.style.width = '75%';  // 將寬度設置為 80%，或根據需要調整
+          canvas.style.height = '350px'; // 高度保持不變
+          canvas.style.display = 'block'; // 設置 display 為 block
+          canvas.style.margin = '0 auto'; // 讓 canvas 在父容器中水平置中
+
+          // 如果成功獲取數據，開始繪製圖表
+          const ctx = canvas.getContext('2d');
+
+          // 設定圖表的標籤和資料
+          const labels = ['未滿18歲', '18-25歲', '26-35歲', '36-45歲', '45歲以上'];
+          const data = [
+            ageDistribution.ageBelow18 || 0,
+            ageDistribution.age18To25 || 0,
+            ageDistribution.age26To35 || 0,
+            ageDistribution.age36To45 || 0,
+            ageDistribution.age46Plus || 0
+          ];
+
+          // 生成新的 Chart.js 長條圖
+          currentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: '會員人數',
+                data: data,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: false,
+              maintainAspectRatio: false,
+              layout: {
+                padding: {
+                  top: 20,
+                  bottom: 20
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        } else {
+          console.error('Failed to fetch age distribution data');
+        }
+      } catch (error) {
+        // 錯誤處理
+        console.error('Error fetching age distribution data:', error);
+      }
+    }
+
+    async function showAgeDistributionPieChart() {
+      clearCurrentChart();
+      try {
+        // 發送 Axios 請求獲取年齡分佈資料
+        const response = await axios.get('/SpanTasty/api/statistics/age-distribution');
+
+        // 假設後端回傳的資料結構是 { success: true, data: {...} }
+        if (response.data.success) {
+          const ageDistribution = response.data.data; // 獲取後端返回的年齡分佈資料
+
+          // 如果成功獲取數據，開始繪製圖表
+          const ctx = document.getElementById('memberChart').getContext('2d');
+
+          // 設定圖表的標籤和資料
+          const labels = ['未滿18歲', '18-25歲', '26-35歲', '36-45歲', '45歲以上'];
+          const data = [
+            ageDistribution.ageBelow18 || 0,
+            ageDistribution.age18To25 || 0,
+            ageDistribution.age26To35 || 0,
+            ageDistribution.age36To45 || 0,
+            ageDistribution.age46Plus || 0
+          ];
+
+          // 生成新的 Chart.js 圓餅圖
+          currentChart = new Chart(ctx, {
+            type: 'pie',  // 使用圓餅圖
+            data: {
+              labels: labels,
+              datasets: [{
+                label: '會員人數',
+                data: data,
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)',
+                  'rgba(255, 206, 86, 0.2)',
+                  'rgba(75, 192, 192, 0.2)',
+                  'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: false,
+              plugins: {
+                legend: {
+                  position: 'top',
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (tooltipItem) {
+                      return tooltipItem.label + ': ' + tooltipItem.raw + ' 人';
+                    }
+                  }
+                }
+              }
+            }
+          });
+        } else {
+          console.error('Failed to fetch age distribution data');
+        }
+      } catch (error) {
+        // 錯誤處理
+        console.error('Error fetching age distribution data:', error);
+      }
+    }
+
+    // 當 DOM 加載完成時，調用所有獲取資料的方法
+    document.addEventListener('DOMContentLoaded', function () {
+      fetchTotalMembers();
+      fetchNewMembersThisMonth();
+      fetchActiveMembersThisMonth();
+      fetchSuspendedMembers();
+
+      document.getElementById('barChartBtn').addEventListener('click', function () {
+        showAgeDistributionBarChart();
+      });
+
+      // 綁定按鈕來觸發圓餅圖
+      document.getElementById('pieChartBtn').addEventListener('click', function () {
+        showAgeDistributionPieChart();
+      });
+    });
+  </script>
+
+</body>
+
+</html>

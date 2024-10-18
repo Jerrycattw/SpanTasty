@@ -35,4 +35,9 @@ public class AdminPageController {
     public String showAdminPermissionPage() {
         return "spantasty//account/adminPermission"; 
     }
+    
+    @GetMapping("/admin/demoPage")
+    public String showDemoPage() {
+        return "spantasty//account/demo"; 
+    }
 }

@@ -51,4 +51,29 @@ public class MemberStatisticsService {
         String yearMonth = String.format("%04d-%02d", year, month);
         return memberRepository.countMembersByYearMonth(yearMonth);
     }
+    
+    
+    public Integer getTotalMembers() {
+        return memberRepository.countTotalMembers();
+    }
+    
+    public Integer getNewMembersThisMonth() {
+        return memberRepository.countMembersRegisteredThisMonth();
+    }
+    
+    // 當月登入會員數查詢
+    public Integer getActiveMembersThisMonth() {
+        return memberRepository.countActiveMembersThisMonth();
+    }
+
+    // 停權會員數查詢
+    public Integer getSuspendedMembers() {
+        return memberRepository.countSuspendedAndInactiveMembers();
+    }
+    
+    // 查詢會員年齡分布	
+    public Map<String, Integer> getMembersAgeDistribution() {
+        return memberRepository.countMembersByAgeGroup();
+    }
+    
 }

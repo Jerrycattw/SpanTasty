@@ -28,6 +28,7 @@
                   <a id="auth-link" class="rd-nav-link" href="/SpanTasty/StarCups/loginRegister">login</a>
                 </li>
               </ul>
+
               <!-- <div class="rd-navbar-search">
                       <button class="rd-navbar-search-toggle" data-rd-navbar-toggle=".rd-navbar-search"><span></span></button>
                       <form class="rd-search" action="search-results.html" data-search-live="rd-search-results-live" method="GET">
@@ -107,27 +108,38 @@
                 <li class="rd-nav-item"><a class="rd-nav-link" href="shop.html">租借</a>
                   <!-- RD Navbar Dropdown-->
                   <ul class="rd-menu rd-navbar-dropdown">
-                    <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="/SpanTasty/StarCups/rental/lookbook">LOOKBOOK</a></li>
-                    <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="/SpanTasty/StarCups/rental/rent">RENT</a></li>
+                    <li class="rd-dropdown-item"><a class="rd-dropdown-link"
+                        href="/SpanTasty/StarCups/rental/lookbook">LOOKBOOK</a></li>
+                    <li class="rd-dropdown-item"><a class="rd-dropdown-link"
+                        href="/SpanTasty/StarCups/rental/rent">RENT</a></li>
                   </ul>
                 </li>
                 <li class="rd-nav-item">
                   <a class="rd-nav-link" id="member-center-link" href="#">會員</a>
                   <!-- RD Navbar Dropdown -->
                   <ul class="rd-menu rd-navbar-dropdown">
-                    <li class="rd-dropdown-item"><a id="member-info-link" class="rd-dropdown-link" href="/SpanTasty/StarCups/memberCenter?section=info">個人資訊</a></li>
-                    <li class="rd-dropdown-item"><a id="change-password-link" class="rd-dropdown-link" href="/SpanTasty/StarCups/memberCenter?section=password">修改密碼</a></li>
-                    <li class="rd-dropdown-item"><a id="change-contact-link" class="rd-dropdown-link" href="/SpanTasty/StarCups/memberCenter?section=contact">修改聯絡方式</a></li>
-                    <li class="rd-dropdown-item"><a id="change-avatar-link" class="rd-dropdown-link" href="/SpanTasty/StarCups/memberCenter?section=avatar">更換頭像</a></li>
-                    <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="/SpanTasty/StarCups/coupon">測試會員優惠券入口</a></li>
-                    <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="/SpanTasty/StarCups/point">測試會員點數入口</a></li>
+                    <li class="rd-dropdown-item"><a id="member-info-link" class="rd-dropdown-link"
+                        href="/SpanTasty/StarCups/memberCenter">帳戶管理</a></li>
+                    <li class="rd-dropdown-item"><a class="rd-dropdown-link"
+                        href="/SpanTasty/StarCups/coupon">測試會員優惠券入口</a></li>
+                    <li class="rd-dropdown-item"><a class="rd-dropdown-link"
+                        href="/SpanTasty/StarCups/point">測試會員點數入口</a></li>
                   </ul>
                 </li>
               </ul>
             </div>
+            <!-------------------------------------------- 頭像 -------------------------------------------->
+            <div class="rd-navbar-nav-wrap">
+              <div class="memberNavbar-info" style="display: flex; align-items: center">
+                <img id="memberNavbar-avatar" src="/SpanTasty/starcups/images/account/defaultUser.jpeg"
+                  alt="User Avatar" style="width: 30px; height: 30px; border-radius: 50%;">
+                <span id="memberNavbar-name" style="margin-left: 7px; margin-right: 10px; font-size: 14px;">訪客</span>
+              </div>
+            </div>
             <!-------------------------------------------- 漢堡 -------------------------------------------->
             <div class="rd-navbar-project-hamburger" data-multitoggle=".rd-navbar-main"
-              data-multitoggle-blur=".rd-navbar-wrap" data-multitoggle-isolate="data-multitoggle-isolate">
+              data-multitoggle-blur=".rd-navbar-wrap" data-multitoggle-isolate="data-multitoggle-isolate"
+              style="display:none">
               <div class="project-hamburger"><span class="project-hamburger-arrow-top"></span><span
                   class="project-hamburger-arrow-center"></span><span class="project-hamburger-arrow-bottom"></span>
               </div>
@@ -154,7 +166,8 @@
                     <!-- Thumbnail Classic-->
                     <article class="thumbnail thumbnail-mary"><a class="thumbnail-mary-figure"
                         href="images/gallery-image-14-1200x800-original.jpg" data-lightgallery="item"><img
-                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124" height="124" /></a>
+                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124"
+                          height="124" /></a>
                       <div class="thumbnail-mary-caption">
                         <div class="icon fl-bigmug-line-zoom60"></div>
                       </div>
@@ -164,7 +177,8 @@
                     <!-- Thumbnail Classic-->
                     <article class="thumbnail thumbnail-mary"><a class="thumbnail-mary-figure"
                         href="images/grid-gallery-3-1200x800-original.jpg" data-lightgallery="item"><img
-                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124" height="124" /></a>
+                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124"
+                          height="124" /></a>
                       <div class="thumbnail-mary-caption">
                         <div class="icon fl-bigmug-line-zoom60"></div>
                       </div>
@@ -174,7 +188,8 @@
                     <!-- Thumbnail Classic-->
                     <article class="thumbnail thumbnail-mary"><a class="thumbnail-mary-figure"
                         href="images/grid-gallery-5-1200x800-original.jpg" data-lightgallery="item"><img
-                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124" height="124" /></a>
+                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124"
+                          height="124" /></a>
                       <div class="thumbnail-mary-caption">
                         <div class="icon fl-bigmug-line-zoom60"></div>
                       </div>
@@ -184,7 +199,8 @@
                     <!-- Thumbnail Classic-->
                     <article class="thumbnail thumbnail-mary"><a class="thumbnail-mary-figure"
                         href="images/gallery-image-17-530x800-original.jpg" data-lightgallery="item"><img
-                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124" height="124" /></a>
+                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124"
+                          height="124" /></a>
                       <div class="thumbnail-mary-caption">
                         <div class="icon fl-bigmug-line-zoom60"></div>
                       </div>
@@ -194,7 +210,8 @@
                     <!-- Thumbnail Classic-->
                     <article class="thumbnail thumbnail-mary"><a class="thumbnail-mary-figure"
                         href="images/grid-gallery-2-530x800-original.jpg" data-lightgallery="item"><img
-                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124" height="124" /></a>
+                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124"
+                          height="124" /></a>
                       <div class="thumbnail-mary-caption">
                         <div class="icon fl-bigmug-line-zoom60"></div>
                       </div>
@@ -204,7 +221,8 @@
                     <!-- Thumbnail Classic-->
                     <article class="thumbnail thumbnail-mary"><a class="thumbnail-mary-figure"
                         href="images/grid-gallery-1-570x800-original.jpg" data-lightgallery="item"><img
-                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124" height="124" /></a>
+                          src="/SpanTasty/starcups/images/index/logo-starcups.png" alt="" width="124"
+                          height="124" /></a>
                       <div class="thumbnail-mary-caption">
                         <div class="icon fl-bigmug-line-zoom60"></div>
                       </div>
@@ -251,13 +269,65 @@
   document.addEventListener('DOMContentLoaded', function () {
     const memberCenterLink = document.getElementById('member-center-link');
     const authLink = document.getElementById('auth-link');
+
+    const memberNavbarNameElement = document.getElementById('memberNavbar-name');
+    const memberNavbarAvatarElement = document.getElementById('memberNavbar-avatar');
+
     const token = localStorage.getItem('token');
     if (token) {
       memberCenterLink.href = '/SpanTasty/StarCups/memberCenter';
       console.log('已登入，Token:', token);
+      navbarGetProfile(); // 獲取會員資訊
+      navbarGetAvatar();  // 獲取會員頭像
     } else {
       memberCenterLink.href = '/SpanTasty/StarCups/loginRegister';
       console.log('未登入');
+    }
+
+    // 使用 axios 獲取會員個人資訊
+    function navbarGetProfile() {
+      axios.get('/SpanTasty/member/profile', {
+        headers: {
+          'Authorization': `${token}`
+        }
+      })
+        .then(response => {
+          if (response.data.success) {
+            const member = response.data.data;
+            // 更新使用者名稱
+            memberNavbarNameElement.textContent = member.memberName || '訪客';  // 如果沒有名稱，顯示「訪客」
+          } else {
+            console.log('無法獲取會員資料: ' + response.data.message);
+            memberNavbarNameElement.textContent = '訪客';  // 顯示「訪客」作為預設
+          }
+        })
+        .catch(error => {
+          console.error('獲取會員資訊錯誤:', error);
+          memberNavbarNameElement.textContent = '訪客';  // 顯示「訪客」作為預設
+        });
+    }
+
+    // 使用 axios 獲取會員頭像
+    function navbarGetAvatar() {
+      axios.get('/SpanTasty/member/getAvatar', {
+        headers: {
+          'Authorization': `${token}`
+        }
+      })
+        .then(response => {
+          if (response.data.success && response.data.data) {
+            // 如果有頭像資料，將其顯示
+            const navbarBase64Avatar = response.data.data;
+            memberNavbarAvatarElement.src = `data:image/jpeg;base64,${navbarBase64Avatar}`;
+          } else {
+            console.log(response.data.message);
+            // 如果沒有頭像資料，使用預設頭像
+            memberNavbarAvatarElement.src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+          }
+        })
+        .catch(error => {
+          userAvatarElement.src = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+        });
     }
 
     if (token) {
@@ -265,10 +335,27 @@
       authLink.textContent = 'logout';
       authLink.href = '#';  // 你可以讓 logout 不跳轉
       authLink.addEventListener('click', function () {
-        // 清除 token，登出
-        localStorage.removeItem('token');
-        alert('已登出');
-        window.location.href = '/SpanTasty/StarCups';
+        // 發送登出請求給後端
+      axios.post('/SpanTasty/member/logout', {}, {
+        headers: {
+          'Authorization': `${token}` // 將 token 放入 header 中
+        }
+      })
+      .then(response => {
+        if (response.data.success) {
+          // 清除 localStorage 中的 token
+          localStorage.removeItem('token');
+          alert('已登出');
+          // 跳轉到首頁或其他頁面
+          window.location.href = '/SpanTasty/StarCups';
+        } else {
+          alert('登出失敗，請重試');
+        }
+      })
+      .catch(error => {
+        console.error('登出錯誤:', error);
+        alert('登出過程中發生錯誤');
+      });
       });
     } else {
       // 未登入，顯示登入按鈕
@@ -276,8 +363,8 @@
       authLink.href = '/SpanTasty/StarCups/loginRegister';  // 導向登入頁面
     }
   });
-  
-  
-  
-  
+
+
+
+
 </script>

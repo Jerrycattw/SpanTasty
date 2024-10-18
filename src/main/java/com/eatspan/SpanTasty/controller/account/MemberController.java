@@ -1,6 +1,7 @@
 package com.eatspan.SpanTasty.controller.account;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -25,6 +26,7 @@ import com.eatspan.SpanTasty.utils.account.JwtUtil;
 import com.eatspan.SpanTasty.utils.account.Result;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/member")
@@ -78,6 +80,15 @@ public class MemberController {
 		// 返回包含 token 的成功結果
 		return Result.success("登入成功", token);
 	}
+	
+	// 登出
+	@PostMapping("/logout")
+	public Result<String> logout(HttpSession session) {
+		System.out.println("前台有登出了!!!");
+		
+		session.invalidate(); // 使 session 無效
+		return Result.success("登出成功");
+	}
 
 	// 獲取資訊
 	@GetMapping("/profile")
@@ -113,48 +124,42 @@ public class MemberController {
 		}
 	}
 
-	// 修改會員聯絡方式
-	@PostMapping("/updateContactInfo")
-	public Result<String> updateContactInfo(@RequestHeader("Authorization") String token,
-			@RequestParam(required = false) String phone, @RequestParam(required = false) String email,
-			@RequestParam(required = false) String address) {
-		// 解析 JWT Token 並取得會員 ID
-		Map<String, Object> claims = JwtUtil.parseToken(token);
-		Integer memberId = (Integer) claims.get("memberId");
+	// 修改會員資訊
+	@PostMapping("/updateMemberInfo")
+	public Result<String> updateMemberInfo(@RequestHeader("Authorization") String token,
+	        @RequestParam(required = false) String phone,
+	        @RequestParam(required = false) String address,
+	        @RequestParam(required = false) LocalDate birthday) {
+	    
+	    // 解析 JWT Token 並取得會員 ID
+	    Map<String, Object> claims = JwtUtil.parseToken(token);
+	    Integer memberId = (Integer) claims.get("memberId");
 
-		// 根據會員 ID 查詢會員
-		Optional<Member> memberOpt = memberService.findMemberById(memberId);
-		if (memberOpt.isEmpty()) {
-			return Result.failure("無法找到該會員的個人資訊");
-		}
+	    // 根據會員 ID 查詢會員
+	    Optional<Member> memberOpt = memberService.findMemberById(memberId);
+	    if (memberOpt.isEmpty()) {
+	        return Result.failure("無法找到該會員的個人資訊");
+	    }
 
-		// 更新聯絡方式
-		Member member = memberOpt.get();
-		if (phone != null) {
-			member.setPhone(phone);
-		}
-		if (email != null) {
-			
-			if ("Google".equals(member.getProvider())) {
-			    return Result.failure("Google 登入的用戶無法修改信箱");
-			}
-			
-			if (memberService.existsByEmail(email)) {
-				return Result.failure("此信箱已被使用");
-			}
-			member.setEmail(email);
-		}
-		if (address != null) {
-			member.setAddress(address);
-		}
+	    // 更新聯絡方式和生日
+	    Member member = memberOpt.get();
+	    if (phone != null) {
+	        member.setPhone(phone);
+	    }
+	    if (address != null) {
+	        member.setAddress(address);
+	    }
+	    if (birthday != null) {
+	        member.setBirthday(birthday);
+	    }
 
-		// 保存修改後的會員資料
-		boolean isSuccess = memberService.save(member);
-		if (isSuccess) {
-			return Result.success("聯絡方式更新成功");
-		} else {
-			return Result.failure("聯絡方式更新失敗，請重試");
-		}
+	    // 保存修改後的會員資料
+	    boolean isSuccess = memberService.updateMemberInfo(member);
+	    if (isSuccess) {
+	        return Result.success("會員資料更新成功");
+	    } else {
+	        return Result.failure("會員資料更新失敗，請重試");
+	    }
 	}
 
 	// 更新密碼
@@ -172,6 +177,8 @@ public class MemberController {
 
 		// 調用 Service 方法來更新密碼
 		boolean isSuccess = memberService.updatePassword(memberId, oldPassword, newPassword);
+		System.out.println("oldPassword : "+oldPassword);
+		System.out.println("newPassword : "+newPassword);
 
 		if (isSuccess) {
 			return Result.success("密碼重設成功");
