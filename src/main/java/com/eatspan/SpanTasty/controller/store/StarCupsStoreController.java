@@ -216,7 +216,7 @@ public class StarCupsStoreController {
 	@ResponseBody
 	public String ecpayCheckout(Model model) {
 	    Integer shoppingId = (Integer) session.getAttribute("shoppingId");
-
+	    
 	    String aioCheckOutALLForm = shoppingOrderService.ecpayCheckout(shoppingId);
 
 	    model.addAttribute("aioCheckOutALLForm", aioCheckOutALLForm);
@@ -226,21 +226,28 @@ public class StarCupsStoreController {
 	}
 
 	
-//	@PostMapping("/checkOutFinish")
-//	@ResponseBody
-//	public String checkOutFinish(@RequestParam Map<String, String>map, Model model) {
+	@GetMapping("/OrderConfirm")
+	public String checkOutFinish(@RequestParam Map<String, String>map, Model model) {
+		Integer shoppingId = (Integer) session.getAttribute("shoppingId");
+		ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+		
+		
+		
+		System.out.println("shoppingId "+shoppingId );
+		model.addAttribute("shopping", shopping);
+		List<ShoppingItem> items = shoppingItemService.findShoppingItemById(shoppingId);
+		model.addAttribute("items", items);
+		List<Product> productList = productService.findAllProduct();
+		model.addAttribute("productList", productList);
+		Integer totalAmount = shoppingOrderService.calculateTotalAmount(shoppingId);
+		model.addAttribute("totalAmount", totalAmount);
+		List<Member> members = memberService.findMemberByShoppingId(shoppingId);
+		model.addAttribute("members",members);
+		
+		
 //		String string = map.get("TradeNo");
 //		System.out.println(map);
-//		return "1|OK";
-//	}
-	
-	
-	@PostMapping("/checkOutFinish")
-	public String checkOutFinish(@RequestParam Map<String, String>map, Model model) {
-		String string = map.get("TradeNo");
-		
-		System.out.println(map);
-		return "starcups/store/page505";
+		return "starcups/store/OrderConfirm";
 	}
 	
 }

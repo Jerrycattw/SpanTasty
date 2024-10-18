@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation"
+	lang="en">
+<head>
+<title>Order Details</title>
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport"
+	content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" type="text/css"
+	href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+<style>
+.ie-panel {
+	display: none;
+	background: #212121;
+	padding: 10px 0;
+	box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
+	clear: both;
+	text-align: center;
+	position: relative;
+	z-index: 1;
+}
+
+html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
+	display: block;
+}
+
+.cart-icon {
+	position: fixed;
+	top: 100px;
+	right: 50px;
+	z-index: 1000;
+	font-size: 2rem;
+	cursor: pointer;
+	color: #AD5A5A;
+}
+</style>
+</head>
+<body>
+	<!-- navbar th:replace=-->
+	<div th:replace="~{starcups/display/navbar}"></div>
+
+	<!-- Breadcrumbs -->
+	<section class="section breadcrumbs-custom-inset">
+		<div class="breadcrumbs-custom context-dark">
+			<div class="container">
+				<h2 class="breadcrumbs-custom-title">Order Details</h2>
+				<ul class="breadcrumbs-custom-path">
+					<li><a href="index.html">Home</a></li>
+					<li><a href="shop.html">Shop</a></li>
+					<li class="active">Order Details</li>
+				</ul>
+			</div>
+			<div class="box-position novi-bg novi-bg-img"
+				style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+		</div>
+	</section>
+
+
+	<!-- Testimonials #4-->
+	<section class="section novi-bg novi-bg-img section-xl bg-default">
+		<div class="container d-flex justify-content-center">
+			<!-- Quote Lisa-->
+			<article class="quote-lisa w-100" th:each="shopping : ${shopping}">
+				<div
+					class="box-icon-classic-icon novi-icon fl-bigmug-line-giftbox54 "></div>
+				<h3 class="box-icon-modern-title">Order Completed</h3>
+				<div class="quote-lisa-body">
+					<div class="quote-lisa-text">
+						<p class="q">
+						<p class="quote-lisa-status">
+						<h4>Order Number #<span th:text=${shopping.shoppingId}></span></h4>
+						</p>
+						<div class="row row-sm row-30 row-fix fs-6 text">
+							<div class="col-sm-12 ">
+								<ul class="list-marked ">
+									<li>Shopping Date : <span
+										th:text="${shopping.formattedShoppingDate}"></span></li>
+									<li>Name: <span th:text="${shopping.member.memberName}"></span></li>
+									<li>Phone: <span th:text="${shopping.member.phone}"></span></li>
+									<li>Address: <span th:text="${shopping.member.address}"></span></li>
+									<li>EMail: <span th:text="${shopping.member.email}"></span></li>
+									<li>Order List:<br><br>
+										<ul th:each="item : ${shopping.items}">
+											<li>
+												<div class="box-pricing-body ">
+													<i class="fa-solid fa-check"></i>&nbsp;&nbsp;<span
+														th:text="${item.product.productName}"></span>: 
+													<span th:text="${item.shoppingItemQuantity}"></span>*NT$
+													<span th:text="${item.shoppingItemPrice}"></span>
+												</div>
+										</ul>
+												<div class="fs-6 text" style="text-align: right"><br>
+													<span>Amount :$0</span><br>
+													Discount Amount :$0<span th:text="${discountAmount}"></span><br></div>
+												<div class="fs-5 text" style="text-align: right">
+													Total Amount :$<span th:text="${totalAmount}"></span>
+												</div>
+							</ul>
+						</div>
+					</div>
+				</div>
+		</div>
+		<h5 class="quote-lisa-cite">
+			<br>
+			<h5>THANKS FOR YOUR SHOPPING</h5>
+		</h5>
+		</div>
+		</article>
+		</div>
+	</section>
+
+
+	<!-- footer th:replace=-->
+	<div th:replace="~{starcups/display/footer}"></div>
+
+	<!-- Cart Icon 
+    <i class="fa-solid fa-cart-plus cart-icon"></i>-->
+
+	<!-- Javascript-->
+	<script>
+      axios.post(`http://localhost:8080/SpanTasty/StarCups/ecpayCheckout`)
+      .then(res => {
+        console.log(res)
+        // document.querySelector("#ppoo").innerHTML += res
+        // document.querySelector("#ppoo form").submit()
+      })
+      .catch(err => {
+        console.error(err); 
+      })
+     </script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+	<script src="/SpanTasty/starcups/js/core.min.js"></script>
+	<script src="/SpanTasty/starcups/js/script.js"></script>
+</body>
+</html>
