@@ -78,6 +78,12 @@ public class Restaurant {
 	@Column(name = "reserve_time_scale")
 	private Integer reserveTimeScale;
 	
+	@Column(name = "reserve_min")
+	private Integer reserveMin;
+	
+	@Column(name = "reserve_max")
+	private Integer reserveMax;
+	
 	
 	@JsonIgnore //該屬性不要做JSON序列化避免無線迴圈 //預設lazy
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "restaurant", cascade = CascadeType.ALL)
@@ -107,6 +113,12 @@ public class Restaurant {
 		}
 		if(this.reserveTimeScale == null) {
 			this.reserveTimeScale = 30; // 訂位的區間(預設為30分鐘)
+		}
+		if(this.reserveMin == null) {
+			this.reserveMin = 2; // 訂位的區間(預設為30分鐘)
+		}
+		if(this.reserveMax == null) {
+			this.reserveMax = 10; // 訂位的區間(預設為30分鐘)
 		}
 	}
 	

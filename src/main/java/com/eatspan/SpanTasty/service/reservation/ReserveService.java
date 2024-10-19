@@ -49,19 +49,18 @@ public class ReserveService {
 	private TableTypeRepository tableTypeRepository;
 	
 	@Autowired
-	private MailConfig mailConfig;// javaMail要注入----------------------------
+	private MailConfig mailConfig;// javaMail
 	
 	@Autowired
-	private JavaMailSender mailSender;// javaMail要注入----------------------------
+	private JavaMailSender mailSender;// javaMail
 	
 	@Autowired
-	private freemarker.template.Configuration freemarkerConfig; // javaMail要注入----------------------------
+	private freemarker.template.Configuration freemarkerConfig; // javaMail
 	
 	// 新增訂位
 	public Reserve addReserve(Reserve reserve) {
 		
 		reserve.setFinishedTime(reserve.getReserveTime().plusMinutes(reserve.getRestaurant().getEattime()));
-		
 		return reserveRepository.save(reserve);
 	}
 	
@@ -104,7 +103,7 @@ public class ReserveService {
 	
 	
 	// 查詢訂位by可變條件
-	public List<Reserve> findReserveByCriteria(String memberName, String phone, Integer restaurantId, String tableTypeId, LocalDateTime reserveTimeStart, LocalDateTime reserveTimeEnd){
+	public List<Reserve> findReserveByCriteria(String memberName, String phone, Integer restaurantId, String tableTypeId, LocalDate reserveTimeStart, LocalDate reserveTimeEnd){
 		return reserveRepository.findReserveByCriteria(memberName, phone, restaurantId, tableTypeId, reserveTimeStart, reserveTimeEnd);
 	}
 	

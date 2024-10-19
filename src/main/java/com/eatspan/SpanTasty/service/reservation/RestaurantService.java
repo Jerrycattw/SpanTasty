@@ -30,6 +30,7 @@ public class RestaurantService {
 	
 	// 新增餐廳
 	public Restaurant addRestaurant(Restaurant restaurant) {
+		
 	    if (restaurant.getRestaurantStatus() == null) {
 	        restaurant.setRestaurantStatus(3);
 	    }
@@ -39,21 +40,15 @@ public class RestaurantService {
 		if(restaurant.getReserveTimeScale() == null) {
 			restaurant.setReserveTimeScale(30); // 訂位的區間(預設為30分鐘)
 		}
+		if(restaurant.getReserveMin() == null) {
+			restaurant.setReserveMin(2); // 餐廳最少開放訂位的人數
+		}
+		if(restaurant.getReserveMax() == null) {
+			restaurant.setReserveMax(10); // 餐廳最多開放訂位的人數
+		}
 	    
-	    // 儲存餐廳以獲取其 ID
-	    Restaurant savedRestaurant = restaurantRepository.save(restaurant);
-
-	    // 插入所有現有桌位種類對於新插入的餐廳
-	    List<TableType> tableTypes = tableTypeRepository.findAll();
-	    for (TableType tableType : tableTypes) {
-	    	RestaurantTable restaurantTable = new RestaurantTable();
-	    	RestaurantTableId restaurantTableId = new RestaurantTableId(savedRestaurant.getRestaurantId(), tableType.getTableTypeId());
-	    	restaurantTable.setId(restaurantTableId);
-	        restaurantTable.setTableTypeNumber(0);
-	        restaurantTableRepository.save(restaurantTable);
-	    }
+	    return restaurantRepository.save(restaurant); // 返回保存的餐廳對象
 	    
-	    return savedRestaurant; // 返回保存的餐廳對象
 	}
 	
 	
@@ -98,6 +93,9 @@ public class RestaurantService {
 		Pageable pageAble = PageRequest.of(pageNumber-1, itemNumber, Sort.Direction.DESC, "restaurantId");
 		return restaurantRepository.findByRestaurantStatus(1, pageAble);
 	}
+	
+	
+	//檢查前端回傳的訂位規則修改DTO物件
 	
 
 

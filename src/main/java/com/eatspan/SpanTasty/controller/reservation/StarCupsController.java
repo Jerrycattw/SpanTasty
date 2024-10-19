@@ -152,6 +152,8 @@ public class StarCupsController {
             if (tableType == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("TableType not found");
             reserve.setTableType(tableType);
             
+            reserve.setReserveNote(reserveDTO.getReserveNote());
+            
             // 保存訂位
             reserveService.addReserve(reserve);
             
