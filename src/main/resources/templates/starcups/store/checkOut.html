@@ -46,7 +46,9 @@
           background-color: #efc4a3;
           border-radius: 3px;
         }
-
+        .cantUse {
+          filter: opacity(50%) grayscale(100%);
+        }
     </style>
 </head>
 <body>
@@ -111,12 +113,12 @@
               <div class="col">
                 <div class="form-wrap">
                   <input class="form-input form-input-inverse" id="coupon-code" type="text" name="email" disabled>
-                  <label class="form-label" for="coupon-code">Coupon code</label>
+                  <label class="form-label" for="coupon-code" id="coupon-code-label">Coupon code</label>
                 </div>
               </div>
               <div class="col">
                 <div class="form-button">
-                  <button class="button button-secondary button-pipaluk" type="submit" id="addCoupon">新增優惠券</button>
+                  <button class="button button-secondary button-pipaluk" type="submit" id="selectCoupon">新增優惠券</button>
                 </div>
               </div>
               <div class="col"></div>
@@ -289,6 +291,7 @@
                 </div> -->
 
                   <!--  -->
+                <div id="couponDiv" class="mt-2">
                   <div class="row">
                     <div class="col d-flex mb-3">
                       <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
@@ -309,11 +312,12 @@
                     </div>
                   </div>                  
                   <!--  -->
+
                   <div class="row mt-1">
                     <div class="col d-flex mb-3">
                       <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
                       <div class="border w-100 d-flex justify-content-between">
-                        <div class="ms-1 mt-1">                                                        
+                        <div class="ms-1 mt-1" th:each="coupon : ${coupons}">                                                        
                           <ul class="">
                             <li><span>歡慶三周年</span><span></span></li>
                             <li><span>低消 </span><span>$100</span></li>
@@ -328,12 +332,12 @@
                       </div>
                     </div>
                   </div>
-                  
+                </div>  
               
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-              <button type="button" class="btn btn-primary">使用</button>
+              <button type="button" class="btn btn-primary" id="useCoupon" data-bs-dismiss="modal">使用</button>
             </div>
           </div>
         </div>
@@ -364,12 +368,63 @@
     <script src="/SpanTasty/starcups/js/core.min.js"></script>
     <script src="/SpanTasty/starcups/js/script.js"></script>
 
-    <script>//edit by hao
-      document.getElementById('addCoupon').addEventListener('click',()=>{
+    <script th:inline="javascript">//edit by hao
+      const shopoingItems = [[${items}]]
+      const memberId = [[${members[0].memberId}]]
+      const totalAmount = [[${totalAmount}]]
+
+      document.getElementById('selectCoupon').addEventListener('click',()=>{
         var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
         myModal.show();
+
+        axios.post('http://localhost:8080/SpanTasty/StarCups/coupon/checkout',{
+                    shoppingItems: shopoingItems,
+                    totalAmount: totalAmount,
+                    memberId: memberId
+                })
+                .then(res=>{
+                    console.log(res.data);
+                    HtmlMaker(res.data)
+                    let coupons = res.data
+                })
+
+
       })
 
+      function HtmlMaker(data){
+        const couponDiv =document.getElementById('couponDiv')
+        couponDiv.innerHTML=''
+        data.forEach(coupon => {
+          couponDiv.innerHTML +=`
+            <div class="row mt-1 ${coupon.canUse? '':'cantUse'}">
+              <div class="col d-flex mb-3">
+                <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
+                <div class="border w-100 d-flex justify-content-between">
+                  <div class="ms-1 mt-1">                                                        
+                    <ul class="">
+                      <li><span>${coupon.coupon.couponDescription}</span><span></span></li>
+                      <li><span>低消: </span><span>$${coupon.coupon.minOrderDiscount?coupon.coupon.minOrderDiscount:'-'}</span></li>
+                      <li><span>低消最多折抵: </span><span>$${coupon.coupon.maxDiscount?coupon.coupon.maxDiscount:'-'}</span></li>
+                      <li><span>有效日期: </span><span>${coupon.coupon.couponEndDate}</span><a href="#" class="ms-2 rule" data-couponid=${coupon.coupon.couponId}>使用規則</a></li>
+                    </ul>
+                  </div>
+                  <div class="d-flex align-items-center me-3">
+                    <input type="radio"  name="radioCoupon" ${coupon.canUse? '':'disabled'}  data-couponcode="${coupon.coupon.couponCode}">  
+                  </div>                                                       
+                  
+                </div>
+              </div>
+            </div>`  
+        });
+      }
+
+
+      document.getElementById('useCoupon').addEventListener('click',()=>{
+        let couponCode = document.querySelector('input[name="radioCoupon"]:checked').dataset.couponcode
+        document.getElementById('coupon-code').value=couponCode
+        document.getElementById('coupon-code-label').textContent=''
+
+      })
     </script>
 </body>
 </html>

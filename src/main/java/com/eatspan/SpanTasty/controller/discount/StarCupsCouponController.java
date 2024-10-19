@@ -64,11 +64,12 @@ public class StarCupsCouponController {
 	
 	@PostMapping("/coupon/checkout")
 	@ResponseBody
-	public List<CouponMember> getMethodName(@RequestHeader(value = "Authorization") String token,@RequestBody ShoppingItemDTO shoppingItemDTO) {
-		Map<String, Object> claims = JwtUtil.parseToken(token);
-        Integer memberId = (Integer) claims.get("memberId"); 
-        
-        return couponService.couponCanUse(shoppingItemDTO.getShoppingItems(), shoppingItemDTO.getTotalAmount(), memberId);
+	public List<CouponMember> getMethodName(@RequestBody ShoppingItemDTO shoppingItemDTO) {
+		Integer memberId = shoppingItemDTO.getMemberId();
+		Integer totalAmount = shoppingItemDTO.getTotalAmount();
+		List<ShoppingItem> shoppingItems = shoppingItemDTO.getShoppingItems();
+		
+        return couponService.couponCanUse(shoppingItems, totalAmount, memberId);
 
 	}
 	

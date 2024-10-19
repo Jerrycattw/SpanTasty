@@ -390,7 +390,7 @@ public class CouponService {
 		//取得會員擁有優惠券 coupons
 		List<CouponMember> couponMembers = couponMemberRepo.findByMemberId(memberId);
 
-		//判斷每個優惠券是否可以使用   1.低消 2.是否包含一種購物車明細的種類
+		//判斷每個優惠券是否可以使用   
 		couponMembers.stream().forEach(couponMember->{
 			Coupon coupon = couponMember.getCoupon();
 			
@@ -429,6 +429,6 @@ public class CouponService {
 			.filter(couponMember->couponMember.getCanUse()==true)
 			.collect(Collectors.toList());
 		
-		return couponMemberCanUse;
+		return couponMembers;
 	}
 }
