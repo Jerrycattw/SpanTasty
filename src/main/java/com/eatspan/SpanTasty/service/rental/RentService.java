@@ -136,5 +136,11 @@ public class RentService {
 		rentRepository.save(rent);
 		return rent;
 	}
+	
+	
+	//
+	public List<Rent> findRentsByMemberId(Integer memberId) {
+		return rentRepository.findByMemberId(memberId);
+	}
 }
 

@@ -39,4 +39,7 @@ public interface RentRepository extends JpaRepository<Rent, Integer> {
 	
 	@Query(value = "SELECT SUM(rentItem.tableware.tablewareDeposit * rentItem.rentItemQuantity) FROM RentItem rentItem WHERE rentItem.rent.rentId = :rentId")
 	Integer countRentDeposit(@Param("rentId") Integer rentId);
+	
+	
+	List<Rent> findByMemberId(Integer memberId);
 }

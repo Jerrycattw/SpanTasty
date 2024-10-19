@@ -19,12 +19,14 @@ import com.eatspan.SpanTasty.dto.rental.RestaurantStockDTO;
 import com.eatspan.SpanTasty.dto.rental.TablewareFilterDTO;
 import com.eatspan.SpanTasty.dto.rental.TablewareIdDTO;
 import com.eatspan.SpanTasty.dto.rental.TablewareKeywordDTO;
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.rental.Rent;
 import com.eatspan.SpanTasty.entity.rental.RentItem;
 import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
+import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.service.rental.RentItemService;
 import com.eatspan.SpanTasty.service.rental.RentService;
 import com.eatspan.SpanTasty.service.rental.TablewareService;
@@ -56,7 +58,16 @@ public class StarCupsRentController {
 	@Autowired
 	private RestaurantService restaurantService;
 	@Autowired
+	private MemberService memberService;
+	@Autowired
 	private HttpSession session;
+	
+	
+	// 導向Home頁面
+	@GetMapping("/rental/home")
+	public String toHomePage(Model model) {
+		return "starcups/rental/rentHomePage";
+	}
 	
 	
 	// 導向到LOOKBOOK頁面
@@ -135,8 +146,14 @@ public class StarCupsRentController {
 			Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
 			
 			Integer rentId = (Integer) session.getAttribute("rentId");
-			Rent rent = rentService.findRentById(rentId);
-			session.setAttribute("rentId", rent.getRentId());
+			
+			Rent rent;
+			if(rentId == null) {
+				rent = rentService.addRentOrder(memberId);
+				session.setAttribute("rentId", rent.getRentId());
+				rentId = rent.getRentId();
+			}
+			
 			Integer rentDeposit = 0;
 			Integer restaurantId = null;
 			for(CartRequestDTO cartRequestDTO : cartRequestDTOList) {
@@ -147,20 +164,10 @@ public class StarCupsRentController {
 	            RentItem rentItem = rentItemService.addRentItemToOrder(rentId, tablewareId, rentItemQuantity);
 	            rentDeposit += rentItem.getRentItemDeposit();
 	        }
-			
-			Date rentDate = new Date();
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(rentDate);
-			calendar.add(Calendar.DAY_OF_YEAR, 7);
-			Date dueDate = calendar.getTime();
+			rent = rentService.findRentById(rentId);
 			rent.setRestaurantId(restaurantId);
 			rent.setRentDeposit(rentDeposit);
 			rent.setMemberId(memberId);
-			rent.setRentDate(rentDate);
-			rent.setDueDate(dueDate);
-			rent.setRentStatus(1);
-			rent.setRentMemo("未歸還");
-			rent.setRentDeposit(0);
 			
 			return ResponseEntity.status(HttpStatus.OK).body(rent);
 		} catch (Exception e) {
@@ -172,20 +179,29 @@ public class StarCupsRentController {
 	
 	// 導向結帳畫面
 	@GetMapping("/rental/cart")
-	public String getMethodName(Model model) {
+	public String toCheckout(Model model) {
 		Integer rentId = (Integer) session.getAttribute("rentId");
 		Rent rent = rentService.findRentById(rentId);
-		model.addAttribute("rent", rent);
-		
-		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
-		model.addAttribute("rentItems", rentItems);
-		
-		List<Tableware> tablewares = tablewareService.findAllTablewares();
-		model.addAttribute("tablewares", tablewares);
-		
 		Integer totalDeposit = rentService.calculateTotalDeposit(rentId);
+		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+		model.addAttribute("rent", rent);
+		model.addAttribute("rentItems", rentItems);
+		model.addAttribute("tablewares", tablewares);
 		model.addAttribute("totalDeposit",totalDeposit);
 		return "starcups/rental/checkoutTablewarePage";
+	}
+	
+	
+	//導向訂單名細頁面
+	@GetMapping("/rental/allRent")
+	public String toAllRent(@RequestParam(value = "token") String token, Model model) {
+		// 解析 JWT token 取得 claims
+		Map<String, Object> claims = JwtUtil.parseToken(token);
+		Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
+		List<Rent> rents = rentService.findRentsByMemberId(memberId);
+		model.addAttribute("rents", rents);
+		return "starcups/rental/allRentPage";
 	}
 	
 
