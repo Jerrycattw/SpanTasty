@@ -15,38 +15,71 @@ import com.eatspan.SpanTasty.utils.account.Result;
 @RestController
 @RequestMapping("/api/statistics")
 public class MemberStatisticsController {
-	
-	
-    @Autowired
-    private MemberStatisticsService memberStatisticsService;
-    
-    @GetMapping("/registrationCounts")
-    public Result<Map<String, Integer>> getRegistrationCounts(
-            @RequestParam(value = "year", required = false) Integer year,
-            @RequestParam(value = "month", required = false) Integer month) {
-        Map<String, Integer> registrationCounts = memberStatisticsService.getRegistrationCounts(year, month);
-        return Result.success(registrationCounts);
-    }
 
-    @GetMapping("/statusCounts")
-    public Result<Map<String, Long>> getStatusCounts() {
-        Map<String, Long> data = memberStatisticsService.getMemberStatusCounts();
-        return Result.success(data);
-    }
-    
-    @GetMapping("/count")
-    public Result<Map<String, Object>> getMemberCountByYearMonth(
-        @RequestParam int year, 
-        @RequestParam int month
-    ) {
-        // 調用 Service 層方法來獲取會員數
-        int memberCount = memberStatisticsService.getMemberCountByYearMonth(year, month);
-        
-        // 構建返回的 Map 來包含會員數
-        Map<String, Object> data = new HashMap<>();
-        data.put("memberCount", memberCount);
-        
-        // 返回一個成功的 Result 物件，包含會員數的資訊
-        return Result.success(data);
-    }
+	@Autowired
+	private MemberStatisticsService memberStatisticsService;
+
+	@GetMapping("/registrationCounts")
+	public Result<Map<String, Integer>> getRegistrationCounts(
+			@RequestParam(value = "year", required = false) Integer year,
+			@RequestParam(value = "month", required = false) Integer month) {
+		Map<String, Integer> registrationCounts = memberStatisticsService.getRegistrationCounts(year, month);
+		return Result.success(registrationCounts);
+	}
+
+	@GetMapping("/statusCounts")
+	public Result<Map<String, Long>> getStatusCounts() {
+		Map<String, Long> data = memberStatisticsService.getMemberStatusCounts();
+		return Result.success(data);
+	}
+
+	@GetMapping("/count")
+	public Result<Map<String, Object>> getMemberCountByYearMonth(@RequestParam int year, @RequestParam int month) {
+		// 調用 Service 層方法來獲取會員數
+		int memberCount = memberStatisticsService.getMemberCountByYearMonth(year, month);
+
+		// 構建返回的 Map 來包含會員數
+		Map<String, Object> data = new HashMap<>();
+		data.put("memberCount", memberCount);
+
+		// 返回一個成功的 Result 物件，包含會員數的資訊
+		return Result.success(data);
+	}
+	
+	// 總會員數員數
+	@GetMapping("/total")
+	public Result<Integer> getTotalMembers() {
+		Integer totalMembers = memberStatisticsService.getTotalMembers();
+		return Result.success(totalMembers);
+
+	}
+	
+	// 當月新會員
+	@GetMapping("/new-this-month")
+	public Result<Integer> getNewMembersThisMonth() {
+		Integer newMembers = memberStatisticsService.getNewMembersThisMonth();
+		return Result.success(newMembers);
+	}
+	
+	// 當月活耀會員
+	@GetMapping("/active-this-month")
+	public Result<Integer> getActiveMembersThisMonth() {
+		Integer activeMembers = memberStatisticsService.getActiveMembersThisMonth();
+		return Result.success(activeMembers);
+	}
+	
+	// 停權會員數
+	@GetMapping("/suspended")
+	public Result<Integer> getSuspendedMembers() {
+		Integer suspendedMembers = memberStatisticsService.getSuspendedMembers();
+		return Result.success(suspendedMembers);
+	}
+	
+	// 年齡分布
+	@GetMapping("/age-distribution")
+	public Result<Map<String, Integer>> getAgeDistribution() {
+		Map<String, Integer> ageDistribution = memberStatisticsService.getMembersAgeDistribution();
+		return Result.success(ageDistribution);
+	}
+
 }

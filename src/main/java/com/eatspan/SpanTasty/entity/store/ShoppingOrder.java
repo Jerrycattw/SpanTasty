@@ -58,6 +58,13 @@ public class ShoppingOrder {
 	@Column(name = "shopping_memo")
     private String shoppingMemo;
 	
+	
+	@Column(name= "discount_amount")
+	private Integer discountAmount;
+	
+	@Column(name= "final_total")
+	private Integer finalAmount;
+	
 	@ManyToOne 
     @JoinColumn(name = "member_id", referencedColumnName = "member_id", insertable = false, updatable = false)
     private Member member;

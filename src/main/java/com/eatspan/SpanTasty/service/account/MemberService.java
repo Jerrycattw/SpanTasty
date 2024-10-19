@@ -123,6 +123,17 @@ public class MemberService {
 		return true; // 密碼更新成功
 	}
 
+	// 更新會員資訊
+	public boolean updateMemberInfo(Member member) {
+	    try {
+	        memberRepository.save(member); // 保存會員更新的資料到資料庫
+	        return true;
+	    } catch (Exception e) {
+	        // 捕捉可能的例外，例如帳號或 email 重複等
+	        return false;
+	    }
+	}
+	
 	// 更新會員頭像
 	public boolean updateMemberAvatar(Integer memberId, byte[] avatarBytes) {
 
@@ -202,7 +213,8 @@ public class MemberService {
 		memberRepository.save(member);
 		return true; // 更新成功
 	}
-
+	
+	// 刪除頭像
 	@Transactional
 	public boolean removeMemberAvatar(Integer memberId) {
 		try {

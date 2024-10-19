@@ -257,31 +257,82 @@ public class ShoppingOrderService {
 
 	
 
-	    // 取得購物訂單
-	    public String ecpayCheckout(Integer shoppingId) {
-	        // 获取当前时间
-	        String currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
-	        
-	        // 计算总金额
-	        Integer totalAmount = calculateTotalAmount(shoppingId);
+//	    // 取得購物訂單
+//	    public String ecpayCheckout(Integer shoppingId) {
+//	        // 获取当前时间
+//	        String currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+//	        
+//	        // 计算总金额
+//	        Integer totalAmount = calculateTotalAmount(shoppingId);
+//
+//	        // 设置 ECPay 结账信息
+//	        AllInOne all = new AllInOne("");
+//	        AioCheckOutALL obj = new AioCheckOutALL();
+////	        obj.setMerchantTradeNo(String.valueOf(shoppingId)); // 使用 shoppingId 作為交易編號
+//	        obj.setMerchantTradeNo("SC" + System.currentTimeMillis()); // 使用 shoppingId 作為交易編號
+//	        obj.setMerchantTradeDate(currentDateTime); // 使用當前時間
+//	        obj.setTotalAmount(String.valueOf(totalAmount)); // 使用總金額
+//	        obj.setItemName("商品名稱"); // 可根據需要設定商品名稱
+//	        obj.setTradeDesc("test Description");
+////	        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/allProduct");
+//	        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/OrderConfirm");
+//	        obj.setNeedExtraPaidInfo("N");
+////	        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/allProduct");
+//	        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/OrderConfirm");
+//
+//	        // 生成 ECPay 表单			
+//	        return all.aioCheckOut(obj, null);
+//	    }
 
-	        // 设置 ECPay 结账信息
-	        AllInOne all = new AllInOne("");
-	        AioCheckOutALL obj = new AioCheckOutALL();
-//	        obj.setMerchantTradeNo(String.valueOf(shoppingId)); // 使用 shoppingId 作為交易編號
-	        obj.setMerchantTradeNo("Spend" + System.currentTimeMillis()); // 使用 shoppingId 作為交易編號
-	        obj.setMerchantTradeDate(currentDateTime); // 使用當前時間
-	        obj.setTotalAmount(String.valueOf(totalAmount)); // 使用總金額
-	        obj.setItemName("商品名稱"); // 可根據需要設定商品名稱
-	        obj.setTradeDesc("test Description");
-	        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/allProduct");
-	        obj.setNeedExtraPaidInfo("N");
-	        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/allProduct");
+    // 取得購物訂單
+    public String ecpayCheckout(Integer shoppingId) {
+        // 获取当前时间
+        String currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+        
+        // 计算总金额
+        Integer totalAmount = calculateTotalAmount(shoppingId);
 
-	        // 生成 ECPay 表单
-	        return all.aioCheckOut(obj, null);
-	    }
+        // 设置 ECPay 结账信息
+        AllInOne all = new AllInOne("");
+        AioCheckOutALL obj = new AioCheckOutALL();
+        obj.setMerchantTradeNo(String.valueOf(shoppingId)); // 使用 shoppingId 作為交易編號
+        obj.setMerchantTradeNo("SC" + System.currentTimeMillis()); // 使用 shoppingId 作為交易編號
+        obj.setMerchantTradeDate(currentDateTime); // 使用當前時間
+        obj.setTotalAmount(String.valueOf(totalAmount)); // 使用總金額
 
+        // 獲取所有商品名稱和金額資訊
+        List<ShoppingItem> shoppingItems = shoppingItemService.findShoppingItemById(shoppingId);
+        StringBuilder itemNames = new StringBuilder();
 
+        for (ShoppingItem item : shoppingItems) {
+            Product product = item.getProduct(); // 假設 ShoppingItem 中有 Product 對象
+            if (product != null) {
+                Integer quantity = item.getShoppingItemQuantity(); // 獲取數量
+                Integer price = item.getShoppingItemPrice(); // 獲取價格
+                itemNames.append(product.getProductName())
+                          .append(" ")
+                          .append(quantity)
+                          .append("*NT$")
+                          .append(price)
+                          .append(".  /  "); // 格式化商品資訊
+            }
+        }
+
+        // 移除最後的逗號和空格
+        if (itemNames.length() > 0) {
+            itemNames.setLength(itemNames.length() - 2);
+        }
+
+        obj.setItemName(itemNames.toString()); // 設置商品名稱
+        obj.setTradeDesc("test Description");
+//        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/allProduct");
+        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/OrderConfirm");
+        obj.setNeedExtraPaidInfo("N");
+//        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/allProduct");
+        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/OrderConfirm");
+
+        // 生成 ECPay 表单			
+        return all.aioCheckOut(obj, null);
+    }
 
 }
