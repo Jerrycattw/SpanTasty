@@ -5,6 +5,13 @@
 <title>Restaurant</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+<style>
+.large-switch {
+    width: 60px; /* 調整按鈕寬度 */
+    height: 30px; /* 調整按鈕高度 */
+    transform: scale(1.5); /* 使用 scale 放大按鈕 */
+}
+</style>
 </head>
 <body>
 <div th:replace="~{spantasty/display/navbar}"></div>
@@ -12,25 +19,27 @@
 <div class="content">
 	
     
-    <h2 class="mb-4 d-flex justify-content-center mt-5">餐 廳 桌 位 管 理</h2>
+    <h2 class="mb-4 d-flex justify-content-center mt-2">餐 廳 訂 位 規 則</h2>
     
 	<div class="container mt-4">
 	    <div class="row justify-content-center">
-	        <div class="col-9">
+	        <div class="col-8">
 	            <div class="card bg-white shadow">
 	                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
-	                    <h3 class="mb-0">桌位種類管理</h3>
+	                    <h3 class="mb-0">餐廳桌位管理</h3>
+						<div>
+	                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#setTableModal">修改餐廳訂位規則</button>
 	                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTableTypeModal">+新增餐廳桌位種類</button>
+						</div>
 	                </div>
 	                <div class="table-responsive">
 	                    <table class="table table-white table-striped table-hover text-center">
 	                        <thead>
 	                            <tr>
 	                                <th scope="col">餐廳名稱</th>
-	                                <th scope="col">桌位種類代碼</th>
+	                                <th scope="col">桌位代碼</th>
 	                                <th scope="col">桌位種類座位數</th>
-	                                <th scope="col">桌位數量</th>
-	                                <th scope="col">修改桌位數量</th>
+	                                <th scope="col">是否可供訂位</th>
 	                                <th scope="col">刪除桌位種類</th>
 	                            </tr>
 	                        </thead>
@@ -38,16 +47,17 @@
 	                            <th:block th:each="table : ${tables}">
 	                                <tr>
 	                                    <td th:text="${restaurant.restaurantName}"></td>
-	                                    <td th:text="${table.tableType.tableTypeId}"></td>
+	                                    <td th:text="${table.id.tableTypeId} + ${table.id.tableId}"></td>
 	                                    <td th:text="${table.tableType.tableTypeName} + '人桌'"></td>
-	                                    <td th:text="${table.tableTypeNumber}"></td>
-	                                    <td>
-	                                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#setTableModal" 
-	                                                th:data-tabletypeid="${table.tableType.tableTypeId}" th:data-tabletypename="${table.tableType.tableTypeName}" 
-	                                                th:data-tabletypenumber="${table.tableTypeNumber}">修改</button>
-	                                    </td>
+	                                    
+										<td>
+										    <div class="form-check form-switch d-flex justify-content-center">
+										        <input class="form-check-input large-switch" type="checkbox" role="switch"  th:data-table-type-id="${table.tableType.tableTypeId}" th:data-restaurant-id="${restaurant.restaurantId}" th:data-table-id="${table.id.tableId}" th:data-table-status="${table.tableStatus}" th:checked="${table.tableStatus == 1}" onchange="changeTableStatus(this)">
+										    </div>
+										</td>
+
 	                                    <td id="delRestaurantTableBtn" class="align-middle">
-	                                        <button th:data-table-type-id="${table.tableType.tableTypeId}" th:data-restaurant-id="${restaurant.restaurantId}" 
+	                                        <button th:data-table-type-id="${table.tableType.tableTypeId}" th:data-restaurant-id="${restaurant.restaurantId}" th:data-table-id="${table.id.tableId}"
 	                                                class="btn btn-danger btn-sm" onclick="confirmDelete(this)">刪除</button>
 	                                    </td>
 	                                </tr>
@@ -66,7 +76,7 @@
 
 
     <!-- 新增桌位種類的模態框 -->
-    <div class="modal fade" id="addTableTypeModal" tabindex="-1" aria-labelledby="addTableTypeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addTableTypeModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -77,8 +87,11 @@
                 
                     <form method="post" th:action="@{/table/add}">
                         <div class="mb-3">
+                            <label for="restaurantName" class="form-label">餐廳名稱</label>
                             <input type="hidden" name="restaurantId" th:value="${restaurant.restaurantId}" />
-
+                            <input type="text" name="restaurantName" th:value="${restaurant.restaurantName}" class="form-control" disabled />
+                        </div>
+                        <div class="mb-3">
                             <label for="tableTypeId" class="form-label">選擇桌位種類:</label>
 					        <select name="tableTypeId" class="form-select" required>
 					            <option value="" disabled selected>請選擇桌位種類</option> <!-- 提供一個默認提示 -->
@@ -88,8 +101,8 @@
 					        </select>
                         </div>
                         <div class="mb-3">
-                            <label for="tableTypeNumber" class="form-label">輸入桌位數量:</label>
-                            <input type="number" class="form-control" name="tableTypeNumber" min="0" max="20" required />
+                            <label for="tableNumber" class="form-label">輸入想新增數量:</label>
+                            <input type="number" class="form-control" name="tableNumber" min="1" max="20" required />
                         </div>
                         <button type="submit" class="btn btn-primary">確定</button>
                     </form>
@@ -102,40 +115,61 @@
 	
 	
 	
-    <!-- 修改桌位種類的模態框 -->
-    <div class="modal fade" id="setTableModal" tabindex="-1" aria-labelledby="setTableModalLabel" aria-hidden="true">
+    <!-- 修改餐廳訂位規則的模態框 -->
+    <div class="modal fade" id="setTableModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="setTableModalLabel">修改餐廳桌位種類</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="setTableModalLabel">修改餐廳訂位規則</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                 
-                    <form th:method="PUT" th:action="@{/table/set}">
-                        <div class="mb-3">
+                    <form th:method="PUT" th:action="@{/restaurant/set}">
+                    	<div class="mb-3">
+                            <label for="restaurantName" class="form-label">餐廳名稱:</label>
+                            <input type="text" name="restaurantName" th:value="${restaurant.restaurantName}" class="form-control" readonly />
                             <input type="hidden" name="restaurantId" th:value="${restaurant.restaurantId}" />
-                            <input type="hidden" name="tableTypeId" id="setTableTypeId" />
-
-                            <label for="tableTypeId" class="form-label">選擇桌位種類:</label>
-					        <select name="setTableTypeId" class="form-select" disabled>
-					            <th:block th:each="type : ${tableTypes}">
-					                <option th:value="${type.tableTypeId}" th:text="${type.tableTypeId} + ' (' + ${type.tableTypeName} + '人桌)'"></option>
-					            </th:block>
-					        </select>
+                            <input type="hidden" name="restaurantAddress" th:value="${restaurant.restaurantAddress}" />
+                            <input type="hidden" name="restaurantPhone" th:value="${restaurant.restaurantPhone}" />
+                            <input type="hidden" name="restaurantOpentime" th:value="${restaurant.restaurantOpentime}" />
+                            <input type="hidden" name="restaurantClosetime" th:value="${restaurant.restaurantClosetime}" />
+                            <input type="hidden" name="restaurantStatus" th:value="${restaurant.restaurantStatus}" />
+                            <input type="hidden" name="restaurantImg" th:value="${restaurant.restaurantImg}" />
+                            <input type="hidden" name="restaurantDesc" th:value="${restaurant.restaurantDesc}" />
                         </div>
                         <div class="mb-3">
-                            <label for="tableTypeNumber" class="form-label">輸入桌位數量:</label>
-                            <input type="number" class="form-control" id="setTableTypeNumber" name="tableTypeNumber" min="0" max="20" required />
+                        	<label for="eattime" class="form-label">用餐時間限制:</label>
+                            <input type="number" class="form-control" name="eattime" id="eattime" th:value="${restaurant.eattime}" />
                         </div>
-                        <button type="submit" class="btn btn-primary">確定</button>
+                        <div class="mb-3">
+                        	<label for="reservePercent" class="form-label">訂位開放比例(%):</label>
+                            <input type="number" class="form-control" name="reservePercent" id="reservePercent" th:value="${restaurant.reservePercent}"  min="1" max="100" required />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reserveTimeScale" class="form-label">訂位選項時間間距(分):</label>
+                            <input type="number" class="form-control" id="reserveTimeScale" name="reserveTimeScale" th:value="${restaurant.reserveTimeScale}" min="15" max="180" required />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reserveMin" class="form-label">餐廳最少可接受訂位人數:</label>
+                            <input type="number" class="form-control" id="reserveMin" name="reserveMin" th:value="${restaurant.reserveMin}" min="1" max="12" required />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reserveMax" class="form-label">餐廳最多可接受訂位人數:</label>
+                            <input type="number" class="form-control" id="reserveMax" name="reserveMax" th:value="${restaurant.reserveMax}" min="1" max="12" required />
+                        </div>
+                        
+                        <button id="setRestaurantReserveBtn" type="submit" class="btn btn-primary">確定</button>
                     </form>
                     
                 </div>
             </div>
         </div>
     </div>
-	<!-- 修改桌位種類的模態框 -->
+	<!-- 修改餐廳訂位規則的模態框-->
 	
 	
 	
@@ -144,43 +178,14 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         showSidebar('reservation');
-    });
-    
-
-    document.addEventListener("DOMContentLoaded", function() {
-        // 監聽 setTableModal 的顯示事件
-        const setTableModal = document.getElementById('setTableModal');
-        setTableModal.addEventListener('show.bs.modal', function (event) {
-            // 取得觸發按鈕
-            const button = event.relatedTarget;
-            
-            // 從按鈕的 data-attributes 中取得值
-            const tableTypeId = button.getAttribute('data-tabletypeid');
-            const tableTypeName = button.getAttribute('data-tabletypename');
-            const tableTypeNumber = button.getAttribute('data-tabletypenumber');
-            console.log(tableTypeId)
-            console.log(tableTypeName)
-            console.log(tableTypeNumber)
-            
-            // 找到模態框中的表單元素
-            const selectTableTypeId = setTableModal.querySelector('select[name="setTableTypeId"]');
-            const inputTableTypeNumber = setTableModal.querySelector('input[name="tableTypeNumber"]');
-            const hiddenInput = setTableModal.querySelector('#setTableTypeId');
-            
-            // 設定桌位種類選項的值和顯示的名稱
-            // selectTableTypeId.disabled = false; 
-            selectTableTypeId.value = tableTypeId;
-            hiddenInput.value = tableTypeId;
-            
-            // 將數量設為預設值
-            inputTableTypeNumber.value = tableTypeNumber;
-        });
+		document.getElementById('setRestaurantReserveBtn').addEventListener('click',setRestaurantReserve);
     });
     
     
 	function confirmDelete(button) {
 	    const tableTypeId = button.getAttribute('data-table-type-id');
 	    const restaurantId = button.getAttribute('data-restaurant-id');
+	    const tableId = button.getAttribute('data-table-id');
 	    
 	    Swal.fire({
 	        title: "確定刪除？",
@@ -192,7 +197,7 @@
 	    }).then((result) => {
 	        if (result.isConfirmed) {
 	            // 使用 axios 發送 DELETE 請求
-	            axios.delete(`/SpanTasty/table/del?restaurantId=${restaurantId}&tableTypeId=${tableTypeId}`)
+	            axios.delete(`/SpanTasty/table/del?restaurantId=${restaurantId}&tableTypeId=${tableTypeId}&tableId=${tableId}`)
 	                .then(response => {
 	                    if (response.status === 200) {
 						    Swal.fire("刪除成功！", "", "success").then(() => {
@@ -214,8 +219,67 @@
 	    });
 	}
 
+	/*
+	function changeTableStatus(button){
+		const tableTypeId = button.getAttribute('data-table-type-id');
+	    const restaurantId = button.getAttribute('data-restaurant-id');
+	    const tableId = button.getAttribute('data-table-id');
+		let tableStatus = button.getAttribute('data-table-status');
+		
+		// 切換 tableStatus：1 變 2，2 變 1
+		tableStatus = tableStatus === '1' ? '2' : '1';
+		console.log('新狀態:', tableStatus);
 
-    
+		// 發送 Ajax 請求來更新狀態
+		axios.put('/SpanTasty/table/set', {
+			tableStatus: tableStatus,
+			tableTypeId: tableTypeId,
+			tableId: tableId,
+			restaurantId: restaurantId
+		})
+		.then(res => {
+			console.log(res);
+
+		})
+		.catch(err => {
+			console.error(err); 
+		})
+	}
+
+	function setRestaurantReserve(event){
+		event.preventDefault();
+
+			name="restaurantName"
+			"restaurantId"
+			"restaurantAddress"
+			"restaurantPhone"
+			"restaurantOpentime"
+			name="restaurantClosetime"
+			name="restaurantStatus"
+			name="restaurantImg"
+			name="restaurantDesc"
+		const tableTypeId = button.getAttribute('data-table-type-id');
+	    const restaurantId = button.getAttribute('data-restaurant-id');
+	    const tableId = button.getAttribute('data-table-id');
+		let tableStatus = button.getAttribute('data-table-status');
+		
+
+		// 發送 Ajax 請求來更新狀態
+		axios.put('/SpanTasty/restaurant/set', {
+			tableStatus: tableStatus,
+			tableTypeId: tableTypeId,
+			tableId: tableId,
+			restaurantId: restaurantId
+		})
+		.then(res => {
+			console.log(res);
+
+		})
+		.catch(err => {
+			console.error(err); 
+		})
+	}
+    */
 </script>
 </body>
 </html>
