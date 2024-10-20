@@ -1,310 +1,380 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
-  <head>
-    <title>Reserve</title>
-    <meta name="format-detection" content="telephone=no">
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta charset="utf-8">
-    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
-    <!-- Stylesheets-->
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
-    <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
-    <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
-    <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
 
-  	<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+<head>
+  <title>Reserve</title>
+  <meta name="format-detection" content="telephone=no">
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <!-- Stylesheets-->
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.5/dist/sweetalert2.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.5/dist/sweetalert2.all.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
 
-    <style>
-    .ie-panel{
-	    display: none;
-	    background: #212121;
-	    padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);
-	    clear: both;
-	    text-align:center;
-	    position: relative;
-	    z-index: 1;
-    } 
-    html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
-	    display: block;
+  <style>
+    .ie-panel {
+      display: none;
+      background: #212121;
+      padding: 10px 0;
+      box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
+      clear: both;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    html.ie-10 .ie-panel,
+    html.lt-ie-10 .ie-panel {
+      display: block;
     }
 
 
     /* 可用按鈕樣式 */
     .btn-available {
-        width: 100px !important;
-        margin: 0px 20px 20px 60px !important;
-        background-color: #d5925e !important;
-        color: white !important;
-        border: none !important;
+      width: 100px !important;
+      margin: 0px 20px 20px 60px !important;
+      background-color: #d5925e !important;
+      color: white !important;
+      border: none !important;
     }
 
     .btn-available:hover {
-        background-color: #5c4331 !important;
+      background-color: #5c4331 !important;
     }
 
     .btn-available.active {
-        background-color: #5c4331 !important;
+      background-color: #5c4331 !important;
     }
 
     /* 不可用按鈕樣式 */
     .btn-unavailable {
-        width: 100px !important;
-        margin: 0px 20px 20px 60px !important;
-        background-color: #6c757d !important;
-        color: white !important;
-        border: none !important;
+      width: 100px !important;
+      margin: 0px 20px 20px 60px !important;
+      background-color: #6c757d !important;
+      color: white !important;
+      border: none !important;
     }
 
     .btn-unavailable:hover {
-        background-color: #5a6268 !important;
+      background-color: #5a6268 !important;
     }
 
-.form-select{
-	height: 60px !important;
-    line-height: 33px !important; /* 設定行高，讓文字垂直居中 */
-}
-#contact-message {
-    height: 100px !important; /* 設定高度 */
-}
-    </style>
-  </head>
-  <body>
-    <!-- navbar  th:replace=-->
-    <div th:replace="~{starcups/display/navbar}" ></div>
-      
-      
-    <!-- 選單下方圖片及連結 -->
-    <section class="section breadcrumbs-custom-inset">
-      <div class="breadcrumbs-custom context-dark">
-        <div class="container">
-          <h2 class="breadcrumbs-custom-title">Book Table Now</h2>
-          <ul class="breadcrumbs-custom-path">
-            <li><a href="/SpanTasty/StarCups">Home</a></li>
-            <li class="active">Reservation</li>
-          </ul>
-        </div>
-        <!-- 圖片-->
-        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+    .form-select {
+      height: 60px !important;
+      line-height: 33px !important;
+      /* 設定行高，讓文字垂直居中 */
+    }
+
+    #contact-message {
+      height: 100px !important;
+      /* 設定高度 */
+    }
+  </style>
+</head>
+
+<body>
+  <!-- navbar  th:replace=-->
+  <div th:replace="~{starcups/display/navbar}"></div>
+
+
+  <!-- 選單下方圖片及連結 -->
+  <section class="section breadcrumbs-custom-inset">
+    <div class="breadcrumbs-custom context-dark">
+      <div class="container">
+        <h2 class="breadcrumbs-custom-title">Book Table Now</h2>
+        <ul class="breadcrumbs-custom-path">
+          <li><a href="/SpanTasty/StarCups">Home</a></li>
+          <li class="active">Reservation</li>
+        </ul>
       </div>
-    </section>
-    
-    <!-- content -->
-    <div class="container">
+      <!-- 圖片-->
+      <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+    </div>
+  </section>
+
+  <!-- content -->
+  <div class="container">
     <div class="my-5 ">
-       <h4 class="text-spacing-50">Reservation</h4>
-       
-       <form class="rd-form rd-mailform" data-form-output="form-output-global" data-form-type="contact" method="post" action="bat/rd-mailform.php" id="addReserveForm">
-         <div class="row row-14 gutters-14 row-fix">
-         
-           <div class="col-sm-4">
-             <div class="form-wrap">
-               <select name="restaurantId" id="addRestaurantId" class="form-select">
-                   <option value="" selected>請選擇餐廳</option>
-                   <th:block th:each="restaurant : ${restaurants}">
-                       <option th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
-                   </th:block>
-               </select>
-             </div>
-           </div>
-           
-           <div class="col-sm-4">
-             <div class="form-wrap">
-               <select name="reserveSeat" id="addReserveSeat" class="form-select" required>
-                   <option value="" selected>請選擇用餐人數</option>
-                   <th:block th:each="i : ${#numbers.sequence(2, 10)}">
-                       <option th:value="${i}" th:text="${i}"></option>
-                   </th:block>
-               </select>             
-             </div>
-           </div>
-           
-           <div class="col-sm-4">
-             <div class="form-wrap input-group input-group-sm">
-               <!-- <input class="form-input bg-white border" id="addCheckDate" type="text" name="checkDate" data-constraints="@Required"> -->
-               <input class="form-input bg-white border" id="addCheckDate" type="Date" name="checkDate" data-constraints="@Required">
-             </div>
-           </div>
-           
-           <div class="col-sm-12">
-           	 <div class="form-wrap">
-               <div class="mt-3">請選擇想預訂的時間</div>
-               <hr>
-               <!-- 動態生成訂位時間的按鈕 -->
-               <div id="addReserveDiv" class="row g-3 d-flex justify-content-start"></div>
-             </div>           
-           </div>           
-           
-           <div class="col-sm-12">
-             <div class="form-wrap">
-               <label class="form-label" for="contact-message">訂位備註</label>
-               <textarea class="form-input" id="contact-message" name="message"></textarea>
-             </div>
-           </div>
-           
-           
-         </div>
-         <button class="button button-secondary button-pipaluk" type="submit">立即預訂</button>
-       </form>
-       
-     </div>
-		<h5 class="my-2">訂位須知</h5>
-		<div class="reservation-notice mt-3 mb-5">
-		  <ul class="list-marked">
-		    <li>網路開放時間為：一個月內。</li>
-		    <li>如欲用餐日期顯示訂位已額滿，建議可致電門市洽詢。</li>
-		    <li>網路訂位是否成功，可至「會員中心/訂位紀錄」進行查詢。</li>
-		    <li>用餐當日訂位保留時間為10分鐘，請準時入席，逾時將取消訂位。</li>
-		    <li>網路訂位如需取消，可於用餐前一日23:59前自行線上取消，如超過時間請聯繫門市為您服務。</li>
-		  </ul>
-		</div>
-    </div>    
+      <h4 class="text-spacing-50">Reservation</h4>
+
+      <form class="rd-form rd-mailform" data-form-output="form-output-global" data-form-type="contact" method="post"
+        action="bat/rd-mailform.php" id="addReserveForm">
+        <div class="row row-14 gutters-14 row-fix">
+
+          <div class="col-sm-4">
+            <div class="form-wrap">
+              <select name="restaurantId" id="addRestaurantId" class="form-select">
+                <option value="" selected>請選擇餐廳</option>
+                <th:block th:each="restaurant : ${restaurants}">
+                  <option th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+                </th:block>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-wrap">
+              <select name="reserveSeat" id="addReserveSeat" class="form-select" required>
+                <option value="" selected>請選擇用餐人數</option>
+                <th:block th:each="i : ${#numbers.sequence(2, 10)}">
+                  <option th:value="${i}" th:text="${i}"></option>
+                </th:block>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-wrap input-group input-group-sm">
+              <!-- <input class="form-input bg-white border" id="addCheckDate" type="text" name="checkDate" data-constraints="@Required"> -->
+              <input class="form-input bg-white border" id="addCheckDate" type="Date" name="checkDate"
+                data-constraints="@Required">
+            </div>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="form-wrap">
+              <div class="mt-3">請選擇想預訂的時間</div>
+              <hr>
+              <!-- 動態生成訂位時間的按鈕 -->
+              <div id="addReserveDiv" class="row g-3 d-flex justify-content-start"></div>
+            </div>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="form-wrap">
+              <label class="form-label" for="addReserveNote">訂位備註</label>
+              <textarea class="form-input" name="addReserveNote" id="addReserveNote"></textarea>
+            </div>
+          </div>
+
+
+        </div>
+        <button class="button button-secondary button-pipaluk" type="submit">立即預訂</button>
+      </form>
+
+    </div>
+    <h5 class="my-2">訂位須知</h5>
+    <div class="reservation-notice mt-3 mb-5">
+      <ul class="list-marked">
+        <li>網路開放時間為：一個月內。</li>
+        <li>如欲用餐日期顯示訂位已額滿，建議可致電門市洽詢。</li>
+        <li>網路訂位是否成功，可至「會員中心/訂位紀錄」進行查詢。</li>
+        <li>用餐當日訂位保留時間為10分鐘，請準時入席，逾時將取消訂位。</li>
+        <li>網路訂位如需取消，可於用餐前一日23:59前自行線上取消，如超過時間請聯繫門市為您服務。</li>
+      </ul>
+    </div>
+  </div>
 
 
 
 
 
-    <!-- Global Mailform Output-->
-    <div class="snackbars" id="form-output-global"></div>
-    <!-- footer  th:replace=-->
-    <div th:replace="~{starcups/display/footer}" ></div>
-    
-     <!-- Javascript-->
-    <script src="/SpanTasty/starcups/js/core.min.js"></script>
-    <script src="/SpanTasty/starcups/js/script.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
-    <script src="/SpanTasty/js/axios.min.js"></script>
-    <script>
+  <!-- Global Mailform Output-->
+  <div class="snackbars" id="form-output-global"></div>
+  <!-- footer  th:replace=-->
+  <div th:replace="~{starcups/display/footer}"></div>
 
-      $(function(){
-        $('#addReserveForm').on('change', 'select', getReserveTimeAndAdd);
-      })
+  <!-- Javascript-->
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+  <script src="/SpanTasty/js/axios.min.js"></script>
+  <script>
 
-      document.addEventListener("DOMContentLoaded", function () {
-          document.getElementById('addRestaurantId').addEventListener('change', getReserveTimeAndAdd);
-          document.getElementById('addReserveSeat').addEventListener('change', getReserveTimeAndAdd);
-          document.getElementById('addCheckDate').addEventListener('change', getReserveTimeAndAdd);
+    $(function () {
+      $('#addReserveForm').on('change', 'select', getReserveTimeAndAdd);
+      $('#addReserveForm').on('change', '#addRestaurantId', getRestaurantAndAdd);
+    })
 
-          // 立即預訂按鈕
-          document.querySelector('.button-pipaluk').addEventListener('click', function (e) {
-              e.preventDefault(); // 防止表單提交
-              addReservation(e);
-          });
+    document.addEventListener("DOMContentLoaded", function () {
+
+      document.getElementById('addCheckDate').addEventListener('change', getReserveTimeAndAdd);
+
+      // 立即預訂按鈕
+      document.querySelector('.button-pipaluk').addEventListener('click', function (e) {
+        e.preventDefault(); // 防止表單提交
+        addReservation(e);
+      });
+    });
+
+    // Ajax查詢餐廳(新增)
+    function getRestaurantAndAdd() {
+      const restaurantId = document.getElementById('addRestaurantId').value;
+      axios.get(`http://localhost:8080/SpanTasty/restaurant/getapi/${restaurantId}`)
+        .then(res => {
+          console.log(res.data);
+          getAddReserveSeatRange(res.data);
+        })
+        .catch(err => {
+          console.error(err);
+        })
+    }
+
+    // 動態改變新增訂位人數選項
+    function getAddReserveSeatRange(restaurant) {
+      const reserveMin = restaurant.reserveMin;
+      const reserveMax = restaurant.reserveMax;
+      const reserveSeatSelect = document.getElementById('addReserveSeat');
+      // 清除之前的選項
+      reserveSeatSelect.innerHTML = '';
+      // 根據 reserveMin 和 reserveMax 動態生成選項
+      for (let i = reserveMin; i <= reserveMax; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        reserveSeatSelect.appendChild(option);
+      }
+    }
+
+
+    // Ajax查詢訂位時間
+    function getReserveTimeAndAdd() {
+      const restaurantId = document.getElementById('addRestaurantId').value;
+      const reserveSeat = document.getElementById('addReserveSeat').value;
+      const checkDate = document.getElementById('addCheckDate').value;
+
+      // 檢查所有必要的值是否都有填寫
+      if (!restaurantId || !reserveSeat || !checkDate) {
+        return; // 若有任何一個值未填寫，則不進行查詢
+      }
+
+      const params = new URLSearchParams({
+        restaurantId: restaurantId,
+        reserveSeat: reserveSeat,
+        checkDate: checkDate
+      }).toString();
+
+      axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveCheck?${params}`)
+        .then(function (response) {
+          console.log(response.data);
+
+          // 清空表格內容
+          const reserveDiv = document.getElementById('addReserveDiv');
+          reserveDiv.innerHTML = '';
+
+          // 檢查是否有資料
+          if (response.data.length > 0) {
+            response.data.forEach(function (checkReserve) {
+              const isAvailable = checkReserve.totalTableNumber > checkReserve.reservedTableNumber;
+              const button = document.createElement('input');
+              button.type = 'button';
+              button.name = 'reserveTime';
+              button.value = checkReserve.startTime;
+              button.className = isAvailable ? 'btn btn-available' : 'btn btn-unavailable';
+              button.disabled = !isAvailable; // 設置禁用按鈕
+
+              reserveDiv.appendChild(button); // 添加按鈕到 reserveDiv
+
+              // 按鈕點擊設置 active 狀態
+              button.onclick = function () {
+                // 清除所有按鈕的 active 狀態
+                const buttons = document.getElementsByName('reserveTime');
+                buttons.forEach(b => b.classList.remove('active'));
+
+                // 設置當前按鈕為 active
+                button.classList.add('active');
+              };
+            });
+          } else {
+            reserveDiv.textContent = '沒有找到任何訂位資料';
+          }
+        })
+        .catch(function (error) {
+          console.error('Error:', error);
+        });
+    }
+
+    // 新增訂位的AJAX函數
+    function addReservation(e) {
+      const reserveSeat = document.getElementById('addReserveSeat').value;
+      const checkDate = document.getElementById('addCheckDate').value;
+      const restaurantId = document.getElementById('addRestaurantId').value;
+
+      // 找出選中的時間按鈕
+      const selectedTimeButton = document.querySelector('input[name="reserveTime"].active');
+      if (!selectedTimeButton) {
+        Swal.fire('錯誤', '請選擇預定的時間', 'error');
+        return;
+      }
+      const startTime = selectedTimeButton.value;
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        Swal.fire('錯誤', '未登入', 'error').then(() => {
+          window.location.href = '/SpanTasty/StarCups/loginRegister';
+        });
+        return;
+      }
+
+      const reserveNote = document.getElementById('addReserveNote').value;
+      let addReserveDTO = {
+        reserveSeat: reserveSeat,
+        checkDate: checkDate,
+        startTime: startTime,
+        reserveNote: reserveNote,
+        restaurantId: restaurantId,
+      };
+
+      // 顯示 loading 彈窗
+      Swal.fire({
+        title: '訂位中...',
+        text: '請稍候，我們正在處理您的訂位請求',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
       });
 
+      // 發送 AJAX 請求
+      axios.post(`http://localhost:8080/SpanTasty/StarCups/reserve/add`, addReserveDTO, {
+        headers: {
+          'Authorization': `${token}`,
+        }
+      })
+        .then(res => {
+          console.log(res.data);
 
-      
-
-      // Ajax查詢訂位時間
-      function getReserveTimeAndAdd() {
-          const restaurantId = document.getElementById('addRestaurantId').value;
-          const reserveSeat = document.getElementById('addReserveSeat').value;
-          const checkDate = document.getElementById('addCheckDate').value;
-
-          // 檢查所有必要的值是否都有填寫
-          if (!restaurantId || !reserveSeat || !checkDate) {
-              return; // 若有任何一個值未填寫，則不進行查詢
-          }
-
-          const params = new URLSearchParams({
-              restaurantId: restaurantId,
-              reserveSeat: reserveSeat,
-              checkDate: checkDate
-          }).toString();
-
-          axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveCheck?${params}`)
-              .then(function (response) {
-                  console.log(response.data);
-
-                  // 清空表格內容
-                  const reserveDiv = document.getElementById('addReserveDiv');
-                  reserveDiv.innerHTML = '';
-
-                  // 檢查是否有資料
-                  if (response.data.length > 0) {
-                      response.data.forEach(function (checkReserve) {
-                          const isAvailable = checkReserve.totalTableNumber > checkReserve.reservedTableNumber;
-                          const button = document.createElement('input');
-                          button.type = 'button';
-                          button.name = 'reserveTime';
-                          button.value = checkReserve.startTime;
-                          button.className = isAvailable ? 'btn btn-available' : 'btn btn-unavailable';
-                          button.disabled = !isAvailable; // 設置禁用按鈕
-
-                          reserveDiv.appendChild(button); // 添加按鈕到 reserveDiv
-
-                          // 按鈕點擊設置 active 狀態
-                          button.onclick = function () {
-                              // 清除所有按鈕的 active 狀態
-                              const buttons = document.getElementsByName('reserveTime');
-                              buttons.forEach(b => b.classList.remove('active'));
-
-                              // 設置當前按鈕為 active
-                              button.classList.add('active');
-                          };
-                      });
-                  } else {
-                      reserveDiv.textContent = '沒有找到任何訂位資料';
-                  }
-              })
-              .catch(function (error) {
-                  console.error('Error:', error);
-              });
-      }
-
-      // 新增訂位的AJAX函數
-      function addReservation(e) {
-          const reserveSeat = document.getElementById('addReserveSeat').value;
-          const checkDate = document.getElementById('addCheckDate').value;
-          const restaurantId = document.getElementById('addRestaurantId').value;
-
-          console.log(reserveSeat);
-          console.log(restaurantId);
-          console.log(checkDate);
-          
-
-          // 找出選中的時間按鈕
-          const selectedTimeButton = document.querySelector('input[name="reserveTime"].active');
-          if (!selectedTimeButton) {
-              alert('請選擇預定的時間');
-              return;
-          }
-          const startTime = selectedTimeButton.value;
-          const token = localStorage.getItem('token');
-          if (!token) {
-            alert('未登入');
-            e.preventDefault();
-            window.location.href = '/SpanTasty/StarCups/loginRegister';
-          }
-
-          let addReserveDTO = {
-              reserveSeat: reserveSeat,
-              checkDate: checkDate,
-              startTime: startTime,
-              restaurantId: restaurantId,
-          };
-
-          axios.post(`http://localhost:8080/SpanTasty/StarCups/reserve/add`, addReserveDTO, {
-            headers: {
-              'Authorization': `${token}`,
+          // 隱藏 loading 並顯示成功訊息
+          Swal.fire({
+            title: '新增訂位成功！',
+            text: `您的訂位已成功，時間：${startTime}, 人數: ${reserveSeat} 人`,
+            icon: 'success',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // 使用者按下「確定」按鈕後跳轉
+              window.location.href = '/SpanTasty/StarCups';
             }
-          })
-          .then(res => {
-              console.log(res.data);
-              alert("新增訂位成功！");
-
-              // 清空表單
-              document.getElementById('addRestaurantId').value = '';
-              document.getElementById('addReserveSeat').value = '';
-              document.getElementById('addCheckDate').value = '';
-              document.getElementById('addReserveDiv').innerHTML = ''; // 清空按鈕
-          })
-          .catch(err => {
-              console.error(err);
-              alert("新增訂位失敗，請稍後再試。");
           });
-      }
-    
-    </script>
-  </body>
+            // 清空表單
+            document.getElementById('addRestaurantId').value = '';
+            document.getElementById('addReserveSeat').value = '';
+            document.getElementById('addCheckDate').value = '';
+            document.getElementById('addReserveNote').value = '';
+            document.getElementById('addReserveDiv').innerHTML = ''; // 清空按鈕
+          
+        })
+        .catch(err => {
+          console.error(err);
+
+          // 顯示失敗訊息
+          Swal.fire({
+            title: '新增訂位失敗',
+            text: '請稍後再試',
+            icon: 'error',
+          });
+        });
+    }
+
+
+  </script>
+</body>
+
 </html>

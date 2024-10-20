@@ -31,7 +31,7 @@
                     </div>
                     <div class="col-md-4 d-flex align-items-center">
                         <label for="reserveTimeStart" class="form-label mb-0 col-2">開始時間:</label>
-                        <input type="datetime-local" name="reserveTimeStart" id="reserveTimeStart"
+                        <input type="Date" name="reserveTimeStart" id="reserveTimeStart"
                             class="form-control ms-2" />
                     </div>
                     <div class="col-md-4 d-flex align-items-center">
@@ -50,7 +50,7 @@
                     </div>
                     <div class="col-md-4 d-flex align-items-center">
                         <label for="reserveTimeEnd" class="form-label mb-0 col-2">結束時間:</label>
-                        <input type="datetime-local" name="reserveTimeEnd" id="reserveTimeEnd"
+                        <input type="Date" name="reserveTimeEnd" id="reserveTimeEnd"
                             class="form-control ms-2" />
                     </div>
                 </div>
@@ -82,6 +82,7 @@
 				            <th>桌位種類</th>
 				            <th>用餐時段</th>
 				            <th>訂位狀態</th>
+				            <th>備註</th>
 				            <th>修改狀態</th>
 				            <th>修改訂位</th>
 				            <th>刪除訂位</th>
@@ -115,11 +116,6 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="memberName" class="form-label mb-0">請輸入會員名稱:</label>
-                                <input type="text" class="form-control" name="memberName" />
-                            </div>
-
-                            <div class="mb-3">
                                 <label for="memberPhone" class="form-label mb-0">請輸入會員電話:</label>
                                 <input type="text" class="form-control" name="memberPhone" />
                             </div>
@@ -138,9 +134,6 @@
                             <div class="mb-3">
                                 <label for="reserveSeat" class="form-label mb-0 col-4">選擇用餐人數:</label>
                                 <select name="reserveSeat" id="addReserveSeat" class="form-select" required>
-                                    <th:block th:each="i : ${#numbers.sequence(2, 10)}">
-                                        <option th:value="${i}" th:text="${i}"></option>
-                                    </th:block>
                                 </select>
                             </div>
 
@@ -150,10 +143,16 @@
                             </div>
 
                             <div class="mb-3">
+                                <textarea class="form-control" id="addReserveNote" placeholder="訂位備註"></textarea>
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label mb-0">選擇預定時間:</label>
                                 <!-- 動態生成訂位時間的按鈕 -->
                                 <div id="addReserveDiv" class="row"></div>
                             </div>
+
+
 
                         </form>
 
@@ -173,7 +172,7 @@
                     </div>
                     <div class="modal-body">
 
-                        <form method="put" th:action="@{/reserve/put}">
+                        <form th:method="put" th:action="@{/reserve/put}">
 
                             <input type="hidden" name="setReserveId" id="setReserveId" required />
 
@@ -208,6 +207,7 @@
                             <div class="mb-3">
                                 <label for="reserveSeat" class="form-label mb-0 col-4">選擇用餐人數:</label>
                                 <select name="reserveSeat" id="setReserveSeat" class="form-select" required>
+                                    <option value="" selected>請選擇用餐人數</option>
                                     <th:block th:each="i : ${#numbers.sequence(2, 10)}">
                                         <option th:value="${i}" th:text="${i}"></option>
                                     </th:block>
@@ -219,12 +219,18 @@
                                 <input type="Date" class="form-control" id="setCheckDate" required />
                             </div>
 
+                            
+                            <div class="mb-3">
+                                <textarea class="form-control" id="setReserveNote" placeholder="訂位備註"></textarea>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label mb-0">選擇預定時間:</label>
                                 <!-- 動態生成訂位時間的按鈕 -->
                                 <div id="setReserveDiv" class="row"></div>
                             </div>
-
+                            
+                            
                         </form>
 
                     </div>
@@ -239,7 +245,6 @@
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('reservation');
 
-            
             // 頁面加載完成後執行一次查詢
             fetchReservations();
 
@@ -249,14 +254,74 @@
             });
 
             document.getElementById('addRestaurantId').addEventListener('change', getReserveTimeAndAdd);
+            document.getElementById('addRestaurantId').addEventListener('change', getRestaurantAndAdd);
             document.getElementById('addReserveSeat').addEventListener('change', getReserveTimeAndAdd);
             document.getElementById('addCheckDate').addEventListener('change', getReserveTimeAndAdd);
-
+            
             document.getElementById('setRestaurantId').addEventListener('change', getReserveTimeAndSet);
+            document.getElementById('setRestaurantId').addEventListener('change', getRestaurantAndSet);
             document.getElementById('setReserveSeat').addEventListener('change', getReserveTimeAndSet);
             document.getElementById('setCheckDate').addEventListener('change', getReserveTimeAndSet);
         });
 
+
+        // Ajax查詢餐廳(新增)
+        function getRestaurantAndAdd(){
+            const restaurantId = document.getElementById('addRestaurantId').value;
+            axios.get(`http://localhost:8080/SpanTasty/restaurant/getapi/${restaurantId}`)
+            .then(res => {
+                console.log(res.data);
+                getAddReserveSeatRange(res.data);
+            })
+            .catch(err => {
+                console.error(err); 
+            })
+        }
+
+        // Ajax查詢餐廳(修改)
+        function getRestaurantAndSet(){
+            const restaurantId = document.getElementById('setRestaurantId').value;
+            axios.get(`http://localhost:8080/SpanTasty/restaurant/getapi/${restaurantId}`)
+            .then(res => {
+                console.log(res.data);
+                getSetReserveSeatRange(res.data);
+            })
+            .catch(err => {
+                console.error(err); 
+            })
+        }
+
+        // 動態改變新增訂位人數選項
+        function getAddReserveSeatRange(restaurant){
+            const reserveMin = restaurant.reserveMin;
+            const reserveMax = restaurant.reserveMax;
+            const reserveSeatSelect = document.getElementById('addReserveSeat');
+            // 清除之前的選項
+            reserveSeatSelect.innerHTML = '';
+            // 根據 reserveMin 和 reserveMax 動態生成選項
+            for (let i = reserveMin; i <= reserveMax; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                reserveSeatSelect.appendChild(option);
+            }
+        }
+
+        // 動態改變修改訂位人數選項
+        function getSetReserveSeatRange(restaurant){
+            const reserveMin = restaurant.reserveMin;
+            const reserveMax = restaurant.reserveMax;
+            const reserveSeatSelect = document.getElementById('setReserveSeat');
+            // 清除之前的選項
+            reserveSeatSelect.innerHTML = '';
+            // 根據 reserveMin 和 reserveMax 動態生成選項
+            for (let i = reserveMin; i <= reserveMax; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                reserveSeatSelect.appendChild(option);
+            }
+        }
 
 
         // Ajax查詢訂位時間+新增訂位訂單
@@ -264,8 +329,7 @@
             const restaurantId = document.getElementById('addRestaurantId').value;
             const reserveSeat = document.getElementById('addReserveSeat').value;
             const checkDate = document.getElementById('addCheckDate').value;
-            const memberId = document.getElementById('addMemberId').value;
-
+            
             // 檢查所有必要的值是否都有填寫
             if (!restaurantId || !reserveSeat || !checkDate) {
                 return; // 若有任何一個值未填寫，則不進行查詢
@@ -306,12 +370,17 @@
 
                             // 按鈕的事件處理（例如，處理點擊事件）
                             button.onclick = function () {
+
+                                const memberId = document.getElementById('addMemberId').value;
+                                const reserveNote = document.getElementById('addReserveNote').value;
+
                                 // 這裡放新增訂位 ajax 函式
                                 let addReserveDTO = {
                                     reserveSeat: reserveSeat,
                                     checkDate: checkDate,
                                     startTime: checkReserve.startTime,
                                     restaurantId: restaurantId,
+                                    reserveNote: reserveNote,
                                     memberId: memberId
                                 }
                                 addReservation(addReserveDTO);
@@ -333,7 +402,7 @@
             const restaurantId = document.getElementById('setRestaurantId').value;
             const reserveSeat = document.getElementById('setReserveSeat').value;
             const checkDate = document.getElementById('setCheckDate').value;
-            const memberId = document.getElementById('setMemberId').value;
+
 
             console.log(reserveId);
             console.log(restaurantId);
@@ -378,6 +447,8 @@
 
                             // 按鈕的事件處理（例如，處理點擊事件）
                             button.onclick = function () {
+                                const memberId = document.getElementById('setMemberId').value;
+                                const reserveNote = document.getElementById('setReserveNote').value;
                                 // 這裡放新增訂位 ajax 函式
                                 let setReserveDTO = {
                                     reserveId: reserveId,
@@ -385,6 +456,7 @@
                                     checkDate: checkDate,
                                     startTime: checkReserve.startTime,
                                     restaurantId: restaurantId,
+                                    reserveNote: reserveNote,
                                     memberId: memberId
                                 }
                                 setReservation(setReserveDTO);
@@ -463,7 +535,7 @@
 		            statusClass = 'badge bg-danger text-white';
 		            statusText = '已取消';
 		        }
-		
+                
 		        const row = document.createElement('tr');
 		        row.innerHTML = `
 		            <td>${reserve.reserveId}</td>
@@ -474,6 +546,10 @@
 		            <td>${reserve.tableType.tableTypeName} 人桌</td>
 		            <td>${reserve.reserveTime} - ${finishedTime}</td>
 		            <td><span class="${statusClass}">${statusText}</span></td>
+		            <td>
+                        ${reserve.reserveNote ? 
+                        `<button type="button" class="btn btn-sm text-white" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="top" data-bs-content="${reserve.reserveNote}"><i class="fa-regular fa-eye"></i></button>` : ''}
+                    </td>
 		            <td>
 		                <select onchange="updateReserveStatus(${reserve.reserveId}, this.value)" class="form-select form-select-sm">
 		                    <option value="1" ${reserve.reserveStatus === 1 ? 'selected' : ''}>未完成</option>
@@ -486,6 +562,12 @@
 		        `;
 		        tbody.appendChild(row);
 		    });
+
+            // 初始化 Popover
+            const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            const popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
 		}
 		
 		// 分頁控制函數
@@ -524,7 +606,8 @@
                 document.getElementById('setMemberPhone').value = data.member.phone;
                 document.getElementById('setRestaurantId').value = data.restaurant.restaurantId;
                 document.getElementById('setReserveSeat').value = data.reserveSeat;
-                document.getElementById('setCheckDate').value = data.reserveTime; // 假設你的資料中有 checkDate
+                document.getElementById('setCheckDate').value = data.reserveTime;
+                document.getElementById('setReserveNote').value = data.reserveNote;
 
                 const modal = new bootstrap.Modal(document.getElementById('setReserveModal'));
                 modal.show();
@@ -584,6 +667,7 @@
                     document.getElementById('addRestaurantId').value = '';
                     document.getElementById('addReserveSeat').value = '';
                     document.getElementById('addCheckDate').value = '';
+                    document.getElementById('addReserveNote').value = '';
                     document.getElementById('addReserveDiv').innerHTML = ''; // 清空訂位時間按鈕
 
                     fetchReservations();// 新增後重新查詢訂位
@@ -614,7 +698,7 @@
 
             axios.put(`http://localhost:8080/SpanTasty/reserve/set`, setReserveDTO)
                 .then(res => {
-                    console.log(res.data)
+                    console.log(res.data);
                     // 關閉模態框
                     const modal = bootstrap.Modal.getInstance(document.getElementById('setReserveModal'));
                     modal.hide();

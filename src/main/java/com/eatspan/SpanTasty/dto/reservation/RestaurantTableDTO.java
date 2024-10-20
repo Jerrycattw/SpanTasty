@@ -12,15 +12,11 @@ import lombok.Data;
 //專門用來接收ajax傳來的json物件
 @Data
 @AllArgsConstructor
-public class ReserveDTO {
+public class RestaurantTableDTO {
 	
-	private Integer reserveId;
-	private Integer memberId;
 	private Integer restaurantId;
-	private Integer reserveSeat;
-	private LocalDate checkDate;
-	private LocalTime startTime;
+	private String tableTypeId;
 	private Integer tableId;
-	private String reserveNote;
+	private Integer tableStatus;
 	
 }

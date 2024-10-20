@@ -347,6 +347,7 @@
         if (response.data.success) {
           // 清除 localStorage 中的 token
           localStorage.removeItem('token');
+          localStorage.removeItem('cart');
           alert('已登出');
           // 跳轉到首頁或其他頁面
           window.location.href = '/SpanTasty/StarCups';

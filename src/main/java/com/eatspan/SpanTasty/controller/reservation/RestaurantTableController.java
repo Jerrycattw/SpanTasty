@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.eatspan.SpanTasty.dto.reservation.RestaurantTableDTO;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.entity.reservation.RestaurantTable;
 import com.eatspan.SpanTasty.entity.reservation.RestaurantTableId;
@@ -53,33 +55,32 @@ public class RestaurantTableController {
 	@PostMapping("/add")
 	public String addTable(@RequestParam Integer restaurantId,
 						   @RequestParam String tableTypeId,
-						   @ModelAttribute RestaurantTable restaurantTable,
+						   @RequestParam Integer tableNumber,
 						   Model model) {
-		restaurantTable.setId(new RestaurantTableId(restaurantId, tableTypeId));
-		restaurantTableService.addRestaurantTable(restaurantTable);
+		
+		for(int i=0 ; i<tableNumber ; i++) {
+			restaurantTableService.addRestaurantTable(restaurantId, tableTypeId);
+		}
 		return "redirect:/table/getAll?restaurantId="+restaurantId;
 	}
 	
 	
 	
 	@PutMapping("/set")
-	public String updateTable(@RequestParam Integer restaurantId,
-							  @RequestParam String tableTypeId,
-							  @RequestParam Integer tableTypeNumber,
-							  Model model) {
-		
-		RestaurantTable restaurantTable = restaurantTableService.findRestaurantTableById(new RestaurantTableId(restaurantId, tableTypeId));
-		restaurantTable.setTableTypeNumber(tableTypeNumber);
-		restaurantTableService.updateRestaurantTable(restaurantTable);
-		return "redirect:/table/getAll?restaurantId="+restaurantId;
+	public ResponseEntity<?> updateTable(@RequestBody RestaurantTableDTO restaurantTableDTO) {
+		RestaurantTableId restaurantTableId = new RestaurantTableId(restaurantTableDTO.getRestaurantId(),restaurantTableDTO.getTableTypeId(),restaurantTableDTO.getTableId());
+		RestaurantTable restaurantTable = restaurantTableService.findRestaurantTableById(restaurantTableId);
+		restaurantTable.setTableStatus(restaurantTableDTO.getTableStatus());
+		RestaurantTable newRestaurantTable = restaurantTableService.updateRestaurantTable(restaurantTable);
+		return ResponseEntity.ok(newRestaurantTable);
 	}
 	
 	
 	
 	
 	@DeleteMapping("/del")
-	public ResponseEntity<?> delTable(@RequestParam Integer restaurantId, @RequestParam String tableTypeId) {
-		restaurantTableService.deleteRestaurantTable(new RestaurantTableId(restaurantId, tableTypeId));
+	public ResponseEntity<?> delTable(@RequestParam Integer restaurantId, @RequestParam String tableTypeId, @RequestParam Integer tableId) {
+		restaurantTableService.deleteRestaurantTable(new RestaurantTableId(restaurantId, tableTypeId, tableId));
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	

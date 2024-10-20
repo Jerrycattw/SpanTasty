@@ -53,6 +53,12 @@ public class Reserve {
 	@Column(name = "reserve_status")
 	private Integer reserveStatus;
 	
+	@Column(name = "table_id")
+	private Integer tableId;
+	
+	@Column(name = "reserve_note")
+	private String reserveNote;
+	
 	
 	@ManyToOne //預設(fetch = FetchType.EAGER)
 	@JoinColumn(name = "table_type_id")
@@ -78,7 +84,7 @@ public class Reserve {
 			this.reserveCreateTime = LocalDateTime.now(); // 使用 LocalDateTime.now() 設置當前時間
 		}
 		if(this.reserveStatus == null) {
-			this.reserveStatus = 1; // 1=未完成, 2=已完成ㄝ, 3=已取消
+			this.reserveStatus = 1; // 1=未完成, 2=已完成, 3=已取消
 		}
 	}
 	

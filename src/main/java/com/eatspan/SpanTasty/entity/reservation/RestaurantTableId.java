@@ -28,16 +28,19 @@ public class RestaurantTableId implements Serializable {
 	@Column(name = "table_type_id")
 	private String tableTypeId;
 	
-    public RestaurantTableId(Integer restaurantId, String tableTypeId) {
-        this.restaurantId = restaurantId;
-        this.tableTypeId = tableTypeId;
-    }
+	@Column(name = "table_id")
+	private Integer tableId;
 
-    
-    
+	public RestaurantTableId(Integer restaurantId, String tableTypeId, Integer tableId) {
+		super();
+		this.restaurantId = restaurantId;
+		this.tableTypeId = tableTypeId;
+		this.tableId = tableId;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(restaurantId, tableTypeId);
+		return Objects.hash(restaurantId, tableId, tableTypeId);
 	}
 
 	@Override
@@ -49,9 +52,10 @@ public class RestaurantTableId implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		RestaurantTableId other = (RestaurantTableId) obj;
-		return Objects.equals(restaurantId, other.restaurantId) && Objects.equals(tableTypeId, other.tableTypeId);
+		return Objects.equals(restaurantId, other.restaurantId) && Objects.equals(tableId, other.tableId)
+				&& Objects.equals(tableTypeId, other.tableTypeId);
 	}
 	
-    
+
 	
 }

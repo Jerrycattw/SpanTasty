@@ -19,9 +19,13 @@ public class RestaurantTableService {
 	
 	
 	// 新增餐廳桌位
-	public RestaurantTable addRestaurantTable(RestaurantTable restaurantTable) {
-		return restaurantTableRepository.save(restaurantTable);
+	public RestaurantTable addRestaurantTable(Integer restaurantId, String tableTypeId) {
+        Integer maxTableId = restaurantTableRepository.findMaxTableIdByRestaurantAndType(restaurantId, tableTypeId);
+        Integer newTableId = (maxTableId != null) ? maxTableId + 1 : 1;
+        RestaurantTable newTable = new RestaurantTable(new RestaurantTableId(restaurantId, tableTypeId, newTableId));
+		return restaurantTableRepository.save(newTable);
 	}
+	
 	
 	
 	// 刪除餐廳桌位
@@ -33,10 +37,7 @@ public class RestaurantTableService {
 	// 更新餐廳桌位
 	public RestaurantTable updateRestaurantTable(RestaurantTable restaurantTable) {
 		Optional<RestaurantTable> optional = restaurantTableRepository.findById(restaurantTable.getId());
-		System.out.println(666);
 		if(optional.isPresent()) {
-			System.out.println(000000);
-			System.out.println("test here");
 			return restaurantTableRepository.save(restaurantTable);
 		}
 		return null;
@@ -55,6 +56,9 @@ public class RestaurantTableService {
 	}
 	
 	
+	
+	
+
 	
 	
 	

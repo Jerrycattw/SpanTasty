@@ -53,8 +53,9 @@ public class RestaurantController {
     // ajax 查詢餐廳
     @GetMapping("/getapi/{id}")
     @ResponseBody
-    public Restaurant getRestaurant(@PathVariable(name = "id") Integer restaurantId) {
-    	return restaurantService.findRestaurantById(restaurantId);
+    public ResponseEntity<?> getRestaurant(@PathVariable(name = "id") Integer restaurantId) {
+    	Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
+    	return ResponseEntity.ok(restaurant);
     }
     
     
@@ -164,6 +165,14 @@ public class RestaurantController {
     
 
     
+    
+    // 修改餐廳訂位規則
+    @PutMapping("/set")
+    public String updateRestaurantReserve(@ModelAttribute Restaurant restaurant){
+        restaurantService.updateRestaurant(restaurant);
+        Integer restaurantId = restaurant.getRestaurantId();
+        return "redirect:/table/getAll?restaurantId="+restaurantId;
+    }
 
 	
 	
