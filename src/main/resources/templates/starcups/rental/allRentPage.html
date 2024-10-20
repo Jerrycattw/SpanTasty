@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
 <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
 <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 .ie-panel{
     display: none;
@@ -28,7 +29,20 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
     display: block;
 }
 
+.card-button {
+	display: inline-block;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    transform: translate3d(0, -50%, 0);
+    transition: .33s all ease;
+}
+.card-button{
 
+}
 </style>
 </head>
 <body>
@@ -65,7 +79,9 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
                 </div>
             </div>
             <a class="toggle-icon " role="button" data-bs-toggle="collapse" th:data-bs-target="'#accordion2Collapse' + ${rent.rentId}" th:href="'#accordion2Collapse' + ${rent.rentId}" aria-controls="accordion2Collapse" th:aria-controls="'accordion2Collapse' + ${rent.rentId}" aria-expanded="false">訂單編號: <span th:text="${rent.rentId}"></span>
-                <div class="card-arrow "></div></a>
+                <div class="card-button"><i class="fa-solid fa-circle-chevron-down position-absolute top-50 start-50 translate-middle chevron-down"></i></div>
+                <div class="card-button"><i class="fa-solid fa-circle-chevron-up position-absolute top-50 start-50 translate-middle chevron-up d-none"></i></i></div>
+            </a>
             </div>
           </div>
           <div class="collapse" th:id="'accordion2Collapse' + ${rent.rentId}" role="tabpanel" th:aria-labelledby="'accordion2Heading' + ${rent.rentId}">
@@ -92,6 +108,22 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 <script src="/SpanTasty/starcups/js/core.min.js"></script>
 <script src="/SpanTasty/starcups/js/script.js"></script>
 <script>
+document.querySelectorAll('.toggle-icon').forEach(function(toggleIcon) {
+    toggleIcon.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-bs-target');
+        const targetElement = document.querySelector(targetId);
+        
+        targetElement.addEventListener('shown.bs.collapse', function () {
+            toggleIcon.querySelector('.chevron-down').classList.add('d-none');
+            toggleIcon.querySelector('.chevron-up').classList.remove('d-none');
+        });
+
+        targetElement.addEventListener('hidden.bs.collapse', function () {
+            toggleIcon.querySelector('.chevron-down').classList.remove('d-none');
+            toggleIcon.querySelector('.chevron-up').classList.add('d-none');
+        });
+    });
+});
 </script>
 </body>
 </html>

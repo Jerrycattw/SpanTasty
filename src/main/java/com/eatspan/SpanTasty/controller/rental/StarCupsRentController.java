@@ -1,7 +1,5 @@
 package com.eatspan.SpanTasty.controller.rental;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +23,8 @@ import com.eatspan.SpanTasty.entity.rental.RentItem;
 import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
+import com.eatspan.SpanTasty.entity.store.Product;
+import com.eatspan.SpanTasty.entity.store.ShoppingItem;
 import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
 import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.service.rental.RentItemService;
@@ -146,28 +146,26 @@ public class StarCupsRentController {
 			Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
 			
 			Integer rentId = (Integer) session.getAttribute("rentId");
+			Integer restaurantId = cartRequestDTOList.get(0).getRestaurantId();
 			
 			Rent rent;
 			if(rentId == null) {
-				rent = rentService.addRentOrder(memberId);
+				rent = rentService.addRentOrder(memberId, restaurantId);
 				session.setAttribute("rentId", rent.getRentId());
 				rentId = rent.getRentId();
 			}
 			
 			Integer rentDeposit = 0;
-			Integer restaurantId = null;
 			for(CartRequestDTO cartRequestDTO : cartRequestDTOList) {
 	            Integer tablewareId = cartRequestDTO.getTablewareId();
 	            Integer rentItemQuantity = cartRequestDTO.getRentItemQuantity();
-	            restaurantId = cartRequestDTO.getRestaurantId();
 	            // 新增每個租借項目
 	            RentItem rentItem = rentItemService.addRentItemToOrder(rentId, tablewareId, rentItemQuantity);
 	            rentDeposit += rentItem.getRentItemDeposit();
 	        }
 			rent = rentService.findRentById(rentId);
-			rent.setRestaurantId(restaurantId);
 			rent.setRentDeposit(rentDeposit);
-			rent.setMemberId(memberId);
+			rentService.addRent(rent);
 			
 			return ResponseEntity.status(HttpStatus.OK).body(rent);
 		} catch (Exception e) {
@@ -182,13 +180,13 @@ public class StarCupsRentController {
 	public String toCheckout(Model model) {
 		Integer rentId = (Integer) session.getAttribute("rentId");
 		Rent rent = rentService.findRentById(rentId);
-		Integer totalDeposit = rentService.calculateTotalDeposit(rentId);
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
 		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+		Member member = rentService.findMemberByRentId(rentId);
+		model.addAttribute("member", member);
 		model.addAttribute("rent", rent);
 		model.addAttribute("rentItems", rentItems);
 		model.addAttribute("tablewares", tablewares);
-		model.addAttribute("totalDeposit",totalDeposit);
 		return "starcups/rental/checkoutTablewarePage";
 	}
 	
@@ -204,5 +202,41 @@ public class StarCupsRentController {
 		return "starcups/rental/allRentPage";
 	}
 	
+	
+	//
+	@PostMapping("/rental/ecpayCheckout")
+	@ResponseBody
+	public String ecpayCheckout(Model model) {
+	    Integer rentId = (Integer) session.getAttribute("rentId");
+	    
+	    String aioCheckOutALLForm = rentService.ecpayCheckout(rentId);
 
+	    model.addAttribute("aioCheckOutALLForm", aioCheckOutALLForm);
+	    
+	    
+	    return aioCheckOutALLForm;
+	}
+	
+	
+	//
+	@GetMapping("/rental/OrderConfirm")
+	public String checkOutFinish(@RequestParam Map<String, String>map, Model model) {
+		Integer rentId = (Integer) session.getAttribute("rentId");
+		Rent rent = rentService.findRentById(rentId);
+		
+		
+		
+		model.addAttribute("rent", rent);
+		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+		model.addAttribute("rentItems", rentItems);
+		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		model.addAttribute("tablewares", tablewares);
+		Member member = rentService.findMemberByRentId(rentId);
+		model.addAttribute("member", member);
+		
+		
+//		String string = map.get("TradeNo");
+//		System.out.println(map);
+		return "starcups/rental/rentOrderConfirm";
+	}
 }

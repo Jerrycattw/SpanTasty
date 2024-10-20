@@ -378,6 +378,7 @@ function submitCart() {
             alert('購物車提交成功');
             localStorage.removeItem('cartItems'); // 清空購物車
             updateCartCount(0); // 重置購物車顯示
+            updateCartUI([]);
             window.location.href = "/SpanTasty/StarCups/rental/cart"; 
         } else {
             alert('提交購物車失敗');
