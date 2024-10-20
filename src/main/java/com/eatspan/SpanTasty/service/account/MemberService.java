@@ -79,7 +79,7 @@ public class MemberService {
 		return memberRepository.findById(memberId);
 	}
 	
-    public List<Member> findMemberByShoppingId(Integer shoppingId) {
+    public Member findMemberByShoppingId(Integer shoppingId) {
         return memberRepository.findMemberByShoppingId(shoppingId);
     }
 

@@ -61,8 +61,8 @@
                                             <td th:text="${shopping.member != null ? shopping.member.memberName : '無會員資料'}"></td>
                                             <td>
                                                 <span th:switch="${shopping.shoppingStatus}">
-                                                    <span th:case="1">待出貨</span>
-                                                    <span th:case="2">已出貨</span>
+                                                    <span th:case="1">待確認</span>
+                                                    <span th:case="2">已結帳</span>
                                                     <span th:case="3">其他</span>
                                                     <span th:case="*">未知狀態</span>
                                                 </span>

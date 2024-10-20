@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Cups 週年慶優惠</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f0f0f0;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #E6C7B3;">
+        <tr>
+            <td align="center" style="padding: 20px;">
+                <img src="cid:logo" alt="Star Cups Logo" style="width: 300px; max-width: 100%; height: auto;">
+                
+                <div style="width: 100%; max-width: 300px; background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;">
+                    <p>親愛的，${shopping.member.memberName} 您好</p>
+                    <section class="section novi-bg novi-bg-img section-xl bg-default">
+                        <div class="container d-flex justify-content-center">
+                            <article class="quote-lisa w-100">
+                                <div class="box-icon-classic-icon novi-icon fl-bigmug-line-giftbox54"></div>
+                                <h3 class="box-icon-modern-title">Order Completed</h3>
+                                <div class="quote-lisa-body">
+                                    <div class="quote-lisa-text">
+                                        <h4>Order Number #${shopping.shoppingId}</h4>
+                                        <div class="row row-sm row-30 row-fix fs-6 text">
+                                            <div class="col-sm-12">
+                                                <ul class="list-marked">
+                                                    <li>Shopping Date : <span>${shopping.formattedShoppingDate}</span></li>
+                                                    <li>Name: <span>${shopping.member.memberName}</span></li>
+                                                    <li>Phone: <span>${shopping.member.phone}</span></li>
+                                                    <li>Address: <span>${shopping.member.address}</span></li>
+                                                    <li>EMail: <span>${shopping.member.email}</span></li>
+                                                    <li>Order List:<br><br>
+                                                        <ul>
+                                                            <#list shopping.items as item>
+                                                                <li>
+                                                                    <div class="box-pricing-body">
+                                                                        <i class="fa-solid fa-check"></i>&nbsp;&nbsp;<span>${item.product.productName}</span>: 
+                                                                        <span>${item.shoppingItemQuantity}</span>*NT$
+                                                                        <span>${item.shoppingItemPrice}</span>
+                                                                    </div>
+                                                                </li>
+                                                            </#list>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                                <div class="fs-6 text" style="text-align: right"><br>
+                                                    Amount :$<span>${shopping.shoppingTotal}</span><br>
+                                                 Discount Amount :$0<span>discountAmount</span><br>
+                                                </div>
+                                                <div class="fs-5 text" style="text-align: right">
+                                                    Total Amount :$finalTotal<span>${shopping.shoppingTotal}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h5 class="quote-lisa-cite">
+                                    <br>
+                                    <h5>THANKS FOR YOUR SHOPPING</h5>
+                                </h5>
+                            </article>
+                        </div>
+                    </section>
+                    <a href="http://localhost:8080/SpanTasty/StarCups" style="display: inline-block; padding: 10px 20px; background-color: #87461A; color: white; text-decoration: none; border-radius: 5px;">Check Now</a>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
