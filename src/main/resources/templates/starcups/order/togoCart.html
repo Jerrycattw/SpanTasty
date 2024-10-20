@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+
+<head>
+  <title>Cart</title>
+  <meta name="format-detection" content="telephone=no">
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <!-- Stylesheets-->
+  <!-- 更改樣式 -->
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <style>
+    .ie-panel {
+      display: none;
+      background: #212121;
+      padding: 10px 0;
+      box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
+      clear: both;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    html.ie-10 .ie-panel,
+    html.lt-ie-10 .ie-panel {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- navbar  th:replace=-->
+  <div th:replace="~{starcups/display/navbar}"></div>
+  <div class="ie-panel"><a href="http://windows.microsoft.com/en-US/internet-explorer/"><img
+        src="images/ie8-panel/warning_bar_0000_us.jpg" height="42" width="820"
+        alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today."></a>
+  </div>
+  <div class="preloader">
+    <div class="preloader-body">
+      <div class="cssload-container"><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+    <!-- Page Header-->
+    <header class="section page-header">
+      <!-- RD Navbar-->
+
+    </header>
+    <!-- Breadcrumbs -->
+    <section class="section breadcrumbs-custom-inset">
+      <div class="breadcrumbs-custom context-dark">
+        <div class="container">
+          <h2 class="breadcrumbs-custom-title">Cart Page</h2>
+          <ul class="breadcrumbs-custom-path">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html">Order Online</a></li>
+            <li class="active">Cart Page</li>
+          </ul>
+        </div>
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+      </div>
+    </section>
+    <!-- Shopping Cart-->
+    <section class="section novi-bg novi-bg-img section-xl bg-default">
+      <div class="container">
+        <!-- shopping-cart-->
+        <div class="table-custom-responsive">
+          <table class="table-custom table-cart">
+            <thead>
+              <tr>
+                <th>Product name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <!-- 圖片 -->
+                  <div class="table-cart-figure" style="margin-right: 30px;">
+                    <img src="images/product-mini-7-146x132.png" alt="" width="146" height="132" />
+                  </div>
+                  <!-- 名稱 -->
+                  <div class="table-cart-link">Burdur Pearl</div>
+                </td>
+                <!-- 價格 -->
+                <td>$289</td>
+                <!-- 數量 -->
+                <td>
+                  <div class="table-cart-stepper">
+                    <input class="form-input" type="number" data-zeros="true" value="1" min="1" max="1000">
+                  </div>
+                </td>
+                <!-- 單項總價 -->
+                <td>$289</td>
+                <!-- 刪除 -->
+                <td>
+                  <button class="button button-md button-secondary button-pipaluk">1</button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+        <div class="group-xl group-lg-justify">
+          <div>
+            <!-- RD Mailform-->
+            <form class="rd-form rd-mailform rd-form-inline rd-form-coupon">
+              <div class="form-wrap">
+                <input class="form-input form-input-inverse" id="coupon-code" type="text" name="email">
+                <label class="form-label" for="coupon-code">Coupon code</label>
+              </div>
+              <div class="form-button">
+                <button class="button button-secondary button-pipaluk" type="submit">Apply coupon</button>
+              </div>
+            </form>
+          </div>
+          <div>
+            <div class="group-xmd group-middle">
+              <div>
+                <div class="group-xmd group-middle">
+                  <h6 class="text-gray-500">Total</h6>
+                  <h3 class="cart-product-price"><sup>$</sup>524</h3>
+                </div>
+              </div><a class="button button-primary button-pipaluk" href="checkout.html">Proceed to checkout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page Footer-->
+    <footer class="section footer-variant-2 footer-modern context-dark novi-bg novi-bg-img">
+    </footer>
+  </div>
+  <!-- Global Mailform Output-->
+  <div class="snackbars" id="form-output-global"></div>
+  <!-- footer th:replace -->
+  <div th:replace="~{starcups/display/footer}"></div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      loadCartIntoTable();
+
+
+    })
+
+    function loadCartIntoTable() {
+      // 從 localStorage 中獲取購物車數據
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      // 目標表格的 tbody 元素
+      const tbody = document.querySelector(".table-custom.table-cart tbody");
+
+      // 清空表格
+      tbody.innerHTML = '';
+
+      // 如果購物車不為空，動態插入每個項目
+      if (cart.length > 0) {
+        cart.forEach(item => {
+          const rowHtml = `
+        <tr>
+          <td>
+            <div class="table-cart-figure" style="margin-right: 30px;">
+              <img src="${item.foodPicture}" alt="" width="146" height="132" />
+            </div>
+            <div class="table-cart-link">${item.foodName}</div>
+          </td>
+          <td>$${item.foodPrice}</td>
+          <td>
+            <div class="table-cart-stepper">
+              <input class="form-input" type="number" data-zeros="true" value="${item.quantity}" min="1" max="1000" 
+                onchange="updateQuantity(${item.foodId}, this.value)">
+            </div>
+          </td>
+          <td>$${item.foodPrice * item.quantity}</td>
+          <td>
+            <button class="button button-md button-secondary button-pipaluk" onclick="removeFromCart(${item.foodId})">Delete</button>
+          </td>
+        </tr>`;
+
+          // 插入新行到表格中
+          tbody.insertAdjacentHTML('beforeend', rowHtml);
+        });
+      } else {
+        // 如果購物車是空的，顯示一條提示信息
+        tbody.innerHTML = `<tr><td colspan="5">購物車是空的。</td></tr>`;
+      }
+    }
+
+    // 刪除購物車中的商品
+    function removeFromCart(foodId) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      // 刪除指定商品
+      cart = cart.filter(item => item.foodId !== foodId);
+
+      // 更新 localStorage
+      localStorage.setItem('cart', JSON.stringify(cart));
+
+      // 重新載入表格
+      loadCartIntoTable();
+    }
+
+
+  </script>
+  <!-- Javascript-->
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+</body>
+
+</html>

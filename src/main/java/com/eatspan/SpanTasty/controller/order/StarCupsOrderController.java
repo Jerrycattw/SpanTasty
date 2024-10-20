@@ -43,4 +43,10 @@ public class StarCupsOrderController {
 		return "starcups/order/showMenu";
 	}
 	
+	@GetMapping("/order/cart")
+	public String togoCartPage(Model model) {
+		List<MenuEntity> foodList = menuService.getAllFoods();
+		model.addAttribute("foodList", foodList);
+		return "starcups/order/togoCart";
+	}
 }
