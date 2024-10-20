@@ -15,13 +15,18 @@ import jakarta.servlet.http.HttpSession;
 import com.eatspan.SpanTasty.dto.rental.CartRequestDTO;
 import com.eatspan.SpanTasty.dto.rental.RestaurantStockDTO;
 import com.eatspan.SpanTasty.dto.rental.TablewareFilterDTO;
+import com.eatspan.SpanTasty.dto.rental.TablewareIdDTO;
 import com.eatspan.SpanTasty.dto.rental.TablewareKeywordDTO;
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.rental.Rent;
 import com.eatspan.SpanTasty.entity.rental.RentItem;
 import com.eatspan.SpanTasty.entity.rental.Tableware;
 import com.eatspan.SpanTasty.entity.rental.TablewareStock;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
+import com.eatspan.SpanTasty.entity.store.Product;
+import com.eatspan.SpanTasty.entity.store.ShoppingItem;
 import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
+import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.service.rental.RentItemService;
 import com.eatspan.SpanTasty.service.rental.RentService;
 import com.eatspan.SpanTasty.service.rental.TablewareService;
@@ -53,7 +58,16 @@ public class StarCupsRentController {
 	@Autowired
 	private RestaurantService restaurantService;
 	@Autowired
+	private MemberService memberService;
+	@Autowired
 	private HttpSession session;
+	
+	
+	// 導向Home頁面
+	@GetMapping("/rental/home")
+	public String toHomePage(Model model) {
+		return "starcups/rental/rentHomePage";
+	}
 	
 	
 	// 導向到LOOKBOOK頁面
@@ -113,29 +127,46 @@ public class StarCupsRentController {
 	}
 	
 	
+	//
+	@ResponseBody
+	@PostMapping("/rental/tableware")
+	public ResponseEntity<Tableware> getOneTableware(@RequestBody TablewareIdDTO tablewareIdDTO) {
+		Tableware tableware = tablewareService.findTablewareById(tablewareIdDTO.getTablewareId());
+		return ResponseEntity.ok(tableware);
+	}
+	
+	
 	// 加入購物車
 	@ResponseBody
 	@PostMapping("/rental/addCart")
-	public ResponseEntity<?> addToCart(@RequestHeader(value = "Authorization") String token, @RequestBody CartRequestDTO cartRequestDTO) {
+	public ResponseEntity<?> addToCart(@RequestHeader(value = "Authorization") String token, @RequestBody List<CartRequestDTO> cartRequestDTOList) {
 		try {
-			System.out.println(token);
-			System.out.println(cartRequestDTO);
 			// 解析 JWT token 取得 claims
 			Map<String, Object> claims = JwtUtil.parseToken(token);
 			Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
 			
 			Integer rentId = (Integer) session.getAttribute("rentId");
-			Integer tablewareId = cartRequestDTO.getTablewareId();
-			Integer rentItemQuantity = cartRequestDTO.getRentItemQuantity();
-			Integer restaurantId = cartRequestDTO.getRestaurantId();
+			Integer restaurantId = cartRequestDTOList.get(0).getRestaurantId();
+			
 			Rent rent;
 			if(rentId == null) {
-				rent = rentService.addRentOrder(memberId, tablewareId, rentItemQuantity, restaurantId);
+				rent = rentService.addRentOrder(memberId, restaurantId);
 				session.setAttribute("rentId", rent.getRentId());
-			}else {
-				rentItemService.addRentItemToOrder(rentId, tablewareId, rentItemQuantity);
-				rent = rentService.findRentById(rentId);
+				rentId = rent.getRentId();
 			}
+			
+			Integer rentDeposit = 0;
+			for(CartRequestDTO cartRequestDTO : cartRequestDTOList) {
+	            Integer tablewareId = cartRequestDTO.getTablewareId();
+	            Integer rentItemQuantity = cartRequestDTO.getRentItemQuantity();
+	            // 新增每個租借項目
+	            RentItem rentItem = rentItemService.addRentItemToOrder(rentId, tablewareId, rentItemQuantity);
+	            rentDeposit += rentItem.getRentItemDeposit();
+	        }
+			rent = rentService.findRentById(rentId);
+			rent.setRentDeposit(rentDeposit);
+			rentService.addRent(rent);
+			
 			return ResponseEntity.status(HttpStatus.OK).body(rent);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -146,21 +177,66 @@ public class StarCupsRentController {
 	
 	// 導向結帳畫面
 	@GetMapping("/rental/cart")
-	public String getMethodName(Model model) {
+	public String toCheckout(Model model) {
 		Integer rentId = (Integer) session.getAttribute("rentId");
 		Rent rent = rentService.findRentById(rentId);
-		model.addAttribute("rent", rent);
-		
-		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
-		model.addAttribute("rentItems", rentItems);
-		
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+		Member member = rentService.findMemberByRentId(rentId);
+		model.addAttribute("member", member);
+		model.addAttribute("rent", rent);
+		model.addAttribute("rentItems", rentItems);
 		model.addAttribute("tablewares", tablewares);
-		
-		Integer totalDeposit = rentService.calculateTotalDeposit(rentId);
-		model.addAttribute("totalDeposit",totalDeposit);
 		return "starcups/rental/checkoutTablewarePage";
 	}
 	
+	
+	//導向訂單名細頁面
+	@GetMapping("/rental/allRent")
+	public String toAllRent(@RequestParam(value = "token") String token, Model model) {
+		// 解析 JWT token 取得 claims
+		Map<String, Object> claims = JwtUtil.parseToken(token);
+		Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
+		List<Rent> rents = rentService.findRentsByMemberId(memberId);
+		model.addAttribute("rents", rents);
+		return "starcups/rental/allRentPage";
+	}
+	
+	
+	//
+	@PostMapping("/rental/ecpayCheckout")
+	@ResponseBody
+	public String ecpayCheckout(Model model) {
+	    Integer rentId = (Integer) session.getAttribute("rentId");
+	    
+	    String aioCheckOutALLForm = rentService.ecpayCheckout(rentId);
 
+	    model.addAttribute("aioCheckOutALLForm", aioCheckOutALLForm);
+	    
+	    
+	    return aioCheckOutALLForm;
+	}
+	
+	
+	//
+	@GetMapping("/rental/OrderConfirm")
+	public String checkOutFinish(@RequestParam Map<String, String>map, Model model) {
+		Integer rentId = (Integer) session.getAttribute("rentId");
+		Rent rent = rentService.findRentById(rentId);
+		
+		
+		
+		model.addAttribute("rent", rent);
+		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
+		model.addAttribute("rentItems", rentItems);
+		List<Tableware> tablewares = tablewareService.findAllTablewares();
+		model.addAttribute("tablewares", tablewares);
+		Member member = rentService.findMemberByRentId(rentId);
+		model.addAttribute("member", member);
+		
+		
+//		String string = map.get("TradeNo");
+//		System.out.println(map);
+		return "starcups/rental/rentOrderConfirm";
+	}
 }

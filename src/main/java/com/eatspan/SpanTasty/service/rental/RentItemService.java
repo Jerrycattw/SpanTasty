@@ -102,7 +102,7 @@ public class RentItemService {
 	
 	
 	//
-	public void addRentItemToOrder(Integer rentId, Integer tablewareId, Integer rentItemQuantity) {
+	public RentItem addRentItemToOrder(Integer rentId, Integer tablewareId, Integer rentItemQuantity) {
 		RentItem rentItem = new RentItem();
 		rentItem.setRentId(rentId);
 		rentItem.setTablewareId(tablewareId);
@@ -114,10 +114,7 @@ public class RentItemService {
 		rentItem.setReturnStatus(1);
 		rentItem.setReturnMemo("未歸還");
 		addRentItem(rentItem);
-		
-		Rent rent = rentService.findRentById(rentId);
-		rent.setRentDeposit(rentService.calculateTotalDeposit(rentId));
-		rentService.addRent(rent);
+		return rentItem;
 	}
 	
 }

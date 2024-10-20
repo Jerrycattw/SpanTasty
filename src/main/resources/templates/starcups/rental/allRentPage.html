@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+<head>
+<title>Rent</title>
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<!-- Stylesheets-->
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+.ie-panel{
+    display: none;
+    background: #212121;
+    padding: 10px 0;
+    box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);
+    clear: both;
+    text-align:center;
+    position: relative;
+    z-index: 1;
+}
+
+html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
+    display: block;
+}
+
+.card-button {
+	display: inline-block;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    transform: translate3d(0, -50%, 0);
+    transition: .33s all ease;
+}
+.card-button{
+
+}
+</style>
+</head>
+<body>
+<!-- navbar  th:replace=-->
+<div th:replace="~{starcups/display/navbar}" ></div>
+<!-- 選單下方圖片及連結 -->
+<section class="section breadcrumbs-custom-inset">
+  <div class="breadcrumbs-custom context-dark">
+    <div class="container">
+      <h2 class="breadcrumbs-custom-title">Single Tableware</h2>
+      <ul class="breadcrumbs-custom-path">
+        <li><a href="/SpanTasty/StarCups">Home</a></li>
+        <li class="active">Single Tableware</li>
+      </ul>
+    </div>
+    <!-- 圖片-->
+    <div class="box-position novi-bg novi-bg-img" style="background-image: url('/SpanTasty/StarCups/images/bg-breadcrumbs.jpg');"></div>
+  </div>
+</section>
+
+<section class="section novi-bg novi-bg-img section-xl bg-default">
+  <div class="container">
+    <!-- Bootstrap collapse-->
+    <div class="row row-15 row-fix align-items-start card-group-custom card-group-corporate" id="accordion2" role="tablist" aria-multiselectable="false">
+      <div class="col-lg-6">
+        <!-- Bootstrap card-->
+        <article class="card card-custom card-corporate" th:each="rent : ${rents}">
+          <div class="card-header" id="accordion2Heading1" role="tab">
+            <div class="card-title">
+            <div class="d-flex align-items-center">
+                <img id="personal-current-avatar" th:src="@{'/SpanTasty/starcups/images/account/' + ${rent.member.avatar}}" alt="頭像" class="rounded-circle border" style="width: 50px; height: 50px; margin-right: 10px;">
+                <div>
+                    <strong th:text="${rent.member.memberName}"></strong>
+                </div>
+            </div>
+            <a class="toggle-icon " role="button" data-bs-toggle="collapse" th:data-bs-target="'#accordion2Collapse' + ${rent.rentId}" th:href="'#accordion2Collapse' + ${rent.rentId}" aria-controls="accordion2Collapse" th:aria-controls="'accordion2Collapse' + ${rent.rentId}" aria-expanded="false">訂單編號: <span th:text="${rent.rentId}"></span>
+                <div class="card-button"><i class="fa-solid fa-circle-chevron-down position-absolute top-50 start-50 translate-middle chevron-down"></i></div>
+                <div class="card-button"><i class="fa-solid fa-circle-chevron-up position-absolute top-50 start-50 translate-middle chevron-up d-none"></i></i></div>
+            </a>
+            </div>
+          </div>
+          <div class="collapse" th:id="'accordion2Collapse' + ${rent.rentId}" role="tabpanel" th:aria-labelledby="'accordion2Heading' + ${rent.rentId}">
+            <div class="card-body">
+             <ul th:each="rentItem : ${rent.rentItems}">
+             	<li th:text="'物品名稱: ' + ${rentItem.tableware.tablewareName} + ', 數量: ' + ${rentItem.rentItemQuantity}+ ', 金額: ' + ${rentItem.rentItemDeposit}"></li>
+             </ul>
+             	<span th:text=" ' 總金額: ' + ${rent.rentDeposit}"></span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+	
+
+
+<!-- Global Mailform Output-->
+<div class="snackbars" id="form-output-global"></div>
+<!-- footer  th:replace=-->
+<div th:replace="~{starcups/display/footer}" ></div>
+<!-- Javascript-->
+<script src="/SpanTasty/starcups/js/core.min.js"></script>
+<script src="/SpanTasty/starcups/js/script.js"></script>
+<script>
+document.querySelectorAll('.toggle-icon').forEach(function(toggleIcon) {
+    toggleIcon.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-bs-target');
+        const targetElement = document.querySelector(targetId);
+        
+        targetElement.addEventListener('shown.bs.collapse', function () {
+            toggleIcon.querySelector('.chevron-down').classList.add('d-none');
+            toggleIcon.querySelector('.chevron-up').classList.remove('d-none');
+        });
+
+        targetElement.addEventListener('hidden.bs.collapse', function () {
+            toggleIcon.querySelector('.chevron-down').classList.remove('d-none');
+            toggleIcon.querySelector('.chevron-up').classList.add('d-none');
+        });
+    });
+});
+</script>
+</body>
+</html>

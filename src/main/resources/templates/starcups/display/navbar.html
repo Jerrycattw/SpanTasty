@@ -105,13 +105,15 @@
                     <li class="rd-dropdown-item"><a class="rd-dropdown-link" href="blog-post.html">Blog Post</a></li>
                   </ul>
                 </li>
-                <li class="rd-nav-item"><a class="rd-nav-link" href="shop.html">租借</a>
+                <li class="rd-nav-item"><a class="rd-nav-link" href="/SpanTasty/StarCups/rental/home">租借</a>
                   <!-- RD Navbar Dropdown-->
                   <ul class="rd-menu rd-navbar-dropdown">
                     <li class="rd-dropdown-item"><a class="rd-dropdown-link"
-                        href="/SpanTasty/StarCups/rental/lookbook">LOOKBOOK</a></li>
+                        href="/SpanTasty/StarCups/rental/lookbook">租借圖冊</a></li>
                     <li class="rd-dropdown-item"><a class="rd-dropdown-link"
-                        href="/SpanTasty/StarCups/rental/rent">RENT</a></li>
+                        href="/SpanTasty/StarCups/rental/rent">開始租借</a></li>
+                    <li class="rd-dropdown-item"><a class="rd-dropdown-link"
+                        href="javascript:void(0)" onclick="toAllRent()">訂單明細</a></li>
                   </ul>
                 </li>
                 <li class="rd-nav-item">
@@ -365,7 +367,16 @@
     }
   });
 
-
+	// toAllRent
+	function toAllRent() {
+	    const token = localStorage.getItem('token');
+	    if (!token) {
+	        alert('Token 不存在，請重新登錄。');
+	        return;
+	    }
+	    // 直接設置網址，並將 token 作為 URL 參數發送
+	    window.location.href = `/SpanTasty/StarCups/rental/allRent?token=${token}`;
+	}
 
 
 </script>

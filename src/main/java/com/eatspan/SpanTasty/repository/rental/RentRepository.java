@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.rental.Rent;
 
 @Repository
@@ -39,4 +41,10 @@ public interface RentRepository extends JpaRepository<Rent, Integer> {
 	
 	@Query(value = "SELECT SUM(rentItem.tableware.tablewareDeposit * rentItem.rentItemQuantity) FROM RentItem rentItem WHERE rentItem.rent.rentId = :rentId")
 	Integer countRentDeposit(@Param("rentId") Integer rentId);
+	
+	
+	List<Rent> findByMemberId(Integer memberId);
+	
+	@Query("SELECT m FROM Member m JOIN Rent rent ON m.id = rent.member.id WHERE rent.rentId = :rentId")
+	Member findMemberByRentId(@Param("rentId") Integer rentId);
 }
