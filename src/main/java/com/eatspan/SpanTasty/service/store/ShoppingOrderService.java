@@ -313,7 +313,7 @@ public class ShoppingOrderService {
                           .append(quantity)
                           .append("*NT$")
                           .append(price)
-                          .append(".  /  "); 
+                          .append("#"); 
             }
         }
 

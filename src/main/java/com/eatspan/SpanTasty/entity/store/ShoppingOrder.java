@@ -74,6 +74,12 @@ public class ShoppingOrder {
 	@OneToMany(mappedBy = "shoppingOrder")
     private List<ShoppingItem> items;
 	
+    @JsonIgnore
+    public Integer getFinalTotal() {
+        Integer discount = (discountAmount != null) ? discountAmount : 0;
+        return (shoppingTotal != null ? shoppingTotal : 0) - discount;
+    }
+	
 	public String getFormattedShoppingDate() {
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	    return shoppingDate != null ? shoppingDate.format(formatter) : null;
