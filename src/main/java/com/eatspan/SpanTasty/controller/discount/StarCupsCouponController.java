@@ -73,4 +73,30 @@ public class StarCupsCouponController {
 
 	}
 	
+	@GetMapping("/coupon/discount")
+	@ResponseBody
+	public Integer coculateCouponDiscount(@RequestParam String couponCode,@RequestParam Integer totalAmount) {
+		return couponService.coculateCouponDiscount(couponCode, totalAmount);
+		
+	}
+	
+	@PostMapping("/coupon/allDiscount")
+	public ResponseEntity<?> postMethodName(@RequestBody Map<String,Integer> jsonMap) {
+		Integer couponDiscount =jsonMap.get("couponDiscount")!= null? jsonMap.get("couponDiscount") : 0 ;
+		Integer pointDiscount =jsonMap.get("pointDiscount")!= null? jsonMap.get("pointDiscount") : 0 ;
+		Integer shoppingId =jsonMap.get("shoppingId") ;
+		Integer totalDiscount = couponDiscount+pointDiscount;
+		
+		try {
+			//更新訂單折扣金額
+			couponService.updateDiscountAmount(shoppingId, totalDiscount);
+			//使用點數方法更新
+			//使用優惠券更新
+			//集點更新
+			return ResponseEntity.ok("新增成功!");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("處理請求時發生錯誤，請稍後再試。");
+		}
+	}
+	
 }

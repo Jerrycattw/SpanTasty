@@ -16,8 +16,8 @@ public class PointMemberDTO {
 	private Integer memberId;
 	private String memberName;
 	private String phone;
-	private Integer totalPointBalance;
-	private Integer expiringPoints;
+	private Integer totalPointBalance=0;
+	private Integer expiringPoints=0;
 	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date expiryDate;
 

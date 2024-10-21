@@ -153,6 +153,9 @@ public class PointController {
 		model.addAttribute("point_pointMember", memberId);//
 		
 		PointMemberDTO pointMember = pointService.getPointMember(memberId);
+		if (pointMember==null) {
+			pointMember=new PointMemberDTO();
+		}
 		Integer pointMemberTotalPoint = pointService.getPointMemberExpiryPoint(memberId);
 		List<Point> pointsById = pointService.getAllRecord(memberId);
 		
