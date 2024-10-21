@@ -99,8 +99,8 @@
 									<div class="col-9">
 										<select class="form-select" id="discountType" name="discountType"
 											aria-label="Default select example">
-											<option value="固定金額">固定金額</option>
-											<option value="百分比">百分比</option>
+											<option class="discountTypeOption" value="固定金額">固定金額</option>
+											<option class="discountTypeOption" value="百分比">百分比</option>
 										</select>
 									</div>
 								</div>
@@ -292,7 +292,11 @@
 							const isCheck = data.coupon.tags.some(t=>t.tagName==option.value && t.tagType=='togo' )
 							option.checked=isCheck
 						})
-						
+						document.querySelectorAll('.discountTypeOption').forEach(option=>{
+							if (option.value==data.coupon.discountType) {
+						        option.selected = true;
+						    }
+						})
 						
 					})
 					.catch(error => {

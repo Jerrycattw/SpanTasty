@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eatspan.SpanTasty.dto.discount.PointMemberDTO;
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.store.Product;
 import com.eatspan.SpanTasty.entity.store.ProductType;
@@ -27,6 +28,7 @@ import com.eatspan.SpanTasty.entity.store.ShoppingItem;
 import com.eatspan.SpanTasty.entity.store.ShoppingItemId;
 import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
 import com.eatspan.SpanTasty.service.account.MemberService;
+import com.eatspan.SpanTasty.service.discount.PointService;
 import com.eatspan.SpanTasty.service.store.ProductService;
 import com.eatspan.SpanTasty.service.store.ProductTypeService;
 import com.eatspan.SpanTasty.service.store.ShoppingItemService;
@@ -60,6 +62,10 @@ public class StarCupsStoreController {
 	
 	@Autowired
 	private HttpSession session;
+	
+	//點數
+	@Autowired
+	private PointService pointService;
 
 	
 	@GetMapping("/allProduct")
@@ -190,6 +196,15 @@ public class StarCupsStoreController {
 		model.addAttribute("totalAmount", totalAmount);
 		List<Member> members = memberService.findMemberByShoppingId(shoppingId);
 		model.addAttribute("members",members);
+		//點數 
+		Integer memberId = shopping.getMemberId();
+		PointMemberDTO pointMember = pointService.getPointMember(memberId);
+		if(pointMember==null) {
+			pointMember=new PointMemberDTO();
+		}	
+		model.addAttribute("pointMember",pointMember);
+		Integer pointMemberTotalPoint = pointService.getPointMemberExpiryPoint(memberId);
+		model.addAttribute("pointMemberTotalPoint",pointMemberTotalPoint);
 		return "starcups/store/checkOut";
 	}
 

@@ -36,12 +36,16 @@ import com.eatspan.SpanTasty.entity.discount.Tag;
 import com.eatspan.SpanTasty.entity.discount.TagId;
 import com.eatspan.SpanTasty.entity.store.ProductType;
 import com.eatspan.SpanTasty.entity.store.ShoppingItem;
+import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
 import com.eatspan.SpanTasty.repository.account.MemberRepository;
 import com.eatspan.SpanTasty.repository.discount.CouponMemberRepository;
 import com.eatspan.SpanTasty.repository.discount.CouponRepository;
 import com.eatspan.SpanTasty.repository.discount.CouponScheduleRepository;
 import com.eatspan.SpanTasty.repository.order.FoodKindRepository;
 import com.eatspan.SpanTasty.repository.store.ProductTypeRepository;
+import com.eatspan.SpanTasty.repository.store.ShoppingItemRepository;
+import com.eatspan.SpanTasty.repository.store.ShoppingOrderRepository;
+import com.eatspan.SpanTasty.service.store.ShoppingOrderService;
 import com.eatspan.SpanTasty.utils.discount.DateUtils;
 
 import freemarker.core.ParseException;
@@ -72,6 +76,9 @@ public class CouponService {
 	
 	@Autowired
 	private MemberRepository memberRepo;
+	
+	@Autowired
+	private ShoppingOrderService shoppingOrderService;
 	
 	@Autowired
 	private MailConfig mailConfig;// javaMail要注入----------------------------
@@ -430,5 +437,35 @@ public class CouponService {
 			.collect(Collectors.toList());
 		
 		return couponMembers;
+	}
+	
+	public Integer coculateCouponDiscount(String couponCode,Integer shoppingItemsAmount) {
+		Coupon coupon = CouponRepo.findByCouponCode(couponCode);
+		Integer couponDiscount;
+		switch (coupon.getDiscountType()){
+		case "百分比": 
+			Integer discountPercentage = coupon.getDiscount();
+			couponDiscount=shoppingItemsAmount * (100-discountPercentage) / 100;
+			//最大折扣限制 null表示無限制
+			Integer maxDiscount = coupon.getMaxDiscount();
+			if(maxDiscount!=null) {
+				return Math.min(couponDiscount, maxDiscount);
+			}
+			
+			return couponDiscount;
+		case "固定金額":
+			return coupon.getDiscount();
+		default:
+			return 0;
+		}
+	}
+	
+	
+	public void updateDiscountAmount(Integer shoppingId,Integer totalDiscount) {
+		
+		ShoppingOrder shoppingOrder = shoppingOrderService.findShoppingOrderById(shoppingId);
+		shoppingOrder.setDiscountAmount(totalDiscount);
+		shoppingOrder.setFinalAmount(shoppingOrder.getShoppingTotal()-totalDiscount);
+		shoppingOrderService.updateShoppingOrder(shoppingOrder);
 	}
 }

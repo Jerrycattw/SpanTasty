@@ -126,16 +126,16 @@
             <!-- point -->
             <div class="row mt-3">
               <div class="col">
-                <span class="point" style="font-size: 16px;">點數折抵</span>
-                <div class="form-wrap text-align-center">
-                  <input class="form-input form-input-inverse pointText" id="coupon-code" type="number" name="email" max="910" style="font-size: 20px;">
-                  <label class="form-label" for="coupon-code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Point</label>
+                <span class="point" style="font-size: 16px;" id="pointItem">點數折抵</span>
+                <div class="form-wrap text-align-center" id="pointItem">
+                  <input class="form-input form-input-inverse pointText" id="pointInput" type="text" name="email" th:max="${pointMemberTotalPoint!=null? pointMemberTotalPoint : 0}" min="0"style="font-size: 20px;">
+                  <label class="form-label" for="pointInput">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Point</label>
                 </div>
               </div>
               <div class="col d-flex align-items-end">
                 <ul class="point" id="">
-                  <li class="active" style="font-size: 16px;">可用點數 : 910點(1點折抵1元)</li>
-                  <li class="active" style="font-size: 16px;">您有 45點將於 2024/13/31到期</li>
+                  <li class="active" style="font-size: 16px;" th:text="'可用點數 : '+${pointMemberTotalPoint!=null? pointMemberTotalPoint : 0}+'點(1點折抵1元)'"><!-- 可用點數 : 910點(1點折抵1元) --></li>
+                  <li class="active" style="font-size: 16px;" th:text="'您有 '+${pointMember.expiringPoints}+' 點將於 '+${pointMember.expiryDate != null? pointMember.expiryDate : '-'}+' 到期'"><!-- 您有 45點將於 2024/13/31到期 --></li>
                 </ul>  
               </div>
               <div class="col"></div>
@@ -190,25 +190,25 @@
                   <tbody>
                     <tr>
                       <td>Cart Subtotal</td>
-                      <td>$524</td>
+                      <td th:text="'$' + ${totalAmount}" th:data-price="${totalAmount}">-</td>
                     </tr>
                     <tr>
                       <td>Coupon Discount</td>
-                      <td>-100</td>
+                      <td id="couponDiscountTd" data-discount="">-</td>
                     </tr>
                     <tr>
                       <td>Point Discount</td>
-                      <td>-15</td>
+                      <td id="pointDiscountTd" data-discount="">-</td>
                     </tr>
                     <tr> 
                       <td><h5>Total</h5></td>
-                      <td><h5 th:text="'$' + ${totalAmount}"></h5></td>
+                      <td><h5 th:text="'$' + ${totalAmount}" id="total"></h5></td>
                     </tr>
                   </tbody>
                 </table>
-                <div class="d-flex justify-content-end point mt-1 me-1" style="font-size: 17px;">
+                <!-- <div class="d-flex justify-content-end point mt-1 me-1" style="font-size: 17px;">
                   <span >訂單完成後獲得   +14 點</span>
-                </div>
+                </div> -->
               </div>
             	<br>
               <h4 class="text-spacing-50">Payment methods</h4>
@@ -242,8 +242,8 @@
             </div>
           </div>
           <div class="button-wrap text-center">
-          	<form th:action= "@{/StarCups/ecpayCheckout(shoppingId=${session['shoppingId']})}" method="post">
-          		<button type="submit" class="button button-secondary button-pipaluk">Proceed to checkout</button>
+          	<form th:action= "@{/StarCups/ecpayCheckout(shoppingId=${session['shoppingId']})}" method="post" id="checkoutForm">
+          		<button type="submit" class="button button-secondary button-pipaluk" id="checkoutBtn">Proceed to checkout</button>
           	</form>
        	 </div>
       </section>
@@ -271,28 +271,9 @@
                   <div class="col-6 d-flex align-items-center"><input type="text" class="form-control" ></div>       
                   <div class="col-3 d-flex align-items-center"><button class="addBtn" >使用</button></div>       
                 </div>
-                <!--  -->
-                <!-- <div class="col-6 d-flex mb-3">
-                  <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
-                  <div class="border w-100 d-flex justify-content-between">
-                    <div class="ms-1 mt-1">                                                        
-                      <ul class="">
-                        <li><span>${coupon.coupon.rulesDescription}</span><span></span></li>
-                        <li><span>低消 </span><span>$${coupon.coupon.minOrderDiscount != null ? coupon.coupon.minOrderDiscount : '-'}</span></li>
-                        <li><span>最多折抵 </span><span>$${coupon.coupon.maxDiscount != null ? coupon.coupon.maxDiscount : '-'}</span></li>
-                        <li><span>有效日期: </span><span>${coupon.coupon.couponEndDate}</span><a href="#" class="ms-2 rule" data-couponid=${coupon.coupon.couponId}>使用規則</a></li>
-                      </ul>
-                    </div>                                                           
-                    <div class="d-flex align-items-center me-3">
-                      <button class="button button-md button-secondary button-pipaluk goshopping">去逛逛</button>
-                    </div>
-                    ${coupon.usageAmount > 1 ? `<div class="box-sportlight-badge box-sportlight-sale mb-3">x ${coupon.usageAmount}</div>` : ''}               
-                  </div>
-                </div> -->
-
                   <!--  -->
                 <div id="couponDiv" class="mt-2">
-                  <div class="row">
+                  <!-- <div class="row">
                     <div class="col d-flex mb-3">
                       <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
                       <div class="border w-100 d-flex justify-content-between">
@@ -309,30 +290,8 @@
                         </div>                                                       
                         <div class="box-sportlight-badge box-sportlight-sale mb-3">x 3</div>      
                       </div>
-                    </div>
+                    </div> -->
                   </div>                  
-                  <!--  -->
-
-                  <div class="row mt-1">
-                    <div class="col d-flex mb-3">
-                      <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
-                      <div class="border w-100 d-flex justify-content-between">
-                        <div class="ms-1 mt-1" th:each="coupon : ${coupons}">                                                        
-                          <ul class="">
-                            <li><span>歡慶三周年</span><span></span></li>
-                            <li><span>低消 </span><span>$100</span></li>
-                            <li><span>最多折抵 </span><span>$10</span></li>
-                            <li><span>有效日期: </span><span>2024/12/31</span><a href="#" class="ms-2 rule" data-couponid=${coupon.coupon.couponId}>使用規則</a></li>
-                          </ul>
-                        </div>
-                        <div class="d-flex align-items-center me-3">
-                          <input type="radio" name="selectCoupon">  
-                        </div>                                                       
-                        <div class="box-sportlight-badge box-sportlight-sale mb-3">x 5</div>      
-                      </div>
-                    </div>
-                  </div>
-                </div>  
               
             </div>
             <div class="modal-footer">
@@ -372,7 +331,12 @@
       const shopoingItems = [[${items}]]
       const memberId = [[${members[0].memberId}]]
       const totalAmount = [[${totalAmount}]]
+      const maxPointUse = [[${pointMemberTotalPoint!=null? pointMemberTotalPoint : 0}]]
+      const shoppingId = [[${items[0].id.shoppingId}]]
+      let conponCode;
+      let discountAmount;
 
+      //選擇優惠券代碼
       document.getElementById('selectCoupon').addEventListener('click',()=>{
         var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
         myModal.show();
@@ -402,9 +366,9 @@
                 <div class="border w-100 d-flex justify-content-between">
                   <div class="ms-1 mt-1">                                                        
                     <ul class="">
-                      <li><span>${coupon.coupon.couponDescription}</span><span></span></li>
+                      <li><span>${coupon.coupon.rulesDescription}</span><span></span></li>
                       <li><span>低消: </span><span>$${coupon.coupon.minOrderDiscount?coupon.coupon.minOrderDiscount:'-'}</span></li>
-                      <li><span>低消最多折抵: </span><span>$${coupon.coupon.maxDiscount?coupon.coupon.maxDiscount:'-'}</span></li>
+                      <li><span>最多折抵: </span><span>$${coupon.coupon.maxDiscount?coupon.coupon.maxDiscount:'-'}</span></li>
                       <li><span>有效日期: </span><span>${coupon.coupon.couponEndDate}</span><a href="#" class="ms-2 rule" data-couponid=${coupon.coupon.couponId}>使用規則</a></li>
                     </ul>
                   </div>
@@ -418,12 +382,76 @@
         });
       }
 
-
+      //使用優惠券
       document.getElementById('useCoupon').addEventListener('click',()=>{
         let couponCode = document.querySelector('input[name="radioCoupon"]:checked').dataset.couponcode
         document.getElementById('coupon-code').value=couponCode
         document.getElementById('coupon-code-label').textContent=''
 
+        axios.get("/SpanTasty/StarCups/coupon/discount",{
+          params: {
+            totalAmount:totalAmount,
+            couponCode:couponCode
+          }
+        })
+        .then(res=>{
+          console.log(res.data);
+          couponDiscountHmtlMaker(res.data)
+          changeTotal()
+        }
+
+        )
+      })
+
+      function couponDiscountHmtlMaker(data){
+        document.getElementById('couponDiscountTd').textContent=`-${data}`
+        document.getElementById('couponDiscountTd').dataset.discount=data
+      }
+      
+
+      //變更點數
+      document.getElementById('pointInput').addEventListener('change',(e)=>{
+        
+        if(Number(e.target.value)>maxPointUse){
+          alert('超過點數上限')
+          e.target.value=''
+          document.getElementById('pointDiscountTd').textContent=`-${e.target.value}`
+          changeTotal()
+          return
+        }
+        document.getElementById('pointDiscountTd').textContent=`-${e.target.value}`
+        document.getElementById('pointDiscountTd').dataset.discount=e.target.value
+        changeTotal()
+
+      })
+
+      //計算最終金額
+      function changeTotal(){
+        const couponDiscount = document.getElementById('couponDiscountTd').dataset.discount
+        const pointDiscount = document.getElementById('pointDiscountTd').dataset.discount
+
+        document.getElementById('total').textContent=`$${totalAmount-couponDiscount-pointDiscount}`
+      }
+
+
+      //送出
+      document.getElementById('checkoutForm').addEventListener('submit',(e)=>{
+        e.preventDefault()
+        const couponDiscount = document.getElementById('couponDiscountTd').dataset.discount
+        const pointDiscount = document.getElementById('pointDiscountTd').dataset.discount
+        console.log('touch');
+        
+        axios.post('/SpanTasty/StarCups/coupon/allDiscount',{
+            couponDiscount:Number(couponDiscount),
+            pointDiscount:Number(pointDiscount),
+            shoppingId:shoppingId
+        })
+        .then(res=>{
+          e.target.submit();
+        })
+        .catch(err=>{         
+          alert("請稍後再試")
+        })
       })
     </script>
 </body>
