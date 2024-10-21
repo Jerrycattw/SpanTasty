@@ -24,7 +24,7 @@ public class CouponMemberService {
 	public Map<String, List<CouponMember>> starCupsCoupon(Integer memberId) {
 		Map<String, List<CouponMember>> couponMap = new HashMap<>();
 		//all
-		List<CouponMember> coupons = couponMemberRepo.findByMemberId(memberId);
+		List<CouponMember> coupons = couponMemberRepo.findByMemberId(memberId).stream().filter(couponMember->couponMember.getUsageAmount() > 0).collect(Collectors.toList());
 		couponMap.put("all", coupons);	
 		
 		//togo,shop分類

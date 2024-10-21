@@ -394,8 +394,10 @@ public class CouponService {
 				.map(shoppingItem->shoppingItem.getProduct().getProductType().getProductTypeName())
 				.collect(Collectors.toList());
 
-		//取得會員擁有優惠券 coupons
-		List<CouponMember> couponMembers = couponMemberRepo.findByMemberId(memberId);
+		//取得會員擁有優惠券 coupons (可使用數量>0)
+		List<CouponMember> couponMembers = couponMemberRepo.findByMemberId(memberId).stream()
+				.filter(couponMember->couponMember.getUsageAmount() > 0)
+				.collect(Collectors.toList());
 
 		//判斷每個優惠券是否可以使用   
 		couponMembers.stream().forEach(couponMember->{
@@ -468,4 +470,11 @@ public class CouponService {
 		shoppingOrder.setFinalAmount(shoppingOrder.getShoppingTotal()-totalDiscount);
 		shoppingOrderService.updateShoppingOrder(shoppingOrder);
 	}
+	
+	public void useCoupon(Integer couponId,Integer memberId) {
+		CouponMember couponMember = couponMemberRepo.findByMemberIdAndCouponId(memberId, couponId);
+		couponMember.setUsageAmount(couponMember.getUsageAmount()-1);
+		couponMemberRepo.save(couponMember);
+	}
+	
 }
