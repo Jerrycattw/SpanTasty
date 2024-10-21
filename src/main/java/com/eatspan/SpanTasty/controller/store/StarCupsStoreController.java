@@ -188,7 +188,7 @@ public class StarCupsStoreController {
 		model.addAttribute("productList", productList);
 		Integer totalAmount = shoppingOrderService.calculateTotalAmount(shoppingId);
 		model.addAttribute("totalAmount", totalAmount);
-		List<Member> members = memberService.findMemberByShoppingId(shoppingId);
+		Member members = memberService.findMemberByShoppingId(shoppingId);
 		model.addAttribute("members",members);
 		return "starcups/store/checkOut";
 	}
@@ -216,6 +216,10 @@ public class StarCupsStoreController {
 	@ResponseBody
 	public String ecpayCheckout(Model model) {
 	    Integer shoppingId = (Integer) session.getAttribute("shoppingId");
+	    ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+	    if (shopping.getShoppingStatus() == 2) {
+	        return "已完成結帳，無法重複結帳";
+	    }
 	    
 	    String aioCheckOutALLForm = shoppingOrderService.ecpayCheckout(shoppingId);
 
@@ -227,13 +231,18 @@ public class StarCupsStoreController {
 
 	
 	@GetMapping("/OrderConfirm")
-	public String checkOutFinish(@RequestParam Map<String, String>map, Model model) {
+//	public String checkOutFinish(@RequestParam Map<String, String>map, Model model) {
+		public String checkOutFinish(Model model) {
+		
 		Integer shoppingId = (Integer) session.getAttribute("shoppingId");
 		ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
+//		String string = map.get("TradeNo");
+//		System.out.println(map);
 		
 		
 		
 		System.out.println("shoppingId "+shoppingId );
+		
 		model.addAttribute("shopping", shopping);
 		List<ShoppingItem> items = shoppingItemService.findShoppingItemById(shoppingId);
 		model.addAttribute("items", items);
@@ -241,12 +250,38 @@ public class StarCupsStoreController {
 		model.addAttribute("productList", productList);
 		Integer totalAmount = shoppingOrderService.calculateTotalAmount(shoppingId);
 		model.addAttribute("totalAmount", totalAmount);
-		List<Member> members = memberService.findMemberByShoppingId(shoppingId);
-		model.addAttribute("members",members);
+//		Member members = memberService.findMemberByShoppingId(shoppingId);
+//		model.addAttribute("members",members);
+		
+	    Integer discountAmount = shopping.getDiscountAmount();
+	    if (discountAmount == null) {
+	        discountAmount = 0;
+	    }
+	    
+////	    // 計算 finalAmount
+//	    Integer shoppingTotal = shopping.getShoppingTotal();
+//	    model.addAttribute("shoppingTotal",shoppingTotal);
+//	    Integer finalAmount = shoppingTotal - discountAmount;
+//	    
+	    model.addAttribute("discountAmount", discountAmount);
+//	    model.addAttribute("finalAmount", finalAmount);
+	    
+		
+//		shopping.setFinalAmount(shopping.getShoppingTotal()-shopping.getDiscountAmount());
 		
 		
-//		String string = map.get("TradeNo");
-//		System.out.println(map);
+	    shopping.setShoppingStatus(2);
+	    shoppingOrderService.updateShoppingOrder(shopping);
+	    
+        try {
+        	shoppingOrderService.sendMail(shopping);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        
+	    
+	    session.removeAttribute("shoppingId");
+	    
 		return "starcups/store/OrderConfirm";
 	}
 	

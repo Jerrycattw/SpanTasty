@@ -63,7 +63,7 @@ public class ShoppingOrder {
 	private Integer discountAmount;
 	
 	@Column(name= "final_total")
-	private Integer finalAmount;
+	private Integer finalTotal;
 	
 	@ManyToOne 
     @JoinColumn(name = "member_id", referencedColumnName = "member_id", insertable = false, updatable = false)

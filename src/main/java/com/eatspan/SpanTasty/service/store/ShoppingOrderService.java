@@ -1,17 +1,28 @@
 package com.eatspan.SpanTasty.service.store;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.context.annotation.SessionScope;
 
+import com.eatspan.SpanTasty.config.MailConfig;
+import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.store.Product;
 import com.eatspan.SpanTasty.entity.store.ShoppingItem;
 import com.eatspan.SpanTasty.entity.store.ShoppingItemId;
@@ -21,6 +32,12 @@ import com.eatspan.SpanTasty.repository.store.ShoppingOrderRepository;
 
 import ecpay.payment.integration.AllInOne;
 import ecpay.payment.integration.domain.AioCheckOutALL;
+import freemarker.core.ParseException;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -47,6 +64,14 @@ public class ShoppingOrderService {
 	@Autowired
 	private HttpSession session;
 
+	@Autowired
+	private MailConfig mailConfig;// javaMail要注入----------------------------
+	
+	@Autowired
+	private JavaMailSender mailSender;// javaMail要注入----------------------------
+	
+	@Autowired
+	private freemarker.template.Configuration freemarkerConfig; // javaMail要注入----------------------------
 	@PersistenceContext
 	private EntityManager entityManager;
 	
@@ -180,27 +205,6 @@ public class ShoppingOrderService {
 		}
 
 	
-	
-//	@Transactional
-//	public ShoppingOrder updateShoppingOrder(Integer shoppingId, String shoppingMemo, Integer shoppingStatus) {
-//	    Optional<ShoppingOrder> optionalOrder = shoppingOrderRepo.findById(shoppingId);
-//
-//	    if (optionalOrder.isPresent()) {
-//	        ShoppingOrder shoppingOrder = optionalOrder.get();
-//	        
-//	        if (shoppingMemo != null) {
-//	            shoppingOrder.setShoppingMemo(shoppingMemo);
-//	        }
-//	        if (shoppingStatus != null) {
-//	            shoppingOrder.setShoppingStatus(shoppingStatus);
-//	        }
-//
-//	        shoppingOrder.setShoppingTotal(calculateTotalAmount(shoppingId));
-//
-//	        return shoppingOrderRepo.save(shoppingOrder);
-//	    }
-//	    return null; 
-//	}
 
 	
 	public ShoppingOrder findShoppingOrderById(Integer id) {
@@ -233,30 +237,7 @@ public class ShoppingOrderService {
 	    return null; 
 	}
 
-//	public String ecpayCheckout() {
-//
-//		AllInOne all = new AllInOne("");
-//
-//		AioCheckOutALL obj = new AioCheckOutALL();
-//		obj.setMerchantTradeNo("testCompany0004");
-//		obj.setMerchantTradeDate("2017/01/01 08:05:23");
-//		obj.setTotalAmount("50");
-//		obj.setTradeDesc("test Description");
-//		obj.setItemName("TestItem");
-//		// 交易結果回傳網址，只接受 https 開頭的網站，可以使用 ngrok
-////		obj.setReturnURL("<http://211.23.128.214:5000>");
-//		obj.setReturnURL("<http://localhost:8080/SpanTasty/StarCups>");
-//		obj.setNeedExtraPaidInfo("N");
-//		// 商店轉跳網址 (Optional)
-////		obj.setClientBackURL("<http://192.168.1.37:8080/>");
-//		obj.setClientBackURL("<http://localhost:8080/SpanTasty/StarCups>");
-//		String form = all.aioCheckOut(obj, null);
-//
-//		return form;
-//	}
-
 	
-
 //	    // 取得購物訂單
 //	    public String ecpayCheckout(Integer shoppingId) {
 //	        // 获取当前时间
@@ -291,30 +272,48 @@ public class ShoppingOrderService {
         
         // 计算总金额
         Integer totalAmount = calculateTotalAmount(shoppingId);
-
+        
+        System.out.println(totalAmount);
+        
+        
+        
+//        ShoppingOrder shopping =  findShoppingOrderById(shoppingId);
+//        Integer discountAmount = shopping.getDiscountAmount();
+//	    if (discountAmount == null) {
+//	        discountAmount = 0;
+//	    }
+	    
+	    // 計算 finalAmount
+//	    Integer shoppingTotal = shopping.getShoppingTotal();
+//	    Integer finalAmount = shoppingTotal - discountAmount;
+	    
+//        ShoppingOrder shopping = new ShoppingOrder();
+        
         // 设置 ECPay 结账信息
         AllInOne all = new AllInOne("");
         AioCheckOutALL obj = new AioCheckOutALL();
-        obj.setMerchantTradeNo(String.valueOf(shoppingId)); // 使用 shoppingId 作為交易編號
-        obj.setMerchantTradeNo("SC" + System.currentTimeMillis()); // 使用 shoppingId 作為交易編號
-        obj.setMerchantTradeDate(currentDateTime); // 使用當前時間
-        obj.setTotalAmount(String.valueOf(totalAmount)); // 使用總金額
+        obj.setMerchantTradeNo(String.valueOf(shoppingId)); 
+//        obj.setMerchantTradeNo("SC" + System.currentTimeMillis()); 
+        obj.setMerchantTradeDate(currentDateTime);
+        obj.setTotalAmount(String.valueOf(totalAmount)); 
+//        obj.setTotalAmount(String.valueOf(shopping.getFinalAmount())); 
+//        obj.setTotalAmount(String.valueOf(finalAmount)); 
 
         // 獲取所有商品名稱和金額資訊
         List<ShoppingItem> shoppingItems = shoppingItemService.findShoppingItemById(shoppingId);
         StringBuilder itemNames = new StringBuilder();
 
         for (ShoppingItem item : shoppingItems) {
-            Product product = item.getProduct(); // 假設 ShoppingItem 中有 Product 對象
+            Product product = item.getProduct(); 
             if (product != null) {
-                Integer quantity = item.getShoppingItemQuantity(); // 獲取數量
-                Integer price = item.getShoppingItemPrice(); // 獲取價格
+                Integer quantity = item.getShoppingItemQuantity(); 
+                Integer price = item.getShoppingItemPrice(); 
                 itemNames.append(product.getProductName())
                           .append(" ")
                           .append(quantity)
                           .append("*NT$")
                           .append(price)
-                          .append(".  /  "); // 格式化商品資訊
+                          .append(".  /  "); 
             }
         }
 
@@ -326,7 +325,7 @@ public class ShoppingOrderService {
         obj.setItemName(itemNames.toString()); // 設置商品名稱
         obj.setTradeDesc("test Description");
 //        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/allProduct");
-        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/OrderConfirm");
+        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/allProduct");
         obj.setNeedExtraPaidInfo("N");
 //        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/allProduct");
         obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/OrderConfirm");
@@ -335,4 +334,33 @@ public class ShoppingOrderService {
         return all.aioCheckOut(obj, null);
     }
 
+    
+    public void sendMail(ShoppingOrder shopping) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+		MimeMessageHelper  helper = new MimeMessageHelper(mimeMessage,true);
+		//設置mail
+		helper.setFrom(mailConfig.getUserName3());//誰寄信(application設定的信箱)
+//		helper.setTo(reserve.getMember().getEmail());//誰收信
+		helper.setTo("spantasty@gmail.com");//誰收信
+		helper.setSubject("謝謝您在☕starcups的訂購");//主旨
+		
+		//設置模板
+		//設置model
+		Map<String, Object> model = new HashMap<String,Object>();
+		//透過modal傳入的物件("參數名","東西")
+		//model.put("userName",memberName);
+		
+		model.put("shopping",shopping);
+		//get模板，並將modal傳入模板
+		String templateString = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfig.getTemplate("storeMail.html"), model);
+		
+		//設置mail內文
+		helper.setText(templateString,true);
+		
+		//設置資源，順序要在內文之後
+		FileSystemResource file = new FileSystemResource(new File("src/main/resources/static/images/mail/logo-starcups.png"));
+		helper.addInline("logo",file);
+		
+		mailSender.send(mimeMessage);	
+	}
 }

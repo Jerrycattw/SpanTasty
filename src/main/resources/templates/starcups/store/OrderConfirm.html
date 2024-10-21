@@ -97,10 +97,10 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 												</div>
 										</ul>
 												<div class="fs-6 text" style="text-align: right"><br>
-													<span>Amount :$0</span><br>
-													Discount Amount :$0<span th:text="${discountAmount}"></span><br></div>
+													Amount :$<span th:text="${shopping.shoppingTotal}"></span><br>
+													Discount Amount :$<span th:text="${discountAmount}"></span><br></div>
 												<div class="fs-5 text" style="text-align: right">
-													Total Amount :$<span th:text="${totalAmount}"></span>
+													Total Amount :$<span th:text="${shopping.finalTotal}"></span>
 												</div>
 							</ul>
 						</div>
@@ -125,15 +125,15 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 
 	<!-- Javascript-->
 	<script>
-      axios.post(`http://localhost:8080/SpanTasty/StarCups/ecpayCheckout`)
-      .then(res => {
-        console.log(res)
+      //axios.post(`http://localhost:8080/SpanTasty/StarCups/ecpayCheckout`)
+      //.then(res => {
+       // console.log(res)
         // document.querySelector("#ppoo").innerHTML += res
         // document.querySelector("#ppoo form").submit()
-      })
-      .catch(err => {
-        console.error(err); 
-      })
+     // })
+      //.catch(err => {
+     //   console.error(err); 
+     // })
      </script>
 	<script
 		src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>

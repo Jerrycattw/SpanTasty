@@ -41,8 +41,8 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 	@Query("SELECT COUNT(m) FROM Member m WHERE FORMAT(m.registerDate, 'yyyy-MM') = :yearMonth")
 	int countMembersByYearMonth(@Param("yearMonth") String yearMonth);
 
-	@Query("SELECT m FROM Member m JOIN ShoppingOrder s ON m.id = s.member.id WHERE s.id = :shoppingId")
-	List<Member> findMemberByShoppingId(@Param("shoppingId") Integer shoppingId);
+	@Query("FROM Member m JOIN ShoppingOrder s ON m.id = s.member.id WHERE s.id = :shoppingId")
+	Member findMemberByShoppingId(@Param("shoppingId") Integer shoppingId);
 
 	// 查詢總會員數
 	@Query("SELECT COUNT(m) FROM Member m")
