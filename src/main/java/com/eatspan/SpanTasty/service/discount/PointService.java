@@ -1,5 +1,6 @@
 package com.eatspan.SpanTasty.service.discount;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,9 +26,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.eatspan.SpanTasty.dto.discount.PointCenterDTO;
 import com.eatspan.SpanTasty.dto.discount.PointMemberDTO;
 import com.eatspan.SpanTasty.dto.discount.PointMemberProjection;
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.discount.Point;
 import com.eatspan.SpanTasty.entity.discount.PointSet;
+import com.eatspan.SpanTasty.repository.account.MemberRepository;
 import com.eatspan.SpanTasty.repository.discount.PointRepository;
+import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.utils.discount.DateUtils;
 
 
@@ -40,6 +44,9 @@ public class PointService {
 	
 	@Autowired
 	private PointRepository pointRepo;
+	
+	@Autowired
+	private MemberService memberService;
 	
 	private static PointSet currentPointSet;
 	
@@ -332,5 +339,31 @@ public class PointService {
 	public Page<Point> StarCupsPointGet(Integer memberId,Integer pageNumber){
 		Pageable pageable =PageRequest.of(pageNumber,5);
 		return pointRepo.findByMemberIdOrderByPointIdDescGet(memberId, pageable);		
+	}
+	
+	public void collectPoint(Integer totalAmount,Integer memberId,Integer transactionId, String transactionType) throws Exception {
+		//取得員工生日
+		Optional<Member> optional = memberService.findMemberById(memberId);
+		LocalDate birthday = optional.get().getBirthday();
+		//點數設定
+		PointSet pointSet = pointSetService.findAllPointSet();
+		//取得點數倍數(生日點數獲得加倍)
+		Integer pointRatio = 1;
+		if((pointSet.getBirthType()=="當月" && LocalDate.now().getMonth()==birthday.getMonth()) || (pointSet.getBirthType()=="當日" && LocalDate.now()==birthday)){
+			pointRatio=pointSet.getPointRatio();
+		}
+		//點數幾元累積幾點
+		Integer amountPerPoint = pointSet.getAmountPerPoint();
+		Integer pointEarned = pointSet.getPointsEarned();
+		//計算累積點數(訂單金額 / 每_元 * 累積_點 * 生日加倍(_或1) )
+		Integer pointCollect = totalAmount / amountPerPoint * pointEarned * pointRatio;
+		//新增點數紀錄
+		Point point = new Point();
+		point.setMemberId(memberId);
+		point.setPointChange(pointCollect);
+		point.setCreateDate(new Date());
+		point.setTransactionId(transactionId);
+		point.setTransactionType(transactionType);
+		insertOneRecord(point);
 	}
 }

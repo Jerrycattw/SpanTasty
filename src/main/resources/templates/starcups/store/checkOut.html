@@ -334,6 +334,7 @@
       const maxPointUse = [[${pointMemberTotalPoint!=null? pointMemberTotalPoint : 0}]]
       const shoppingId = [[${items[0].id.shoppingId}]]
       let conponCode;
+      let couponId;
       let discountAmount;
 
       //選擇優惠券代碼
@@ -373,7 +374,7 @@
                     </ul>
                   </div>
                   <div class="d-flex align-items-center me-3">
-                    <input type="radio"  name="radioCoupon" ${coupon.canUse? '':'disabled'}  data-couponcode="${coupon.coupon.couponCode}">  
+                    <input type="radio"  name="radioCoupon" ${coupon.canUse? '':'disabled'}  data-couponcode="${coupon.coupon.couponCode}" data-couponid="${coupon.coupon.couponId}">  
                   </div>                                                       
                   
                 </div>
@@ -385,6 +386,7 @@
       //使用優惠券
       document.getElementById('useCoupon').addEventListener('click',()=>{
         let couponCode = document.querySelector('input[name="radioCoupon"]:checked').dataset.couponcode
+        couponId = document.querySelector('input[name="radioCoupon"]:checked').dataset.couponid
         document.getElementById('coupon-code').value=couponCode
         document.getElementById('coupon-code-label').textContent=''
 
@@ -429,8 +431,9 @@
       function changeTotal(){
         const couponDiscount = document.getElementById('couponDiscountTd').dataset.discount
         const pointDiscount = document.getElementById('pointDiscountTd').dataset.discount
-
+        
         document.getElementById('total').textContent=`$${totalAmount-couponDiscount-pointDiscount}`
+        return totalAmount-couponDiscount-pointDiscount
       }
 
 
@@ -438,13 +441,16 @@
       document.getElementById('checkoutForm').addEventListener('submit',(e)=>{
         e.preventDefault()
         const couponDiscount = document.getElementById('couponDiscountTd').dataset.discount
-        const pointDiscount = document.getElementById('pointDiscountTd').dataset.discount
-        console.log('touch');
+        const pointDiscount = document.getElementById('pointDiscountTd').dataset.discount    
         
         axios.post('/SpanTasty/StarCups/coupon/allDiscount',{
             couponDiscount:Number(couponDiscount),
             pointDiscount:Number(pointDiscount),
-            shoppingId:shoppingId
+            shoppingId:shoppingId,
+            couopnId:couponId,
+            memberId:memberId,
+            finalAmount:changeTotal()
+
         })
         .then(res=>{
           e.target.submit();
