@@ -31,20 +31,21 @@
     <div th:replace="~{starcups/display/navbar}"></div>
     <input type="hidden" th:value="${session.shoppingId}" id="shoppingId">
     
-    <!-- Breadcrumbs -->
-    <section class="section breadcrumbs-custom-inset">
-        <div class="breadcrumbs-custom context-dark">
-            <div class="container">
+	<!-- Breadcrumbs -->
+	<section class="section breadcrumbs-custom-inset">
+		<div class="breadcrumbs-custom context-dark">
+			<div class="container">
                 <h2 class="breadcrumbs-custom-title">Checkout</h2>
                 <ul class="breadcrumbs-custom-path">
                     <li><a href="index.html">Home</a></li>
                     <li><a href="shop.html">Shop</a></li>
                     <li class="active">Checkout</li>
-                </ul>
-            </div>
-             <div class="box-position novi-bg novi-bg-img" style="background-image: url(/images/store/bg-503.jpg);"></div>
+                </ul>>
 			</div>
-    </section>
+			<div class="box-position novi-bg novi-bg-img"
+				style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+		</div>
+	</section>
 
     <!-- Shopping Cart -->
     <section class="section novi-bg novi-bg-img section-xl bg-default">
@@ -79,18 +80,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="group-xl group-lg-justify">
-                <div>
-                    <form class="rd-form rd-mailform rd-form-inline rd-form-coupon">
-                        <div class="form-wrap">
-                            <input class="form-input form-input-inverse" id="coupon-code" type="text" name="email">
-                            <label class="form-label" for="coupon-code">Coupon code</label>
-                        </div>
-                        <div class="form-button">
-                            <button class="button button-secondary button-pipaluk" type="submit" id="addCoupon">Apply coupon</button>
-                        </div>
-                    </form>
-                </div>
+            <div class="group-xl group-lg-justify justify-content-end">
+                
                 <div>
                     <div class="group-xmd group-middle">
                         <div>
@@ -120,9 +111,7 @@
 
 
 let debounceTimeout;
-let finalItems = [[${items}]]  //edit by hao
-let finalTotal = [[${totalAmount}]] //edit by hao
-console.log('old',finalItems);
+
 
 
 function updateTotal(input) {
@@ -195,35 +184,6 @@ function updateTotal(input) {
         
         
         
-    </script>
-    <script> //edit by hao
-        document.getElementById('addCoupon').addEventListener('click',function(){
-            event.preventDefault()
-            const token = localStorage.getItem('token');
-            console.log('123',token);
-            console.log(finalTotal);
-            
-            
-            axios.post('http://localhost:8080/SpanTasty/StarCups/coupon/checkout',{
-                    shoppingItems: finalItems,
-                    totalAmount: finalTotal
-                },
-                {
-                    headers: {
-                        'Authorization': `${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(res=>{
-                    console.log(res.data);
-                    
-                })
-
-        })
-
-        
-                
-
     </script>
 </body>
 </html>
