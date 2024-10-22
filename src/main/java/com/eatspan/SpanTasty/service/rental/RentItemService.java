@@ -18,8 +18,8 @@ public class RentItemService {
 	private RentItemRepository rentItemRepository;
 	@Autowired
 	private TablewareService tablewareService;
-	@Autowired
-	private RentService rentService;
+//	@Autowired
+//	private RentService rentService;
 	
 	
 	//新增訂單明細

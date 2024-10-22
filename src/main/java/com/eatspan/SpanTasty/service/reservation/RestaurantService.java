@@ -1,7 +1,11 @@
 package com.eatspan.SpanTasty.service.reservation;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.eatspan.SpanTasty.dto.reservation.RestaurantDTO;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.entity.reservation.RestaurantTable;
 import com.eatspan.SpanTasty.entity.reservation.RestaurantTableId;
@@ -97,6 +102,85 @@ public class RestaurantService {
 	
 	//檢查前端回傳的訂位規則修改DTO物件
 	
+	// 根據地址欄位解析縣市
+    public List<String> getAllCities() {
+        List<Restaurant> restaurants = restaurantRepository.findAll();
+        Set<String> cities = new HashSet<>();
+        for (Restaurant restaurant : restaurants) {
+            String city = city(restaurant.getRestaurantAddress());
+            if (city != null && !city.isEmpty()) {
+                cities.add(city);
+            }
+        }
+        return new ArrayList<>(cities);
+    }
 
+    // 根據縣市解析鄉鎮
+    public List<String> getTownsByCity(String city) {
+        List<Restaurant> restaurants = restaurantRepository.findByRestaurantAddressContaining(city);
+        Set<String> towns = new HashSet<>();
+        for (Restaurant restaurant : restaurants) {
+            String town = town(restaurant.getRestaurantAddress(), city);
+            if (town != null && !town.isEmpty()) {
+                towns.add(town);
+            }
+        }
+        return new ArrayList<>(towns);
+    }
+    
+    public List<RestaurantDTO> getRestaurantsByTown(String town) {
+        List<Restaurant> restaurants = restaurantRepository.findByRestaurantAddressContaining(town);
+        List<RestaurantDTO> restaruantDtos = new ArrayList<>();
+        for (Restaurant restaurant : restaurants) {
+        	RestaurantDTO restaurantDto = new RestaurantDTO();
+        	restaurantDto.setRestaurantId(restaurant.getRestaurantId());
+        	restaurantDto.setRestaurantName(restaurant.getRestaurantName());
+        	restaurantDto.setRestaurantAddress(restaurant.getRestaurantAddress());
+        	restaruantDtos.add(restaurantDto);
+        }
+        return restaruantDtos;
+    }
+    
+    // 縣市
+    private String city(String address) {
+    	if (address != null && !address.isEmpty()) {
+            String city = null;
+            if (address.contains("市")) {
+                // 市
+                String[] parts = address.split("市");
+                if (parts.length > 0) {
+                    city = parts[0] + "市";
+                }
+            } else if (address.contains("縣")) {
+                // 縣
+                String[] parts = address.split("縣");
+                if (parts.length > 0) {
+                    city = parts[0] + "縣";
+                }
+            }
+            return city;
+        }
+        return null;
+    }
+
+    // 鄉鎮
+    private String town(String address, String city) {
+    	if (address != null && !address.isEmpty() && city != null) {
+            // 去除縣市部分
+            String remainingAddress = address.replace(city, "");
+            
+            // 判斷鄉鎮市區
+            if (remainingAddress.contains("區")) {
+                return remainingAddress.split("區")[0] + "區";
+            } else if (remainingAddress.contains("鄉")) {
+                return remainingAddress.split("鄉")[0] + "鄉";
+            } else if (remainingAddress.contains("鎮")) {
+                return remainingAddress.split("鎮")[0] + "鎮";
+            } else if (remainingAddress.contains("市")) {
+                return remainingAddress.split("市")[0] + "市";
+            }
+        }
+        return null;
+    }
 
 }

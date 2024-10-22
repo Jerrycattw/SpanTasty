@@ -329,7 +329,9 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-
+      //取得登入資訊
+      const token = localStorage.getItem('token');
+      
       // 名稱搜尋
       document.getElementById("nameSearchBtn").addEventListener("click", function () {
         getMenuByName();
@@ -356,6 +358,12 @@
       // 加入購物車
       addToCartButtons.forEach(button => {
         button.addEventListener("click", function () {
+          // 先檢查是否已登入
+          if (!token) {
+            alert('請先登入才能加入購物車');
+            window.location.href = '/SpanTasty/StarCups/loginRegister';  // 導向登入頁面
+            return; // 如果未登入則退出
+          }
           // 取得與當前按鈕相鄰的隱藏 input (foodId)
           const foodId = this.previousElementSibling.value;
 
