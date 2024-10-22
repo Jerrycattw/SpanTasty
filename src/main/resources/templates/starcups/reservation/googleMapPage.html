@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="zh-tw">
+<head>
+    <title>Google Maps Geocoding Example</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <!-- Stylesheets-->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+    <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+    <script src="/SpanTasty/js/axios.min.js"></script>
+    <style>
+        #map {
+            height: 300px;
+            width: 100%;
+        }
+        #address {
+            height: 50px;
+            width: 500px;
+        }
+    </style>
+    <script>
+        // 初始化 Google Maps
+        function initMap(lat = 24.985729, lng = 121.2220087) {
+            const location = { lat, lng };
+            const map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 14,
+                center: location
+            });
+            new google.maps.Marker({
+                position: location,
+                map: map
+            });
+        }
+
+        // 獲取當前位置並初始化地圖
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    initMap(lat, lng); // 根據當前位置初始化地圖
+                }, () => {
+                    alert('無法獲取您的位置');
+                    initMap(); // 如果無法獲取位置，則使用預設位置
+                });
+            } else {
+                alert('您的瀏覽器不支持地理位置功能');
+                initMap(); // 如果瀏覽器不支持地理位置，則使用預設位置
+            }
+        }
+
+        // 動態加載 Google Maps API
+        function loadGoogleMaps() {
+            axios.get('/SpanTasty/api/google-api-key')
+                .then(response => {
+                    const apiKey = response.data;
+                    const script = document.createElement('script');
+                    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=getCurrentLocation`;
+                    script.async = true;
+                    script.defer = true;
+                    document.head.appendChild(script);
+                })
+                .catch(error => console.error('Error loading Google Maps API key:', error));
+        }
+
+        window.onload = loadGoogleMaps;
+    </script>
+</head>
+<body>
+    <div id="map"></div>
+</body>
+</html>

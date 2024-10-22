@@ -35,8 +35,94 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
     width: 450px;
     height: auto; /* 保持比例 */
 }
+#map {
+    height: 400px; /* 調整地圖高度 */
+    width: 100%; /* 讓地圖寬度為100% */
+}
 </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
 
+		// 動態加載 Google Maps API
+		function loadGoogleMaps() {
+			axios.get('/SpanTasty/api/google-api-key')
+				.then(response => {
+					const apiKey = response.data;  // 獲取 API 金鑰
+					const script = document.createElement('script');
+					script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`; // 確保 callback 方法存在
+					script.async = true;
+					script.defer = true;
+					document.head.appendChild(script);
+				})
+				.catch(error => console.error('Error loading Google Maps API key:', error));
+		}
+
+		// 初始化地圖
+		function initMap() {
+			const center = { lat: 24.985729, lng: 121.2220087 }; // 初始地圖中心
+			const map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 14,
+				center: center
+			});
+
+			// 在此定義 geocoder
+			const geocoder = new google.maps.Geocoder(); // Geocoding API
+
+			// 使用 Axios 獲取所有餐廳的 API
+			axios.get('/SpanTasty/StarCups/api/restaurants')
+				.then(response => {
+					console.log(response.data);
+					const restaurants = response.data;
+					// 對每個餐廳地址進行地理編碼
+					restaurants.forEach(restaurant => {
+						geocoder.geocode({ 'address': restaurant.restaurantAddress }, function (results, status) {
+							if (status === 'OK') {
+								const location = results[0].geometry.location;
+								// 在地圖上標記每個分店
+								new google.maps.Marker({
+									position: location,
+									map: map,
+									title: restaurant.restaurantName,
+									icon: {
+										url: 'http://localhost:8080/SpanTasty/starcups/images/reservation/cartoon_coffee.png', // 圖標的路徑
+										scaledSize: new google.maps.Size(64, 64) // 設定圖標的大小
+									}
+								});
+							} else {
+								console.error('Geocode was not successful for the following reason: ' + status);
+							}
+						});
+					});
+				})
+				.catch(error => {
+					console.error('Error fetching restaurants:', error);
+				});
+		}
+
+
+		// 獲取當前位置並初始化地圖
+		function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    initMap(lat, lng); // 根據當前位置初始化地圖
+                }, () => {
+                    alert('無法獲取您的位置');
+                    initMap(); // 如果無法獲取位置，則使用預設位置
+                });
+            } else {
+                alert('您的瀏覽器不支持地理位置功能');
+                initMap(); // 如果瀏覽器不支持地理位置，則使用預設位置
+            }
+        }
+
+
+		// 在 DOM 完全加載後調用 loadGoogleMaps()
+		document.addEventListener('DOMContentLoaded', function () {
+			loadGoogleMaps();
+		});
+    </script>
 </head>
 <body>
 	<!-- navbar  th:replace=-->
@@ -56,6 +142,8 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 				style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
 		</div>
 	</section>
+	
+	
 
 	<!-- Classic blog-->
 	<section
@@ -90,13 +178,17 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 						      <span class="novi-icon icon"><i class="fa-solid fa-location-dot"></i> 餐廳地址: </span>
 						      <span class="fs-5" th:text="${restaurant.restaurantAddress}"></span>
 						    </div>
-						    
+						    <a th:href="@{/StarCups/reserve(restaurantId=${restaurant.restaurantId})}" class="text-white">
 						    <div class="button button-md button-icon button-icon-left button-secondary button-pipaluk ms-3 mt-0">
-						    <a th:href="@{}"><span class="novi-icon icon fa fa-plus"></span> 線上訂位</a></div>
+						    <span class="novi-icon icon fa fa-plus"></span> 線上訂位</div>
+						    </a>
 						    
 						  </div>
+						  
+						  
 						</div>
 					</article>
+
 
 
 					<div class="pagination-wrap">
@@ -135,12 +227,18 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 					</div>
 
 				</div>
-				<div class="col-lg-4"></div>
 			</div>
 		</div>
 	</section>
 
 
+	
+	<!-- 地圖區域 -->
+	<h4 class="text-center">Our Locations</h4>
+    <div class="container my-3 d-flex justify-content-center">
+        <div id="map"></div>
+    </div>
+	
 
 	<!-- Global Mailform Output-->
 	<div class="snackbars" id="form-output-global"></div>

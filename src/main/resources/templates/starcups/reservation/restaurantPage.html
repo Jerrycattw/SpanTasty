@@ -35,8 +35,103 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
     width: 650px;
     height: auto; /* 保持比例 */
 }
+#map {
+    height: 400px; /* 調整地圖高度 */
+    width: 100%; /* 讓地圖寬度為100% */
+}
 </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
 
+    // 動態加載 Google Maps API
+    function loadGoogleMaps() {
+        axios.get('/SpanTasty/api/google-api-key')
+            .then(response => {
+                const apiKey = response.data;  // 獲取 API 金鑰
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`; // 確保 callback 方法存在
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+            })
+            .catch(error => console.error('Error loading Google Maps API key:', error));
+    }
+
+		// 初始化地圖
+		function initMap() {
+			const map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 14,
+				center: { lat: 24.985729, lng: 121.2220087 } // 初始地圖中心
+			});
+
+			const geocoder = new google.maps.Geocoder(); // Geocoding API
+			const directionsService = new google.maps.DirectionsService(); // Directions API
+			const directionsRenderer = new google.maps.DirectionsRenderer(); // 用於顯示導航路線
+
+			directionsRenderer.setMap(map); // 將導航路線綁定到地圖
+
+			// 獲取餐廳位置
+			const restaurantId = document.getElementById('restaurantId').value;
+			axios.get(`/SpanTasty/StarCups/api/restaurant/${restaurantId}`)
+				.then(response => {
+					const restaurant = response.data;
+					geocoder.geocode({ 'address': restaurant.restaurantAddress }, function (results, status) {
+						if (status === 'OK') {
+							const restaurantLocation = results[0].geometry.location;
+
+							// 將餐廳位置作為導航的目的地
+							if (navigator.geolocation) {
+								navigator.geolocation.getCurrentPosition(function (position) {
+									const userLocation = {
+										lat: position.coords.latitude,
+										lng: position.coords.longitude
+									};
+
+									// 計算路線
+									directionsService.route({
+										origin: userLocation,
+										destination: restaurantLocation,
+										travelMode: 'DRIVING'
+									}, function (response, status) {
+										if (status === 'OK') {
+											directionsRenderer.setDirections(response); // 顯示路線
+										} else {
+											window.alert('Directions request failed due to ' + status);
+										}
+									});
+								}, function () {
+									handleLocationError(true, map.getCenter());
+								});
+							} else {
+								// 瀏覽器不支持地理定位
+								handleLocationError(false, map.getCenter());
+							}
+
+						} else {
+							console.error('Geocode was not successful for the following reason: ' + status);
+						}
+					});
+				})
+				.catch(error => {
+					console.error('Error fetching restaurant:', error);
+				});
+		}
+
+		// 處理地理定位錯誤
+		function handleLocationError(browserHasGeolocation, pos) {
+			const infoWindow = new google.maps.InfoWindow();
+			infoWindow.setPosition(pos);
+			infoWindow.setContent(browserHasGeolocation ?
+				'Error: The Geolocation service failed.' :
+				'Error: Your browser doesn\'t support geolocation.');
+			infoWindow.open(map);
+		}
+
+		// 在 DOM 完全加載後調用 loadGoogleMaps()
+		document.addEventListener('DOMContentLoaded', function () {
+			loadGoogleMaps();
+		});
+    </script>
 </head>
 <body>
 	<!-- navbar  th:replace=-->
@@ -72,6 +167,7 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
                 <p class="text-gray-500"  th:text="${restaurant.restaurantDesc}"></p>
                 <div class="divider divider-30"></div>
                 <ul class="list list-description d-inline-block d-md-block">
+                  <input type="hidden" id="restaurantId" th:value="${restaurant.restaurantId}"/>
                   <li><span>Phone:</span><span  th:text="${restaurant.restaurantPhone}">Valley Accommodation Ltd.</span></li>
                   <li><span>Time:</span><span th:text="${restaurant.restaurantOpentime}+' - '+${restaurant.restaurantClosetime}"></span></li>
                   <li><span>Location:</span><span th:text="${restaurant.restaurantAddress}"></span></li>
@@ -95,6 +191,12 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
       </section>
 
 
+
+	<!-- 地圖區域 -->
+	<h4 class="text-center">Go To StarCups Immediately</h4>
+    <div class="container my-3 d-flex justify-content-center">
+        <div id="map"></div>
+    </div>
 
 
 
