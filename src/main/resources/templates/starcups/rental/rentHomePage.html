@@ -34,31 +34,74 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 <!-- navbar  th:replace=-->
 <div th:replace="~{starcups/display/navbar}" ></div>
 <!-- 選單下方圖片及連結 -->
-    <section class="section breadcrumbs-custom-inset">
-      <div class="breadcrumbs-custom context-dark">
-        <div class="container">
-          <h2 class="breadcrumbs-custom-title">Single Tableware</h2>
-          <ul class="breadcrumbs-custom-path">
-            <li><a href="/SpanTasty/StarCups">Home</a></li>
-            <li class="active">Single Tableware</li>
-          </ul>
-        </div>
-        <!-- 圖片-->
-        <div class="box-position novi-bg novi-bg-img" style="background-image: url('/SpanTasty/StarCups/images/bg-breadcrumbs.jpg');"></div>
+<section class="section breadcrumbs-custom-inset">
+  <div class="breadcrumbs-custom context-dark">
+    <div class="container">
+      <h2 class="breadcrumbs-custom-title">Rent</h2>
+      <ul class="breadcrumbs-custom-path">
+        <li><a href="/SpanTasty/StarCups">Home</a></li>
+        <li class="active">Rent</li>
+      </ul>
+    </div>
+    <!-- 圖片-->
+    <div class="box-position novi-bg novi-bg-img" style="background-image: url('/SpanTasty/StarCups/images/bg-breadcrumbs.jpg');"></div>
+  </div>
+</section>
+
+<!-- In the spotlight-->
+<section class="section section-xl bg-default novi-bg novi-bg-img">
+  <div class="container text-align d-flex justify-content-center">
+     <div class="col-md-6 col-lg-5 col-xl-4" style="width:1200px;">
+       <div class="box-pricing box-pricing-popular pe-5 ps-5 pb-5" style="max-width:1200px;">
+         <div class="box-pricing-body" style="max-width:1200px;">
+           <div class="box-pricing-caption">
+             <h4 class="box-pricing-title">租借需知</h4>
+           </div>
+           <div class="divider divider-35"></div>
+           <ul class="box-pricing-list">
+             <li class="active">租借服務只提供門市營業時間內取件，門市營業時間內還件。</li>
+             <li class="active">租金的計算方法: 單日租金是 100 元，總共是 7 天，總租金為 100*7=700 元</li>
+             <li class="active">因為出租用品庫存及調度的問題，為顧及下一位客戶的權益，請務必在指定時間內歸還。</li>
+             <li class="active">租借方式: 選擇租借餐廳 -> 選擇餐具數量並加入購物車(需在同一頁面選擇完成) -> 租借訂單結帳。</li>
+             <li class="active">租借期間從您收到當天，算到我們收到當天，總共七天，比如說 1 號您收到，7 號必須歸還至隨機門市。</li>
+             <li class="active">歸還後若有遲歸或用具有損壞的狀況，會再與租借會員做請款。(遲歸的部分: 遲歸一天，需多付一天 1.5倍的租金 |  損壞的部分: 需照價賠償)</li>
+           </ul>
+         </div>
+         <div class="box-pricing-badge">notice</div>
+       </div>
+     </div>
+    </div>
+</section>
+
+      
+
+
+<!-- Section Subscribe-->
+<section class="section text-center pb-5 mb-5">
+  <div class="parallax-container" data-parallax-img="/SpanTasty/StarCups/images/rental/bg-forms.jpg">
+    <div class="parallax-content section-xl section-inset-custom-1 context-dark">
+      <div class="container ">
+        <h3 class="oh fw-normal"><span class="d-inline-block wow slideInDown">精美可愛又環保</span></h3>
+        <p class="text-width-medium text-spacing-75 wow fadeInLeft" data-wow-delay=".1s">從2024.10.24號起租借都會附送星之咖啡觀星平台體驗券一張</p>
+        <!-- RD Mailform-->
+        <form class="rd-form rd-mailform rd-form-inline oh-desktop justify-content-center" data-form-output="form-output-global" data-form-type="subscribe" method="post" action="bat/rd-mailform.php">
+          <div class="form-button wow slideInRight">
+          	<a class="button button-ujarak button-gray-7" href="/SpanTasty/StarCups/rental/rent">開始租借</a>
+          </div>
+        </form>
       </div>
-    </section>
-    
+    </div>
+  </div>
+</section>
 	
 
 
 <!-- Global Mailform Output-->
- <div class="snackbars" id="form-output-global"></div>
- <!-- footer  th:replace=-->
- <div th:replace="~{starcups/display/footer}" ></div>
- 
+<div class="snackbars" id="form-output-global"></div>
+<!-- footer  th:replace=-->
+<div th:replace="~{starcups/display/footer}" ></div>
 <!-- Javascript-->
 <script src="/SpanTasty/starcups/js/core.min.js"></script>
 <script src="/SpanTasty/starcups/js/script.js"></script>
-
-  </body>
+</body>
 </html>
