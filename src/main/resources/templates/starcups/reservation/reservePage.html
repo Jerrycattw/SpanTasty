@@ -112,9 +112,9 @@
           <div class="col-sm-4">
             <div class="form-wrap">
               <select name="restaurantId" id="addRestaurantId" class="form-select">
-                <option value="" selected>請選擇餐廳</option>
+                <option value=""  th:selected="${selectedRestaurantId == ''}">請選擇餐廳</option>
                 <th:block th:each="restaurant : ${restaurants}">
-                  <option th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
+                  <option th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}" th:selected="${restaurant.restaurantId == selectedRestaurantId}"></option>
                 </th:block>
               </select>
             </div>
@@ -124,7 +124,7 @@
             <div class="form-wrap">
               <select name="reserveSeat" id="addReserveSeat" class="form-select" required>
                 <option value="" selected>請選擇用餐人數</option>
-                <th:block th:each="i : ${#numbers.sequence(2, 10)}">
+                <th:block th:each="i : ${#numbers.sequence(reserveMin, reserveMax)}">
                   <option th:value="${i}" th:text="${i}"></option>
                 </th:block>
               </select>

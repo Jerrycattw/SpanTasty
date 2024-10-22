@@ -1,5 +1,6 @@
 package com.eatspan.SpanTasty.controller.reservation;
 
+import java.awt.Image;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,7 +44,7 @@ import com.eatspan.SpanTasty.utils.account.Result;
 
 @Controller
 @RequestMapping("/StarCups")
-public class StarCupsController {
+public class StarCupsReservationController {
 	
 	
 	@Autowired
@@ -59,15 +60,33 @@ public class StarCupsController {
 	
 	
 	
+    // 導向到測試地圖頁面
+    @GetMapping("/map")
+    public String reserveMap() {
+    	return "starcups/reservation/googleMapPage";
+    }
+	
+	
 	// 導向到訂位頁面
     @GetMapping("/reserve")
-    public String showReserve(Model model) {
+    public String showReserve(Model model, @RequestParam(required = false) Integer restaurantId) {
     	
         List<Restaurant> restaurants = restaurantService.findAllRestaurants()
                 .stream()
                 .filter(restaurant -> restaurant.getRestaurantStatus() == 1)
                 .collect(Collectors.toList());
         
+        Integer reserveMin = 2;
+        Integer reserveMax = 10;
+        if(restaurantId!=null) {
+        	Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
+        	reserveMin = restaurant.getReserveMin();
+        	reserveMax = restaurant.getReserveMax();
+        }
+        
+        model.addAttribute("selectedRestaurantId", restaurantId==null? "":restaurantId);
+        model.addAttribute("reserveMin", reserveMin);
+        model.addAttribute("reserveMax", reserveMax);
         model.addAttribute("restaurants", restaurants);
         return "starcups/reservation/reservePage";
     }
@@ -79,6 +98,18 @@ public class StarCupsController {
     	model.addAttribute("restaurantsPage", restaurantsPage);
     	return "starcups/reservation/allRestaurantPage";
     }
+    
+    // ajax查詢所有餐廳(營業中)
+    @GetMapping("/api/restaurants")
+    public ResponseEntity<?> getAllRestaurantApi(Model model, @RequestParam(defaultValue = "0") Integer page) {
+    	
+        List<Restaurant> restaurants = restaurantService.findAllRestaurants()
+                .stream()
+                .filter(restaurant -> restaurant.getRestaurantStatus() == 1)
+                .collect(Collectors.toList());
+    	
+    	return ResponseEntity.ok(restaurants);
+    }
 	
     // 導向到單一餐廳頁面
     @GetMapping("/restaurant/{id}")
@@ -87,6 +118,17 @@ public class StarCupsController {
         model.addAttribute("restaurant", restaurant);
         return "starcups/reservation/restaurantPage";
     }
+    
+    // ajax查詢單一餐廳
+    @GetMapping("/api/restaurant/{id}")
+    public ResponseEntity<?> getRestaurantApi(@PathVariable(name = "id") Integer restaurantId) {
+    	Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
+    	return ResponseEntity.ok(restaurant);
+    }
+    
+    
+    
+    
     
     // 導向到訂位紀錄頁面
     @GetMapping("/reserveRecord")
@@ -158,7 +200,6 @@ public class StarCupsController {
             reserveService.addReserve(reserve);
             
             // 寄訂位成功信
-//            reserveService.sendMail(member.getMemberName(), "spantasty@gmail.com");
             try {
             	reserveService.sendMail(reserve);
 			} catch (Exception e) {

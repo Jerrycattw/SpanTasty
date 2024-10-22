@@ -95,7 +95,6 @@ public class RestaurantService {
 	}
 	
 	
-	//檢查前端回傳的訂位規則修改DTO物件
 	
 
 

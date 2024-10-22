@@ -56,8 +56,7 @@
                 </div>
                 <div class=" d-flex justify-content-end">
                     <button type="button" id="searchbtn" class="btn btn-success btn-sm mt-3 me-3">送出查詢</button>
-                    <button type="button" class="btn btn-primary btn-sm mt-3" data-bs-toggle="modal"
-                        data-bs-target="#addReserveModal">+新增訂位</button>
+                    <button type="button" id="exportJsonBtn" class="btn btn-info btn-sm mt-3 me-3">匯出 JSON</button>
                 </div>
 
             </form>
@@ -70,6 +69,7 @@
           <div class="card bg-dark text-white shadow">
 		  <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
 		    <h3 class="mb-0">餐廳訂位資料</h3>
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addReserveModal">+新增訂位</button>
 		  </div>
 				<table class="table table-dark table-striped table-hover text-center">
 				    <thead>
@@ -262,7 +262,52 @@
             document.getElementById('setRestaurantId').addEventListener('change', getRestaurantAndSet);
             document.getElementById('setReserveSeat').addEventListener('change', getReserveTimeAndSet);
             document.getElementById('setCheckDate').addEventListener('change', getReserveTimeAndSet);
+            
+		    document.getElementById('exportJsonBtn').addEventListener('click', exportJson);
         });
+        
+
+		async function exportJson() {
+		    const memberName = document.getElementById('memberName').value;
+		    const phone = document.getElementById('phone').value;
+		    const restaurantId = document.getElementById('restaurantId').value;
+		    const tableTypeId = document.getElementById('tableTypeId').value;
+		    const reserveTimeStart = document.getElementById('reserveTimeStart').value;
+		    const reserveTimeEnd = document.getElementById('reserveTimeEnd').value;
+		
+		    // 建立查詢參數
+		    const params = {
+		        memberName: memberName || null,
+		        phone: phone || null,
+		        restaurantId: restaurantId ? Number(restaurantId) : null,
+		        tableTypeId: tableTypeId || null,
+		        reserveTimeStart: reserveTimeStart || null,
+		        reserveTimeEnd: reserveTimeEnd || null
+		    };
+		
+		    try {
+		        const response = await axios.get('http://localhost:8080/SpanTasty/reserve/export/json', { params });
+		
+		        // 將 JSON 資料下載為檔案
+		        handleJsonDownload(response.data, 'reservations.json');
+		        alert('匯出 JSON 成功!');
+		    } catch (error) {
+		        console.error('匯出 JSON 失敗:', error);
+		        alert('匯出 JSON 失敗，請稍後再試。');
+		    }
+		}
+		
+		function handleJsonDownload(data, fileName) {
+		    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+		    const url = URL.createObjectURL(blob);
+		    const a = document.createElement('a');
+		    a.href = url;
+		    a.download = fileName;
+		    document.body.appendChild(a);
+		    a.click();
+		    document.body.removeChild(a);
+		}
+        
 
 
         // Ajax查詢餐廳(新增)
