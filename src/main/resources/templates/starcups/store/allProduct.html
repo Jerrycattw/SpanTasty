@@ -43,6 +43,8 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 .ui-to-top.active {
 	transform: 0 !important;
 }
+
+
 </style>
 </head>
 <body>
@@ -107,8 +109,17 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 									</div>
 								</div>
 								<h5 class="product-title">
-									<a th:href="@{/shop/single-product(id=${product.productId})}"
-										th:text="${product.productName}"></a>
+									<a href="#" 
+                                       th:data-bs-toggle="'modal'" 
+                                       th:data-bs-target="'#productModal'" 
+                                       th:data-productpicture="${product.productPicture}" 
+                                       th:data-productname="${product.productName}" 
+                                       th:data-productprice="${product.productPrice}" 
+                                       th:data-productdescription="${product.productDescription}" 
+                                       th:data-productstock="${product.productStock}" 
+                                       th:data-productstatus="${product.productStatus}">
+                                       <span th:text="${product.productName}"></span>
+                                    </a>
 								</h5>
 								<div class="product-price-wrap">
 									<div th:text="'$' + ${product.productPrice}"></div>
@@ -144,6 +155,36 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 				</div>
 				<div class="col-sm-10 col-md-12 col-lg-4 col-xl-3">
 					<!-- 其他內容 -->
+					
+					        <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="productModalLabel">商品資訊</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                     <div class="row">
+                    <div class="col-md-6">
+                            <img id="modalProductPicture" src="" alt="Product Image" style="width: 100%; height: auto;" />
+					</div>
+					 <div class="col-md-6 position-relative">
+                        <ul class="list list-description position-absolute top-50 start-50 translate-middle fs-5"  style="align-items: center;  white-space: nowrap">
+                            <li><span>商品名稱:</span> <span id="modalProductName"></span></li>
+                            <li><span>商品金額:</span> <span id="modalProductPrice"></span></li>
+                            <li><span>商品描述:</span> <span id="modalProductDescription"></span></li>
+                            <li><span>商品庫存:</span> <span id="modalProductStock"></span></li>
+                            <li><span>商品狀態:</span> <span id="modalProductStatus"></span></li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">關閉</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
 				</div>
 			</div>
 		</div>
@@ -155,8 +196,38 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 
 	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 	<script>
+		const productLinks = document.querySelectorAll('.product-title a')
         const addButtons = document.querySelectorAll('.add-to-cart');
         let cartItemCount = 0; 
+        
+        
+          productLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); // 防止默認行為
+
+                // 獲取商品資訊
+                const productPicture = this.getAttribute('data-productpicture');
+                const productName = this.getAttribute('data-productname');
+                const productPrice = this.getAttribute('data-productprice');
+                const productDescription = this.getAttribute('data-productdescription');
+                const productStock = this.getAttribute('data-productstock');
+                const productStatus = this.getAttribute('data-productstatus');
+
+                // 更新模態框中的內容
+                document.getElementById('modalProductPicture').src  = productPicture;
+                document.getElementById('modalProductName').textContent = productName;
+                document.getElementById('modalProductPrice').textContent = '$' + productPrice;
+                document.getElementById('modalProductDescription').textContent = productDescription;
+                document.getElementById('modalProductStock').textContent = productStock;
+                document.getElementById('modalProductStatus').textContent = productStatus;
+				document.getElementById('modalProductStatus').textContent = (productStatus == 1) ? "上架中" : (productStatus == 2) ? "已停售" : "未知狀態";
+
+            });
+        });
+        
+
+
+
 
         addButtons.forEach(button => {
             button.addEventListener('click', function () {
@@ -173,10 +244,10 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 		        console.log('Product ID:', productId);
 		        console.log('Quantity:', quantity);
 
-				if (!token) {
-		            alert('請先登入會員');
-		            return; // 如果未登入，跳出函數
-		        }
+				        if (!token) {
+            alert('請先登入會員');
+            return; // 如果未登入，跳出函數
+        }
 	
                 if (token) {
                     axios.post(`http://localhost:8080/SpanTasty/StarCups/addPost`,null, {

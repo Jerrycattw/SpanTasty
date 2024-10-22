@@ -11,8 +11,8 @@
             <td align="center" style="padding: 20px;">
                 <img src="cid:logo" alt="Star Cups Logo" style="width: 300px; max-width: 100%; height: auto;">
                 
-                <div style="width: 100%; max-width: 300px; background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;">
-                    <p>親愛的，${shopping.member.memberName} 您好</p>
+                <div style="width: 100%; max-width: 500px; background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;">
+                    <p  style="text-align: left">親愛的，${shopping.member.memberName} 您好</p>
                     <section class="section novi-bg novi-bg-img section-xl bg-default">
                         <div class="container d-flex justify-content-center">
                             <article class="quote-lisa w-100">
@@ -24,12 +24,12 @@
                                         <div class="row row-sm row-30 row-fix fs-6 text">
                                             <div class="col-sm-12">
                                                 <ul class="list-marked">
-                                                    <li>Shopping Date : <span>${shopping.formattedShoppingDate}</span></li>
-                                                    <li>Name: <span>${shopping.member.memberName}</span></li>
-                                                    <li>Phone: <span>${shopping.member.phone}</span></li>
-                                                    <li>Address: <span>${shopping.member.address}</span></li>
-                                                    <li>EMail: <span>${shopping.member.email}</span></li>
-                                                    <li>Order List:<br><br>
+                                                    <li style="text-align: left">Shopping Date : <span>${shopping.formattedShoppingDate}</span></li>
+                                                    <li style="text-align: left">Name: <span>${shopping.member.memberName}</span></li>
+                                                    <li style="text-align: left">Phone: <span>${shopping.member.phone}</span></li>
+                                                    <li style="text-align: left">Address: <span>${shopping.member.address}</span></li>
+                                                    <li style="text-align: left">EMail: <span>${shopping.member.email}</span></li>
+                                                    <li  style="text-align: left">Order List:<br><br>
                                                         <ul>
                                                             <#list shopping.items as item>
                                                                 <li>
@@ -44,11 +44,11 @@
                                                     </li>
                                                 </ul>
                                                 <div class="fs-6 text" style="text-align: right"><br>
-                                                    Amount :$<span>${shopping.shoppingTotal}</span><br>
-                                                 Discount Amount :$0<span>discountAmount</span><br>
+                                                    Amount :NT$<span>${shopping.shoppingTotal}</span><br>
+                                                 Discount Amount :NT$<span>${shopping.discountAmount!0}</span><br>
                                                 </div>
                                                 <div class="fs-5 text" style="text-align: right">
-                                                    Total Amount :$finalTotal<span>${shopping.shoppingTotal}</span>
+                                                    Total Amount :NT$<span>${shopping.finalTotal}</span>
                                                 </div>
                                             </div>
                                         </div>
