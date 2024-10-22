@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eatspan.SpanTasty.dto.reservation.RestaurantDTO;
 import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.service.reservation.RestaurantService;
@@ -175,8 +176,26 @@ public class RestaurantController {
     }
 
 	
-	
-	
+    // 取得所有縣市
+    @GetMapping("/city")
+    public ResponseEntity<List<String>> getAllCities() {
+        List<String> cities = restaurantService.getAllCities();
+        return ResponseEntity.ok(cities);
+    }
+
+    // 根據縣市取得鄉鎮
+    @GetMapping("/{city}/towns")
+    public ResponseEntity<List<String>> getTownsByCity(@PathVariable String city) {
+        List<String> towns = restaurantService.getTownsByCity(city);
+        return ResponseEntity.ok(towns);
+    }
+    
+    // 根據鄉鎮取得餐廳
+    @GetMapping("/{town}/list")
+    public ResponseEntity<List<RestaurantDTO>> getRestaurantsByTown(@PathVariable String town) {
+        List<RestaurantDTO> restaurants = restaurantService.getRestaurantsByTown(town);
+        return ResponseEntity.ok(restaurants);
+    }
 	
 	
 }

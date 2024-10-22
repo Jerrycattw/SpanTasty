@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+
+<head>
+  <title>Checkout</title>
+  <meta name="format-detection" content="telephone=no">
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <!-- Stylesheets-->
+  <!-- 更改樣式 -->
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <style>
+    .ie-panel {
+      display: none;
+      background: #212121;
+      padding: 10px 0;
+      box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
+      clear: both;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    html.ie-10 .ie-panel,
+    html.lt-ie-10 .ie-panel {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- navbar  th:replace=-->
+  <div th:replace="~{starcups/display/navbar}"></div>
+  <div class="ie-panel"><a href="http://windows.microsoft.com/en-US/internet-explorer/"><img
+        src="images/ie8-panel/warning_bar_0000_us.jpg" height="42" width="820"
+        alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today."></a>
+  </div>
+  <div class="preloader">
+    <div class="preloader-body">
+      <div class="cssload-container"><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+    <!-- Page Header-->
+    <header class="section page-header">
+      <!-- RD Navbar-->
+
+    </header>
+    <!-- Breadcrumbs -->
+    <section class="section breadcrumbs-custom-inset">
+      <div class="breadcrumbs-custom context-dark">
+        <div class="container">
+          <h2 class="breadcrumbs-custom-title">Checkout</h2>
+          <ul class="breadcrumbs-custom-path">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html">Order Online</a></li>
+            <li class="active">Checkout</li>
+          </ul>
+        </div>
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+      </div>
+    </section>
+    <!-- Section checkout form-->
+    <!-- <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start"> -->
+    <section>
+      <div class="container">
+        <!-- 刪除帳單地址填寫框 -->
+        <div class="row row-50 justify-content-center">
+        </div>
+      </div>
+    </section>
+    <!-- Shopping Cart-->
+    <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+      <div class="container">
+        <div class="group-xmd group-middle">
+          <h4 class="text-spacing-50">Your shopping cart</h4>
+          <div style="display: flex; align-items: center; margin-left: auto; margin-bottom: 10px;">
+            <h6 class="text-gray-500" style="margin-right: 10px;">Total</h6>
+            <h3 class="cart-product-price"><sup>$</sup>524</h3>
+          </div>
+        </div>
+        <!-- shopping-cart-->
+        <div class="table-custom-responsive">
+          <table class="table-custom table-cart">
+            <thead>
+              <tr>
+                <th>Product name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <!-- 購物車資訊 -->
+            <tbody>
+              <tr>
+                <td>
+                  <!-- 圖片 -->
+                  <div class="table-cart-figure" style="margin-right: 30px;">
+                    <img src="images/product-mini-7-146x132.png" alt="" width="146" height="132" />
+                  </div>
+                  <!-- 名稱 -->
+                  <div class="table-cart-link">Burdur Pearl</div>
+                </td>
+                <!-- 價格 -->
+                <td>$289</td>
+                <!-- 數量 -->
+                <td>1</td>
+                <!-- 單項總價 -->
+                <td>$235</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section payment-->
+    <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+      <div class="container">
+        <div class="row row-50 justify-content-center">
+          <!-- 取餐資訊 -->
+          <div class="col-md-10 col-lg-6">
+            <h4 class="text-spacing-50" style="margin-bottom: 25px;">Pickup Location</h4>
+            <div class="product-top-panel-select">
+              <!--Select 2-->
+              <select class="form-input select-filter" data-minimum-results-for-search="Infinity"
+                data-constraints="@Required" id="citySelect" onchange="fetchTowns()">
+                <option value="">選擇縣市</option>
+              </select>
+              <select class="form-input select-filter" data-minimum-results-for-search="Infinity"
+                data-constraints="@Required" id="townSelect" disabled onchange="fetchRestaurants()">
+                <option value="">選擇鄉鎮</option>
+              </select>
+              <select class="form-input select-filter" data-minimum-results-for-search="Infinity"
+                data-constraints="@Required" id="restaurantSelect" disabled>
+                <option value="">選擇餐廳</option>
+              </select>
+            </div>
+            <h4 class="text-spacing-50" style="margin-top: 30px;">Pickup Information</h4>
+            <form class="rd-form rd-mailform">
+              <div class="row row-14 row-fix gutters-14">
+                <div class="col-sm-6">
+                  <div class="form-wrap">
+                    <input class="form-input" id="checkout-first-name-1" type="text" name="name"
+                      data-constraints="@Required" />
+                    <label class="form-label" for="checkout-first-name-1">First Name</label>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-wrap">
+                    <input class="form-input" id="checkout-last-name-1" type="text" name="name"
+                      data-constraints="@Required" />
+                    <label class="form-label" for="checkout-last-name-1">Last Name</label>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-wrap">
+                    <input class="form-input" id="checkout-email-1" type="email" name="email"
+                      data-constraints="@Email @Required" />
+                    <label class="form-label" for="checkout-email-1">E-Mail</label>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-wrap">
+                    <input class="form-input" id="checkout-phone-1" type="text" name="phone"
+                      data-constraints="@Numeric" />
+                    <label class="form-label" for="checkout-phone-1">Phone</label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-10 col-lg-6">
+            <h4 class="text-spacing-50">Payment methods</h4>
+            <div class="box-radio">
+              <div class="radio-panel">
+                <label class="radio-inline active">
+                  <input name="input-group-radio" value="checkbox-1" type="radio" checked>Direct Bank Transfer
+                </label>
+                <div class="radio-panel-content">
+                  <p>Make your payment directly into our bank account. Please use your Order ID as the payment
+                    reference.</p>
+                </div>
+              </div>
+              <div class="radio-panel">
+                <label class="radio-inline">
+                  <input name="input-group-radio" value="checkbox-1" type="radio">PayPal
+                </label>
+                <div class="radio-panel-content">
+                  <p>Pay via PayPal; you can pay with your credit card if you don’t have a PayPal account.</p>
+                </div>
+              </div>
+              <div class="radio-panel">
+                <label class="radio-inline">
+                  <input name="input-group-radio" value="checkbox-1" type="radio">Cheque Payment
+                </label>
+                <div class="radio-panel-content">
+                  <p>Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <h4 class="text-spacing-50">Cart totals</h4>
+            <div class="table-custom-responsive">
+              <table class="table-custom table-custom-primary table-checkout">
+                <tbody>
+                  <tr>
+                    <td>Cart Subtotal</td>
+                    <td>$524</td>
+                  </tr>
+                  <tr>
+                    <td>Shipping</td>
+                    <td>Free</td>
+                  </tr>
+                  <tr>
+                    <td>Total</td>
+                    <td>$524</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="button-wrap text-center"><a class="button button-secondary button-pipaluk" href="#">Proceed to
+            checkout</a></div>
+      </div>
+    </section>
+
+    <!-- Page Footer-->
+    <footer class="section footer-variant-2 footer-modern context-dark novi-bg novi-bg-img">
+    </footer>
+  </div>
+  <!-- Global Mailform Output-->
+  <div class="snackbars" id="form-output-global"></div>
+  <!-- footer th:replace -->
+  <div th:replace="~{starcups/display/footer}"></div>
+  <script>
+    // 載入縣市列表
+    function loadCities() {
+      axios.get('http://localhost:8080/SpanTasty/restaurant/city')
+        .then(function (response) {
+          var citySelect = document.getElementById("citySelect");
+          citySelect.innerHTML = '<option value="">選擇縣市</option>';
+          response.data.forEach(function (city) {
+            var option = document.createElement("option");
+            option.value = city;
+            option.text = city;
+            citySelect.appendChild(option);
+          });
+        })
+        .catch(function (error) {
+          console.error("無法載入縣市資料", error);
+        });
+    }
+
+    // 當用戶選擇縣市時，載入對應鄉鎮
+    function fetchTowns() {
+      var city = document.getElementById("citySelect").value;
+      console.log("city "+city)
+      if (city) {
+        axios.get(`http://localhost:8080/SpanTasty/restaurant/${city}/towns`)
+          .then(function (response) {
+            var townSelect = document.getElementById("townSelect");
+            townSelect.innerHTML = '<option value="">選擇鄉鎮</option>';
+            response.data.forEach(function (town) {
+              var option = document.createElement("option");
+              option.value = town;
+              option.text = town;
+              townSelect.appendChild(option);
+            });
+            townSelect.disabled = false;  // 啟用鄉鎮選單
+          })
+          .catch(function (error) {
+            console.error("無法載入鄉鎮資料", error);
+          });
+      }
+    }
+
+    // 當用戶選擇鄉鎮時，載入對應餐廳
+    function fetchRestaurants() {
+      var town = document.getElementById("townSelect").value;
+      console.log("town "+townSelect)
+      if (town) {
+        axios.get(`http://localhost:8080/SpanTasty/restaurant/${town}/list`)
+          .then(function (response) {
+            var restaurantSelect = document.getElementById("restaurantSelect");
+            console.log(restaurantSelect)
+            restaurantSelect.innerHTML = '<option value="">選擇餐廳</option>';
+            response.data.forEach(function (restaurant) {
+              var option = document.createElement("option");
+              option.value = restaurant.restaurantId; // 餐廳的唯一 ID
+              option.text = restaurant.restaurantName; // 餐廳名稱
+              // option.text = restaurant.restaurantAddress;
+              restaurantSelect.appendChild(option);
+            });
+            restaurantSelect.disabled = false;  // 啟用餐廳選單
+          })
+          .catch(function (error) {
+            console.error("無法載入餐廳資料", error);
+          });
+      } else {
+        document.getElementById("restaurantSelect").disabled = true;
+      }
+    }
+
+    // 頁面載入時預先載入縣市選項
+    window.onload = function () {
+      loadCities();
+    };
+
+  </script>
+  <!-- Javascript-->
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+</body>
+
+</html>
