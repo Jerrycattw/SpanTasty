@@ -101,11 +101,9 @@ public class RentController {
 	public ResponseEntity<Integer> getRentStock(@RequestBody StockKeywordDTO stockKeywordDTO) {
 		Integer tablewareId = stockKeywordDTO.getTablewareId();
 		Integer restaurantId = stockKeywordDTO.getRestaurantId();
-		System.out.println(stockKeywordDTO);
 	    TablewareStock tablewareStock = tablewareStockService.findStockById(tablewareId, restaurantId);
 	    if (tablewareStock != null) {
 	        Integer stock = tablewareStock.getStock();
-	        System.out.println(stock);
 	        return ResponseEntity.ok(stock);
 	    } else {
 	        return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 如果未找到，返回 404
@@ -240,11 +238,12 @@ public class RentController {
 		rent.setRentStatus(2);
 		rent.setRentMemo("已歸還");
 		rentService.addRent(rent);
-		
-		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rent.getRentId());
+		List<RentItem> rentItems = rent.getRentItems();
+		System.out.println(rentItems);
 		for(RentItem rentItem: rentItems) {
-			rentItem.setReturnStatus(2);
+			System.out.println(rentItem);
 			String returnMemo = rentItem.getReturnMemo();
+			System.out.println(returnMemo);
 			
 			// 解析 returnMemo 得到歸還數量和破損數量
 	        String[] memoParts = returnMemo.replace("租借", "").replace("歸還", ",").replace("破損", ",").split(",");
@@ -253,8 +252,16 @@ public class RentController {
 	        int damagedQuantity = Integer.parseInt(memoParts[2]); // 破損數量
 			
 			rentItem.setReturnMemo(returnMemo);
+			if (rentItemQuantity == returnedQuantity && damagedQuantity > 0) {
+			    rentItem.setReturnStatus(3); //完全歸還(有破損)
+			} else if (rentItemQuantity == returnedQuantity) {
+			    rentItem.setReturnStatus(2); //完全歸還
+			} else if (rentItemQuantity > returnedQuantity && damagedQuantity > 0) {
+			    rentItem.setReturnStatus(5); //未完全歸還(有破損)
+			} else if (rentItemQuantity > returnedQuantity) {
+			    rentItem.setReturnStatus(4); //未完全歸還
+			}
 			rentItemService.addRentItem(rentItem);
-			
 			// 更新庫存
 	        int stockChange = returnedQuantity - damagedQuantity;
 	        TablewareStock tablewareStock = tablewareStockService.findStockById(rentItem.getTablewareId(), rent.getRestaurantId());
