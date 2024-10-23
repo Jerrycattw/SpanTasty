@@ -79,17 +79,6 @@ p.global-primary.dark-primary.section-title::after {
       </div>
     </section>
 	
-<section class="section pt-4 novi-bg novi-bg-img section-xl bg-default text-md-start">
-	<div class="container">
-	    <div class="row row-90 row-fix justify-content-center">
-	        <div class="Grid-item Grid-products-item" style="margin-bottom: 10px;">
-	            <p class="global-primary dark-primary section-title">
-	                <span> SINGLE  TABLEWARE </span>
-	            </p>
-	        </div>
-		</div>
-	</div>
-</section>
 <section class="section novi-bg novi-bg-img section-xl bg-default">
         <div class="container">
           <div class="row row-50">
@@ -108,8 +97,7 @@ p.global-primary.dark-primary.section-title::after {
               <div class="single-product">
                 <h3 th:text="${tableware.tablewareName}" ></h3>
                 <div class="group-md group-middle">
-                  <div class="single-product-price"><span>NT$</span><span th:text="${tableware.tablewareDeposit}"></span></div>
-                  <div class="box-rating"><span class="novi-icon icon fa fa-star"></span><span class="novi-icon icon fa fa-star"></span><span class="novi-icon icon fa fa-star"></span><span class="novi-icon icon fa fa-star"></span><span class="novi-icon icon fa fa-star-half-o"></span></div>
+                  <div class="single-product-price"><span>NT$</span><span th:text="${tableware.tablewareDeposit}"></span><span>/1day</span></div>
                 </div>
                 <p th:text="${tableware.tablewareDescription}"></p>
                 <div class="divider divider-30"></div>
@@ -118,9 +106,6 @@ p.global-primary.dark-primary.section-title::after {
                   <li><span>重量:</span><span>2 kg</span></li>
                   <li><span>容量:</span><span>500 ml</span></li>
                 </ul>
-                <div class="group-sm group-middle">
-                  <div><a class="button button-secondary button-pipaluk" href="/SpanTasty/StarCups/rental/rent">查看庫存</a></div>
-                </div>
                 <div class="divider divider-40"></div>
                 <div class="group-md group-middle"><span class="social-title">Share</span>
                   <div>

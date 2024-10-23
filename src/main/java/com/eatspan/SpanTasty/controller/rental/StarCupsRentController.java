@@ -145,25 +145,22 @@ public class StarCupsRentController {
 			Map<String, Object> claims = JwtUtil.parseToken(token);
 			Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
 			
-			Integer rentId = (Integer) session.getAttribute("rentId");
+			// 清空並重新生成 rentId，確保每次請求都是一個新訂單
+	        session.removeAttribute("rentId");
+	        
 			Integer restaurantId = cartRequestDTOList.get(0).getRestaurantId();
 			
-			Rent rent;
-			if(rentId == null) {
-				rent = rentService.addRentOrder(memberId, restaurantId);
-				session.setAttribute("rentId", rent.getRentId());
-				rentId = rent.getRentId();
-			}
+			Rent rent = rentService.addRentOrder(memberId, restaurantId);
+			session.setAttribute("rentId", rent.getRentId());
 			
 			Integer rentDeposit = 0;
 			for(CartRequestDTO cartRequestDTO : cartRequestDTOList) {
 	            Integer tablewareId = cartRequestDTO.getTablewareId();
 	            Integer rentItemQuantity = cartRequestDTO.getRentItemQuantity();
 	            // 新增每個租借項目
-	            RentItem rentItem = rentItemService.addRentItemToOrder(rentId, tablewareId, rentItemQuantity);
+	            RentItem rentItem = rentItemService.addRentItemToOrder(rent.getRentId(), tablewareId, rentItemQuantity);
 	            rentDeposit += rentItem.getRentItemDeposit();
 	        }
-			rent = rentService.findRentById(rentId);
 			rent.setRentDeposit(rentDeposit);
 			rentService.addRent(rent);
 			
