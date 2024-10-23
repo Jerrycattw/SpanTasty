@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>使用規則</title>
+<link rel="stylesheet" type="text/css"
+href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+<link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+</head>
+<body>
+
+<div class="container" id="exampleModal" tabindex="-1" >
+    <div class="card mt-5">
+      <div class="modal-content">
+        <div class="modal-body p-3">
+          <div>
+            <div class="row">
+              <div class="col-3">
+                <img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt="">
+              </div>
+              <div class="col-9 d-flex align-items-center">
+                <div>
+                  <span class="h4 quote-creative-cite" id="couponDescription"><!-- 歡慶三周年折抵$10元 --></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="divider divider-35"></div>
+          <ul class="box-pricing-list" id="couponDetail">
+            <!-- <li class="active">有效期限 : 2024/10/16 00:00 - 2024/10/31 23:59</li>
+                  <li class="active">優惠代碼 : ANNIV03CAKE</li>
+                  <li class="active">優惠內容 : 歡慶三周年折抵$10元</li>
+                  <li class="active">優惠條件 : 滿$100元折抵$10元</li>
+                  <li>商城 : 適用於所有商品</li>
+                  <li>訂餐 : 不適用</li> -->
+          </ul>
+
+        </div>
+        <div class="card-footer">
+          <button type="button" class="button button-md button-secondary button-pipaluk  w-100 " id="close"
+            data-bs-dismiss="modal">OK</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!--  -->
+  <script src="/SpanTasty/js/axios.min.js"></script>    
+  <script>
+  document.addEventListener('DOMContentLoaded', (e) => {
+    const pathSegments = window.location.pathname.split('/');
+    const couponId = pathSegments[pathSegments.indexOf('coupon') + 1];
+
+
+   axios.post(`/SpanTasty/coupon/${couponId}/show`, {
+            headers: {
+              'Content-Type': 'text/plain'
+            },
+            body: couponId
+          })
+            .then(res => {
+              console.log(res.data);
+              const data = res.data
+              document.getElementById('couponDescription').textContent = data.coupon.couponDescription
+              const couponDetail = document.getElementById('couponDetail')
+              couponDetail.innerHTML = `
+                <li class="active">有效期限 : ${data.coupon.couponStartDate} 00:00 - ${data.coupon.couponEndDate} 23:59</li>
+                <li class="active">優惠代碼 : ${data.coupon.couponCode}</li>
+                <li class="active">優惠條件 : ${data.coupon.rulesDescription}</li>
+                <li class="${data.coupon.minOrderDiscount ? 'active' : ''}">低消 : $${data.coupon.minOrderDiscount ? data.coupon.minOrderDiscount : '不適用'}</li>
+                <li class="${data.couponperMaxCoupon ? 'active' : ''}">最高折抵 : $${data.coupon.perMaxCoupon ? data.coupon.perMaxCoupon : '不適用'}</li>
+                ${getTagTextFinal(data)}`
+
+
+            })
+            .then(err => {
+              console.error
+            })
+        });
+
+
+
+
+
+
+    function getTagTextFinal(data){
+      if(getTagsText(data,'product')==="沒有適用的商品" && getTagsText(data,'togo')==="沒有適用的商品" ){
+        return`
+        <li class="active">商城 : 適用於 全部商品</li>
+        <li class="active">訂餐 : 適用於 全部商品</li>
+        `
+      }else {
+        return `
+         <li class="${getTagsText(data,'product')==="沒有適用的商品" ? '' : 'active'}">商城 : ${getTagsText(data,'product')}</li>
+         <li class="${getTagsText(data,'togo')==="沒有適用的商品" ? '' : 'active'}">訂餐 : ${getTagsText(data,'togo')}</li>
+        `
+      }
+    }
+
+
+    function getTagsText(data,type) {
+      const productTags = data.coupon.tags
+        .filter(tag => tag.tagType === type)
+        .map(tag => tag.tagName);
+
+      if (productTags.length === 0) {
+        return "沒有適用的商品";
+      }
+
+      const uniqueTags = [...new Set(productTags)];
+      return `適用於 ${uniqueTags.join('、')} `;
+    }
+
+    document.getElementById('close').addEventListener('click',()=>{
+      window.close()
+    })
+  </script>
+</body>
+</html>
