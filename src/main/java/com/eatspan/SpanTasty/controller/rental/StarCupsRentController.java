@@ -177,18 +177,20 @@ public class StarCupsRentController {
 	public String toCheckout(Model model) {
 		Integer rentId = (Integer) session.getAttribute("rentId");
 		Rent rent = rentService.findRentById(rentId);
+		Member member = rentService.findMemberByRentId(rentId);
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
 		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
-		Member member = rentService.findMemberByRentId(rentId);
-		model.addAttribute("member", member);
+		Restaurant restaurant = restaurantService.findRestaurantById(rent.getRestaurantId());
 		model.addAttribute("rent", rent);
+		model.addAttribute("member", member);
 		model.addAttribute("rentItems", rentItems);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("tablewares", tablewares);
 		return "starcups/rental/checkoutTablewarePage";
 	}
 	
 	
-	//導向訂單名細頁面
+	// 導向訂單名細頁面
 	@GetMapping("/rental/allRent")
 	public String toAllRent(@RequestParam(value = "token") String token, Model model) {
 		// 解析 JWT token 取得 claims
@@ -221,8 +223,6 @@ public class StarCupsRentController {
 		Integer rentId = (Integer) session.getAttribute("rentId");
 		Rent rent = rentService.findRentById(rentId);
 		
-		
-		
 		model.addAttribute("rent", rent);
 		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
 		model.addAttribute("rentItems", rentItems);
@@ -231,9 +231,6 @@ public class StarCupsRentController {
 		Member member = rentService.findMemberByRentId(rentId);
 		model.addAttribute("member", member);
 		
-		
-//		String string = map.get("TradeNo");
-//		System.out.println(map);
 		return "starcups/rental/rentOrderConfirm";
 	}
 }
