@@ -54,7 +54,7 @@ public class FirstController {
 	 public void sendSimpleMail() throws Exception {
 	        SimpleMailMessage message = new SimpleMailMessage();
 	        message.setFrom("receipt0210@gmail.com");//誰寄信(你設定的信箱)  要修改!
-	        message.setTo("receipt0210@gmail.com");//寄給誰  要修改!
+	        message.setTo("lao0978177213@gmail.com");//寄給誰  要修改!
 	        message.setSubject("主旨：Hello hao");
 	        message.setText("內容：這是一封測試信件，恭喜您成功發送了唷");
 

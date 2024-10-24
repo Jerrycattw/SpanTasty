@@ -195,16 +195,18 @@ public class RentService {
 
         obj.setItemName(itemNames.toString()); // 設置商品名稱
         obj.setTradeDesc("test Description");
-//        obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/allProduct");
         obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/rental/OrderConfirm");
         obj.setNeedExtraPaidInfo("N");
-//        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/allProduct");
         obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/rental/OrderConfirm");
 
         // 生成 ECPay 表单			
         return all.aioCheckOut(obj, null);
     }
 
+    
+    public List<Rent> findByDueDateTomorrow(){
+    	return rentRepository.findByDueDateTomorrow();
+    }
 }
 
 
