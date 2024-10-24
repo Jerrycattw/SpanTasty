@@ -52,7 +52,7 @@ public class Rent implements Serializable {
 	@Column(name = "restaurant_id")
 	private Integer restaurantId;
 	
-	@Column(name = "member_id")
+	@Column(name = "member_id", insertable = false, updatable = false)
 	private Integer memberId;
 	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")

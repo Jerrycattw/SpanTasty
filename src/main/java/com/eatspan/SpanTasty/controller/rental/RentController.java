@@ -1,5 +1,6 @@
 package com.eatspan.SpanTasty.controller.rental;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,6 +42,12 @@ import com.eatspan.SpanTasty.service.rental.RentService;
 import com.eatspan.SpanTasty.service.rental.TablewareService;
 import com.eatspan.SpanTasty.service.rental.TablewareStockService;
 import com.eatspan.SpanTasty.service.reservation.RestaurantService;
+
+import freemarker.core.ParseException;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+import jakarta.mail.MessagingException;
 
 @Controller
 @RequestMapping("/rent")
@@ -237,13 +244,11 @@ public class RentController {
 	public String returnRent(@ModelAttribute Rent rent, Model model) {
 		rent.setRentStatus(2);
 		rent.setRentMemo("已歸還");
-		rentService.addRent(rent);
 		List<RentItem> rentItems = rent.getRentItems();
-		System.out.println(rentItems);
+
+		
 		for(RentItem rentItem: rentItems) {
-			System.out.println(rentItem);
 			String returnMemo = rentItem.getReturnMemo();
-			System.out.println(returnMemo);
 			
 			// 解析 returnMemo 得到歸還數量和破損數量
 	        String[] memoParts = returnMemo.replace("租借", "").replace("歸還", ",").replace("破損", ",").split(",");
@@ -264,12 +269,18 @@ public class RentController {
 			rentItemService.addRentItem(rentItem);
 			// 更新庫存
 	        int stockChange = returnedQuantity - damagedQuantity;
-	        TablewareStock tablewareStock = tablewareStockService.findStockById(rentItem.getTablewareId(), rent.getRestaurantId());
+	        System.out.println(stockChange);
+	        TablewareStock tablewareStock = tablewareStockService.findStockById(rentItem.getTablewareId(), rent.getReturnRestaurantId());
+	        System.out.println(tablewareStock);
 	        Integer stock = tablewareStock.getStock();
-	        stock += stockChange;
-	        tablewareStock.setStock(stock);
+	        System.out.println(stock);
+	        Integer newStock = stock + stockChange;
+	        System.out.println(newStock);
+	        tablewareStock.setStock(newStock);
 	        tablewareStockService.addStock(tablewareStock);
 		}
+		rentService.addRent(rent);
+		System.out.println("有更新");
 		return "redirect:/rent/getAll";
 	}
 
@@ -374,11 +385,11 @@ public class RentController {
 	}
 	
 	
-	//查詢訂單(By過期未歸還)
-	@GetMapping("/overtime")
-	public String getOvertimeRents(Model model) {
-		List<Rent> rents = rentService.findOvertimeRents();
-		model.addAttribute("rents", rents);
-		return "spantasty/rental/getAllRents";
-	}
+//	查詢訂單(By過期未歸還)
+//	@GetMapping("/overtime")
+//	public String getOvertimeRents(Model model) {
+//		List<Rent> rents = rentService.findOvertimeRents();
+//		model.addAttribute("rents", rents);
+//		return "spantasty/rental/getAllRents";
+//	}
 }

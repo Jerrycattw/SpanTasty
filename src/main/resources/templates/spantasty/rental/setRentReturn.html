@@ -70,17 +70,17 @@ form {
                 <th>品項數量</th>
                 <th>歸還備註</th>
             </tr>
-            <tr th:each=" rentItem, iter : ${rentItems}">
-                <td th:text="${rentItem.tablewareId}" th:value="${rentItem.tablewareId}" readonly></td>
-                <td th:text="${rentItem.rentItemQuantity}" th:value="${rentItem.rentItemQuantity}" readonly></td>
+            <tr th:each=" rentItem, index: ${rentItems}">
+                <td th:text="${rentItem.tablewareId}" th:value="${rentItem.tablewareId}"  ></td>
+                <td th:text="${rentItem.rentItemQuantity}" th:value="${rentItem.rentItemQuantity}" ></td>
                 <td>
-	                <select name="rentItems[0].returnMemo" class="returnMemo" th:id="'returnMemo' + ${rentItem.tablewareId}" required>
-                    	<option th:text="${rentItem.returnMemo}" selected></option>
+	                <select th:name="'rentItems'+'['+${index.index}+']'+'.returnMemo'" class="returnMemo" th:id="'returnMemo' + ${rentItem.tablewareId}" required>
+                    	<option th:value="${rentItem.returnMemo}" th:text="${rentItem.returnMemo}" selected></option>
                     </select>
                     <script th:inline="javascript">
-                        let rentItemQuantity = [[${rentItem.rentItemQuantity}]];
-                        let returnMemo = '[[${rentItem.returnMemo}]]';
-                        let select = document.currentScript.previousElementSibling;
+                        var rentItemQuantity = [[${rentItem.rentItemQuantity}]];
+                        var returnMemo = '[[${rentItem.returnMemo}]]';
+                        var select = document.querySelector('#returnMemo' + [[${rentItem.tablewareId}]]);
                         // 清除之前的選項（除了第一個提示選項）
                         while (select.options.length > 1) {
                             select.remove(1);
@@ -106,11 +106,11 @@ form {
                     </script>
                 </td>
                  <td>
-			        <input type="hidden" name="rentItems[0].rentId" th:value="${rentItem.rentId}" />
-			        <input type="hidden" name="rentItems[0].tablewareId" th:value="${rentItem.tablewareId}" />
-			        <input type="hidden" name="rentItems[0].rentItemQuantity" th:value="${rentItem.rentItemQuantity}" />
-			        <input type="hidden" name="rentItems[0].rentItemDeposit" th:value="${rentItem.rentItemDeposit}" />
-			        <input type="hidden" name="rentItems[0].returnStatus" th:value="${rentItem.returnStatus}" />
+			        <input type="hidden" th:name="'rentItems'+'['+${index.index}+']'+'.rentId'" th:value="${rentItem.rentId}" />
+			        <input type="hidden" th:name="'rentItems'+'['+${index.index}+']'+'.tablewareId'" th:value="${rentItem.tablewareId}" />
+			        <input type="hidden" th:name="'rentItems'+'['+${index.index}+']'+'.rentItemQuantity'" th:value="${rentItem.rentItemQuantity}" />
+			        <input type="hidden" th:name="'rentItems'+'['+${index.index}+']'+'.rentItemDeposit'" th:value="${rentItem.rentItemDeposit}" />
+			        <input type="hidden" th:name="'rentItems'+'['+${index.index}+']'+'.returnStatus'" th:value="${rentItem.returnStatus}" />
 			    </td>
             </tr>
         </table>
@@ -137,47 +137,6 @@ window.onload = function() {
 		document.getElementById('disabledMsg').style.display = 'block';
 	}
 };
-
-
-
-/*
-document.addEventListener('DOMContentLoaded', function() {
-    const rentItems = document.querySelectorAll('#table1 tbody tr');
-
-    rentItems.forEach((item, index) => {
-        let rentItemQuantity = parseInt(item.querySelector('td:nth-child(2)').textContent.trim(), 10);
-        let returnMemo = item.querySelector('.returnMemo option').textContent.trim();
-        let select = item.querySelector('.returnMemo');
-        populateReturnMemoOptions(select, rentItemQuantity, returnMemo);
-    });
-});
-
-function populateReturnMemoOptions(select, rentItemQuantity, returnMemo) {
-    // 清除之前的選項（除了第一個提示選項）
-    while (select.options.length > 1) {
-        select.remove(1);
-    }
-
-    // 生成每個選項
-    for (let y = rentItemQuantity; y >= 0; y--) {
-        for (let z = 0; z <= y; z++) {
-            let option = document.createElement('option');
-            let optionText = '租借 ' + rentItemQuantity + ' 歸還 ' + y + ' 破損 ' + z;
-            option.value = optionText;
-            option.text = optionText;
-            if (optionText === returnMemo) {
-                option.selected = true;  // 預設選中與 returnMemo 匹配的選項
-            }
-            select.appendChild(option);
-        }
-    }
-
-    // 如果 returnMemo 存在但不匹配任何生成的選項，自動取消提示選項
-    if (returnMemo) {
-        select.options[0].disabled = true;
-    }
-}
-*/
 </script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Cups 週年慶優惠</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f0f0f0;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #E6C7B3;">
+        <tr>
+            <td align="center" style="padding: 20px;">
+            	<!-- cid:logo   cid是固定寫法 -->
+                <img src="cid:logo" alt="Star Cups Logo" style="width: 300px; max-width: 100%; height: auto;">
+                
+                <div style="width: 100%; max-width: 300px; padding: 15px; text-align: center; color: rgb(135, 70, 23);">
+                    <!-------------------------------- 設置標題 ------------------------------------------->
+                    <h2>租借訂單 即將遲歸通知</h2>
+                </div>
+                
+                <div style="width: 100%; max-width: 300px; background-color: white; border-radius: 15px; padding: 15px; margin-bottom: 15px;">
+                	<!--------------------------- 設置內文  可用${}動態顯示-------------------------------------->
+                    <p>親愛的，${rent.member.memberName}</p>
+                    <p>您的租借訂單 編號: #${rent.rentId} 於 ${rent.dueDate} 即將到期</p>
+                    <p>您的租借品項為:</p>
+					<ul>
+					    <#list rent.rentItems as rentItem>
+					        <li>
+					            <div class="box-pricing-body">
+					                <i class="fa-solid fa-check"></i>&nbsp;&nbsp;<span>${rentItem.tableware.tablewareName}</span>: 
+					                <span>${rentItem.rentItemQuantity}</span>
+					            </div>
+					        </li>
+					    </#list>
+					</ul>
+                    <p>請務必按時歸還</p>
+                    <a href="http://localhost:8080/SpanTasty/StarCups" style="display: inline-block; padding: 10px 20px; background-color: #87461A; color: white; text-decoration: none; border-radius: 5px;">SHOP NOW ></a>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
