@@ -84,8 +84,8 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 						<div class="product-top-panel-title">
 							Showing 1–12 of <span th:text="${totalProducts}"></span> results
 						</div>
-						<form th:action= "@{/StarCups/OrderHistory(shoppingId=${session['shoppingId']})}" method="get" id="checkoutForm">
-          		<button type="submit" class="button button-secondary button-pipaluk" id="checkoutBtn">His</button>
+						<form th:action= "@{/StarCups/orderHistory(shoppingId=${session['shoppingId']})}" method="get" id="checkoutForm">
+          		<button type="submit" class="button button-secondary button-pipaluk" id="checkoutBtn" hidden>His</button>
           	</form>
 						<div class="product-top-panel-select">
 							<select class="form-input select-filter"
