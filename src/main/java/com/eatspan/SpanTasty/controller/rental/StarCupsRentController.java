@@ -145,25 +145,22 @@ public class StarCupsRentController {
 			Map<String, Object> claims = JwtUtil.parseToken(token);
 			Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
 			
-			Integer rentId = (Integer) session.getAttribute("rentId");
+			// 清空並重新生成 rentId，確保每次請求都是一個新訂單
+	        session.removeAttribute("rentId");
+	        
 			Integer restaurantId = cartRequestDTOList.get(0).getRestaurantId();
 			
-			Rent rent;
-			if(rentId == null) {
-				rent = rentService.addRentOrder(memberId, restaurantId);
-				session.setAttribute("rentId", rent.getRentId());
-				rentId = rent.getRentId();
-			}
+			Rent rent = rentService.addRentOrder(memberId, restaurantId);
+			session.setAttribute("rentId", rent.getRentId());
 			
 			Integer rentDeposit = 0;
 			for(CartRequestDTO cartRequestDTO : cartRequestDTOList) {
 	            Integer tablewareId = cartRequestDTO.getTablewareId();
 	            Integer rentItemQuantity = cartRequestDTO.getRentItemQuantity();
 	            // 新增每個租借項目
-	            RentItem rentItem = rentItemService.addRentItemToOrder(rentId, tablewareId, rentItemQuantity);
+	            RentItem rentItem = rentItemService.addRentItemToOrder(rent.getRentId(), tablewareId, rentItemQuantity);
 	            rentDeposit += rentItem.getRentItemDeposit();
 	        }
-			rent = rentService.findRentById(rentId);
 			rent.setRentDeposit(rentDeposit);
 			rentService.addRent(rent);
 			
@@ -180,18 +177,20 @@ public class StarCupsRentController {
 	public String toCheckout(Model model) {
 		Integer rentId = (Integer) session.getAttribute("rentId");
 		Rent rent = rentService.findRentById(rentId);
+		Member member = rentService.findMemberByRentId(rentId);
 		List<Tableware> tablewares = tablewareService.findAllTablewares();
 		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
-		Member member = rentService.findMemberByRentId(rentId);
-		model.addAttribute("member", member);
+		Restaurant restaurant = restaurantService.findRestaurantById(rent.getRestaurantId());
 		model.addAttribute("rent", rent);
+		model.addAttribute("member", member);
 		model.addAttribute("rentItems", rentItems);
+		model.addAttribute("restaurant", restaurant);
 		model.addAttribute("tablewares", tablewares);
 		return "starcups/rental/checkoutTablewarePage";
 	}
 	
 	
-	//導向訂單名細頁面
+	// 導向訂單名細頁面
 	@GetMapping("/rental/allRent")
 	public String toAllRent(@RequestParam(value = "token") String token, Model model) {
 		// 解析 JWT token 取得 claims
@@ -224,8 +223,6 @@ public class StarCupsRentController {
 		Integer rentId = (Integer) session.getAttribute("rentId");
 		Rent rent = rentService.findRentById(rentId);
 		
-		
-		
 		model.addAttribute("rent", rent);
 		List<RentItem> rentItems = rentItemService.findRentItemsByRentId(rentId);
 		model.addAttribute("rentItems", rentItems);
@@ -234,9 +231,6 @@ public class StarCupsRentController {
 		Member member = rentService.findMemberByRentId(rentId);
 		model.addAttribute("member", member);
 		
-		
-//		String string = map.get("TradeNo");
-//		System.out.println(map);
 		return "starcups/rental/rentOrderConfirm";
 	}
 }

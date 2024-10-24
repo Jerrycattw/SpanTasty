@@ -40,12 +40,12 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
     transform: translate3d(0, -50%, 0);
     transition: .33s all ease;
 }
-.card-button{
 
-}
+
+
 </style>
 </head>
-<body>
+<body >
 <!-- navbar  th:replace=-->
 <div th:replace="~{starcups/display/navbar}" ></div>
 <!-- 選單下方圖片及連結 -->
@@ -63,37 +63,38 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
   </div>
 </section>
 
-<section class="section novi-bg novi-bg-img section-xl bg-default">
+<section class="section novi-bg novi-bg-img section-xl bg-default page animated" style="animation-duration: 500ms;">
   <div class="container">
     <!-- Bootstrap collapse-->
-    <div class="row row-15 row-fix align-items-start card-group-custom card-group-corporate" id="accordion2" role="tablist" aria-multiselectable="false">
-      <div class="col-lg-6">
-        <!-- Bootstrap card-->
-        <article class="card card-custom card-corporate" th:each="rent : ${rents}">
-          <div class="card-header" id="accordion2Heading1" role="tab">
-            <div class="card-title">
-            <div class="d-flex align-items-center">
-                <img id="personal-current-avatar" th:src="@{'/SpanTasty/starcups/images/account/' + ${rent.member.avatar}}" alt="頭像" class="rounded-circle border" style="width: 50px; height: 50px; margin-right: 10px;">
-                <div>
-                    <strong th:text="${rent.member.memberName}"></strong>
-                </div>
-            </div>
-            <a class="toggle-icon " role="button" data-bs-toggle="collapse" th:data-bs-target="'#accordion2Collapse' + ${rent.rentId}" th:href="'#accordion2Collapse' + ${rent.rentId}" aria-controls="accordion2Collapse" th:aria-controls="'accordion2Collapse' + ${rent.rentId}" aria-expanded="false">訂單編號: <span th:text="${rent.rentId}"></span>
-                <div class="card-button"><i class="fa-solid fa-circle-chevron-down position-absolute top-50 start-50 translate-middle chevron-down"></i></div>
-                <div class="card-button"><i class="fa-solid fa-circle-chevron-up position-absolute top-50 start-50 translate-middle chevron-up d-none"></i></i></div>
-            </a>
-            </div>
-          </div>
-          <div class="collapse" th:id="'accordion2Collapse' + ${rent.rentId}" role="tabpanel" th:aria-labelledby="'accordion2Heading' + ${rent.rentId}">
-            <div class="card-body">
-             <ul th:each="rentItem : ${rent.rentItems}">
-             	<li th:text="'物品名稱: ' + ${rentItem.tableware.tablewareName} + ', 數量: ' + ${rentItem.rentItemQuantity}+ ', 金額: ' + ${rentItem.rentItemDeposit}"></li>
-             </ul>
-             	<span th:text=" ' 總金額: ' + ${rent.rentDeposit}"></span>
-            </div>
-          </div>
-        </article>
-      </div>
+    <div class="row row-15 align-items-start card-group-custom card-group-corporate " id="accordion2" role="tablist" aria-multiselectable="false">
+    
+      <div class="col-lg-6" th:each="rent : ${rents}">
+	  <article class="card card-custom card-corporate"  >
+	    <div class="card-header" id="accordion2Heading1" role="tab">
+	      <div class="card-title">
+	        <div class="d-flex align-items-center">
+	          <img id="personal-current-avatar" th:src="@{'/SpanTasty/starcups/images/account/' + ${rent.member.avatar}}" alt="頭像" class="rounded-circle border" style="width: 50px; height: 50px; margin-right: 10px;">
+	          <div>
+	            <strong th:text="${rent.member.memberName}"></strong>
+	          </div>
+	        </div>
+	        <a class="toggle-icon" role="button" data-bs-toggle="collapse" th:data-bs-target="'#accordion2Collapse' + ${rent.rentId}" th:href="'#accordion2Collapse' + ${rent.rentId}" aria-controls="accordion2Collapse" th:aria-controls="'accordion2Collapse' + ${rent.rentId}" aria-expanded="false">訂單編號: <span th:text="${rent.rentId}"></span>
+	          <div class="card-button"><i class="fa-solid fa-circle-chevron-down position-absolute top-50 start-50 translate-middle chevron-down"></i></div>
+	          <div class="card-button"><i class="fa-solid fa-circle-chevron-up position-absolute top-50 start-50 translate-middle chevron-up d-none"></i></div>
+	        </a>
+	      </div>
+	    </div>
+	    <div class="collapse" th:id="'accordion2Collapse' + ${rent.rentId}" role="tabpanel" th:aria-labelledby="'accordion2Heading' + ${rent.rentId}">
+	      <div class="card-body">
+	        <ul th:each="rentItem : ${rent.rentItems}">
+	          <li th:text="'物品名稱: ' + ${rentItem.tableware.tablewareName} + ', 數量: ' + ${rentItem.rentItemQuantity}+ ', 金額: ' + ${rentItem.rentItemDeposit}"></li>
+	        </ul>
+	        <span th:text=" ' 總金額: ' + ${rent.rentDeposit}"></span>
+	      </div>
+	    </div>
+	  </article>
+	</div>
+
     </div>
   </div>
 </section>

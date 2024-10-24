@@ -82,17 +82,12 @@ p.global-primary.dark-primary.section-title::after {
 	<section class="section pt-4 novi-bg novi-bg-img section-xl bg-default text-md-start">
     <div class="container">
         <div class="row row-90 row-fix justify-content-center">
-            <div class="Grid-item Grid-products-item" style="margin-bottom: 10px;">
-                <p class="global-primary dark-primary section-title">
-                    <span> LOOK BOOK </span>
-                </p>
-            </div>
             <div class="product-top-panel group-lg pe-0">
                 <div class="product-top-panel-title">Showing 1–10 of <span th:text="${totalTablewares}"></span> results</div>
                 <div class="form-wrap">
                     <label class="form-label" for="search-form">用具搜尋</label>
                     <input class="form-input " id="search-form" type="text" name="s" autocomplete="off">
-                    <button class="button-search fl-bigmug-line-search74" id="search" type="submit"></button>
+                    <button class="button-search fl-bigmug-line-search74 d-flex align-item-center justify-content-center" id="search" type="submit"></button>
                   </div>
             </div>
             <div class="row row-lg row-40" id="resultContainer">
@@ -102,7 +97,7 @@ p.global-primary.dark-primary.section-title::after {
                     <div class="product-figure">
                         <img th:src="${tableware.tablewareImage != null ? tableware.tablewareImage : 'https://via.placeholder.com/450x400'}" alt="" width="255" height="255" />
                         <div class="product-button">
-                            <a class="button button-bt button-md button-white button-ujarak" th:href="@{/StarCups/rental/single/{id}(id=${tableware.tablewareId})}">不是偷看 是查看</a></div>
+                            <a class="button button-bt button-md button-white button-ujarak" th:href="@{/StarCups/rental/single/{id}(id=${tableware.tablewareId})}">查看</a></div>
                         </div>
                     <h6 class="product-title" th:text="${tableware.tablewareName}" ></h6>
                     <div class="product-price-wrap">
@@ -140,8 +135,6 @@ p.global-primary.dark-primary.section-title::after {
 				</div>
 				<div class="col-lg-4"></div>
 			</div>
-		</div>
-		</div>
 	</section>
 	
 

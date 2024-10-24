@@ -80,7 +80,7 @@
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Total</th>
-                <th>Delete</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -98,7 +98,12 @@
                 <!-- 數量 -->
                 <td>
                   <div class="table-cart-stepper">
-                    <input class="form-input" type="number" data-zeros="true" value="1" min="1" max="1000">
+                    <div class="stepper">
+                      <input id="amountInput" class="form-input stepper-input" type="number" data-zeros="true" value="1"
+                        min="1" max="1000" readonly/>
+                      <span id="increaseBtn" class="stepper-arrow up"></span>
+                      <span id="decreaseBtn" class="stepper-arrow down"></span>
+                    </div>
                   </div>
                 </td>
                 <!-- 單項總價 -->
@@ -132,7 +137,9 @@
                   <h6 class="text-gray-500">Total</h6>
                   <h3 class="cart-product-price"><sup>$</sup>524</h3>
                 </div>
-              </div><a class="button button-primary button-pipaluk" href="checkout.html">Proceed to checkout</a>
+              </div>
+              <a class="button button-md button-default-outline button-wapasha" th:href="@{/StarCups/order/checkout}">checkout</a>
+              <a class= "button button-md button-primary button-pipaluk" th:href="@{/StarCups/order}">continue shopping</a>
             </div>
           </div>
         </div>
@@ -164,9 +171,14 @@
       // 清空表格
       tbody.innerHTML = '';
 
+      // 計算總金額
+      let totalPrice = 0;
+
       // 如果購物車不為空，動態插入每個項目
       if (cart.length > 0) {
         cart.forEach(item => {
+          const itemTotalPrice = item.foodPrice * item.quantity;
+          totalPrice += itemTotalPrice;
           const rowHtml = `
         <tr>
           <td>
@@ -178,11 +190,15 @@
           <td>$${item.foodPrice}</td>
           <td>
             <div class="table-cart-stepper">
-              <input class="form-input" type="number" data-zeros="true" value="${item.quantity}" min="1" max="1000" 
-                onchange="updateQuantity(${item.foodId}, this.value)">
+            <div class="stepper">
+              <input id="amountInput-${item.foodId}" class="form-input stepper-input" type="number" 
+                data-zeros="true" value="${item.quantity}" min="1" max="1000" readonly/>
+              <span id="increaseBtn-${item.foodId}" class="stepper-arrow up"></span>
+              <span id="decreaseBtn-${item.foodId}" class="stepper-arrow down"></span>
             </div>
+            
           </td>
-          <td>$${item.foodPrice * item.quantity}</td>
+          <td>$${itemTotalPrice}</td>
           <td>
             <button class="button button-md button-secondary button-pipaluk" onclick="removeFromCart(${item.foodId})">Delete</button>
           </td>
@@ -190,25 +206,66 @@
 
           // 插入新行到表格中
           tbody.insertAdjacentHTML('beforeend', rowHtml);
+
+          // 綁定數量增加事件
+          document.getElementById(`increaseBtn-${item.foodId}`).addEventListener("click", function () {
+            console.log("數量增加")
+            updateQuantity(item.foodId, 1);
+          });
+
+          // 綁定數量減少事件
+          document.getElementById(`decreaseBtn-${item.foodId}`).addEventListener("click", function () {
+            console.log("數量減少")
+            updateQuantity(item.foodId, -1);
+          });
+
         });
       } else {
         // 如果購物車是空的，顯示一條提示信息
         tbody.innerHTML = `<tr><td colspan="5">購物車是空的。</td></tr>`;
       }
+      // 更新總金額顯示
+      document.querySelector(".cart-product-price").innerHTML = `<sup>$</sup>${totalPrice}`;
     }
 
     // 刪除購物車中的商品
     function removeFromCart(foodId) {
+      const confirmed = confirm("您確定要將該商品從購物車中刪除嗎？");
+      if (confirmed) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // 刪除指定商品
+        cart = cart.filter(item => item.foodId !== foodId);
+
+        // 更新 localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // 重新載入表格
+        loadCartIntoTable();
+        alert("商品已從購物車中移除！");
+
+      }
+    }
+
+    // 更新商品數量
+    function updateQuantity(foodId, delta) {
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const item = cart.find(i => i.foodId === foodId);
 
-      // 刪除指定商品
-      cart = cart.filter(item => item.foodId !== foodId);
+      if (item) {
+        // 計算新的數量
+        let newQuantity = item.quantity + delta;
+        if (newQuantity >= 1 && newQuantity <= 1000) {
+          item.quantity = newQuantity;
+          localStorage.setItem('cart', JSON.stringify(cart));
 
-      // 更新 localStorage
-      localStorage.setItem('cart', JSON.stringify(cart));
+          // 更新表格中的數量顯示
+          document.getElementById(`amountInput-${foodId}`).value = item.quantity;
 
-      // 重新載入表格
-      loadCartIntoTable();
+          // 重新計算並更新總金額
+          loadCartIntoTable();
+        }
+      }
     }
 
 

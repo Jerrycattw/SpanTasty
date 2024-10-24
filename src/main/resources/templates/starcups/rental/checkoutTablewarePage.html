@@ -28,37 +28,9 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
     display: block;
 }
 
-p.global-primary.dark-primary.section-title::after {
-    content: '';
-    display: block;
-    width: 25px; /* 設定線條的寬度 */
-    height: 3px; /* 設定線條的高度 */
-    background-color: darkgrey; /* 設定線條的顏色 */
-    margin: 20px auto 0; /* 調整線條與文字之間的距離 */
-}
 
-.section-title {
-    font-size: 20px; /* 調整文字大小 */
-    color: #333; /* 調整文字顏色 */
-    text-align: center; /* 文字居中 */
-    font-weight: bold;
-}
 
-.Grid-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 讓每個項目占據最少250px寬度，並自動填充 */
-    gap: 20px; /* 產品之間的間距 */
-}
 
-.Grid-products-item {
-    padding: 10px;
-    border-radius: 8px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.Grid-products-item:hover {
-    transform: translateY(-5px); /* 在懸停時使產品項目上移 */
-}
 </style>
 </head>
 <body>
@@ -79,19 +51,8 @@ p.global-primary.dark-primary.section-title::after {
       </div>
     </section>
 	
-<section class="section pt-4 novi-bg novi-bg-img section-xl bg-default text-md-start">
-	<div class="container">
-	    <div class="row row-90 row-fix justify-content-center">
-	        <div class="Grid-item Grid-products-item" style="margin-bottom: 10px;">
-	            <p class="global-primary dark-primary section-title">
-	                <span> Checkout  Tableware </span>
-	            </p>
-	        </div>
-		</div>
-	</div>
-</section>
 <!-- Shopping Cart-->
-      <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+      <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start pb-5">
         <div class="container">
           <h4 class="text-spacing-50">租借車</h4>
           <!-- shopping-cart-->
@@ -119,47 +80,6 @@ p.global-primary.dark-primary.section-title::after {
           </div>
         </div>
       </section>
-	<!-- Section payment-->
-      <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
-        <div class="container" th:each="member : ${member}">
-          <div class="row row-50 justify-content-center">
-          <div class="col-md-10 col-lg-6">
-              <h4 class="text-spacing-50">Delivery Address</h4>
-              <form class="rd-form rd-mailform">
-                <div class="row row-14 row-fix gutters-14">
-                  <div class="col-sm-6">
-                    <div class="form-wrap">
-                      <input class="form-input" id="checkout-first-name-2" type="text" th:value="${member.memberName}"  name="name" data-constraints="@Required"/>
-                      <!-- <input class="form-input" id="checkout-first-name-2" type="text" th:value="${member.memberName}"  name="name" data-constraints="@Required"/> -->
-                      <label class="form-label" for="checkout-first-name-2">Name</label>
-                    </div>
-                  </div>
-                  <div class="col-sm-6">
-                    <div class="form-wrap">
-                      <input class="form-input" id="checkout-last-name-2" type="text"  th:value="${member.phone}"  name="name" data-constraints="@Required"/>
-                      <label class="form-label" for="checkout-last-name-2">Phone</label>
-                    </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="form-wrap">
-                      <input class="form-input" id="checkout-company-2" type="text"  th:value="${member.address}"  name="name" data-constraints="@Required"/>
-                      <label class="form-label" for="checkout-company-2">Address</label>
-                    </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="form-wrap">
-                      <input class="form-input" id="checkout-address-2" type="text" th:value="${member.email}"  name="name" data-constraints="@Required"/>
-                      <label class="form-label" for="checkout-address-2">E-Mail</label>
-                    </div>
-                  </div>
-                  <div class="col-sm-6">
-                  </div>
-                </div>
-              </form>
-            </div>
-            </div>
-            </div>
-            </section>
       <!-- Section payment-->
       <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
         <div class="container">
@@ -215,6 +135,50 @@ p.global-primary.dark-primary.section-title::after {
               </div>
             </div>
           </div>
+          <!-- Section payment-->
+      <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start pb-1">
+         <h4 class="text-spacing-50 d-flex justify-content-center">取件餐廳</h4>
+        <div class="container d-flex justify-content-center"  th:each="restaurant : ${restaurant}">
+         <div class="row me-5">
+           <img th:src="${restaurant.restaurantImg != null ? restaurant.restaurantImg : 'https://via.placeholder.com/450x400'}" alt="" style="height:400px;"/>
+         </div>
+          <div class="row">
+          	<div class="col-md-10 col-lg-6">
+              <form class="rd-form rd-mailform" style="width:550px;">
+                <div class="row row-14 row-fix gutters-14">
+                  <div class="col-sm-6">
+                    <div class="form-wrap">
+                      <input class="form-input" id="checkout-first-name-2" type="text" th:value="${'餐廳名稱: ' + restaurant.restaurantName}"  name="name" data-constraints="@Required"/>
+                      <!-- <input class="form-input" id="checkout-first-name-2" type="text" th:value="${member.memberName}"  name="name" data-constraints="@Required"/> -->
+                      <label class="form-label" for="checkout-first-name-2">Name</label>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="form-wrap">
+                      <input class="form-input" id="checkout-last-name-2" type="text"  th:value="${'餐廳電話: ' + restaurant.restaurantPhone}"  name="name" data-constraints="@Required"/>
+                      <label class="form-label" for="checkout-last-name-2">Phone</label>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-wrap">
+                      <input class="form-input" id="checkout-company-2" type="text"  th:value="${'餐廳地址: ' + restaurant.restaurantAddress}"  name="name" data-constraints="@Required"/>
+                      <label class="form-label" for="checkout-company-2">Address</label>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-wrap">
+                      <input class="form-input" id="checkout-address-2" type="text" th:value="${'營業時間: ' + restaurant.restaurantOpentime} + '-' + ${restaurant.restaurantClosetime}"  name="name" data-constraints="@Required"/>
+                      <label class="form-label" for="checkout-address-2">E-Mail</label>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                  </div>
+                </div>
+              </form>
+            </div>
+           </div>
+          </div>
+         </section>
           <div class="button-wrap text-center">
           	<form th:action= "@{/StarCups/rental/ecpayCheckout(rentId=${session['rentId']})}" method="post">
           		<button type="submit" class="button button-secondary button-pipaluk">Proceed to checkout</button>

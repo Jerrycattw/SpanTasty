@@ -40,6 +40,11 @@
     #cartContainer.active {
       display: block;
     }
+    
+    #cartIcon, .disable-link {
+	  pointer-events: none;
+	  opacity: 0.5;
+	}
   </style>
 </head>
 
@@ -66,11 +71,11 @@
     <section class="section breadcrumbs-custom-inset">
       <div class="breadcrumbs-custom context-dark">
         <div class="container">
-          <h2 class="breadcrumbs-custom-title">Order Online</h2>
+          <h2 class="breadcrumbs-custom-title">Start Rent</h2>
           <ul class="breadcrumbs-custom-path">
             <li><a href="/SpanTasty/StarCups">Home</a></li>
             <!-- <li><a href="grid-gallery.html">Menu</a></li> -->
-            <li class="active">Order Online</li>
+            <li class="active">Start Rent</li>
           </ul>
         </div>
         <div class="box-position novi-bg novi-bg-img" style="background-image: url('/SpanTasty/StarCups/images/bg-breadcrumbs.jpg');"></div>
@@ -180,14 +185,13 @@
                     <span style="position: absolute; bottom: 10px; right: 10px; color:red;"
                       th:id="'stock' + ${tableware.tablewareId}"></span>
 
-                    <div class="quantity-selector d-inline-flex justify-content-center align-center"
-                      style="position: absolute; bottom:50px; right: 13px;">
-                      <div class="table-cart-stepper d-inline-flex justify-content-center align-center"
+                    <div class="quantity-selector">
+                      <div class="table-cart-stepper"
                         style="padding-top:0; padding-bottom:0;line-height: 20px;">
-                        <input class="form-input d-inline-flex pt-0 ps-1 pe-1 pb-0"
+                        <input class="form-input"
                           th:id="'rentItemQuantity'+${tableware.tablewareId}"
-                          style="min-height:1px; position: relative; top:-5px;" type="number" data-zeros="true"
-                          value="1" min="1" max="1000">
+                          style="min-height:1px;" type="number" data-zeros="true"
+                          value="0" min="0" max="1000">
                       </div>
                     </div>
                     <button class="btn btn-primary btn-sm pb-0 pt-0"
@@ -202,13 +206,7 @@
         </div>
       </div>
     </section>
-
-    <h5 class="ms-4">租借須知</h5>
-    <div class="mt-2 ms-4 mb-5">
-      <ul class="">
-        <li>租借用具歸還時間為：七天內。</li>
-      </ul>
-    </div>
+    
 <!-- Global Mailform Output-->
 <div class="snackbars" id="form-output-global"></div>
 
@@ -220,9 +218,7 @@
 <script src="/SpanTasty/starcups/js/script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    
-    
-      // 顯示購物車內容
+// 顯示購物車內容
 document.addEventListener("DOMContentLoaded", function () {
   // 顯示購物車內容
   document.getElementById("cartIcon").addEventListener("click", function () {
@@ -252,6 +248,11 @@ function addToCart(button) {
 	}
     const tablewareId = button.getAttribute('data-tablewareid'); // 正確獲取 tablewareId
     const rentItemQuantity = parseInt(document.getElementById(`rentItemQuantity${tablewareId}`).value, 10);
+    // 檢查數量是否為 0，如果為 0 則不允許加入購物車
+    if (rentItemQuantity === 0) {
+        alert('請選擇至少 1 件商品後再加入購物車');
+        return;
+    }
     const restaurantId = document.getElementById("restaurantId").value;
 	const url = 'http://localhost:8080/SpanTasty/StarCups/rental/tableware';
     let dtoObject = {
@@ -260,35 +261,15 @@ function addToCart(button) {
     // 透過 axios 從後端抓取商品資料
     axios.post(url, dtoObject) // 使用正確的 tablewareId 發送請求
         .then(function (response) {
-			console.log(response);
             const itemData = response.data; // 從後端獲取的商品資料，假設包含名稱、圖片、價格、庫存
-			console.log(itemData);
-			
-            const stockElement = document.getElementById(`stock${tablewareId}`);
-            let stock = parseInt(stockElement.innerHTML.replace('剩', '').replace('件', ''), 10);
-
-            // 檢查庫存是否足夠
-            if (stock < rentItemQuantity) {
-                alert('庫存不足，無法加入購物車');
-                return;
-            }
-
+			const quantityInput = document.getElementById(`rentItemQuantity${tablewareId}`);
             // 從 localStorage 中獲取當前的購物車資料
             let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
 
             // 檢查購物車是否已有此商品
             let existingItem = cartItems.find(item => item.tablewareId === tablewareId);
             if (existingItem) {
-                const newQuantity = parseInt(existingItem.rentItemQuantity) + rentItemQuantity;
-
-                // 檢查新數量是否超過庫存
-                if (newQuantity > stock) {
-                    alert('庫存不足，無法增加更多商品');
-                    return;
-                }
-
-                // 更新商品數量
-                existingItem.rentItemQuantity = newQuantity;
+                existingItem.rentItemQuantity = parseInt(existingItem.rentItemQuantity) + rentItemQuantity;
             } else {
                 // 如果是新的商品，則新增到購物車
                 cartItems.push({
@@ -300,18 +281,22 @@ function addToCart(button) {
                     itemPrice: itemData.tablewareDeposit // 從後端獲取的價格
                 });
             }
-			console.log(cartItems);
             // 更新 localStorage
             localStorage.setItem('cartItems', JSON.stringify(cartItems));
 	
             // 更新購物車顯示
             updateCartUI(cartItems);
 
-            // 更新庫存顯示
-            stock -= rentItemQuantity;
-            stockElement.innerHTML = `剩${stock}件`;
-
+            // 更新顯示的庫存（庫存邏輯已由 updateStock 處理）
+            
+            const stockElement = document.getElementById(`stock${tablewareId}`);
+            let stock = parseInt(stockElement.innerHTML.replace('剩', '').replace('件', ''), 10);
+            //stock -= rentItemQuantity;
+            //stockElement.innerHTML = `剩${stock}件`;
+            
+            quantityInput.value = 0; 
             alert('成功加入購物車');
+            updateStock([{ tablewareId: tablewareId, stock: stock }]);
         })
         .catch(function (error) {
             console.error(error);
@@ -322,6 +307,7 @@ function addToCart(button) {
 // 更新購物車 UI
 function updateCartUI(cartItems) {
     const cartContainer = document.getElementById('cartItemsContainer');
+    const showCartAmount = document.getElementById('showCartAmount');
     const showAmount = document.getElementById('showAmount');
     const showTotalPrice = document.getElementById('showTotalPrice');
     let totalPrice = 0;
@@ -355,6 +341,7 @@ function updateCartUI(cartItems) {
 
     // 更新總數和總價
     showAmount.textContent = cartItems.length;
+    showCartAmount.textContent = cartItems.length;
     showTotalPrice.textContent = `NT$${totalPrice}`;
 }
 
@@ -403,6 +390,12 @@ function reloadCartItems() {
   function changeRestaurant() {
     localStorage.removeItem('cartItems'); // 清空購物車
     updateCartCount(0); // 更新購物車顯示為 0
+    document.getElementById('cartIcon').style.pointerEvents = 'auto'; // 恢復購物車點擊功能
+    document.getElementById('cartIcon').style.opacity = '1';
+	document.querySelectorAll('.disable-link').forEach(function(link) {
+	    link.style.pointerEvents = 'auto';
+	    link.style.opacity = '1'; // 恢復商品點擊功能
+	});
     const restaurantId = document.getElementById("restaurantId").value;
     const url = 'http://localhost:8080/SpanTasty/StarCups/rental/showRestaurantStock';
     let dtoObject = {
@@ -410,7 +403,9 @@ function reloadCartItems() {
     };
     axios.post(url, dtoObject)
       .then(function (response) {
-        htmlMaker(response.data);
+        //htmlMaker(response.data);
+        console.log(response.data.stocks);
+        updateStock(response.data.stocks);
       })
       .catch(function (error) {
         console.log(error);
@@ -418,34 +413,79 @@ function reloadCartItems() {
   }
 
   function updateStock(stocks) {
-    document.querySelectorAll('[id^="single"]').forEach(link => {
-      link.classList.remove('disabled');
-      link.style.pointerEvents = 'auto'; // 恢復點擊事件
-      link.style.opacity = '1'; // 恢復樣式到正常狀態
-    });
-    stocks.forEach(stock => {
-      // 根據 tablewareId 查找對應的 span 標籤
-      const stockElement = document.getElementById(`stock${stock.tablewareId}`);
+	stocks.forEach(stock => {
+	// 根據 tablewareId 查找對應的 span 標籤
+	const stockElement = document.getElementById(`stock${stock.tablewareId}`);
+	const linkElement = document.getElementById(`single${stock.tablewareId}`);
+	const quantityInput = document.getElementById(`rentItemQuantity${stock.tablewareId}`);
+	const stepUpArrow = document.querySelector(`#rentItemQuantity${stock.tablewareId} ~ .up`);
+    const stepDownArrow = document.querySelector(`#rentItemQuantity${stock.tablewareId} ~ .down`);
 
-      if (stockElement) {
-        const linkElement = document.getElementById(`single${stock.tablewareId}`);
+      if (stockElement && quantityInput) {
         // 插入剩餘庫存資料
         stockElement.innerHTML = `剩${stock.stock}件`;
-        console.log(`stock: ${stock.stock}, type: ${typeof stock.stock}`);
         if (Number(stock.stock) === 0) {
           linkElement.classList.add('disabled');
           linkElement.style.pointerEvents = 'none'; // 禁用點擊事件
           linkElement.style.opacity = '0.5'; // 改變樣式表示禁用狀態
+          quantityInput.value = 0;
+        } else {
+	       	quantityInput.value = 0;
+	        quantityInput.max = stock.stock; 
+	        // 手動輸入監聽，防止超過庫存
+	        quantityInput.addEventListener('input', function () {
+	          const max = parseInt(quantityInput.max, 10);
+	          const min = parseInt(quantityInput.min, 10);
+	          const value = parseInt(quantityInput.value, 10);
+	          
+	          if (value > max) {
+	            alert('超過庫存上限！');
+	            quantityInput.value = max; // 限制數值為最大值
+	          } else if (value < min) {
+	            alert('數量不能少於 0 件');
+	            quantityInput.value = min; // 限制數值為最小值
+	          }
+	          
+	          // 動態更新剩餘庫存
+	          stockElement.innerHTML = `剩 ${max - value} 件`;
+	        });
+	        
+	        // 監聽步進器上箭頭點擊事件
+	        stepUpArrow.addEventListener('click', function () {
+	          const currentValue = parseInt(quantityInput.value, 10);
+	          const max = parseInt(quantityInput.max, 10);
+	          if (currentValue >= max) {
+	            alert('超過庫存上限！');
+	            quantityInput.value = max;
+	          } else {
+	            quantityInput.value = currentValue + 1;
+	          }
+	          // 更新剩餘庫存
+	          stockElement.innerHTML = `剩 ${max - quantityInput.value} 件`;
+	        });
+	
+	        // 監聽步進器下箭頭點擊事件
+	        stepDownArrow.addEventListener('click', function () {
+	          const currentValue = parseInt(quantityInput.value, 10);
+	          const min = parseInt(quantityInput.min, 10);
+	          if (currentValue > min) {
+	            quantityInput.value = currentValue - 1;
+	          } else {
+	            alert('數量不能少於 0 件');
+	            quantityInput.value = min;
+	          }
+	          // 更新剩餘庫存
+	          stockElement.innerHTML = `剩 ${parseInt(quantityInput.max, 10) - quantityInput.value} 件`;
+	        });
         }
       } else {
         console.log(`Element with id stock${stock.tablewareId} not found`);
       }
     });
   }
-
+/*
   function htmlMaker(data) {
     const restaurant = data.restaurant;
-    const stocks = data.stocks;
     const showRestaurant = document.getElementById("show-restaurant");
 
     showRestaurant.innerHTML = `
@@ -473,9 +513,8 @@ function reloadCartItems() {
     </div>
   </section>
 `;
-    updateStock(stocks);
   }
-
+*/
 </script>
 </body>
 </html>

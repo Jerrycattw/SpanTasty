@@ -467,7 +467,7 @@ public class CouponService {
 		
 		ShoppingOrder shoppingOrder = shoppingOrderService.findShoppingOrderById(shoppingId);
 		shoppingOrder.setDiscountAmount(totalDiscount);
-//		shoppingOrder.setFinalAmount(shoppingOrder.getShoppingTotal()-totalDiscount);
+		shoppingOrder.setFinalTotal(shoppingOrder.getShoppingTotal()-totalDiscount);
 		shoppingOrderService.updateShoppingOrder(shoppingOrder);
 	}
 	

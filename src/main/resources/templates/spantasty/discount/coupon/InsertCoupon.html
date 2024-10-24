@@ -64,7 +64,7 @@
                                 </div>
                                 <div class="col-9">
                                     <input class="form-control" name="couponStartDate" type="date" placeholder=""
-                                        aria-label="default input example">
+                                        aria-label="default input example" id="couponStartDate">
                                 </div>
                             </div>
                             <!--  -->
@@ -74,7 +74,7 @@
                                 </div>
                                 <div class="col-9">
                                     <input class="form-control" name="couponEndDate" type="date" placeholder=""
-                                        aria-label="default input example">
+                                        aria-label="default input example" id="couponEndDate">
                                 </div>
                             </div>
                             <!--  -->
@@ -214,6 +214,7 @@
                 <div class="accordion-item">
                     <div class="card-footer d-flex justify-content-end">
                         <div class="m-3">
+                         	<button  id="demo" type="button" class="btn btn-info me-2">一鍵輸入</button>
                             <button  id="backBtn" type="button" class="btn btn-secondary me-2">返回</button>
                             <button type="submit" class="btn btn-primary me-2">新增</button>
                         </div>
@@ -258,7 +259,12 @@
 
 
         })
-
+		document.getElementById('couponStartDate').addEventListener('change',(e)=>{
+			document.getElementById('couponEndDate').min=e.target.value
+			if(document.getElementById('couponEndDate').value>e.target.value){
+				document.getElementById('couponEndDate').value=e.target.value
+			}
+		})
 
     </script>
     <script>
