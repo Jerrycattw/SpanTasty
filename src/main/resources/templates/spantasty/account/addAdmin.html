@@ -3,50 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <title>新增管理員</title>
+<style>
+  .form-check {
+    margin-bottom: 10px;
+  }
+</style>
 </head>
-<body class="bg-dark text-white">
+<body style="font-size: 1.5rem;">
     <!-- 頂部導航欄 -->
     <div th:replace="~{spantasty/display/navbar}"></div>
 
     <!-- 主要內容區域 -->
-    <div class="container mt-5" style="padding-left: 270px; padding-top: 80px;">
-        <h1 class="text-center">管理員管理</h1>
-
+    <div class="container mt-5" style="padding-left: 200px; padding-top: 30px;">
+        <h1 class="text-center">新增管理員</h1>
+		<div class="p-4 border border-dark rounded bg-light text-dark">
         <!-- 權限選擇 -->
         <div class="form-group mt-4">
             <label>管理員權限：</label><br/>
-            <div class="form-check">
-                <input type="checkbox" name="permissions" value="account" id="permission-account" class="form-check-input" />
-                <label for="permission-account" class="form-check-label">管理會員</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" name="permissions" value="discount" id="permission-discount" class="form-check-input" />
-                <label for="permission-discount" class="form-check-label">管理優惠券</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" name="permissions" value="order" id="permission-order" class="form-check-input" />
-                <label for="permission-order" class="form-check-label">管理外帶訂單</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" name="permissions" value="rental" id="permission-rental" class="form-check-input" />
-                <label for="permission-rental" class="form-check-label">管理租借餐具</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" name="permissions" value="reservation" id="permission-reservation" class="form-check-input" />
-                <label for="permission-reservation" class="form-check-label">管理餐廳</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" name="permissions" value="store" id="permission-store" class="form-check-input" />
-                <label for="permission-store" class="form-check-label">管理線上商城</label>
+            <div class="row">
+                <!-- 上三個 -->
+                <div class="col-md-6">
+                    <div class="form-check">
+                        <input type="checkbox" name="permissions" value="account" id="permission-account" class="form-check-input" />
+                        <label for="permission-account" class="form-check-label">管理會員</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="permissions" value="discount" id="permission-discount" class="form-check-input" />
+                        <label for="permission-discount" class="form-check-label">管理優惠券</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="permissions" value="order" id="permission-order" class="form-check-input" />
+                        <label for="permission-order" class="form-check-label">管理外帶訂單</label>
+                    </div>
+                </div>
+
+                <!-- 下三個 -->
+                <div class="col-md-6">
+                    <div class="form-check">
+                        <input type="checkbox" name="permissions" value="rental" id="permission-rental" class="form-check-input" />
+                        <label for="permission-rental" class="form-check-label">管理租借餐具</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="permissions" value="reservation" id="permission-reservation" class="form-check-input" />
+                        <label for="permission-reservation" class="form-check-label">管理餐廳</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="permissions" value="store" id="permission-store" class="form-check-input" />
+                        <label for="permission-store" class="form-check-label">管理線上商城</label>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 新增管理員按鈕 -->
-        <button id="addAdminBtn" class="btn btn-primary mt-3">新增管理員</button>
-
-        <!-- 顯示新增結果的區域 -->
-        <div id="resultMessage" class="alert mt-3" style="display: none;"></div>
+        	<!-- 新增管理員按鈕 -->
+        	<button id="addAdminBtn" class="btn btn-primary mt-3">新增管理員</button>
+        	<!-- 顯示新增結果的區域 -->
+        	<div id="resultMessage" class="alert mt-6" style="display: none;"></div>
+    	</div>
     </div>
+    
 
     <script>
     

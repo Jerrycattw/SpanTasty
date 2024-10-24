@@ -1,10 +1,12 @@
 package com.eatspan.SpanTasty.controller.account;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +47,7 @@ public class MemberStatisticsController {
 		// 返回一個成功的 Result 物件，包含會員數的資訊
 		return Result.success(data);
 	}
-	
+
 	// 總會員數員數
 	@GetMapping("/total")
 	public Result<Integer> getTotalMembers() {
@@ -53,33 +55,46 @@ public class MemberStatisticsController {
 		return Result.success(totalMembers);
 
 	}
-	
+
 	// 當月新會員
 	@GetMapping("/new-this-month")
 	public Result<Integer> getNewMembersThisMonth() {
 		Integer newMembers = memberStatisticsService.getNewMembersThisMonth();
 		return Result.success(newMembers);
 	}
-	
+
 	// 當月活耀會員
 	@GetMapping("/active-this-month")
 	public Result<Integer> getActiveMembersThisMonth() {
 		Integer activeMembers = memberStatisticsService.getActiveMembersThisMonth();
 		return Result.success(activeMembers);
 	}
-	
+
+	// 當月每日活耀會員數
+	@GetMapping("/active-members-daily/{year}/{month}")
+	public Result<List<Map<String, Object>>> getActiveMembersForMonth(@PathVariable int year, @PathVariable int month) {
+		List<Map<String, Object>> activeMembersDaily = memberStatisticsService.getActiveMembersForMonth(year, month);
+		return Result.success(activeMembersDaily);
+	}
+
 	// 停權會員數
 	@GetMapping("/suspended")
 	public Result<Integer> getSuspendedMembers() {
 		Integer suspendedMembers = memberStatisticsService.getSuspendedMembers();
 		return Result.success(suspendedMembers);
 	}
-	
+
 	// 年齡分布
 	@GetMapping("/age-distribution")
 	public Result<Map<String, Integer>> getAgeDistribution() {
 		Map<String, Integer> ageDistribution = memberStatisticsService.getMembersAgeDistribution();
 		return Result.success(ageDistribution);
+	}
+
+	@GetMapping("/registrations-per-month/{year}")
+	public Result<List<Map<String, Object>>> getMonthlyRegistrations(@PathVariable int year) {
+		List<Map<String, Object>> monthlyRegistrations = memberStatisticsService.getMonthlyRegistrations(year);
+		return Result.success(monthlyRegistrations);
 	}
 
 }

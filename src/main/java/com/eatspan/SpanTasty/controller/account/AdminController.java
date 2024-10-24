@@ -337,6 +337,16 @@ public class AdminController {
 			memberData.put("memberName", member.getMemberName());
 			memberData.put("account", member.getAccount());
 			memberData.put("status", member.getStatus());
+		    memberData.put("birthday", member.getBirthday() != null ? member.getBirthday().toString() : null); // 日期轉為字串
+		    memberData.put("email", member.getEmail());
+		    memberData.put("address", member.getAddress());
+		    memberData.put("phone", member.getPhone());
+		    memberData.put("registerDate", member.getRegisterDate() != null ? member.getRegisterDate().toString() : null); // 日期轉為字串
+		    memberData.put("loginDate", member.getLoginDate() != null ? member.getLoginDate().toString() : null); // 日期轉為字串
+		    memberData.put("suspendedUntil", member.getSuspendedUntil() != null ? member.getSuspendedUntil().toString() : null); // 停權日期
+		    memberData.put("provider", member.getProvider());
+		    memberData.put("providerId", member.getProviderId());
+		    memberData.put("reason", member.getReason());
 
 			// 將 byte[] 照片數據轉換為 Base64 字串
 			String avatarBase64 = member.getAvatar() != null

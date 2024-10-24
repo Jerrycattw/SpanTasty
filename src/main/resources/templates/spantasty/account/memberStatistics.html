@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+<meta charset="UTF-8">
+<title>Demo</title>
+<style>
+/* 切換按鈕的樣式 */
+.switch-button {
+	background-color: #f0f0f0;
+	border: 1px solid #ccc;
+	padding: 10px 20px;
+	margin: 10px;
+	cursor: pointer;
+}
+
+.switch-button.active {
+	background-color: #efc4a3;
+	border-color: #efc4a3;
+	color: #fff;
+}
+
+/* 統計區塊樣式 */
+.stat-section {
+	display: none;
+	padding: 20px;
+	margin-top: 20px;
+	background-color: #f8f9fa;
+	border: 1px solid #ccc;
+}
+
+.stat-section.active {
+	display: block;
+}
+</style>
+</head>
+
+<body>
+	<div th:replace="~{spantasty/display/navbar}"></div>
+	<!-- 主要內容區域 -->
+	<div class="container mt-5"
+		style="padding-left: 200px; padding-top: 30px;">
+		<div class="p-4 border border-dark rounded bg-light text-dark">
+			<h2 class="text-center">會員統計</h2>
+
+			<!-- 會員統計數據展示區域 -->
+			<div class="row mt-4">
+				<div class="col-md-3">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">總會員數</h5>
+							<p class="card-text" id="totalMembers"></p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">當月新會員</h5>
+							<p class="card-text" id="newMembersThisMonth"></p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">當月登入會員</h5>
+							<p class="card-text" id="activeMembersThisMonth"></p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-3">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">停權會員數</h5>
+							<p class="card-text" id="suspendedMembers"></p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 切換按鈕區域 -->
+			<div class="d-flex justify-content-center mt-4">
+				<div class="switch-button" id="totalMembersBtn">年度會員目標</div>
+				<div class="switch-button" id="newMembersBtn">當月會員目標</div>
+				<div class="switch-button" id="showRegistrationsYear">年度會員註冊數量</div>
+				<div class="switch-button" id="activeMembersBtn">當月活耀會員數</div>
+				<div class="switch-button" id="ageDistributionBtn">年齡分佈</div>
+			</div>
+
+			<!-- 圖表區域 -->
+			<div class="row mt-5">
+				<div class="col-md-12"
+					style="border: 2px solid #ccc; padding: 20px; border-radius: 10px;">
+					<h3 id="chartTitle" style="text-align: center; margin-bottom: 20px; display: block;">會員數據圖表</h3>
+					<canvas id="memberChart" style="width: 100%; height: 300px; display: none;"></canvas>
+					<div id="yearlyGoalContainer" style="width: 250px; height: 250px; margin: 20px auto; display: none;"></div>
+					<div id="monthlyGoalContainer" style="width: 250px; height: 250px; margin: 20px auto; display: none;"></div>
+				</div>
+			</div>
+
+			<div class="d-flex justify-content-center mt-4">
+				<button id="compareLastYearBtn" class="btn btn-primary"	style="display: none;">比較去年的數據</button>
+			</div>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/progressbar.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+    // 通用函數來更新 DOM 元素的內容
+    function updateTextContent(elementId, content) {
+      document.getElementById(elementId).textContent = content;
+    }
+
+    let yearlyGoalBar;
+    let monthlyGoalBar;
+    let currentChart = null;
+
+    function hideAllSections() {
+      document.getElementById('yearlyGoalContainer').style.display = 'none';
+      document.getElementById('monthlyGoalContainer').style.display = 'none';
+      const canvas = document.getElementById('memberChart');
+      canvas.style.display = 'none'; // 隱藏圖表
+      clearCurrentChart();  // 確保圖表被銷毀
+    }
+    // 清除當前的圖表（重設畫布和大小）
+    function clearCurrentChart() {
+      if (currentChart) {
+        currentChart.destroy();  // 正確銷毀當前圖表
+        currentChart = null;     // 清空圖表實例
+      }
+
+      // 重置 canvas
+      const canvas = document.getElementById('memberChart');
+      const parent = canvas.parentNode;
+      parent.removeChild(canvas);  // 移除 canvas 元素
+      const newCanvas = document.createElement('canvas');  // 創建新的 canvas 元素
+      newCanvas.id = 'memberChart';  // 設置新 canvas 的 ID
+      newCanvas.style.width = '100%';  // 固定寬度 100%
+      newCanvas.style.height = '300px'; // 固定高度 300px
+
+      // 確保新創建的 canvas 可見，設置 display 屬性
+      newCanvas.style.display = 'none';  // 設置 display 為 block，讓它可見
+
+      parent.appendChild(newCanvas);  // 將新 canvas 添加到原本的位置
+    }
+
+    // 獲取總會員數資料
+    function fetchTotalMembers() {
+      axios.get('/SpanTasty/api/statistics/total')
+        .then(function (response) {
+          if (response.data.success) {
+            updateTextContent('totalMembers', response.data.data);
+          } else {
+            updateTextContent('totalMembers', '查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('查詢過程中發生錯誤:', error);
+          updateTextContent('totalMembers', '錯誤');
+        });
+    }
+
+    // 獲取當月新會員數資料
+    function fetchNewMembersThisMonth() {
+      axios.get('/SpanTasty/api/statistics/new-this-month')
+        .then(function (response) {
+          if (response.data.success) {
+            updateTextContent('newMembersThisMonth', response.data.data);
+          } else {
+            updateTextContent('newMembersThisMonth', '查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('查詢過程中發生錯誤:', error);
+          updateTextContent('newMembersThisMonth', '錯誤');
+        });
+    }
+
+    // 獲取當月登入會員數資料
+    function fetchActiveMembersThisMonth() {
+      axios.get('/SpanTasty/api/statistics/active-this-month')
+        .then(function (response) {
+          if (response.data.success) {
+            updateTextContent('activeMembersThisMonth', response.data.data);
+          } else {
+            updateTextContent('activeMembersThisMonth', '查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('查詢過程中發生錯誤:', error);
+          updateTextContent('activeMembersThisMonth', '錯誤');
+        });
+    }
+
+    // 獲取停權會員數資料
+    function fetchSuspendedMembers() {
+      axios.get('/SpanTasty/api/statistics/suspended')
+        .then(function (response) {
+          if (response.data.success) {
+            updateTextContent('suspendedMembers', response.data.data);
+          } else {
+            updateTextContent('suspendedMembers', '查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('查詢過程中發生錯誤:', error);
+          updateTextContent('suspendedMembers', '錯誤');
+        });
+    }
+
+    // 顯示年度會員目標
+    function showYearlyGoal() {
+      hideAllSections(); // 隱藏其他區域
+      clearCurrentChart();
+
+      document.getElementById('yearlyGoalContainer').style.display = 'block'; // 顯示年度目標
+
+      // 獲取總會員數並顯示年度目標
+      axios.get('/SpanTasty/api/statistics/total')
+        .then(function (response) {
+          if (response.data.success) {
+            const totalMembers = response.data.data;
+            const yearlyGoal = 100; // 假設年度目標為 100
+
+            const title = document.getElementById('chartTitle');
+            title.textContent = `年度會員目標 : ${totalMembers} / ${yearlyGoal}`;  // 更改標題
+
+            if (yearlyGoalBar) {
+              yearlyGoalBar.destroy();
+            }
+
+            yearlyGoalBar = new ProgressBar.Circle('#yearlyGoalContainer', {
+              color: '#4CAF50', // 使用一個柔和的綠色
+              trailColor: '#ddd', // 修改 trail 顏色為較淡的灰色
+              strokeWidth: 8, // 增加 stroke 的寬度
+              trailWidth: 4, // 修改 trail 寬度
+              easing: 'bounce', // 使用 bounce 動畫效果
+              duration: 2000, // 延長動畫持續時間
+              from: { color: '#ff4500', width: 4 }, // 從橘色開始
+              to: { color: '#00ff7f', width: 8 },  // 到亮綠色結束
+              text: {
+                value: '0%',
+                className: 'progress-text',  // 為進度文字添加自定義樣式
+                style: {
+                  color: '#333', // 修改進度文字顏色
+                  position: 'absolute',
+                  left: '50%',
+                  top: '50%',
+                  padding: 0,
+                  margin: 0,
+                  transform: {
+                    prefix: true,
+                    value: 'translate(-50%, -50%)',
+                  },
+                  fontSize: '1.5rem',  // 修改字體大小
+                },
+              },
+              step: function (state, circle) {
+                circle.path.setAttribute('stroke', state.color);
+                circle.path.setAttribute('stroke-width', state.width);
+                var value = Math.round(circle.value() * 100);
+                if (value === 0) {
+                  circle.setText('');
+                } else {
+                  circle.setText(value + '%');
+                }
+              }
+            });
+
+            var progress = totalMembers / yearlyGoal;
+            yearlyGoalBar.animate(progress);
+          } else {
+            console.error('查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('發生錯誤:', error);
+        });
+    }
+
+    // 顯示當月會員目標
+    function showMonthlyGoal() {
+      hideAllSections(); // 隱藏其他區域
+      clearCurrentChart();
+      document.getElementById('monthlyGoalContainer').style.display = 'block'; // 顯示當月目標
+
+      // 獲取當月新會員數並顯示當月目標
+      axios.get('/SpanTasty/api/statistics/new-this-month')
+        .then(function (response) {
+          if (response.data.success) {
+            const newMembersThisMonth = response.data.data;
+            const monthlyGoal = 20; // 假設當月目標為 20
+
+            const title = document.getElementById('chartTitle');
+            title.textContent = `當月會員目標 : ${newMembersThisMonth} / ${monthlyGoal}`;  // 更改標題
+
+            if (monthlyGoalBar) {
+              monthlyGoalBar.destroy();
+            }
+
+            monthlyGoalBar = new ProgressBar.Circle('#monthlyGoalContainer', {
+              color: '#FF8C00', // 橙色進度條
+              trailColor: '#eee', // 修改 trail 顏色為較亮的灰色
+              strokeWidth: 8,
+              trailWidth: 4,
+              easing: 'bounce',
+              duration: 2000, // 延長動畫持續時間
+              from: { color: '#1E90FF', width: 4 }, // 從藍色開始
+              to: { color: '#FFD700', width: 8 },  // 到金黃色結束
+              text: {
+                value: '0%',
+                className: 'progress-text',  // 為進度文字添加自定義樣式
+                style: {
+                  color: '#333',
+                  position: 'absolute',
+                  left: '50%',
+                  top: '50%',
+                  padding: 0,
+                  margin: 0,
+                  transform: {
+                    prefix: true,
+                    value: 'translate(-50%, -50%)',
+                  },
+                  fontSize: '1.5rem',  // 修改字體大小
+                },
+              },
+              step: function (state, circle) {
+                circle.path.setAttribute('stroke', state.color);
+                circle.path.setAttribute('stroke-width', state.width);
+                var value = Math.round(circle.value() * 100);
+                if (value === 0) {
+                  circle.setText('');
+                } else {
+                  circle.setText(value + '%');
+                }
+              }
+            });
+
+            var progress = newMembersThisMonth / monthlyGoal;
+            monthlyGoalBar.animate(progress);
+          } else {
+            console.error('查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('發生錯誤:', error);
+        });
+    }
+
+    // 顯示年齡分佈的圓餅圖
+    function showAgeDistributionPieChart() {
+      hideAllSections(); // 隱藏其他區域
+      clearCurrentChart();
+      const canvas = document.getElementById('memberChart');
+      const title = document.getElementById('chartTitle');
+      title.textContent = '年齡分佈圖';  // 更改標題
+      canvas.style.display = 'block'; // 顯示圖表
+
+      axios.get('/SpanTasty/api/statistics/age-distribution')
+        .then(function (response) {
+          if (response.data.success) {
+            const ageDistribution = response.data.data;
+
+            const ctx = canvas.getContext('2d');
+            const labels = ['未滿18歲', '18-25歲', '26-35歲', '36-45歲', '45歲以上'];
+            const data = [
+              ageDistribution.ageBelow18 || 0,
+              ageDistribution.age18To25 || 0,
+              ageDistribution.age26To35 || 0,
+              ageDistribution.age36To45 || 0,
+              ageDistribution.age46Plus || 0
+            ];
+
+            currentChart = new Chart(ctx, {
+              type: 'pie',
+              data: {
+                labels: labels,
+                datasets: [{
+                  data: data,
+                  backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                  ],
+                  borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                  ],
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                responsive: false,
+                maintainAspectRatio: false
+              }
+            });
+            // 調整圖表大小以避免變形
+            currentChart.resize();
+          } else {
+            console.error('查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('發生錯誤:', error);
+        });
+    }
+
+    // 顯示當月活耀會員數的折線圖
+    function showActiveMembers(year, month) {
+      hideAllSections(); // 隱藏其他區域
+      clearCurrentChart();  // 清除當前圖表以便重新繪製
+      const title = document.getElementById('chartTitle');
+      title.textContent = `${year} 年 ${month} 月每日活躍會員數`;  // 更改標題
+      const canvas = document.getElementById('memberChart');
+      canvas.style.display = 'block'; // 顯示圖表
+
+
+      // 使用指定的年和月從後端獲取每日活躍會員數據
+      axios.get(`/SpanTasty/api/statistics/active-members-daily/${year}/${month}`)
+        .then(function (response) {
+          if (response.data.success) {
+            const activeMembersData = response.data.data;
+
+            const ctx = canvas.getContext('2d');
+
+            // 獲取日期（labels）和每日活躍會員數（data）
+            const labels = activeMembersData.map(item => {
+              const date = new Date(item.date);
+              const day = date.getDate().toString().padStart(2, '0'); // 只提取日期中的日部分
+              return day;
+            });
+            const data = activeMembersData.map(item => item.activeMembers); // 活躍會員數
+
+            currentChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: labels, // 每天的日期
+                datasets: [{
+                  label: '每日活躍會員數',
+                  data: data, // 對應每天的活躍會員數
+                  fill: false,
+                  borderColor: 'rgba(75, 192, 192, 1)', // 線條顏色
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)', // 線條填充背景顏色
+                  tension: 0.1, // 控制曲線的柔和度
+                  pointBackgroundColor: 'rgba(75, 192, 192, 1)', // 點的顏色
+                  pointBorderColor: '#fff', // 點的邊框顏色
+                  pointHoverBackgroundColor: '#fff', // 點在懸停時的背景色
+                  pointHoverBorderColor: 'rgba(75, 192, 192, 1)', // 點在懸停時的邊框顏色
+                }]
+              },
+              options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: '日期'
+                    }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: '活躍會員數'
+                    },
+                    ticks: {
+                      stepSize: 1, // 每次步進 1
+                      callback: function (value) {
+                        return Number.isInteger(value) ? value : ''; // 只顯示整數
+                      }
+                    }
+                  }
+                },
+                plugins: {
+                  legend: {
+                    display: false
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        return context.raw + ' 人'; // 自定義 tooltip 標籤
+                      }
+                    }
+                  }
+                }
+              }
+            });
+
+          } else {
+            console.error('查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('發生錯誤:', error);
+        });
+    }
+
+    // 每月的會員註冊數據的折線圖
+    function showYearlyRegistrations(year) {
+      hideAllSections(); // 隱藏其他區域
+      clearCurrentChart();  // 清除當前圖表以便重新繪製
+      const title = document.getElementById('chartTitle');
+      title.textContent = `${year} 年註冊會員數`;  // 更改標題
+
+      const canvas = document.getElementById('memberChart');
+      const ctx = canvas.getContext('2d');
+      canvas.style.display = 'block'; // 顯示圖表
+
+      // 從後端獲取每月註冊數據
+      axios.get(`/SpanTasty/api/statistics/registrations-per-month/${year}`)
+        .then(function (response) {
+          if (response.data.success) {
+            const monthlyData = response.data.data;
+
+            // 假設 API 返回的數據包含 { month: 1, registrations: 50 }
+            const labels = monthlyData.map(item => `${item.month} 月`); // 獲取月份
+            const data = monthlyData.map(item => item.registrations); // 獲取註冊數
+
+            currentChart = new Chart(ctx, {
+              type: 'line', // 使用折線圖
+              data: {
+                labels: labels, // 每月的月份
+                datasets: [{
+                  label: '會員註冊數',
+                  data: data, // 每月的註冊數據
+                  fill: false,
+                  borderColor: 'rgba(75, 192, 192, 1)', // 線條顏色
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)', // 線條背景色
+                  tension: 0.1 // 控制曲線的柔和度
+                }]
+              },
+              options: {
+                responsive: true,
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: '月份'
+                    }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: '註冊會員數'
+                    },
+                    ticks: {
+                      stepSize: 1, // 每次步進 1
+                      callback: function (value) {
+                        return Number.isInteger(value) ? value : ''; // 只顯示整數
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          } else {
+            console.error('查詢失敗');
+          }
+        })
+        .catch(function (error) {
+          console.error('發生錯誤:', error);
+        });
+    }
+
+    // 當 DOM 加載完成時，調用所有獲取資料的方法
+    document.addEventListener('DOMContentLoaded', function () {
+      fetchTotalMembers();
+      fetchNewMembersThisMonth();
+      fetchActiveMembersThisMonth();
+      fetchSuspendedMembers();
+
+      document.getElementById('totalMembersBtn').addEventListener('click', function () {
+        showYearlyGoal();
+        document.getElementById('compareLastYearBtn').style.display = 'none';
+      });
+
+
+      document.getElementById('newMembersBtn').addEventListener('click', function () {
+        showMonthlyGoal();
+        document.getElementById('compareLastYearBtn').style.display = 'none';
+      }
+      );
+      document.getElementById('ageDistributionBtn').addEventListener('click', function () {
+        showAgeDistributionPieChart();
+        document.getElementById('compareLastYearBtn').style.display = 'none';
+      })
+        ;
+      // 示例：當前年月的顯示
+      document.getElementById('activeMembersBtn').addEventListener('click', function () {
+        const today = new Date();
+        const year = today.getFullYear();  // 當前年份
+        const month = today.getMonth() + 1; // 當前月份，getMonth() 返回值為 0-11，所以要加1
+        showActiveMembers(year, month);  // 顯示當前年月的活躍會員數
+        document.getElementById('compareLastYearBtn').style.display = 'none';
+
+      });
+
+      document.getElementById('showRegistrationsYear').addEventListener('click', function () {
+        const today = new Date();
+        const year = today.getFullYear();  // 當前年份
+        showYearlyRegistrations(year);
+        document.getElementById('compareLastYearBtn').style.display = 'block';
+
+      });
+
+      // 比較去年數據按鈕的點擊事件
+      document.getElementById('compareLastYearBtn').addEventListener('click', function () {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const lastYear = currentYear - 1;
+
+        // 假設我們有一個函數來顯示年度註冊會員數，這裡使用去年的數據
+        showYearlyRegistrations(lastYear);
+      });
+
+
+    });
+  </script>
+
+</body>
+
+</html>

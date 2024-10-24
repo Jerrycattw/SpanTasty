@@ -8,6 +8,6 @@ public class MemberStatisticsPageController {
 	
     @GetMapping("/memberStatistics")
     public String showMemberStatisticsPage() {
-        return "spantasty//account/memberStatisticsPage"; 
+        return "spantasty//account/memberStatistics"; 
     }
 }
