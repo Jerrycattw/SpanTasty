@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .tooltip-inner {
+
+            width: 1000px;     /* 固定寬度 */
+        }
+    </style>
 </head>
 <body>
 <div th:replace="~{spantasty//display/navbar}"></div>
@@ -144,10 +150,26 @@
                         </div>
                         <div class="card-body">
                         <blockquote class="blockquote mb-0">
-                            <p>寫下你的點數使用說明、集點說明集條款，將於點數中心展示。</p>
-                            <div class="form-floating">
-                                <textarea name="setDescription" th:text="${pointSet.setDescription}" class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 250px"></textarea>
-                              </div>
+                            <div class="d-flex justify-content-between">
+                                <span>寫下你的點數使用說明、集點說明集條款，將於點數中心展示。</span>
+                                <button type="button" class="btn btn-outline-primary" id="preview">預覽</button>
+                            </div>
+                            <div class="border p-3 mt-3">
+                                <p>點擊下方標籤可快速插入系統變數，將自動帶入對應的設定值。<span class="ms-3 text-primary " data-bs-html="true" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="【範例】<br>
+                                    每週領 {AMOUNT} 元即可累積 {POINT} 點<br>
+                                    實際顯示：每週領 $10 元即可累積 1 點">查看範例<i class="fa-regular fa-circle-question ms-1 text-primary"></i></span></p>
+                                <div class="">
+                                    <button type="button" class="btn btn-warning btn-sm tag-btn" data-value="{AMOUNT}">點數金額 {AMOUNT}</button>
+                                    <button type="button" class="btn btn-warning btn-sm tag-btn" data-value="{POINT}">點數回饋 {POINT}</button>
+                                    <button type="button" class="btn btn-success btn-sm tag-btn" data-value="{EXPIRE_DATE}">到期日 {EXPIRE_DATE}</button>
+                                    <button type="button" class="btn btn-info btn-sm tag-btn" data-value="{BIRTH_PERIOD}">生日期間 {BIRTH_PERIOD}</button>
+                                    <button type="button" class="btn btn-info btn-sm tag-btn" data-value="{MULTIPLY_POINT}">生日倍數 {MULTIPLY_POINT}</button>
+                                    <button type="button" class="btn btn-secondary btn-sm tag-btn" data-value="{br}">換行 {br}</button>
+                                </div>
+                            </div>
+                            <div class="form-floating mt-2">
+                                <textarea name="setDescription" th:text="${pointSet.setDescription}" class="form-control" placeholder="Leave a comment here" id="pointTextArea" style="height: 250px"></textarea>
+                            </div>
                         </blockquote>
                         </div>
                     </div>
@@ -161,6 +183,26 @@
         </div>
     </div>
 </form>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">點數公告預覽</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="previewDiv">
+          ...
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
     <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded and parsed");
@@ -241,7 +283,52 @@
 
 document.addEventListener("DOMContentLoaded", function() {
      showSidebar('points');
+
+
+     //點數說明
+    let cursorPosition = 0;
+    const pointTextArea = document.getElementById('pointTextArea')
+    pointTextArea.addEventListener('click',function(){
+        cursorPosition=this.selectionStart
+    })
+    pointTextArea.addEventListener('keyup',function(){
+        cursorPosition=this.selectionStart
+    })
+
+    document.querySelectorAll('.tag-btn').forEach(tag => {
+        tag.addEventListener('click',function(){
+            const tagValue = this.getAttribute('data-value')
+            const content = pointTextArea.value
+
+            const newConent = content.slice(0,cursorPosition)+tagValue+content.slice(cursorPosition)
+            pointTextArea.value = newConent
+
+            const newPosition = cursorPosition + tagValue.length;
+            pointTextArea.setSelectionRange(newPosition,newPosition)
+
+            pointTextArea.focus
+        })
+    });
 });
+
+
+document.getElementById('preview').addEventListener('click',function(e){
+    e.preventDefault()
+    axios.get('/SpanTasty/point/pointSet/preview',{
+        params:{
+            pointText:document.getElementById('pointTextArea').value
+        }
+    })
+    .then(res=>{
+        document.getElementById('previewDiv').innerHTML=res.data
+        var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+        myModal.show();
+    })
+})
+
+
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
     </script>      
 </body>

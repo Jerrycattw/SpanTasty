@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.eatspan.SpanTasty.dto.discount.PointMemberDTO;
 import com.eatspan.SpanTasty.entity.discount.Point;
 import com.eatspan.SpanTasty.service.discount.PointService;
+import com.eatspan.SpanTasty.service.discount.PointSetService;
 
 
 @Controller
@@ -28,10 +29,21 @@ public class StarCupsPointController {
 	@Autowired
 	private PointService pointService;
 	
+	@Autowired
+	private PointSetService pointSetService;
+	
 	//導向頁面
 	@GetMapping("/point")
 	public String goToPoint() {
 		return "/starcups/discount/point";
+	}
+	
+	
+	
+	@GetMapping("/pointSet")
+	public String getPointSetText() {
+		String content = pointSetService.findAllPointSet().getSetDescription();
+		return "starcups/discount/pointSet";
 	}
 	
 	//

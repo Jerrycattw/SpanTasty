@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<meta name="format-detection" content="telephone=no">
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <!-- Stylesheets-->
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+    <style>
+    .ie-panel {
+      display: none;
+      background: #212121;
+      padding: 10px 0;
+      box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
+      clear: both;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    html.ie-10 .ie-panel,
+    html.lt-ie-10 .ie-panel {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+ <!-- navbar  th:replace=-->
+  <div th:replace="~{starcups/display/navbar}"></div>
+  <!-- Breadcrumbs -->
+  <section class="section breadcrumbs-custom-inset">
+    <div class="breadcrumbs-custom context-dark">
+      <div class="container">
+        <h2 class="breadcrumbs-custom-title">Coupon</h2>
+        <ul class="breadcrumbs-custom-path">
+          <li><a href="index.html">Home</a></li>
+          <li class="active">Coupon</li>
+        </ul>
+      </div>
+      <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+    </div>
+  </section>
+  <!--  -->
+  <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+    <div class="container">
+    
+    
+   <!-- Quote Modern-->
+              <article class="quote-modern">
+                <div class="quote-modern-text">
+                  <p class="q">Peritus elevatus sed mire quaestios bulla est. Eposs messis! Zeluss sunt cottas de raptus planeta. Burguss mori in audax palatium! Cum acipenser mori, omnes uriaes tractare.</p>
+                </div>
+              </article>
+            </div>
+  	</div>
+   <!-- footer  th:replace=-->
+  <div th:replace="~{starcups/display/footer}"></div>
+  <!-- Javascript-->
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+</body>
+</html>
