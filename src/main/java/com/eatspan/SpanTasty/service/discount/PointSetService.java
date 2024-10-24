@@ -1,13 +1,17 @@
 package com.eatspan.SpanTasty.service.discount;
 
 import java.beans.Transient;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eatspan.SpanTasty.entity.discount.PointSet;
+import com.eatspan.SpanTasty.enums.PointTextVariable;
 import com.eatspan.SpanTasty.repository.discount.PointSetRepository;
 
 @Service
@@ -49,5 +53,28 @@ public class PointSetService {
 		return null;
 	}
 	
+	private String getValueFromVariable(PointSet pointSet,PointTextVariable pointTextVariable) {
+		return switch (pointTextVariable) {
+				case AMOUNT -> String.valueOf(pointSet.getAmountPerPoint()) ;
+				case POINT ->String.valueOf(pointSet.getPointsEarned());
+				case EXPIRE_DATE -> pointSet.getExpiryMonth()+"/"+pointSet.getExpiryDay();
+				case BIRTH_PERIOD -> pointSet.getBirthType();
+				case MULTIPLY_POINT -> String.valueOf(pointSet.getPointRatio());
+				case SPACE -> "<br>";
+				
+		};
+	}
+	
+	public String getPointSetText(String content) {
+		PointSet pointSet = findAllPointSet();
+		
+		for (PointTextVariable variable : PointTextVariable.values()) {
+			String value = getValueFromVariable(pointSet, variable);
+			content = content.replace(variable.getVaribale(), value);
+		}
+		return content;
+		
+		
+	}
 	
 }
