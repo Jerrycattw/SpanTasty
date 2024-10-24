@@ -5,6 +5,7 @@
     <title>Restaurant</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
     <div th:replace="~{spantasty/display/navbar}"></div>
@@ -57,6 +58,7 @@
                 <div class=" d-flex justify-content-end">
                     <button type="button" id="searchbtn" class="btn btn-success btn-sm mt-3 me-3">送出查詢</button>
                     <button type="button" id="exportJsonBtn" class="btn btn-info btn-sm mt-3 me-3">匯出 JSON</button>
+                    <button type="button" id="exportExcelBtn" class="btn btn-info btn-sm mt-3 me-3">匯出 Excel</button>
                 </div>
 
             </form>
@@ -175,20 +177,21 @@
                         <form th:method="put" th:action="@{/reserve/put}">
 
                             <input type="hidden" name="setReserveId" id="setReserveId" required />
+                            <input type="hidden" name="setReserveStatus" id="setReserveStatus" required />
 
                             <div class="mb-3">
-                                <label for="memberId" class="form-label mb-0">請輸入會員編號:</label>
+                                <label for="memberId" class="form-label mb-0">會員編號:</label>
                                 <input type="number" class="form-control" name="memberId" id="setMemberId" required
                                     readonly />
                             </div>
 
                             <div class="mb-3">
-                                <label for="memberName" class="form-label mb-0">請輸入會員名稱:</label>
+                                <label for="memberName" class="form-label mb-0">會員名稱:</label>
                                 <input type="text" class="form-control" name="memberName" id="setMemberName" readonly />
                             </div>
 
                             <div class="mb-3">
-                                <label for="memberPhone" class="form-label mb-0">請輸入會員電話:</label>
+                                <label for="memberPhone" class="form-label mb-0">會員電話:</label>
                                 <input type="text" class="form-control" name="memberPhone" id="setMemberPhone"
                                     readonly />
                             </div>
@@ -242,6 +245,7 @@
     </div>
     <script>
 
+
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('reservation');
 
@@ -263,11 +267,12 @@
             document.getElementById('setReserveSeat').addEventListener('change', getReserveTimeAndSet);
             document.getElementById('setCheckDate').addEventListener('change', getReserveTimeAndSet);
             
-		    document.getElementById('exportJsonBtn').addEventListener('click', exportJson);
+		    document.getElementById('exportJsonBtn').addEventListener('click', ()=>exportData('Json'));
+		    document.getElementById('exportExcelBtn').addEventListener('click', ()=>exportData('Excel'));
         });
         
-
-		async function exportJson() {
+        // 匯出訂位檔案
+		async function exportData(file) {
 		    const memberName = document.getElementById('memberName').value;
 		    const phone = document.getElementById('phone').value;
 		    const restaurantId = document.getElementById('restaurantId').value;
@@ -285,31 +290,37 @@
 		        reserveTimeEnd: reserveTimeEnd || null
 		    };
 		
-		    try {
-		        const response = await axios.get('http://localhost:8080/SpanTasty/reserve/export/json', { params });
-		
-		        // 將 JSON 資料下載為檔案
-		        handleJsonDownload(response.data, 'reservations.json');
-		        alert('匯出 JSON 成功!');
-		    } catch (error) {
-		        console.error('匯出 JSON 失敗:', error);
-		        alert('匯出 JSON 失敗，請稍後再試。');
-		    }
+            try {
+                const response = await axios.get('http://localhost:8080/SpanTasty/reserve/export', { params });
+                const jsonData = response.data;
+
+                if (file === 'Json') {
+                    // 匯出 JSON 檔案
+                    const jsonString = JSON.stringify(jsonData, null, 2);
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'reservations.json';  // 定義下載的檔案名稱
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    alert('匯出 JSON 成功!');
+                } else if (file === 'Excel') {
+                    // 使用 SheetJS 匯出 Excel
+                    const worksheet = XLSX.utils.json_to_sheet(jsonData);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reservations');
+                    XLSX.writeFile(workbook, 'reservations.xlsx');
+                    alert('匯出 Excel 成功!');
+                }
+            } catch (error) {
+                console.error(`匯出 ${file} 失敗:`, error);
+                alert(`匯出 ${file} 失敗，請稍後再試。`);
+            }
 		}
 		
-		function handleJsonDownload(data, fileName) {
-		    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-		    const url = URL.createObjectURL(blob);
-		    const a = document.createElement('a');
-		    a.href = url;
-		    a.download = fileName;
-		    document.body.appendChild(a);
-		    a.click();
-		    document.body.removeChild(a);
-		}
         
-
-
         // Ajax查詢餐廳(新增)
         function getRestaurantAndAdd(){
             const restaurantId = document.getElementById('addRestaurantId').value;
@@ -449,9 +460,6 @@
             const checkDate = document.getElementById('setCheckDate').value;
 
 
-            console.log(reserveId);
-            console.log(restaurantId);
-
             // 檢查所有必要的值是否都有填寫
             if (!restaurantId || !reserveSeat || !checkDate) {
                 return; // 若有任何一個值未填寫，則不進行查詢
@@ -494,6 +502,7 @@
                             button.onclick = function () {
                                 const memberId = document.getElementById('setMemberId').value;
                                 const reserveNote = document.getElementById('setReserveNote').value;
+                                const reserveStatus = document.getElementById('setReserveStatus').value;
                                 // 這裡放新增訂位 ajax 函式
                                 let setReserveDTO = {
                                     reserveId: reserveId,
@@ -502,7 +511,8 @@
                                     startTime: checkReserve.startTime,
                                     restaurantId: restaurantId,
                                     reserveNote: reserveNote,
-                                    memberId: memberId
+                                    memberId: memberId,
+                                    reserveStatus: reserveStatus
                                 }
                                 setReservation(setReserveDTO);
                             };
@@ -518,9 +528,8 @@
         }
 
 		let allReservations = []; // 用來存儲所有的訂位資料
-		let currentPage = 1;
-		const itemsPerPage = 8; // 每頁顯示8筆資料
-		
+        let currentPage = 1;
+		const itemsPerPage = 8; // 每頁顯示8筆資料	
 		// 查詢訂位訂單的AJAX函數
 		function fetchReservations() {
 		    // 取得輸入的值
@@ -554,6 +563,7 @@
 		        });
 		}
 		
+	
 		// 根據頁碼顯示資料
 		function renderReservations(page) {
 		    const tbody = document.querySelector('table tbody');
@@ -615,31 +625,40 @@
             });
 		}
 		
-		// 分頁控制函數
-		function generatePagination(totalItems) {
-		    const totalPages = Math.ceil(totalItems / itemsPerPage);
-		    const paginationContainer = document.getElementById('pagination');
-		
-		    paginationContainer.innerHTML = ''; // 清空現有的分頁按鈕
-		
-		    // 建立分頁按鈕
-		    for (let i = 1; i <= totalPages; i++) {
-		        const pageButton = document.createElement('button');
-		        pageButton.classList.add('btn', 'btn-primary', 'mx-1');
-		        pageButton.textContent = i;
-		        pageButton.onclick = function () {
-		            currentPage = i; // 更新當前頁面
-		            renderReservations(i); // 渲染對應頁面的資料
-		        };
-		
-		        // 設置當前頁面的按鈕樣式
-		        if (i === currentPage) {
-		            pageButton.classList.add('active');
-		        }
-		
-		        paginationContainer.appendChild(pageButton);
-		    }
-		}
+        // 分頁控制函數
+        function generatePagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const paginationContainer = document.getElementById('pagination');
+
+            paginationContainer.innerHTML = ''; // 清空現有的分頁按鈕
+
+            // 建立分頁按鈕
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.classList.add('btn', 'btn-primary', 'mx-1');
+                pageButton.textContent = i;
+
+                // 設置當前頁面的按鈕樣式
+                if (i === currentPage) {
+                    pageButton.classList.add('active');
+                }
+
+                pageButton.onclick = function () {
+                    currentPage = i; // 更新當前頁面
+                    renderReservations(i); // 渲染對應頁面的資料
+
+                    // 清除所有按鈕的 active 樣式
+                    const buttons = paginationContainer.querySelectorAll('button');
+                    buttons.forEach(button => button.classList.remove('active'));
+
+                    // 設置當前按鈕為 active
+                    pageButton.classList.add('active');
+                };
+
+                paginationContainer.appendChild(pageButton);
+            }
+        }
+
 
         // 開啟修改模態框並填入資料
         async function openSetReserveModal(reserveId) {
@@ -653,6 +672,7 @@
                 document.getElementById('setReserveSeat').value = data.reserveSeat;
                 document.getElementById('setCheckDate').value = data.reserveTime;
                 document.getElementById('setReserveNote').value = data.reserveNote;
+                document.getElementById('setReserveStatus').value = data.reserveStatus;
 
                 const modal = new bootstrap.Modal(document.getElementById('setReserveModal'));
                 modal.show();

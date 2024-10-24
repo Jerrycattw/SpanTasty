@@ -1,15 +1,11 @@
 package com.eatspan.SpanTasty.controller.reservation;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,24 +13,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eatspan.SpanTasty.dto.reservation.ExportReserveDTO;
-import com.eatspan.SpanTasty.dto.reservation.ReserveCenterDTO;
 import com.eatspan.SpanTasty.dto.reservation.ReserveCheckDTO;
 import com.eatspan.SpanTasty.dto.reservation.ReserveDTO;
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
-import com.eatspan.SpanTasty.entity.reservation.RestaurantTable;
-import com.eatspan.SpanTasty.entity.reservation.RestaurantTableId;
 import com.eatspan.SpanTasty.entity.reservation.TableType;
 import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.service.reservation.ReserveService;
@@ -80,10 +71,6 @@ public class ReserveController {
     
     
     
-    
-    
-    
-    
     // ajax 查詢訂位訂單
     @GetMapping("/getList")
     public ResponseEntity<?> getReserveList(@RequestParam(required = false) String memberName,
@@ -98,29 +85,9 @@ public class ReserveController {
     }
     
     
-//    // ajax 查詢訂位訂單
-//    @GetMapping("/export")
-//    public ResponseEntity<?> exportReserveList(@RequestParam(required = false) String memberName,
-//									    	   @RequestParam(required = false) String phone,
-//								    	   	   @RequestParam(required = false) Integer restaurantId,
-//								    		   @RequestParam(required = false) String tableTypeId,
-//								    		   @RequestParam(required = false) LocalDate reserveTimeStart,
-//								    		   @RequestParam(required = false) LocalDate reserveTimeEnd) {
-//    	
-//    	List<Reserve> reserveByCriteria = reserveService.findReserveByCriteria(memberName, phone, restaurantId, tableTypeId, reserveTimeStart, reserveTimeEnd);
-//    	List<ExportReserveDTO> exportReserveDTOs = new ArrayList<>();
-//    	ExportReserveDTO exportReserveDTO = null;
-//    	for(Reserve reserve : reserveByCriteria) {
-//    		exportReserveDTO = new ExportReserveDTO(reserve);
-//    		exportReserveDTOs.add(exportReserveDTO);
-//    	}
-//    	return ResponseEntity.ok(exportReserveDTOs);
-//    }
-    
-    
     // 匯出 JSON 訂位訂單
-    @GetMapping("/export/json")
-    public ResponseEntity<?> exportReserveListAsJson(@RequestParam(required = false) String memberName,
+    @GetMapping("/export")
+    public ResponseEntity<?> exportReserveList(@RequestParam(required = false) String memberName,
                                                      @RequestParam(required = false) String phone,
                                                      @RequestParam(required = false) Integer restaurantId,
                                                      @RequestParam(required = false) String tableTypeId,
@@ -138,10 +105,6 @@ public class ReserveController {
                 .body(exportReserveDTOs);
     }
 
-    
-    
-    
-    
     // ajax查詢可訂位時段
     @GetMapping("/getReserveCheck")
     public ResponseEntity<?> getReserveCheck(@RequestParam Integer restaurantId,
@@ -161,41 +124,17 @@ public class ReserveController {
 		return ResponseEntity.ok("delete ok");
 	}
     
-    
 	
 	
 	// 新增訂位的ajax
 	@PostMapping("/add")
 	public ResponseEntity<?> addReserve(@RequestBody ReserveDTO reserveDTO) {
-		
-	    Reserve reserve = new Reserve();
-	    reserve.setReserveSeat(reserveDTO.getReserveSeat());
-	    reserve.setReserveTime(reserveDTO.getCheckDate().atTime(reserveDTO.getStartTime()));
-	    
-	    // 設定member外鍵關聯
-	    Member member = memberService.findMemberById(reserveDTO.getMemberId()).get();
-	    if(member!=null) {
-	    	reserve.setMember(member);	    	
-	    }
-	    
-	    // 設定restaurant外鍵關聯
-	    Restaurant restaurant = restaurantService.findRestaurantById(reserveDTO.getRestaurantId());
-		if (restaurant == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Restaurant not found");
-	    reserve.setRestaurant(restaurant);
-	    
-	    // 根據reserveSeat取得訂位桌子種類
-	    String tableTypeId = reserveService.getTableTypeIdByReserveSeat(reserve.getReserveSeat());
-	    
-	    // 設定tableType外鍵關聯
-	    TableType tableType = tableTypeService.findTableTypeById(tableTypeId);
-	    if (tableType == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("TableType not found");
-	    reserve.setTableType(tableType);
-	    
-	    reserve.setReserveNote(reserveDTO.getReserveNote());
-	    
+		String validateResult = reserveService.validateAddReserveDto(reserveDTO);
+		if(validateResult!=null) {
+			return ResponseEntity.badRequest().body(validateResult);
+		}
 	    // 保存訂位
-	    reserveService.addReserve(reserve);
-		
+	    reserveService.addReserve(reserveDTO);
 		return ResponseEntity.ok("reserve add success");
 	}
 	
@@ -211,70 +150,58 @@ public class ReserveController {
 	// 修改訂位的ajax
 	@PutMapping("/set")
 	public ResponseEntity<?> updateReserve(@RequestBody ReserveDTO reserveDTO) {
-		
-	    Reserve reserve = reserveService.findReserveById(reserveDTO.getReserveId());
-	    
-	    reserve.setReserveSeat(reserveDTO.getReserveSeat());
-	    reserve.setReserveTime(reserveDTO.getCheckDate().atTime(reserveDTO.getStartTime()));
-	    
-	    // 設定member外鍵關聯
-	    Member member = memberService.findMemberById(reserveDTO.getMemberId()).orElseThrow(() -> new RuntimeException("Member not found"));
-	    reserve.setMember(member);
-	    
-	    // 設定restaurant外鍵關聯
-	    Restaurant restaurant = restaurantService.findRestaurantById(reserveDTO.getRestaurantId());
-		if (restaurant == null) throw new RuntimeException("Restaurant not found");
-	    reserve.setRestaurant(restaurant);
-	    
-	    // 根據reserveSeat取得訂位桌子種類
-	    String tableTypeId = reserveService.getTableTypeIdByReserveSeat(reserve.getReserveSeat());
-	    // 設定tableType外鍵關聯
-	    TableType tableType = tableTypeService.findTableTypeById(tableTypeId);
-	    if (tableType == null) throw new RuntimeException("TableType not found");
-	    reserve.setTableType(tableType);
-	    
-	    reserve.setReserveNote(reserveDTO.getReserveNote());
-	    
+		String validateResult = reserveService.validateSetReserveDto(reserveDTO);
+		if(validateResult!=null) {
+			return ResponseEntity.badRequest().body(validateResult);
+		}
 	    // 保存訂位
-	    reserveService.updateReserve(reserve);
-		
+	    reserveService.updateReservebyDto(reserveDTO);
 		return ResponseEntity.ok("Reserve update ok");
 		
 	}
 	
 	// 修改訂位狀態的ajax
 	@PutMapping("/setStatus")
-	public ResponseEntity<?> updateReserveStatus(@RequestBody Reserve newReserveStatus) {
-		Reserve reserve = reserveService.findReserveById(newReserveStatus.getReserveId());
-		reserve.setReserveStatus(newReserveStatus.getReserveStatus());
-		reserveService.updateReserve(reserve);
+	public ResponseEntity<?> updateReserveStatus(@RequestBody Reserve reserveStatus){
+		Reserve reserve = reserveService.findReserveById(reserveStatus.getReserveId());
+		reserve.setReserveStatus(reserveStatus.getReserveStatus());
+		reserveService.updateReserveByEntity(reserve);
 		return ResponseEntity.ok("ReserveStatus update ok");
 	}
 	
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
     // ajax 查詢所有餐廳特定時間內訂位訂單數量
     @GetMapping("/getReserveSum")
-    public ResponseEntity<?> getReserveSum(@RequestParam(required = false) LocalDate slotEndDate,
+    public ResponseEntity<?> countReserveSum(@RequestParam(required = false) LocalDate slotEndDate,
     								   	   @RequestParam(required = false) LocalDate slotStartDate) {
-    	Map<String, Integer> reserveSum = reserveService.getReserveSum(null, null);
+    	Map<String, Integer> reserveSum = reserveService.getReserveSum(slotStartDate, slotEndDate);
     	return ResponseEntity.ok(reserveSum);
     }
     
     
     // ajax 查詢所有訂位訂單數量byMonth
     @GetMapping("/getReserveMonth")
-    public ResponseEntity<?> getReserveMonth(@RequestParam(required = false) Integer year) {
+    public ResponseEntity<?> countReserveMonth(@RequestParam(required = false) Integer year) {
     	List<Integer> reserveSum = reserveService.getReserveInMonth(year);
     	return ResponseEntity.ok(reserveSum);
+    }
+    
+    
+    // ajax 查詢所有訂位訂單數量bySeat
+    @GetMapping("/getReserveSeat")
+    public ResponseEntity<?> countReserveBySeat(@RequestParam Integer restaurantId) {
+    	Map<String, Integer> reserveBySeat = reserveService.getReserveBySeat(restaurantId);
+    	return ResponseEntity.ok(reserveBySeat);
+    }
+    
+    
+    // ajax 查詢所有訂位訂單數量byWeekDay
+    @GetMapping("/getReserveWeekDay")
+    public ResponseEntity<?> countReserveByWeekDay(@RequestParam Integer restaurantId) {
+    	Map<String, Integer> reserveBySeat = reserveService.getReserveByWeekDay(restaurantId);
+    	return ResponseEntity.ok(reserveBySeat);
     }
     
     

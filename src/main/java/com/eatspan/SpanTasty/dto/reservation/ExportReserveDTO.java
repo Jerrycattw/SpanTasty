@@ -19,15 +19,27 @@ public class ExportReserveDTO {
 	
 	
 	private Integer reserveId;
+	
 	private String memberName;
+	
 	private String memberPhone;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate birthday;
+	
 	private String restaurantName;
+	
 	private String restaurantPhone;
+	
 	private String restaurantAddress;
+	
 	private Integer reserveSeat;
-	private String reserveTime;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd EEEE HH:mm", timezone = "UTC+8")
+	private LocalDateTime reserveTime;
+	
 	private String tableTypeId;
+	
 	private String reserveNote;
 	
 	
@@ -41,7 +53,7 @@ public class ExportReserveDTO {
 		this.restaurantPhone = reserve.getRestaurant().getRestaurantPhone();
 		this.restaurantAddress = reserve.getRestaurant().getRestaurantAddress();
 		this.reserveSeat = reserve.getReserveSeat();
-		this.reserveTime = reserve.getReserveTime().toString();
+		this.reserveTime = reserve.getReserveTime();
 		this.tableTypeId = reserve.getTableType().getTableTypeName().toString()+"人桌";
 		this.reserveNote = reserve.getReserveNote();
 	}
