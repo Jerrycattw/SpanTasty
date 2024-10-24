@@ -1,59 +1,41 @@
 package com.eatspan.SpanTasty.service.reservation;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eatspan.SpanTasty.dto.reservation.RestaurantDTO;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
-import com.eatspan.SpanTasty.entity.reservation.RestaurantTable;
-import com.eatspan.SpanTasty.entity.reservation.RestaurantTableId;
-import com.eatspan.SpanTasty.entity.reservation.TableType;
 import com.eatspan.SpanTasty.repository.reservation.RestaurantRepository;
-import com.eatspan.SpanTasty.repository.reservation.RestaurantTableRepository;
-import com.eatspan.SpanTasty.repository.reservation.TableTypeRepository;
 
 @Service
+@PropertySource("upload.properties")
 public class RestaurantService {
 	
 	@Autowired
 	private RestaurantRepository restaurantRepository;
-	@Autowired
-	private TableTypeRepository tableTypeRepository;
-	@Autowired
-	private RestaurantTableRepository restaurantTableRepository;
+	
+	@Value("${upload.reservationPath}")
+	private String uploadPath;
+	
 	
 	// 新增餐廳
 	public Restaurant addRestaurant(Restaurant restaurant) {
-		
-	    if (restaurant.getRestaurantStatus() == null) {
-	        restaurant.setRestaurantStatus(3);
-	    }
-		if(restaurant.getReservePercent() == null) {
-			restaurant.setReservePercent(100); // 餐廳開放訂位的比例
-		}
-		if(restaurant.getReserveTimeScale() == null) {
-			restaurant.setReserveTimeScale(30); // 訂位的區間(預設為30分鐘)
-		}
-		if(restaurant.getReserveMin() == null) {
-			restaurant.setReserveMin(2); // 餐廳最少開放訂位的人數
-		}
-		if(restaurant.getReserveMax() == null) {
-			restaurant.setReserveMax(10); // 餐廳最多開放訂位的人數
-		}
-	    
-	    return restaurantRepository.save(restaurant); // 返回保存的餐廳對象
-	    
+	    return restaurantRepository.save(restaurant);
 	}
 	
 	
@@ -98,6 +80,40 @@ public class RestaurantService {
 		Pageable pageAble = PageRequest.of(pageNumber-1, itemNumber, Sort.Direction.DESC, "restaurantId");
 		return restaurantRepository.findByRestaurantStatus(1, pageAble);
 	}
+	
+	
+	// 上傳照片至upload資料夾
+	public Restaurant uploadFile(Restaurant restaurant, MultipartFile file) throws IllegalStateException, IOException {
+		
+        // 建立圖片保存的目錄
+        File fileSaveDirectory = new File(uploadPath);
+        if (!fileSaveDirectory.exists()) {
+            fileSaveDirectory.mkdirs();
+        }
+
+        // 檢查文件是否不為空，並處理上傳
+        if (!file.isEmpty()) {
+            String fileName = file.getOriginalFilename();
+            String extension = fileName.substring(fileName.lastIndexOf("."));
+            String newFileName = restaurant.getRestaurantName() + extension;
+
+            // 保存檔案到指定路徑
+            File fileToSave = new File(uploadPath + File.separator + newFileName);
+            file.transferTo(fileToSave);
+            restaurant.setRestaurantImg("/SpanTasty/upload/reservation/" + newFileName);
+        } else {
+        	// 如果是修改餐廳，保留原有圖片
+        	if (restaurant.getRestaurantId() != null) {
+        		String restaurantImg = findRestaurantById(restaurant.getRestaurantId()).getRestaurantImg();
+        		restaurant.setRestaurantImg(restaurantImg);
+        	}
+		}
+        
+        return restaurant;
+		
+	}
+	
+	
 	
 	
 	

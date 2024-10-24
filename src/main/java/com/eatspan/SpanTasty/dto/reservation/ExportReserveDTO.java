@@ -19,15 +19,26 @@ public class ExportReserveDTO {
 	
 	
 	private Integer reserveId;
+	
 	private String memberName;
+	
 	private String memberPhone;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate birthday;
+	
 	private String restaurantName;
+	
 	private String restaurantPhone;
+	
 	private String restaurantAddress;
+	
 	private Integer reserveSeat;
+	
 	private String reserveTime;
+	
 	private String tableTypeId;
+	
 	private String reserveNote;
 	
 	

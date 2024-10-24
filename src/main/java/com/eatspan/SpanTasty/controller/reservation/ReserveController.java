@@ -1,15 +1,11 @@
 package com.eatspan.SpanTasty.controller.reservation;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,24 +13,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eatspan.SpanTasty.dto.reservation.ExportReserveDTO;
-import com.eatspan.SpanTasty.dto.reservation.ReserveCenterDTO;
 import com.eatspan.SpanTasty.dto.reservation.ReserveCheckDTO;
 import com.eatspan.SpanTasty.dto.reservation.ReserveDTO;
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
-import com.eatspan.SpanTasty.entity.reservation.RestaurantTable;
-import com.eatspan.SpanTasty.entity.reservation.RestaurantTableId;
 import com.eatspan.SpanTasty.entity.reservation.TableType;
 import com.eatspan.SpanTasty.service.account.MemberService;
 import com.eatspan.SpanTasty.service.reservation.ReserveService;
@@ -80,10 +71,6 @@ public class ReserveController {
     
     
     
-    
-    
-    
-    
     // ajax 查詢訂位訂單
     @GetMapping("/getList")
     public ResponseEntity<?> getReserveList(@RequestParam(required = false) String memberName,
@@ -97,25 +84,6 @@ public class ReserveController {
     	return ResponseEntity.ok(reserveByCriteria);
     }
     
-    
-//    // ajax 查詢訂位訂單
-//    @GetMapping("/export")
-//    public ResponseEntity<?> exportReserveList(@RequestParam(required = false) String memberName,
-//									    	   @RequestParam(required = false) String phone,
-//								    	   	   @RequestParam(required = false) Integer restaurantId,
-//								    		   @RequestParam(required = false) String tableTypeId,
-//								    		   @RequestParam(required = false) LocalDate reserveTimeStart,
-//								    		   @RequestParam(required = false) LocalDate reserveTimeEnd) {
-//    	
-//    	List<Reserve> reserveByCriteria = reserveService.findReserveByCriteria(memberName, phone, restaurantId, tableTypeId, reserveTimeStart, reserveTimeEnd);
-//    	List<ExportReserveDTO> exportReserveDTOs = new ArrayList<>();
-//    	ExportReserveDTO exportReserveDTO = null;
-//    	for(Reserve reserve : reserveByCriteria) {
-//    		exportReserveDTO = new ExportReserveDTO(reserve);
-//    		exportReserveDTOs.add(exportReserveDTO);
-//    	}
-//    	return ResponseEntity.ok(exportReserveDTOs);
-//    }
     
     
     // 匯出 JSON 訂位訂單
@@ -250,13 +218,6 @@ public class ReserveController {
 		reserveService.updateReserve(reserve);
 		return ResponseEntity.ok("ReserveStatus update ok");
 	}
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	
