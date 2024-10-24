@@ -40,5 +40,10 @@ public class StarCupsPageController {
 	public String showrCallbackPage() {
 		return "starcups/account/callback"; 
 	}
+	
+	@GetMapping("/StarCups/demoPage")
+	public String showrDemoPage() {
+		return "starcups/account/demoPage"; 
+	}
 
 }
