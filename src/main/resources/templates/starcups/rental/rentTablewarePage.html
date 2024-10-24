@@ -185,13 +185,12 @@
                     <span style="position: absolute; bottom: 10px; right: 10px; color:red;"
                       th:id="'stock' + ${tableware.tablewareId}"></span>
 
-                    <div class="quantity-selector d-inline-flex justify-content-center align-center"
-                      style="position: absolute; bottom:50px; right: 13px;">
-                      <div class="table-cart-stepper d-inline-flex justify-content-center align-center"
+                    <div class="quantity-selector">
+                      <div class="table-cart-stepper"
                         style="padding-top:0; padding-bottom:0;line-height: 20px;">
-                        <input class="form-input d-inline-flex pt-0 ps-1 pe-1 pb-0"
+                        <input class="form-input"
                           th:id="'rentItemQuantity'+${tableware.tablewareId}"
-                          style="min-height:1px; position: relative; top:-5px;" type="number" data-zeros="true"
+                          style="min-height:1px;" type="number" data-zeros="true"
                           value="0" min="0" max="1000">
                       </div>
                     </div>
@@ -207,13 +206,7 @@
         </div>
       </div>
     </section>
-
-    <h5 class="ms-4">租借須知</h5>
-    <div class="mt-2 ms-4 mb-5">
-      <ul class="">
-        <li>租借用具歸還時間為：七天內。</li>
-      </ul>
-    </div>
+    
 <!-- Global Mailform Output-->
 <div class="snackbars" id="form-output-global"></div>
 
@@ -410,7 +403,9 @@ function reloadCartItems() {
     };
     axios.post(url, dtoObject)
       .then(function (response) {
-        htmlMaker(response.data);
+        //htmlMaker(response.data);
+        console.log(response.data.stocks);
+        updateStock(response.data.stocks);
       })
       .catch(function (error) {
         console.log(error);
@@ -488,10 +483,9 @@ function reloadCartItems() {
       }
     });
   }
-
+/*
   function htmlMaker(data) {
     const restaurant = data.restaurant;
-    const stocks = data.stocks;
     const showRestaurant = document.getElementById("show-restaurant");
 
     showRestaurant.innerHTML = `
@@ -519,9 +513,8 @@ function reloadCartItems() {
     </div>
   </section>
 `;
-    updateStock(stocks);
   }
-
+*/
 </script>
 </body>
 </html>

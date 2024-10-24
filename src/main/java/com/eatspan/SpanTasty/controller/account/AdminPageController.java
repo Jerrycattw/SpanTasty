@@ -8,7 +8,7 @@ public class AdminPageController {
 	
     @GetMapping("/admin/member-list")
     public String showMemberListPage() {
-        return "spantasty//account/findMembers"; 
+        return "spantasty//account/findMembers2"; 
     }
     
     @GetMapping("/admin/admin-list")

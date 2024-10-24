@@ -223,7 +223,7 @@ function filterNewTablewareOptions(selectElement) {
                     selectElement.innerHTML = '<option value="" disabled selected>沒有可用的餐具</option>';
                     return;
                 }
-                selectElement.innerHTML = '<option value="">請選擇餐具</option>'; // 清空现有选项
+                selectElement.innerHTML = '<option value="" >請選擇餐具</option>'; // 清空现有选项
                 tablewares.forEach(function(tableware) {
                     const option = document.createElement("option");
                     option.value = tableware.tablewareId;
@@ -280,9 +280,6 @@ function handleSelectChange(selectElement) {
     const quantityInput = rentItemRow.querySelector('input[name^="rentItemQuantity"]');
     const restaurantId = document.getElementById('restaurantId').value; // 取得餐廳ID
     const tablewareId = selectElement.value; // 取得餐具ID
-	if (selectedValues.includes(tablewareId)) {
-        return; // 避免重複處理已選擇過的餐具
-    }
 	const url = 'http://localhost:8080/SpanTasty/rent/check';
     if (restaurantId && tablewareId) {
         let stock = {
@@ -332,10 +329,7 @@ function updateDeposit(selectElement) {
 // 根據數量更新押金
 function updateDepositByQuantity(quantityInput) {
     const selectElement = quantityInput.closest('.item-entry').querySelector('select[name^="tablewareId"]');
-	console.log(selectElement);
     const maxStock = quantityInput.max;
-	console.log(maxStock);
-	console.log(quantityInput.value);
     if (Number(quantityInput.value) == Number(maxStock)) {
         alert('租借數量已達餐廳最大庫存數量');
         quantityInput.value = maxStock;

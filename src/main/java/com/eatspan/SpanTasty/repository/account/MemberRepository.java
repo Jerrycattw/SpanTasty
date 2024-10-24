@@ -68,5 +68,19 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
 			+ "SUM(CASE WHEN DATEDIFF(YEAR, m.birthday, CURRENT_DATE) > 45 THEN 1 ELSE 0 END) AS age46Plus "
 			+ "FROM Member m")
 	Map<String, Integer> countMembersByAgeGroup();
+	
+	// 會員登入日期查詢人數
+	@Query(value = "SELECT CONVERT(DATE, m.login_date) AS date, COUNT(m.member_id) AS activeMembers " +
+            "FROM members m " +
+            "WHERE YEAR(m.login_date) = :year AND MONTH(m.login_date) = :month " +
+            "GROUP BY CONVERT(DATE, m.login_date) " +
+            "ORDER BY CONVERT(DATE, m.login_date)", 
+    nativeQuery = true)
+     List<Object[]> findActiveMembersByLoginDateForMonth(@Param("year") int year, @Param("month") int month);
+     
+     // 每月的會員註冊數據
+     @Query("SELECT MONTH(m.registerDate) as month, COUNT(m) as registrations " +
+             "FROM Member m WHERE YEAR(m.registerDate) = :year GROUP BY MONTH(m.registerDate) ORDER BY month")
+      List<Map<String, Object>> findMonthlyRegistrationsByYear(@Param("year") int year);
 
 }

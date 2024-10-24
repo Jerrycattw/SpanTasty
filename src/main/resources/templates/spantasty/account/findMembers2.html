@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <meta charset="UTF-8">
+  <title>搜尋全部會員</title>
+</head>
+<style>
+  .input-group .btn-outline-light {
+    background-color: #6c757d;
+    /* 灰色按鈕背景 */
+    color: white;
+    border: none;
+  }
+
+  .input-group .btn-outline-light:hover {
+    background-color: #5a6268;
+    /* 灰色按鈕懸停時更深的顏色 */
+  }
+
+  .table-light {
+    background-color: #f8f9fa;
+    /* 表格淺灰背景 */
+  }
+
+  .table-light th {
+    background-color: #e9ecef;
+    /* 表格標題區的稍深灰色背景 */
+  }
+
+  .btn-outline-light {
+    background-color: #6c757d;
+    /* 灰色按鈕背景 */
+    color: white;
+  }
+
+  .btn-outline-light:hover {
+    background-color: #5a6268;
+    /* 灰色按鈕懸停時顏色變深 */
+  }
+
+  .modal-content {
+    background-color: #f8f9fa;
+    /* 模態框的淺灰背景 */
+    color: #333;
+  }
+
+  .modal-header,
+  .modal-footer {
+    background-color: #6c757d;
+    /* 模態框頭部和底部為灰色背景 */
+    color: white;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+  }
+</style>
+
+<body>
+  <div th:replace="~{spantasty/display/navbar}"></div>
+  <!-- 主要內容區域 -->
+  <div class="container mt-5" style="padding-left: 200px; padding-top: 30px;">
+    <h1 class="text-center">會員列表</h1>
+    <div class="p-4 border border-dark rounded bg-light text-dark">
+      <!-- 搜索框 -->
+      <div class="input-group mb-3">
+        <input type="text" id="searchMemberInput" class="form-control" placeholder="輸入會員名稱或帳號進行搜尋">
+        <button class="btn btn-outline-light" onclick="searchMembers()">搜尋</button>
+      </div>
+
+      <!-- 顯示會員列表的表格 -->
+      <table id="memberListTable" class="table table-light table-striped rounded">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>頭像</th>
+            <th>會員名稱</th>
+            <th>帳號</th>
+            <th>狀態</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 會員資料將由 JavaScript 動態加載到這裡 -->
+        </tbody>
+      </table>
+
+      <!-- 分頁控制 -->
+      <div id="memberPagination" class="d-flex justify-content-between mt-4">
+        <button id="memberPrevPage" class="btn btn-outline-dark" onclick="goToPreviousPage()">上一頁</button>
+
+        <select id="pageSelector" class="form-select mx-3" style="width: auto;"
+          onchange="goToSelectedPage(this.value)"></select>
+
+        <button id="memberNextPage" class="btn btn-outline-dark" onclick="goToNextPage()">下一頁</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 頭像預覽模態框 -->
+  <div class="modal fade" id="memberAvatarModal" tabindex="-1" aria-labelledby="avatarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-light text-white">
+        <div class="modal-header">
+          <h5 class="modal-title" id="avatarModalLabel">頭像預覽</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="memberAvatarPreview" src="" alt="Avatar Preview"
+            style="width: 100%; height: auto; border-radius: 50%;">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+          <button type="button" class="btn btn-danger" onclick="deleteMemberAvatar()">刪除頭像</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 會員詳細資料模態框 -->
+  <div class="modal fade" id="memberDetailModal" tabindex="-1" aria-labelledby="memberDetailModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="memberDetailModalLabel">會員詳細資料</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-4 text-center">
+              <img id="memberDetailAvatar" src="" alt="Avatar" style="width:150px; height:150px; border-radius:50%;">
+            </div>
+            <div class="col-md-8">
+              <p><strong>會員名稱：</strong> <span id="memberDetailName"></span></p>
+              <p><strong>帳號：</strong> <span id="memberDetailAccount"></span></p>
+              <p><strong>生日：</strong> <span id="memberDetailBirthday"></span></p>
+              <p><strong>Email：</strong> <span id="memberDetailEmail"></span></p>
+              <p><strong>地址：</strong> <span id="memberDetailAddress"></span></p>
+              <p><strong>電話：</strong> <span id="memberDetailPhone"></span></p>
+              <p><strong>註冊日期：</strong> <span id="memberDetailRegisterDate"></span></p>
+              <p><strong>最近登入日期：</strong> <span id="memberDetailLoginDate"></span></p>
+              <p><strong>狀態：</strong> <span id="memberDetailStatus"></span></p>
+              <p><strong>停權原因：</strong> <span id="memberDetailReason"></span></p>
+              <p><strong>停權日期：</strong> <span id="memberDetailSuspendedUntil"></span></p>
+              <p><strong>註冊方式：</strong> <span id="memberDetailProvider"></span></p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+      showSidebar('member');
+    });
+
+
+    var currentPage = 0;
+    var totalPages = 0;
+    var selectedMemberId = null;
+    var searchQuery = '';
+
+    // 搜索會員函數
+    function searchMembers() {
+      searchQuery = document.getElementById('searchMemberInput').value;
+      loadMembers(0);
+    }
+
+    // 更新頁碼選擇
+    function updatePageSelector() {
+      var pageSelector = document.getElementById('pageSelector');
+      pageSelector.innerHTML = ''; // 清空頁碼選擇
+
+      // 動態生成頁碼選項
+      for (var i = 0; i < totalPages; i++) {
+        var option = document.createElement('option');
+        option.value = i;
+        option.text = '第 ' + (i + 1) + ' 頁'; // 顯示從 1 開始的頁碼
+        if (i === currentPage) {
+          option.selected = true; // 當前頁碼預設選中
+        }
+        pageSelector.appendChild(option);
+      }
+    }
+
+    // 跳轉到指定頁碼
+    function goToSelectedPage(page) {
+      loadMembers(parseInt(page));
+    }
+
+    // 顯示會員詳細資料的模態框
+    function showMemberDetails(member) {
+      // 動態設置模態框的內容
+      document.getElementById('memberDetailAvatar').src = member.avatar ? member.avatar : '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+      document.getElementById('memberDetailName').innerText = member.memberName;
+      document.getElementById('memberDetailAccount').innerText = member.account;
+      document.getElementById('memberDetailBirthday').innerText = member.birthday;
+      document.getElementById('memberDetailEmail').innerText = member.email;
+      document.getElementById('memberDetailAddress').innerText = member.address;
+      document.getElementById('memberDetailPhone').innerText = member.phone;
+      document.getElementById('memberDetailRegisterDate').innerText = member.registerDate;
+      document.getElementById('memberDetailLoginDate').innerText = member.loginDate;
+      document.getElementById('memberDetailStatus').innerText = member.status;
+      document.getElementById('memberDetailReason').innerText = member.reason ? member.reason : '無';
+      document.getElementById('memberDetailSuspendedUntil').innerText = member.suspendedUntil ? member.suspendedUntil : '無';
+      document.getElementById('memberDetailProvider').innerText = member.provider ? member.provider : '本地註冊';
+
+      // 顯示模態框
+      new bootstrap.Modal(document.getElementById('memberDetailModal')).show();
+    }
+
+
+    function handleStatusChange(selectElement, memberId) {
+      var status = selectElement.value;
+      var reason = prompt("請輸入修改原因：");
+      var suspendedUntil = null;
+
+      if (status === 'S') {
+        suspendedUntil = prompt("請輸入停權日期 (格式：YYYY-MM-DD)：");
+      }
+
+      var requestData = {
+        memberId: memberId,
+        status: status,
+        reason: reason,
+        suspendedUntil: suspendedUntil
+      };
+
+      // 發送更新會員狀態的請求
+      axios.post('/SpanTasty/admin/updateMemberStatus', requestData)
+        .then(function (response) {
+          if (response.data.success) {
+            alert(response.data.message);  // 顯示成功訊息
+            loadMembers(currentPage);  // 重新加載當前頁面
+          } else {
+            alert(response.data.message);  // 顯示失敗訊息
+          }
+        })
+        .catch(function (error) {
+          console.error(error);
+          alert("會員狀態更新失敗，請重試！");
+        });
+    }
+
+    // 頭像預覽和刪除功能
+    function previewMemberAvatar(memberId, avatarUrl) {
+      selectedMemberId = memberId;
+      console.log(`Member ID: ${selectedMemberId}`);
+
+      var defaultAvatarUrl = '/SpanTasty/starcups/images/account/defaultUser.jpeg';
+      document.getElementById('memberAvatarPreview').src = avatarUrl ? avatarUrl : defaultAvatarUrl;
+
+      new bootstrap.Modal(document.getElementById('memberAvatarModal')).show();
+    }
+
+    function deleteMemberAvatar() {
+      console.log("Selected Member ID for Deletion:", selectedMemberId); // 檢查是否正確
+      if (confirm("確定要刪除此會員的頭像嗎？")) {
+        axios.post('/SpanTasty/admin/removeMemberAvatar', { memberId: selectedMemberId })
+          .then(function (response) {
+            if (response.data.success) {
+              alert("頭像刪除成功！");
+              loadMembers(currentPage);  // 重新加載當前頁面
+            } else {
+              alert("頭像刪除失敗：" + response.data.message);
+            }
+          })
+          .catch(function (error) {
+            console.error(error);
+            alert("頭像刪除失敗，請稍後重試！");
+          });
+      }
+    }
+
+    // 動態加載會員資料
+    function loadMembers(page) {
+      axios.get('/SpanTasty/admin/findMembers', {
+        params: {
+          page: page,
+          size: 10,
+          search: searchQuery
+        }
+      })
+        .then(function (response) {
+          var members = response.data.data.members;
+          var tbody = document.querySelector('#memberListTable tbody');
+          tbody.innerHTML = ''; // 清空當前的表格資料
+
+          members.forEach(function (member) {
+            var avatarHtml = member.avatar
+              ? '<img src="' + member.avatar + '" alt="Avatar" style="width:50px; height:50px; border-radius:50%;cursor:pointer;" onclick="previewMemberAvatar(' + member.memberId + ', \'' + member.avatar + '\')">'
+              : '<i class="fa-regular fa-face-smile" style="font-size:50px; border-radius:50%; cursor:pointer;" onclick="previewMemberAvatar(' + member.memberId + ', \'\')"></i>';
+
+            var statusSelect = '<select class="form-select form-select-sm bg-light text-dark" onchange="handleStatusChange(this, ' + member.memberId + ')">';
+            statusSelect += '<option value="A"' + (member.status === 'A' ? ' selected' : '') + '>啟用</option>';
+            statusSelect += '<option value="S"' + (member.status === 'S' ? ' selected' : '') + '>暫停</option>';
+            statusSelect += '<option value="I"' + (member.status === 'I' ? ' selected' : '') + '>禁用</option>';
+            statusSelect += '</select>';
+
+            var row = '<tr>' +
+              '<td>' + member.memberId + '</td>' +
+              '<td>' + avatarHtml + '</td>' +
+              '<td>' + member.memberName + '</td>' +
+              '<td>' + member.account + '</td>' +
+              '<td>' + statusSelect + '</td>' +
+              '<td><button class="btn btn-sm btn-primary" onclick=\'showMemberDetails(' + JSON.stringify(member) + ')\'>查看詳細</button></td>' +  // 加入查看詳細按鈕
+              '</tr>';
+            tbody.innerHTML += row;
+          });
+
+          currentPage = response.data.data.currentPage;
+          totalPages = response.data.data.totalPages;
+
+          updatePageSelector();
+
+          document.querySelector('#memberPrevPage').disabled = currentPage === 0;
+          document.querySelector('#memberNextPage').disabled = currentPage === totalPages - 1;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+
+    // 分頁控制：上一頁
+    function goToPreviousPage() {
+      if (currentPage > 0) {
+        loadMembers(currentPage - 1);
+      }
+    }
+
+    // 分頁控制：下一頁
+    function goToNextPage() {
+      if (currentPage < totalPages - 1) {
+        loadMembers(currentPage + 1);
+      }
+    }
+
+    // 初次加載時調用
+    document.addEventListener('DOMContentLoaded', function () {
+      loadMembers(0);
+    });
+  </script>
+</body>
+
+</html>
