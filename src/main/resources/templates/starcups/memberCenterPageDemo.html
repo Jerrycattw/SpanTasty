@@ -147,7 +147,8 @@
 
 <body>
   <div th:replace="~{/starcups/display/navbar}"></div>
-
+	
+  <!-- 記得修改 -->
   <section class="section breadcrumbs-custom-inset">
     <div class="breadcrumbs-custom context-dark">
       <div class="container">
@@ -165,14 +166,13 @@
   <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
     <div class="container">
       <div class="row row-50 justify-content-md-center">
-		
-		
-		<!-- 左側區域 -->
-		<div th:replace="~{/starcups/display/memberCenterSidebar}"></div>
+      	
+      	<!-- 左側區域 -->
+        <div th:replace="~{/starcups/display/memberCenterSidebar}"></div>
         
 
         <!-- 右側區域 -->
-        <div class="col-md-8">
+        <div class="col-md-9">
 
           <!-- 個人資訊 -->
           <div id="personal-info" class="content-section">
@@ -266,9 +266,9 @@
 
           <!-- 修改密碼區塊 -->
           <div id="change-password" class="content-section" style="display:none;">
+            <h4 class="text-spacing-50 text-center mb10">修改密碼</h4>
             <div class="card mx-auto">
               <div class="card-body bcf7">
-            <h4 class="text-spacing-50 text-center mb10">修改密碼</h4>
                 <form class="bcf7">
                   <div class="form-group">
                     <label for="current-password">原密碼</label>

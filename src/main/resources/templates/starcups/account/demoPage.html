@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員中心</title>
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <style>
+    .user-avatar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 275px;
+      height: 275px;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .personal-info-table {
+      width: 100%;
+      margin: 20px auto;
+      font-size: 18px;
+    }
+
+    .personal-info-table th,
+    .personal-info-table td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .personal-info-table th {
+      width: 40%;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .button-custom {
+      border: none;
+      color: white;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      width: 80%;
+      margin-bottom: 10px;
+      background-color: #efc4a3;
+    }
+
+    .button-custom:hover {
+      background-color: #efc4a3;
+      transform: scale(1.05);
+    }
+
+    .button-custom:active {
+      background-color: #b3876a;
+      transform: scale(0.98);
+    }
+
+    .button-red {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .button-red:hover {
+      background-color: #c82333;
+      transform: scale(1.05);
+    }
+
+    .button-red:active {
+      background-color: #bd2130;
+      transform: scale(0.98);
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      /* 按鈕兩端對齊，並在中間留出空間 */
+      width: 100%;
+    }
+
+
+
+    .mleft10 {
+      margin-left: 10px;
+    }
+
+    .mb10 {
+      margin-bottom: 10px;
+    }
+
+    .post-sidebar-item {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .list-categories li {
+      list-style: none;
+      margin-bottom: 8px;
+    }
+
+    .list-categories a {
+      color: #007bff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .list-categories a:hover {
+      color: #0056b3;
+    }
+
+    .bcf7 {
+      background-color: #F7F7F7;
+    }
+
+    #edit-member-name,
+    #edit-birthday,
+    #edit-memberPhone,
+    #edit-memberAddress,
+    #edit-member-email {
+      width: 120%;
+      /* 設置輸入框寬度為父元素的 100% */
+      max-width: 600px;
+      /* 設置一個合理的最大寬度 */
+    }
+  </style>
+</head>
+
+<body>
+  <div th:replace="~{/starcups/display/navbar}"></div>
+	
+  <!-- 記得修改 -->
+  <section class="section breadcrumbs-custom-inset">
+    <div class="breadcrumbs-custom context-dark">
+      <div class="container">
+        <h2 class="breadcrumbs-custom-title">會員中心</h2>
+        <ul class="breadcrumbs-custom-path">
+          <li><a href="/SpanTasty/StarCups">Home</a></li>
+          <li><a href="/SpanTasty/StarCups/memberCenter">會員中心</a></li>
+          <li class="active">帳戶管理</li>
+        </ul>
+      </div>
+      <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+    </div>
+  </section>
+
+  <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+    <div class="container">
+      <div class="row row-50 justify-content-md-center">
+      	
+      	<!-- 左側區域 -->
+        <div th:replace="~{/starcups/display/memberCenterSidebar}"></div>
+        
+
+        <!-- 右側區域 -->
+        <div class="col-md-9">
+        <!-- 資料請放裡面 -->
+        </div>
+        
+        
+      </div>
+    </div>
+  </section>
+
+  <div th:replace="~{starcups/display/footer}"></div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+  
+</body>
+
+</html>

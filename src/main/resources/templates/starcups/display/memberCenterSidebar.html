@@ -1,0 +1,80 @@
+
+<style>
+.list-categories li {
+	margin-bottom: 10px;
+	padding: 10px 10px 10px 10px !important;
+}
+
+.list-categories li button {
+	width: 100%;
+	text-align: left;
+}
+
+.list-categories li {
+	display: flex;
+	justify-content: center; /* 水平置中 */
+	align-items: center; /* 垂直置中 */
+}
+
+.list-categories li button {
+	width: 100%; /* 讓按鈕佔滿 li 的寬度 */
+	text-align: center; /* 讓按鈕內的文字置中 */
+}
+</style>
+<div class="col-md-3">
+
+          <div class="post-sidebar-item">
+            <h5>帳戶管理</h5>
+            <div class="post-sidebar-item-inset">
+              <ul class="list list-categories">
+                <li><button class="button-custom" id="btn-personal-info"><span class="icon fa fa-user"></span>
+                    個人資訊</button></li>
+                <li><button class="button-custom" id="btn-change-password"><span class="icon fa fa-key"></span>
+                    修改密碼</button></li>
+                <li><button class="button-custom" id="btn-change-avatar"><span class="icon fa fa-image"></span>
+                    修改頭像</button></li>
+                <li><button class="button-custom" id="btn-delete-account"><span class="icon fa fa-trash"></span>
+                    刪除帳號</button></li>
+              </ul>
+            </div>
+          </div>
+	
+          <div class="post-sidebar-item">
+            <h5>歷史紀錄</h5>
+            <div class="post-sidebar-item-inset">
+              <ul class="list list-categories">
+                <li><button class="button-custom" id="btn-personal-info"><span class="icon fa fa-user"></span>
+                    訂位紀錄</button></li>
+                <li><button class="button-custom" id="btn-change-password"><span class="icon fa fa-key"></span>
+                    訂餐紀錄</button></li>
+                <li><form th:action= "@{/StarCups/orderHistory(shoppingId=${session['shoppingId']})}" method="get" id="checkoutForm"></form>
+                <button class="button-custom" id="btn-change-avatar"><span class="icon fa fa-image"></span>
+                    商城購買紀錄</button></li>
+                <li><button class="button-custom" id="btn-delete-account"><span class="icon fa fa-trash"></span>
+                    租借紀錄</button></li>
+              </ul>
+            </div>
+          </div>
+          
+          
+          <!-- 請複製此段 -->
+          <div class="post-sidebar-item">
+            <h5>新增標題</h5>
+            <div class="post-sidebar-item-inset">
+              <ul class="list list-categories">
+                <li><button class="button-custom" id="btn-personal-info"><span class="icon fa fa-user"></span>
+                    標題 1</button></li>
+                <li><button class="button-custom" id="btn-change-password"><span class="icon fa fa-key"></span>
+                    標題 2</button></li>
+                <li><button class="button-custom" id="btn-change-avatar"><span class="icon fa fa-image"></span>
+                    標題 3</button></li>
+                <li><button class="button-custom" id="btn-delete-account"><span class="icon fa fa-trash"></span>
+                    標題 4</button></li>
+              </ul>
+            </div>
+          </div>
+          <!-- 請複製此段 -->
+          
+          
+          
+</div>
