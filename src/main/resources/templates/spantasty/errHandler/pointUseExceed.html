@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div th:replace="~{spantasty//display/navbar}"></div>
+	<div class="content">
+	 <div class="container">
+        <div class="row">
+				<div class="col">
+					<div class="card" style="width: 18rem;">
+						<div class="card-body">
+							<h5 class="card-title">錯誤!</h5>
+							<p class="card-text">扣除點數大於可用點數，請返回上一頁重新操作</p>
+							<a href="#" class="card-link" onclick="goBack()">返回上一頁</a>
+						</div>
+					</div>
+				</div>
+
+			</div>
+        </div>
+    </div>
+	<script>
+		function goBack(){
+			window.history.back()
+		}
+	</script>
+</body>
+</html>

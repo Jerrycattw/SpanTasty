@@ -108,15 +108,15 @@
           <!-- discount -->
           <div class="table-custom-responsive border p-3">
             <!-- coupon -->
-            <div class="row">
+            <div class="row p-3">
               <span class="point" style="font-size: 16px;">優惠券</span>
-              <div class="col">
+              <div class="col-7">
                 <div class="form-wrap">
                   <input class="form-input form-input-inverse" id="coupon-code" type="text" name="email" disabled>
                   <label class="form-label" for="coupon-code" id="coupon-code-label">Coupon code</label>
                 </div>
               </div>
-              <div class="col">
+              <div class="col-3">
                 <div class="form-button">
                   <button class="button button-secondary button-pipaluk" type="submit" id="selectCoupon">新增優惠券</button>
                 </div>
@@ -124,15 +124,15 @@
               <div class="col"></div>
             </div>
             <!-- point -->
-            <div class="row mt-3">
-              <div class="col">
+            <div class="row mt-3 p-3">
+              <div class="col-7">
                 <span class="point" style="font-size: 16px;" id="pointItem">點數折抵</span>
                 <div class="form-wrap text-align-center" id="pointItem">
                   <input class="form-input form-input-inverse pointText" id="pointInput" type="text" name="email" th:max="${pointMemberTotalPoint!=null? pointMemberTotalPoint : 0}" min="0"style="font-size: 20px;">
                   <label class="form-label" for="pointInput">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Point</label>
                 </div>
               </div>
-              <div class="col d-flex align-items-end">
+              <div class="col-4 d-flex align-items-end">
                 <ul class="point" id="">
                   <li class="active" style="font-size: 16px;" th:text="'可用點數 : '+${pointMemberTotalPoint!=null? pointMemberTotalPoint : 0}+'點(1點折抵1元)'"><!-- 可用點數 : 910點(1點折抵1元) --></li>
                   <li class="active" style="font-size: 16px;" th:text="'您有 '+${pointMember.expiringPoints}+' 點將於 '+${pointMember.expiryDate != null? pointMember.expiryDate : '-'}+' 到期'"><!-- 您有 45點將於 2024/13/31到期 --></li>
@@ -249,8 +249,8 @@
             <div class="modal-body">
                 <div class="row ms-1 me-1 " style="background-color: #F7F7F7;height: 70px;">
                   <div class="col-3 d-flex justify-content-end align-items-center">新增優惠券</div>       
-                  <div class="col-6 d-flex align-items-center"><input type="text" class="form-control" ></div>       
-                  <div class="col-3 d-flex align-items-center"><button class="addBtn" >使用</button></div>       
+                  <div class="col-6 d-flex align-items-center"><input type="text" class="form-control" id="modelCouponCode"></div>       
+                  <div class="col-3 d-flex align-items-center"><button class="addBtn" id="add">新增</button></div>       
                 </div>
                   <!--  -->
                 <div id="couponDiv" class="mt-2">
@@ -351,13 +351,13 @@
                       <li><span>${coupon.coupon.rulesDescription}</span><span></span></li>
                       <li><span>低消: </span><span>$${coupon.coupon.minOrderDiscount?coupon.coupon.minOrderDiscount:'-'}</span></li>
                       <li><span>最多折抵: </span><span>$${coupon.coupon.maxDiscount?coupon.coupon.maxDiscount:'-'}</span></li>
+                      <li><span>數量: </span><span>${coupon.usageAmount}</span></li>
                       <li><span>有效日期: </span><span>${coupon.coupon.couponEndDate}</span><a href="#" class="ms-2 rule" data-couponid=${coupon.coupon.couponId}>使用規則</a></li>
                     </ul>
                   </div>
                   <div class="d-flex align-items-center me-3">
                     <input type="radio"  name="radioCoupon" ${coupon.canUse? '':'disabled'}  data-couponcode="${coupon.coupon.couponCode}" data-couponid="${coupon.coupon.couponId}">  
                   </div>                                                       
-                  
                 </div>
               </div>
             </div>`  
@@ -440,6 +440,54 @@
           alert("請稍後再試")
         })
       })
+
+
+      //使用規則
+      document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('rule')) {
+          event.preventDefault();
+          const couponId = event.target.dataset.couponid
+          window.open(`/SpanTasty/StarCups/coupon/${couponId}`)
+        }
+      })
+
+
+      document.getElementById('add').addEventListener('click',function(){
+          const couponCode = document.getElementById('modelCouponCode').value
+          console.log(document.getElementById('modelCouponCode'));
+          
+          console.log(couponCode);
+          console.log(memberId);
+          
+          
+
+          
+          //新增優惠券
+          axios.post('/SpanTasty/StarCups/coupon/add',{           
+              memberId:memberId,
+              couponCode:couponCode
+          })
+          .then(res=>{
+                console.log(res.data);
+                alert(res.data)
+                //刷新優惠券DIV
+                axios.post('http://localhost:8080/SpanTasty/StarCups/coupon/checkout',{
+                    shoppingItems: shopoingItems,
+                    totalAmount: totalAmount,
+                    memberId: memberId
+                })
+                .then(res=>{
+                    console.log(res.data);
+                    HtmlMaker(res.data)
+                    let coupons = res.data
+                })
+        
+          })
+          .catch(err=>{
+            console.log(err.response.data);
+            alert(err.response.data)
+          })
+        })
     </script>
 </body>
 </html>

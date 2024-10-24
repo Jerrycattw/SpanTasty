@@ -29,6 +29,7 @@ import com.eatspan.SpanTasty.dto.discount.PointMemberProjection;
 import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.discount.Point;
 import com.eatspan.SpanTasty.entity.discount.PointSet;
+import com.eatspan.SpanTasty.errHandler.PointUseExceedException;
 import com.eatspan.SpanTasty.repository.account.MemberRepository;
 import com.eatspan.SpanTasty.repository.discount.PointRepository;
 import com.eatspan.SpanTasty.service.account.MemberService;
@@ -127,7 +128,7 @@ public class PointService {
 	
 	//消耗點數
 	@Transactional
-	public void usePoint(Integer pointChange,Integer memberId) throws Exception {
+	public void usePoint(Integer pointChange,Integer memberId) throws PointUseExceedException {
 		System.out.println("use");
 		List<Point> points = pointRepo.findByMemberIdBeforeUsePoint(memberId);
 		Integer pointChangeAbs = Math.abs(pointChange);
@@ -138,7 +139,7 @@ public class PointService {
 		System.out.println("use "+pointChangeAbs+" "+ totalpoints);
 		if(pointChangeAbs > totalpoints) {
 			System.out.println("use 不夠扣 "+pointChangeAbs+" "+ totalpoints);
-			throw new Exception();
+			throw new PointUseExceedException("扣除點數大於可用點數，請返回上一頁重新操作");
 		}
 		//消耗前的map  //Map<pointId,pointUsage>
 		Map<Integer, Integer> pointMap = points.stream()
