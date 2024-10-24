@@ -161,50 +161,22 @@ public class StarCupsReservationController {
     public ResponseEntity<String> addReserve(@RequestHeader("Authorization") String token,
     										 @RequestBody ReserveDTO reserveDTO) {
         try {
-            Reserve reserve = new Reserve();
-            
-            reserve.setReserveSeat(reserveDTO.getReserveSeat());
-            reserve.setReserveTime(reserveDTO.getCheckDate().atTime(reserveDTO.getStartTime()));
-            
-            // token取得memberId
-    	    // 解析 JWT token 取得 claims
+        	
+    	    // 解析 JWT token 取得 claims 再取得會員 ID
     	    Map<String, Object> claims = JwtUtil.parseToken(token);
-
-    	    // 取得會員 ID
     	    Integer memberId = (Integer) claims.get("memberId");
-    	    System.out.println(memberId);
-    	    if (memberId == null) {
-    	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("無法從 Token 中取得會員 ID");
-    	    }
-            
-            // 設定member外鍵關聯
-            Member member = memberService.findMemberById(memberId).orElse(null);
-            if (member == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Member not found");
-            reserve.setMember(member);
-            
-            // 設定restaurant外鍵關聯
-            Restaurant restaurant = restaurantService.findRestaurantById(reserveDTO.getRestaurantId());
-            if (restaurant == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant not found");
-            reserve.setRestaurant(restaurant);
-            
-            // 根據reserveSeat取得訂位桌子種類
-            String tableTypeId = reserveService.getTableTypeIdByReserveSeat(reserve.getReserveSeat());
-            // 設定tableType外鍵關聯
-            TableType tableType = tableTypeService.findTableTypeById(tableTypeId);
-            if (tableType == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("TableType not found");
-            reserve.setTableType(tableType);
-            
-            reserve.setReserveNote(reserveDTO.getReserveNote());
-            
+    	    reserveDTO.setMemberId(memberId);
+    	    
+    		String validateResult = reserveService.validateAddReserveDto(reserveDTO);
+    		if(validateResult!=null) {
+    			return ResponseEntity.badRequest().body(validateResult);
+    		}
+        	
             // 保存訂位
-            reserveService.addReserve(reserve);
+            Reserve reserve = reserveService.addReserve(reserveDTO);
             
             // 寄訂位成功信
-            try {
-            	reserveService.sendMail(reserve);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+            reserveService.sendMail(reserve);
             
             // 回傳成功訊息和狀態碼201 (Created)
             return ResponseEntity.status(HttpStatus.CREATED).body("Reserve added successfully");

@@ -25,6 +25,7 @@ public class ReserveDTO {
 	private LocalTime startTime;
 	private Integer tableId;
 	private String reserveNote;
+	private Integer reserveStatus;
 	
 	
 }
