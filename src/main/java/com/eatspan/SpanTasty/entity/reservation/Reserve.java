@@ -1,6 +1,7 @@
 package com.eatspan.SpanTasty.entity.reservation;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -87,6 +88,12 @@ public class Reserve {
 			this.reserveStatus = 1; // 1=未完成, 2=已完成, 3=已取消
 		}
 	}
+	
+	
+	 public String getFormattedReserveTime() {
+	     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+	     return reserveTime != null ? reserveTime.format(formatter) : null;
+	 }
 	
 	
 

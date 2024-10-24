@@ -1,13 +1,9 @@
 package com.eatspan.SpanTasty.controller.reservation;
 
-import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.eatspan.SpanTasty.dto.reservation.RestaurantDTO;
-import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.reservation.Restaurant;
 import com.eatspan.SpanTasty.service.reservation.RestaurantService;
 
@@ -33,14 +28,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @Controller
 @RequestMapping("/restaurant")
-@PropertySource("upload.properties")
 public class RestaurantController {
 	
 	@Autowired
 	private RestaurantService restaurantService;
 	
-	@Value("${upload.reservationPath}")
-	private String uploadPath;
 	
 	
     @GetMapping("/getAll")
@@ -84,27 +76,8 @@ public class RestaurantController {
     public String addRestaurant(@ModelAttribute Restaurant addRestaurant, 
                                 @RequestParam("rimg") MultipartFile file) throws IllegalStateException, IOException {
         
-        // 建立圖片保存的目錄
-        File fileSaveDirectory = new File(uploadPath);
-        if (!fileSaveDirectory.exists()) {
-            fileSaveDirectory.mkdirs();
-        }
-
-        // 檢查文件是否不為空，並處理上傳
-        if (!file.isEmpty()) {
-            String fileName = file.getOriginalFilename();
-            String extension = fileName.substring(fileName.lastIndexOf("."));
-            String newFileName = addRestaurant.getRestaurantName() + extension;
-
-            // 保存檔案到指定路徑
-            File fileToSave = new File(uploadPath + File.separator + newFileName);
-            file.transferTo(fileToSave);
-            addRestaurant.setRestaurantImg("/SpanTasty/upload/reservation/" + newFileName);
-        }
-
-        // 新增餐廳至資料庫
-        restaurantService.addRestaurant(addRestaurant);
-        
+    	Restaurant restaurant = restaurantService.uploadFile(addRestaurant, file);
+        restaurantService.addRestaurant(restaurant);
         return "redirect:/restaurant/getAll";
     }
     
@@ -127,29 +100,8 @@ public class RestaurantController {
     public String updateRestaurant(@ModelAttribute Restaurant setRestaurant, 
     							   @RequestParam("rimg") MultipartFile file) throws IllegalStateException, IOException {
     	
-        // 建立圖片保存的目錄
-        File fileSaveDirectory = new File(uploadPath);
-        if (!fileSaveDirectory.exists()) {
-            fileSaveDirectory.mkdirs();
-        }
-
-        // 檢查文件是否不為空，並處理上傳
-        if (!file.isEmpty()) {
-            String fileName = file.getOriginalFilename();
-            String extension = fileName.substring(fileName.lastIndexOf("."));
-            String newFileName = setRestaurant.getRestaurantName() + extension;
-
-            // 保存檔案到指定路徑
-            File fileToSave = new File(uploadPath + File.separator + newFileName);
-            file.transferTo(fileToSave);
-            setRestaurant.setRestaurantImg("/SpanTasty/upload/reservation/" + newFileName);
-        } else {
-        	String restaurantImg = restaurantService.findRestaurantById(setRestaurant.getRestaurantId()).getRestaurantImg();
-			setRestaurant.setRestaurantImg(restaurantImg);
-		}
-
-        restaurantService.updateRestaurant(setRestaurant);
-        
+    	Restaurant restaurant = restaurantService.uploadFile(setRestaurant, file);
+        restaurantService.updateRestaurant(restaurant);
         return "redirect:/restaurant/getAll";
     }
     
@@ -163,8 +115,6 @@ public class RestaurantController {
         restaurantService.deleteRestaurant(restaurantId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
-
     
     
     // 修改餐廳訂位規則

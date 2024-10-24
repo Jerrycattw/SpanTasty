@@ -9,7 +9,7 @@ import com.eatspan.SpanTasty.entity.store.ShoppingOrder;
 
 public interface ShoppingOrderRepository extends JpaRepository<ShoppingOrder, Integer> {
 
-	List<ShoppingOrder> findByMemberId(Integer memberId);
+	List<ShoppingOrder> findOrdersByMemberId(Integer memberId);
 
 
 }

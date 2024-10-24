@@ -223,14 +223,14 @@ public class ShoppingOrderService {
 	
 	@Transactional
 	public List<ShoppingOrder> findOrdersByMemberId(Integer memberId) {
-	    return shoppingOrderRepo.findByMemberId(memberId);
+	    return shoppingOrderRepo.findOrdersByMemberId(memberId);
 	}
 	
 
 	// 按照購物日期排序，搜尋最近的一筆訂單
 	@Transactional
 	public ShoppingOrder getLatestShoppingOrderByMemberId(Integer memberId) {
-	    List<ShoppingOrder> orders = shoppingOrderRepo.findByMemberId(memberId);
+	    List<ShoppingOrder> orders = shoppingOrderRepo.findOrdersByMemberId(memberId);
 	    if (orders != null && !orders.isEmpty()) {
 	        return orders.stream()
 	                     .max((o1, o2) -> o1.getShoppingDate().compareTo(o2.getShoppingDate()))
@@ -320,7 +320,7 @@ public class ShoppingOrderService {
         obj.setReturnURL("https://5b6d-61-222-34-1.ngrok-free.app/SpanTasty/StarCups/allProduct");
         obj.setNeedExtraPaidInfo("N");
 //        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/allProduct");
-        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/OrderConfirm");
+        obj.setClientBackURL("http://localhost:8080/SpanTasty/StarCups/orderConfirm");
 
         // 生成 ECPay 表单			
         return all.aioCheckOut(obj, null);

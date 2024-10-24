@@ -30,6 +30,9 @@ public class TogoItemServiceImpl implements TogoItemService {
 	@Autowired
 	private TogoRepository togoRepository;
 	
+	@Autowired
+	private TogoCalculateUtils togoCalculateUtils;
+	
 	@Override
 	public List<TogoItemEntity> getAllTogoItemByTogoId(Integer togoId) {
 		return togoItemRepository.findByTogoId(togoId);
@@ -69,10 +72,11 @@ public class TogoItemServiceImpl implements TogoItemService {
             }
 		}
 		List<TogoItemEntity> newTogoItemList = togoItemRepository.saveAll(savedTogoItems);
-		 // 計算新的總金額
-		TogoCalculateUtils calculateUtils = new TogoCalculateUtils();
-		Integer newTotalPrice = calculateUtils.sumOfTotalPrice(togoId);
-		Optional<TogoEntity> togoOptional = togoRepository.findById(togoId);
+		// 計算新的總金額
+		List<TogoItemEntity> togoItemList = togoItemRepository.findByTogoId(togoId);
+	    Integer newTotalPrice = togoCalculateUtils.sumOfTotalPrice(togoItemList);
+	    // 更新訂單的總金額
+	    Optional<TogoEntity> togoOptional = togoRepository.findById(togoId);
 	    if (togoOptional.isPresent()) {
 	        TogoEntity togo = togoOptional.get();
 	        togo.setTotalPrice(newTotalPrice);
@@ -81,6 +85,10 @@ public class TogoItemServiceImpl implements TogoItemService {
 		
 		return newTogoItemList;
 	}
+	public Integer calculateTotalPrice(Integer togoId) {
+        List<TogoItemEntity> togoItemList = getAllTogoItemByTogoId(togoId);
+        return togoCalculateUtils.sumOfTotalPrice(togoItemList);
+    }
 	
 	@Transactional
 	@Override
@@ -93,8 +101,9 @@ public class TogoItemServiceImpl implements TogoItemService {
 			togoItem.setTogoItemPrice(amount*foodPrice);
 			
 			// 更新訂單總金額
-			TogoCalculateUtils calculateUtils = new TogoCalculateUtils();
-			Integer newTotalPrice = calculateUtils.sumOfTotalPrice(togoItemId.getTogoId());
+			Integer togoId = togoItemId.getTogoId();
+			List<TogoItemEntity> togoItemList = togoItemRepository.findByTogoId(togoId);
+		    Integer newTotalPrice = togoCalculateUtils.sumOfTotalPrice(togoItemList);
 			Optional<TogoEntity> togoOptional = togoRepository.findById(togoItemId.getTogoId());
 		    if (togoOptional.isPresent()) {
 		        TogoEntity togo = togoOptional.get();
@@ -111,8 +120,9 @@ public class TogoItemServiceImpl implements TogoItemService {
 	public void deleteTogoItemById(TogoItemId togoItemId) {
 		togoItemRepository.deleteById(togoItemId);
 		// 更新訂單總金額
-		TogoCalculateUtils calculateUtils = new TogoCalculateUtils();
-		Integer newTotalPrice = calculateUtils.sumOfTotalPrice(togoItemId.getTogoId());
+		Integer togoId = togoItemId.getTogoId();
+		List<TogoItemEntity> togoItemList = togoItemRepository.findByTogoId(togoId);
+	    Integer newTotalPrice = togoCalculateUtils.sumOfTotalPrice(togoItemList);
 		Optional<TogoEntity> togoOptional = togoRepository.findById(togoItemId.getTogoId());
 	    if (togoOptional.isPresent()) {
 	        TogoEntity togo = togoOptional.get();

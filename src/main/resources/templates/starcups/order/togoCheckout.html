@@ -60,8 +60,8 @@
         <div class="container">
           <h2 class="breadcrumbs-custom-title">Checkout</h2>
           <ul class="breadcrumbs-custom-path">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="shop.html">Order Online</a></li>
+            <li><a href="/SpanTasty/StarCups">Home</a></li>
+            <li><a href="/SpanTasty/StarCups/order">Order Online</a></li>
             <li class="active">Checkout</li>
           </ul>
         </div>
@@ -128,51 +128,64 @@
         <div class="row row-50 justify-content-center">
           <!-- 取餐資訊 -->
           <div class="col-md-10 col-lg-6">
-            <h4 class="text-spacing-50" style="margin-bottom: 25px;">Pickup Location</h4>
-            <div class="product-top-panel-select">
+            <h4 class="text-spacing-50">Pickup Location</h4>
+            <div class="row row-14 row-fix gutters-14" style="margin-top: 25px;">
               <!--Select 2-->
-              <select class="form-input select-filter" data-minimum-results-for-search="Infinity"
-                data-constraints="@Required" id="citySelect" onchange="fetchTowns()">
-                <option value="">選擇縣市</option>
-              </select>
-              <select class="form-input select-filter" data-minimum-results-for-search="Infinity"
-                data-constraints="@Required" id="townSelect" disabled onchange="fetchRestaurants()">
-                <option value="">選擇鄉鎮</option>
-              </select>
-              <select class="form-input select-filter" data-minimum-results-for-search="Infinity"
-                data-constraints="@Required" id="restaurantSelect" disabled>
-                <option value="">選擇餐廳</option>
-              </select>
+
+              <div class="col-sm-6">
+                <!-- <div style="display: flex; gap: 10px;"> -->
+                <select class="form-input select-filter" data-minimum-results-for-search="Infinity"
+                  data-constraints="@Required" id="citySelect" onchange="fetchTowns()">
+                  <option value="">選擇縣市</option>
+                </select>
+              </div>
+              <div class="col-sm-6">
+                <select class="form-input select-filter" data-minimum-results-for-search="Infinity"
+                  data-constraints="@Required" id="townSelect" disabled onchange="fetchRestaurants()">
+                  <option value="">選擇鄉鎮</option>
+                </select>
+                <!-- </div> -->
+              </div>
+              <div class="col-sm-12">
+                <select class="form-input select-filter" data-minimum-results-for-search="Infinity"
+                  data-constraints="@Required" id="restaurantSelect" disabled>
+                  <option value="">選擇餐廳</option>
+                </select>
+              </div>
             </div>
             <h4 class="text-spacing-50" style="margin-top: 30px;">Pickup Information</h4>
             <form class="rd-form rd-mailform">
               <div class="row row-14 row-fix gutters-14">
                 <div class="col-sm-6">
                   <div class="form-wrap">
-                    <input class="form-input" id="checkout-first-name-1" type="text" name="name"
-                      data-constraints="@Required" />
-                    <label class="form-label" for="checkout-first-name-1">First Name</label>
+                    <input class="form-input" id="tgName" type="text" name="tgName" data-constraints="@Required" />
+                    <label class="form-label" for="tgName">Name</label>
                   </div>
                 </div>
-                <div class="col-sm-6">
+                <!-- <div class="col-sm-6">
                   <div class="form-wrap">
                     <input class="form-input" id="checkout-last-name-1" type="text" name="name"
                       data-constraints="@Required" />
                     <label class="form-label" for="checkout-last-name-1">Last Name</label>
                   </div>
-                </div>
-                <div class="col-sm-6">
+                </div> -->
+                <!-- <div class="col-sm-6">
                   <div class="form-wrap">
                     <input class="form-input" id="checkout-email-1" type="email" name="email"
                       data-constraints="@Email @Required" />
                     <label class="form-label" for="checkout-email-1">E-Mail</label>
                   </div>
-                </div>
+                </div> -->
                 <div class="col-sm-6">
                   <div class="form-wrap">
-                    <input class="form-input" id="checkout-phone-1" type="text" name="phone"
-                      data-constraints="@Numeric" />
-                    <label class="form-label" for="checkout-phone-1">Phone</label>
+                    <input class="form-input" id="tgPhone" type="text" name="tgPhone" data-constraints="@Numeric" />
+                    <label class="form-label" for="tgPhone">Phone</label>
+                  </div>
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-wrap">
+                    <label class="form-label" for="togoMemo">Memo</label>
+                    <textarea class="form-input" name="togoMemo" id="togoMemo"></textarea>
                   </div>
                 </div>
               </div>
@@ -183,14 +196,13 @@
             <div class="box-radio">
               <div class="radio-panel">
                 <label class="radio-inline active">
-                  <input name="input-group-radio" value="checkbox-1" type="radio" checked>Direct Bank Transfer
+                  <input name="input-group-radio" value="checkbox-1" type="radio" checked readonly>現金支付
                 </label>
                 <div class="radio-panel-content">
-                  <p>Make your payment directly into our bank account. Please use your Order ID as the payment
-                    reference.</p>
+                  <p>僅供門市現金支付</p>
                 </div>
               </div>
-              <div class="radio-panel">
+              <!-- <div class="radio-panel">
                 <label class="radio-inline">
                   <input name="input-group-radio" value="checkbox-1" type="radio">PayPal
                 </label>
@@ -203,34 +215,36 @@
                   <input name="input-group-radio" value="checkbox-1" type="radio">Cheque Payment
                 </label>
                 <div class="radio-panel-content">
-                  <p>Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.
-                  </p>
+                  <p>Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.</p>
                 </div>
-              </div>
+              </div> -->
             </div>
-            <h4 class="text-spacing-50">Cart totals</h4>
+            <h4 class="text-spacing-50" style="margin-top: 30px;">Cart totals</h4>
             <div class="table-custom-responsive">
               <table class="table-custom table-custom-primary table-checkout">
                 <tbody>
                   <tr>
                     <td>Cart Subtotal</td>
-                    <td>$524</td>
+                    <td id="subtotal">$524</td>
                   </tr>
                   <tr>
-                    <td>Shipping</td>
-                    <td>Free</td>
+                    <td>Discount</td>
+                    <td id="discount"></td>
                   </tr>
                   <tr>
                     <td>Total</td>
-                    <td>$524</td>
+                    <td id="total">$524</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-        <div class="button-wrap text-center"><a class="button button-secondary button-pipaluk" href="#">Proceed to
-            checkout</a></div>
+        <!-- 訂單送出 -->
+        <div class="button-wrap text-center">
+          <button class="button button-secondary button-pipaluk" id="submitTogoBtn" type="submit">Proceed to
+            checkout</button>
+        </div>
       </div>
     </section>
 
@@ -243,6 +257,98 @@
   <!-- footer th:replace -->
   <div th:replace="~{starcups/display/footer}"></div>
   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      loadCartIntoTable(); // 頁面加載時調用
+
+
+
+      //訂單提交
+      document.getElementById("submitTogoBtn").addEventListener("click", function () {
+        getProfile();
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        // 如果購物車是空的，則提醒用戶
+        if (cart.length === 0) {
+          alert("您的購物車是空的，無法進行結帳！");
+          return;
+        }
+        createTogo();
+
+      })
+
+    })
+
+    function createTogo() {
+      // 從 localStorage 中獲取 memberId
+      const memberId = localStorage.getItem('memberId');
+      const togoMemo = document.getElementById("togoMemo").value;
+      const restaurantId = document.getElementById("restaurantSelect").value;
+      const tgName = document.getElementById("tgName").value;
+      const tgPhone = document.getElementById("tgPhone").value;
+
+      if (!restaurantId) {
+        alert("請選擇餐廳");
+        return;
+      }
+
+      // 建立訂單資料物件
+      const togoData = {
+        memberId,
+        tgPhone,
+        tgName,
+        restaurantId,
+        togoMemo,
+      };
+      // 發送 axios 請求來建立訂單
+      axios.post('http://localhost:8080/SpanTasty/order/togo', togoData)
+        .then(response => {
+          if (response.data) {
+            const togoId = response.data.togoId; // 獲取新建訂單的 ID
+            console.log('togoId ' + togoId)
+            // 接著建立訂單明細
+            createOrderItems(togoId);
+          } else {
+            console.log('無法建立訂單');
+          }
+        })
+        .catch(error => {
+          console.error('建立訂單過程中發生錯誤:', error);
+        });
+    }
+
+    function createOrderItems(togoId) {
+      // 取得購物車中的資料
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const newTogoItems = cart.map(item => {
+        return {
+          togoItemId: {
+            togoId: togoId,
+            foodId: item.foodId
+          },
+          amount: item.quantity,
+          togoItemPrice: item.foodPrice * item.quantity // 計算價格
+        };
+      });
+      console.log(newTogoItems)
+      console.log('togoId ' + togoId)
+      // 發送請求將訂單明細發送到後端
+      axios.post(`http://localhost:8080/SpanTasty/order/togo/${togoId}/items`, newTogoItems)
+        .then(response => {
+          if (response.data) {
+            console.log('訂單明細建立成功');
+            alert('訂單已送出')
+            // 清除 localStorage 中的購物車資料
+            localStorage.removeItem('cart');
+            // 跳轉到成功頁面
+            window.location.href = `/SpanTasty/StarCups/order/togo/information?id=${togoId}`;
+          } else {
+            console.log('訂單明細建立失敗');
+          }
+        })
+        .catch(error => {
+          console.error('上傳訂單明細過程中發生錯誤:', error);
+        });
+    }
+
     // 載入縣市列表
     function loadCities() {
       axios.get('http://localhost:8080/SpanTasty/restaurant/city')
@@ -264,7 +370,6 @@
     // 當用戶選擇縣市時，載入對應鄉鎮
     function fetchTowns() {
       var city = document.getElementById("citySelect").value;
-      console.log("city "+city)
       if (city) {
         axios.get(`http://localhost:8080/SpanTasty/restaurant/${city}/towns`)
           .then(function (response) {
@@ -287,12 +392,10 @@
     // 當用戶選擇鄉鎮時，載入對應餐廳
     function fetchRestaurants() {
       var town = document.getElementById("townSelect").value;
-      console.log("town "+townSelect)
       if (town) {
         axios.get(`http://localhost:8080/SpanTasty/restaurant/${town}/list`)
           .then(function (response) {
             var restaurantSelect = document.getElementById("restaurantSelect");
-            console.log(restaurantSelect)
             restaurantSelect.innerHTML = '<option value="">選擇餐廳</option>';
             response.data.forEach(function (restaurant) {
               var option = document.createElement("option");
@@ -315,6 +418,84 @@
     window.onload = function () {
       loadCities();
     };
+
+    function loadCartIntoTable() {
+      // 從 localStorage 中獲取購物車數據
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      // 目標表格的 tbody 元素
+      const tbody = document.querySelector(".table-custom.table-cart tbody");
+
+      // 清空表格
+      tbody.innerHTML = '';
+
+      // 計算總金額
+      let totalPrice = 0;
+
+      // 如果購物車不為空，動態插入每個項目
+      if (cart.length > 0) {
+        cart.forEach(item => {
+          const itemTotalPrice = item.foodPrice * item.quantity;
+          totalPrice += itemTotalPrice;
+          const rowHtml = `
+          <tr>
+            <td>
+              <div class="table-cart-figure" style="margin-right: 30px;">
+                <img src="${item.foodPicture}" alt="" width="146" height="132" />
+              </div>
+              <div class="table-cart-link">${item.foodName}</div>
+            </td>
+            <td>$${item.foodPrice}</td>
+            <td>${item.quantity}</td>
+            <td>$${itemTotalPrice}</td>
+          </tr>`;
+
+          // 插入新行到表格中
+          tbody.insertAdjacentHTML('beforeend', rowHtml);
+        });
+      } else {
+        // 如果購物車是空的，顯示一條提示信息
+        tbody.innerHTML = `<tr><td colspan="4">購物車是空的。</td></tr>`;
+      }
+
+      // 更新總金額顯示
+      document.querySelector(".cart-product-price").innerHTML = `<sup>$</sup>${totalPrice}`;
+
+      // 將總金額放入表格中的 "Cart Subtotal" 和 "Total" 欄位
+      document.getElementById("subtotal").innerText = `$${totalPrice}`;
+      document.getElementById("total").innerText = `$${totalPrice}`;
+    }
+
+    // 取得會員資料
+    function getProfile() {
+      const token = localStorage.getItem('token');
+
+      if (token) {
+        axios.get('/SpanTasty/member/profile', {
+          headers: {
+            'Authorization': `${token}`
+          }
+        })
+          .then(response => {
+            if (response.data.success) {
+              const member = response.data.data;
+              // 取得 memberId
+              const memberId = member.memberId;
+              localStorage.setItem('memberId', memberId); // 儲存至 localStorage
+              // memberId.textContent = member.memberId;
+              // memberName.textContent = member.memberName;
+              // phone.textContent = member.phone;
+            } else {
+              alert('無法獲取個人資訊');
+            }
+          })
+          .catch(error => {
+            console.error('獲取個人資訊過程中發生錯誤:', error);
+          })
+      } else {
+        alert('請先登入')
+      }
+    }
 
   </script>
   <!-- Javascript-->

@@ -181,7 +181,26 @@
               </ul>
             </div>
           </div>
+          
+          
+          <div class="post-sidebar-item">
+            <h5>歷史紀錄</h5>
+            <div class="post-sidebar-item-inset">
+              <ul class="list list-categories">
+                <li><button class="button-custom" id="btn-personal-info"><span class="icon fa fa-user"></span>
+                    訂位紀錄</button></li>
+                <li><button class="button-custom" id="btn-change-password"><span class="icon fa fa-key"></span>
+                    訂餐紀錄</button></li>
+                <form th:action= "@{/StarCups/orderHistory(shoppingId=${session['shoppingId']})}" method="get" id="checkoutForm">
+                <li><button class="button-custom" id="btn-change-avatar"><span class="icon fa fa-image"></span>
+                    商城購買紀錄</button></li></form>
+                <li><button class="button-custom" id="btn-delete-account"><span class="icon fa fa-trash"></span>
+                    租借紀錄</button></li>
+              </ul>
+            </div>
+          </div>
         </div>
+        
 
         <!-- 右側區域 -->
         <div class="col-md-8">

@@ -1,113 +1,240 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
-  <head>
-    <title>Order History</title>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="zh-Hant">
+<head>
+    <title>訂單歷史</title>
     <meta name="format-detection" content="telephone=no">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
-    <!-- Stylesheets-->
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
     <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
     <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
     <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
-
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
-
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
     <style>
-    .ie-panel{
-	    display: none;
-	    background: #212121;
-	    padding: 10px 0;box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3);
-	    clear: both;
-	    text-align:center;
-	    position: relative;
-	    z-index: 1;
-    } 
-    html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
-	    display: block;
-    }
+        .ie-panel { display: none; background: #212121; padding: 10px 0; box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3); clear: both; text-align: center; position: relative; z-index: 1; }
+        html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel { display: block; }
+        .detail-table th {
+            background-color: gray !important;
+            color: white !important;
+        }
+        .btn-info {
+            outline: none !important;
+        }
     </style>
-  </head>
-  <body>
-    <!-- navbar  th:replace=-->
-    <div th:replace="~{starcups/display/navbar}" ></div>
-      
-      
-    <!-- 選單下方圖片及連結 -->
+</head>
+<body>
+    <div th:replace="~{starcups/display/navbar}"></div>
+
     <section class="section breadcrumbs-custom-inset">
-      <div class="breadcrumbs-custom context-dark">
-        <div class="container">
-          <h2 class="breadcrumbs-custom-title">Order History</h2>
-          <ul class="breadcrumbs-custom-path">
-            <li><a href="/SpanTasty/StarCups">Home</a></li>
-            <li><a href="/SpanTasty/StarCups/memberCenter">MemberCenter</a></li>
-            <li class="active">Order History</li>
-          </ul>
+        <div class="breadcrumbs-custom context-dark">
+            <div class="container">
+                <h2 class="breadcrumbs-custom-title">Order History</h2>
+                <ul class="breadcrumbs-custom-path">
+                    <li><a href="/SpanTasty/StarCups">Home</a></li>
+                    <li><a href="/SpanTasty/StarCups/memberCenter">Member Cent</a></li>
+                    <li class="active">Order History</li>
+                </ul>
+            </div>
+            <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
         </div>
-        <!-- 圖片-->
-        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
-      </div>
     </section>
-    
-    <!-- content -->
-    <div class="container">
-    	
-		<div class="booking-records my-5">
-		  <h2 class="heading-5 my-3">Order History</h2>
-		  <table class="table-custom table-custom-striped table-custom-bordered">
 
-		  </table>
-		
-		  <div class="pagination">
-		  </div>
-		</div>    	
-    
-	  </div>
+    <div class="container d-flex justify-content-center">
+        <div class="booking-records w-75 p-3">
+            <table class="table-custom table-custom-striped table-custom-bordered text-bg-light">
+                <thead>
+                    <tr>
+                        <th>訂單編號</th>
+                        <th>訂單日期</th>
+                        <th>訂單總金額</th>
+                        <th>購買明細</th>
+                        <th>收件資訊</th>
+                    </tr>
+                </thead>
+                <tbody id="order-history-body">
+                    <!-- 訂單資料將會被填充在這裡 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-
-    <!-- Global Mailform Output-->
     <div class="snackbars" id="form-output-global"></div>
-    <!-- footer  th:replace=-->
-    <div th:replace="~{starcups/display/footer}" ></div>
+    <div th:replace="~{starcups/display/footer}"></div>
 
-    
-     <!-- Javascript-->
     <script src="/SpanTasty/starcups/js/core.min.js"></script>
     <script src="/SpanTasty/starcups/js/script.js"></script>
     <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
     <script src="/SpanTasty/js/axios.min.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-			    reserveRecord();
-      });
-      
-      function reserveRecord() {
+        document.addEventListener("DOMContentLoaded", function () {
+            orderHistory();
+        });
 
-          const token = localStorage.getItem('token');
-    	  console.log(token)
-          if (!token) {
-            alert('未登入');
-            window.location.href = '/SpanTasty/StarCups/loginRegister';
-          }
-
-		      axios.get(`http://localhost:8080/SpanTasty/StarCups/OrderHistoryTurn`,{
-            headers: {
-              'Authorization': `${token}`,
+        function orderHistory() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('未登入');
+                window.location.href = '/SpanTasty/StarCups/loginRegister';
+                return;
             }
-          })
-          .then(res => {
-              console.log(res.data);
-              htmlMaker(res.data);
-          })
-          .catch(err => {
-              console.error(err);
-              alert("查詢訂單失敗，請稍後再試。");
-          });
-      }
 
-    	
+            axios.get(`http://localhost:8080/SpanTasty/StarCups/orderHistoryTurn`, {
+                headers: {
+                    'Authorization': `${token}`,
+                }
+            })
+            .then(res => {
+                populateOrderHistory(res.data);
+            })
+            .catch(err => {
+                console.error(err);
+                alert("查詢訂單歷史失敗，請稍後再試。");
+            });
+        }
+
+        function populateOrderHistory(data) {
+            const tbody = document.getElementById('order-history-body');
+            tbody.innerHTML = ''; // 清空原有資料
+            
+            data.sort((a, b) => new Date(b.shoppingDate) - new Date(a.shoppingDate));
+            data.forEach(order => {
+                const row = `
+                    <tr>
+                        <td>${order.shoppingId}</td>
+                        <td>${order.formattedShoppingDate}</td>
+                        <td>$${order.shoppingTotal}</td>
+                        <td class="btn-info">
+                            <button class="btn btn-info" onclick="toggleOrderDetail(${order.shoppingId}, this)">購買明細</button>
+                        </td>
+                        <td class="btn-info">
+                            <button class="btn btn-info" onclick="toggleRecipientInfo(${order.shoppingId}, this)">收件資訊</button>
+                        </td>
+                    </tr>
+                    <tr id="details-${order.shoppingId}" class="collapse">
+                        <td colspan="5">
+                            <div id="detail-content-${order.shoppingId}"></div>
+                        </td>
+                    </tr>
+                    <tr id="recipient-info-${order.shoppingId}" class="collapse">
+                        <td colspan="5">
+                            <div id="recipient-content-${order.shoppingId}"></div>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function toggleOrderDetail(orderId, button) {
+            const detailRow = document.getElementById(`details-${orderId}`);
+            const detailContent = document.getElementById(`detail-content-${orderId}`);
+
+            if (detailRow.classList.contains('collapse')) {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('未登入');
+                    window.location.href = '/SpanTasty/StarCups/loginRegister';
+                    return;
+                }
+
+                axios.get(`http://localhost:8080/SpanTasty/StarCups/orderDetail/${orderId}`, {
+                    headers: {
+                        'Authorization': `${token}`,
+                    }
+                })
+                .then(res => {
+                    let detailHTML = `
+                        <table class="table detail-table">
+                            <thead>
+                                <tr>
+                                    <th>訂單編號</th>
+                                    <th>商品名稱</th>
+                                    <th>數量</th>
+                                    <th>價格</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    res.data.forEach(item => {
+                        detailHTML += `
+                            <tr>
+                                <td>${item.shoppingOrder.shoppingId}</td>
+                                <td>${item.product.productName}</td>
+                                <td>${item.shoppingItemQuantity}</td>
+                                <td>$${item.shoppingItemPrice}</td>
+                            </tr>
+                        `;
+                    });
+
+                    detailHTML += `
+                            </tbody>
+                        </table>
+                    `;
+
+                    detailContent.innerHTML = detailHTML;
+                    detailRow.classList.remove('collapse'); 
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("查詢訂單明細失敗，請稍後再試。");
+                });
+            } else {
+                detailRow.classList.add('collapse');
+            }
+        }
+
+        function toggleRecipientInfo(orderId, button) {
+            const infoRow = document.getElementById(`recipient-info-${orderId}`);
+            const infoContent = document.getElementById(`recipient-content-${orderId}`);
+
+            if (infoRow.classList.contains('collapse')) {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('未登入');
+                    window.location.href = '/SpanTasty/StarCups/loginRegister';
+                    return;
+                }
+
+                axios.get(`http://localhost:8080/SpanTasty/StarCups/recipientInfo/${orderId}`, {
+                    headers: {
+                        'Authorization': `${token}`,
+                    }
+                })
+                .then(res => {
+                    const recipient = res.data; // 假設返回的資料是 Member 對象
+                    const recipientHTML = `
+                        <table class="table detail-table">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>電話</th>
+                                    <th>Email</th>
+                                    <th>地址</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${recipient.memberName}</td>
+                                    <td>${recipient.phone}</td>
+                                    <td>${recipient.email}</td>
+                                    <td>${recipient.address}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                    infoContent.innerHTML = recipientHTML;
+                    infoRow.classList.remove('collapse'); 
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("查詢收件資訊失敗，請稍後再試。");
+                });
+            } else {
+                infoRow.classList.add('collapse');
+            }
+        }
     </script>
-  </body>
+</body>
 </html>

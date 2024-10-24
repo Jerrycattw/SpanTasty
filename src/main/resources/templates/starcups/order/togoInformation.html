@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/" class="wide wow-animation" lang="en">
+
+<head>
+  <title>Order Details</title>
+  <meta name="format-detection" content="telephone=no">
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <!-- Stylesheets-->
+  <!-- 更改樣式 -->
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Poppins:400,500%7CTeko:300,400,500%7CMaven+Pro:500">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <style>
+    .ie-panel {
+      display: none;
+      background: #212121;
+      padding: 10px 0;
+      box-shadow: 3px 3px 5px 0 rgba(0, 0, 0, .3);
+      clear: both;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    html.ie-10 .ie-panel,
+    html.lt-ie-10 .ie-panel {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- navbar  th:replace=-->
+  <div th:replace="~{starcups/display/navbar}"></div>
+  <div class="ie-panel"><a href="http://windows.microsoft.com/en-US/internet-explorer/"><img
+        src="images/ie8-panel/warning_bar_0000_us.jpg" height="42" width="820"
+        alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today."></a>
+  </div>
+  <div class="preloader">
+    <div class="preloader-body">
+      <div class="cssload-container"><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+    <!-- Page Header-->
+    <header class="section page-header">
+      <!-- RD Navbar-->
+
+    </header>
+    <!-- Breadcrumbs -->
+    <section class="section breadcrumbs-custom-inset">
+      <div class="breadcrumbs-custom context-dark">
+        <div class="container">
+          <h2 class="breadcrumbs-custom-title">Order Details</h2>
+          <ul class="breadcrumbs-custom-path">
+            <li><a href="/SpanTasty/StarCups">Home</a></li>
+            <li><a href="/SpanTasty/StarCups/order">Online Order</a></li>
+            <li class="active">Order Details</li>
+          </ul>
+        </div>
+        <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+      </div>
+    </section>
+    <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+      <div class="container">
+        <h4 class="text-spacing-50" style="text-align: center;">訂單已成立✅</h4>
+        <h5 class="text-spacing-50" style="text-align: center;">門市取餐時間：立即(15-20分)</h5>
+        
+      </div>
+    </section>
+    <!-- 取餐資訊 -->
+    <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+      <div class="container">
+        <div class="col-md-10 col-lg-12">
+          <h4 class="text-spacing-50" >Pickup Information</h4>
+          <div class="table-custom-responsive">
+            <table class="table-custom table-custom-primary table-checkout">
+              <tbody>
+                <tr>
+                  <td style="text-align: center;">取餐人姓名</td>
+                  <td style="text-align: center;">取餐人電話</td>
+                  <td style="text-align: center;">取餐門市</td>
+                  <td style="text-align: center;">成立時間</td>
+                  <td style="text-align: center;">訂單總額</td>
+                  <td style="text-align: center;">訂單備註</td>
+                </tr>
+                <tr>
+                  <td th:text="${togo.tgName}" style="text-align: center;"></td>
+                  <td th:text="${togo.tgPhone}" style="text-align: center;"></td>
+                  <td th:text="${togo.restaurant.restaurantName}" style="text-align: center;"></td>
+                  <td th:text="${togo.formattedDate}" style="text-align: center;"></td>
+                  <td th:text="${togo.totalPrice}" style="text-align: center;"></td>
+                  <td th:text="${togo.togoMemo}" style="text-align: center;"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+      <div class="container">
+        <h4 class="text-spacing-50">Your Order Details</h4>
+        <!-- shopping-cart-->
+        <div class="table-custom-responsive">
+          <table class="table-custom table-cart">
+            <thead>
+              <tr>
+                <th>Product name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="item : ${togoItems}">
+                <td>
+                  <!-- 圖片 -->
+                  <div class="table-cart-figure" style="margin-right: 30px;">
+                    <img th:src="${item.menu.foodPicture}" alt="" width="146" height="132" />
+                  </div>
+                  <!-- 名稱 -->
+                  <div class="table-cart-link" th:text="${item.menu.foodName}"></div>
+                </td>
+                <!-- 價格 -->
+                <td th:text="'$' + ${item.menu.foodPrice}"></td>
+                <!-- 數量 -->
+                <td th:text="${item.amount}"></td>
+                <!-- 單項總價 -->
+                <td th:text="'$' + ${item.togoItemPrice}"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section payment-->
+    <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+      <div class="container">
+        <div class="row row-50 justify-content-center">
+          <div class="col-md-10 col-lg-6">
+            <h4 class="text-spacing-50">Payment methods</h4>
+            <div class="box-radio">
+              <div class="radio-panel">
+                <label class="radio-inline active">
+                  <input name="input-group-radio" value="checkbox-1" type="radio" checked>Direct Bank Transfer
+                </label>
+                <div class="radio-panel-content">
+                  <p>Make your payment directly into our bank account. Please use your Order ID as the payment
+                    reference.</p>
+                </div>
+              </div>
+              <div class="radio-panel">
+                <label class="radio-inline">
+                  <input name="input-group-radio" value="checkbox-1" type="radio">PayPal
+                </label>
+                <div class="radio-panel-content">
+                  <p>Pay via PayPal; you can pay with your credit card if you don’t have a PayPal account.</p>
+                </div>
+              </div>
+              <div class="radio-panel">
+                <label class="radio-inline">
+                  <input name="input-group-radio" value="checkbox-1" type="radio">Cheque Payment
+                </label>
+                <div class="radio-panel-content">
+                  <p>Please send a check to Store Name, Store Street, Store Town, Store State / County, Store Postcode.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-10 col-lg-6">
+            <h4 class="text-spacing-50">Cart totals</h4>
+            <div class="table-custom-responsive">
+              <table class="table-custom table-custom-primary table-checkout">
+                <tbody>
+                  <tr>
+                    <td>Cart Subtotal</td>
+                    <td>$524</td>
+                  </tr>
+                  <tr>
+                    <td>Shipping</td>
+                    <td>Free</td>
+                  </tr>
+                  <tr>
+                    <td>Total</td>
+                    <td>$524</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="button-wrap text-center"><a class="button button-secondary button-pipaluk" href="#">Proceed to
+            checkout</a></div>
+      </div>
+    </section>
+
+    <!-- Page Footer-->
+    <footer class="section footer-variant-2 footer-modern context-dark novi-bg novi-bg-img">
+    </footer>
+  </div>
+  <!-- Global Mailform Output-->
+  <div class="snackbars" id="form-output-global"></div>
+  <!-- footer th:replace -->
+  <div th:replace="~{starcups/display/footer}"></div>
+  <!-- Javascript-->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // getTogoById();
+
+
+    })
+
+    // function getTogoById() {
+    //   const urlParams = new URLSearchParams(window.location.search);
+    //   const togoId = urlParams.get('id');
+    //   console.log('togoId:', togoId);
+
+    //   if (togoId) {
+    //     // 發送請求以獲取訂單資料
+    //     axios.get(`/SpanTasty/order/togo/${togoId}`)
+    //       .then(response => {
+    //         console.log('訂單資料:', response.data);
+    //         // 在這裡處理和顯示訂單資料
+    //       })
+    //       .catch(error => {
+    //         console.error('獲取訂單資料過程中發生錯誤:', error);
+    //       });
+    //   } else {
+    //     console.error('未找到 togoId');
+    //   }
+    // }
+
+  </script>
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+</body>
+
+</html>

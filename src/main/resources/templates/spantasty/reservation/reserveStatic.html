@@ -9,110 +9,135 @@
     <div th:replace="~{spantasty/display/navbar}"></div>
     <!-- 主要內容區域 -->
     <div class="content">
+        <h2 class="ms-3 mb-0 text-center"><i class="fa-solid fa-chart-pie"></i> 訂位數據統計 <i class="fa-solid fa-chart-column"></i></h2>
 
-        <!-- 訂位參數表單 -->
-        <div class="container mt-1 mb-4">
-            <form id="searchForm" class="bg-primary-subtle">
-                <div class="row g-3  d-flex justify-content-center">
-                    <div class="col-3 d-flex align-items-center">
-                        <label for="restaurantId" class="form-label mb-0 text-nowrap">選擇餐廳:</label>
-                        <select name="restaurantId" id="restaurantId" class="form-select ms-2">
-                            <option value="" selected>請選擇餐廳</option>
-                            <th:block th:each="restaurant : ${restaurants}">
-                                <option th:value="${restaurant.restaurantId}" th:text="${restaurant.restaurantName}"></option>
-                            </th:block>
-                        </select>
-                    </div>
-
-                    <div class="col-3 d-flex align-items-center">
-                        <label for="reservePercent" class="form-label mb-0 text-nowrap">開放訂位比例(%):</label>
-                        <input type="number" name="reservePercent" id="reservePercent" class="form-control ms-2" min="0" max="100" step="10" />
-                    </div>
-
-                    <div class="col-3 d-flex align-items-center">
-                        <label for="reserveTimeScale" class="form-label mb-0 text-nowrap">訂位間距設定(分):</label>
-                        <input type="number" name="reserveTimeScale" id="reserveTimeScale" class="form-control ms-2" min="15" max="180" step="30"/>
-                    </div>
-
-                    <div class="col-1 d-flex align-items-center justify-content-center">
-                        <button type="button" id="setReserveCenterbtn" class="btn btn-success btn-sm">確認修改</button>
-                    </div>
+        <div class="container mt-3">
+            <div class="row gap-5 d-flex justify-content-center">
+                <div class="col-5 bg-white p-2">
+                    <h5 class="text-center">StarCups分店訂位數量統計</h5>
+                    <form>
+                        <div class="my-3 d-flex align-items-center">
+                            <label for="slotStartDate" class="form-label mb-0 me-1" style="white-space: nowrap;">開始:</label>
+                            <input type="date" class="form-control me-2" name="slotStartDate" id="slotStartDate" />
+                            <label for="slotEndDate" class="form-label mb-0 me-1" style="white-space: nowrap;">結束:</label>
+                            <input type="date" class="form-control me-2" name="slotEndDate" id="slotEndDate" />
+                            <button class="btn btn-sm btn-success" type="button" id="getReserveSumBtn">Search</button>
+                        </div>
+                    </form>
+                    <canvas id="myChart3"></canvas>
                 </div>
-            </form>
-        </div>
-        <!-- 訂位參數表單 -->
-
-
-        <div class="container mt-5">
-            <div class="row gap-3 d-flex justify-content-center">
-                <div class="col-9 bg-white">
-                    <canvas id="myChart3" height="100"></canvas>
-                </div>
-                <div class="col-9 bg-white">
-                    <canvas id="myChart4" height="100"></canvas>
+            
+                <div class="col-5 bg-white p-2">
+                    <h5 class="text-center">StarCups每月訂位數量統計</h5>
+                    <form>
+                        <div class="my-3 d-flex align-items-center">
+                            <label for="year" class="form-label mb-0 me-2 ms-4" style="white-space: nowrap;">查詢年份:</label>
+                            <input type="number" class="form-control" name="year" id="year" style="width: 200px;" />
+                            <button class="btn btn-sm btn-success ms-auto me-2" type="button" id="getReserveMonthBtn">Search</button>
+                        </div>
+                    </form>
+                    <canvas id="myChart4"></canvas>
                 </div>
             </div>
         </div>
+
+        <div class="container mt-5">
+            <div class="row gap-5 d-flex justify-content-center">
+                <div class="col-5 bg-white p-2">
+                    <h5 class="text-center">WeekDay訂位數量統計</h5>
+                    <form>
+                        <div class="my-3 d-flex align-items-center">
+
+                            <label for="weekdayRestaurantId" class="form-label mb-0 me-2 ms-4" style="white-space: nowrap;">選擇餐廳:</label>
+                            <select name="restaurantId" id="weekdayRestaurantId" class="form-select" required style="width: 200px;">
+                                <th:block th:each="restaurant : ${restaurants}">
+                                    <option th:value="${restaurant.restaurantId}"
+                                        th:text="${restaurant.restaurantName}"></option>
+                                </th:block>
+                            </select>
+
+                            <button class="btn btn-sm btn-success ms-auto me-2" type="button" id="getReserveWeekdayBtn">Search</button>
+                        </div>
+                    </form>
+                    <canvas id="myChart1"></canvas>
+                </div>
+            
+                <div class="col-5 bg-white p-2">
+                    <h5 class="text-center">訂位人數數量統計</h5>
+                    <form>
+                        <div class="my-3 d-flex align-items-center">
+                            <label for="seatRestaurantId" class="form-label mb-0 me-2 ms-4" style="white-space: nowrap;">選擇餐廳:</label>
+                            <select name="restaurantId" id="seatRestaurantId" class="form-select" required style="width: 200px;">
+                                <th:block th:each="restaurant : ${restaurants}">
+                                    <option th:value="${restaurant.restaurantId}"
+                                        th:text="${restaurant.restaurantName}"></option>
+                                </th:block>
+                            </select>
+                            <button class="btn btn-sm btn-success ms-auto me-2" type="button" id="getReserveSeatBtn">Search</button>
+                        </div>
+                    </form>
+                    <canvas id="myChart2"></canvas>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('reservation');
-            document.getElementById('restaurantId').addEventListener('change', getRestaurant);
-            document.getElementById('setReserveCenterbtn').addEventListener('click', setReserveCenter);
-            
-            getReserveSum()
-            getReserveMonth()
-            
+            getReserveSum();
+            getReserveMonth();
+            getReserveWeekday(1);
+            getReserveSeat(1);
         });
 
-        function setReserveCenter() {
-            const restaurantId = document.getElementById('restaurantId').value;
-            const reservePercent = document.getElementById('reservePercent').value;
-            const reserveTimeScale = document.getElementById('reserveTimeScale').value;
+        // 綁定事件處理器到搜尋按鈕
+        document.getElementById('getReserveSumBtn').addEventListener('click', function(event) {
+            event.preventDefault();
+            const slotStartDate = document.getElementById('slotStartDate').value;
+            const slotEndDate = document.getElementById('slotEndDate').value;
+            getReserveSum(slotStartDate, slotEndDate); // 傳遞參數
+        });
 
-            let params = {
-                restaurantId: restaurantId,
-                reservePercent: reservePercent,
-                reserveTimeScale: reserveTimeScale
+        document.getElementById('getReserveMonthBtn').addEventListener('click', function(event) {
+            event.preventDefault();
+            const year = document.getElementById('year').value;
+            getReserveMonth(year); // 傳遞年份參數
+        });
+
+        // 綁定WeekDay查詢按鈕
+        document.getElementById('getReserveWeekdayBtn').addEventListener('click', function(event) {
+            event.preventDefault();
+            const restaurantId = document.getElementById('weekdayRestaurantId').value;
+            if (restaurantId) {
+                getReserveWeekday(restaurantId); // 傳遞餐廳ID進行查詢
             }
+        });
 
-            axios.put("http://localhost:8080/SpanTasty/reserve/setReserveCenter", params)
-            .then(res => {
-                console.log(res.data)
-                alert("訂位參數修改成功!")
-                document.getElementById('restaurantId').value = '';
-                document.getElementById('reservePercent').value = '';
-                document.getElementById('reserveTimeScale').value = '';
-            })
-            .catch(err => {
-                console.error(err);
-                alert("訂位參數修改失敗，請稍後再試")
-            })
-        }
+        // 綁定Seat查詢按鈕
+        document.getElementById('getReserveSeatBtn').addEventListener('click', function(event) {
+            event.preventDefault();
+            const restaurantId = document.getElementById('seatRestaurantId').value;
+            if (restaurantId) {
+                getReserveSeat(restaurantId); // 傳遞餐廳ID進行查詢
+            }
+        });
 
-        function getRestaurant() {
-            const restaurantId = document.getElementById('restaurantId').value;
-
-            axios.get(`http://localhost:8080/SpanTasty/restaurant/getapi/${restaurantId}`)
-            .then(res => {
-                console.log(res.data)
-                document.getElementById('reservePercent').value = res.data.reservePercent;
-                document.getElementById('reserveTimeScale').value = res.data.reserveTimeScale;
-            })
-            .catch(err => {
-                console.error(err);
-            })
-        }
 
 
         // 查詢餐廳訂位訂單統計
-        function getReserveSum() {
+        function getReserveSum(slotStartDate, slotEndDate) {
 
-            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveSum`)
+            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveSum`,{
+                params: {
+                    slotStartDate: slotStartDate,
+                    slotEndDate: slotEndDate
+                }
+            })
             .then(res => {
                 console.log(res.data)
-                
                 
 	            // 將餐廳名稱和對應的訂位數量分別提取到 labels 和 data 陣列
 	            const labels = Object.keys(res.data); // 餐廳名稱
@@ -129,8 +154,12 @@
 
 
         // 查詢每月訂位訂單統計
-        function getReserveMonth() {
-            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveMonth`)
+        function getReserveMonth(year) {
+            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveMonth`,{
+                    params: {
+                        year: year
+                    }
+                })
                 .then(res => {
                     console.log(res.data);
                     
@@ -147,6 +176,47 @@
                 .catch(err => {
                     console.error(err);
                 });
+        }
+
+
+        // 查詢按餐廳及WeekDay的訂位數量統計
+        function getReserveWeekday(restaurantId) {
+            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveWeekDay`, {
+                params: {
+                    restaurantId: restaurantId
+                }
+            })
+            .then(res => {
+                console.log(res.data);
+                const labels = Object.keys(res.data); // 提取WeekDay（星期幾）
+                const data = Object.values(res.data); // 提取訂位數量
+                
+                // 更新 myChart1
+                updateChart(myChart1, labels, data);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+        }
+
+        // 查詢按餐廳及人數的訂位數量統計
+        function getReserveSeat(restaurantId) {
+            axios.get(`http://localhost:8080/SpanTasty/reserve/getReserveSeat`, {
+                params: {
+                    restaurantId: restaurantId
+                }
+            })
+            .then(res => {
+                console.log(res.data);
+                const labels = Object.keys(res.data); // 提取座位數
+                const data = Object.values(res.data); // 提取訂位數量
+                
+                // 更新 myChart2
+                updateChart(myChart2, labels, data);
+            })
+            .catch(err => {
+                console.error(err);
+            });
         }
         
         
@@ -190,29 +260,11 @@
                                 weight: 'bold'
                             }
                         }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: '餐廳名稱',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            }
-                        }
                     }
                 },
                 plugins: {
                     legend: {
-                        position: 'right',
-                        labels: {
-                            font: {
-                                size: 14,
-                                family: 'Arial',
-                                weight: 'bold'
-                            },
-                            boxWidth: 20 // 圖例方塊的寬度
-                        }
+                        display: false // 隱藏圖例
                     },
                     tooltip: {
                         callbacks: {
@@ -259,29 +311,11 @@
                                 weight: 'bold'
                             }
                         }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: '月份',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            }
-                        }
                     }
                 },
                 plugins: {
                     legend: {
-                        position: 'right',
-                        labels: {
-                            font: {
-                                size: 14,
-                                family: 'Arial',
-                                weight: 'bold'
-                            },
-                            boxWidth: 20
-                        }
+                        display: false
                     },
                     tooltip: {
                         callbacks: {
@@ -293,6 +327,108 @@
                 }
             }
         });
+
+
+        const ctx1 = document.getElementById('myChart1').getContext('2d');
+        const myChart1 = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: [], // 更新標籤
+                datasets: [{
+                    label: 'WeekDay 訂位數量',
+                    data: [], // 更新數據
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 柔和背景色
+                    borderColor: 'rgba(54, 162, 235, 1)', // 邊框顏色
+                    borderWidth: 2,
+                    borderRadius: 5, // 圓角
+                    hoverBackgroundColor: 'rgba(54, 162, 235, 0.8)', // 懸停背景色
+                    hoverBorderColor: 'rgba(54, 162, 235, 1)', // 懸停邊框顏色
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.3)', // 網格顏色
+                        },
+                        title: {
+                            display: true,
+                            text: '訂位數量',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false // 隱藏圖例
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.dataset.label + ': ' + tooltipItem.raw; // 自定義顯示數據標籤
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+
+        const ctx2 = document.getElementById('myChart2').getContext('2d');
+        const myChart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: [], // 更新標籤
+                datasets: [{
+                    label: '訂位人數 訂位數量',
+                    data: [], // 更新數據
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 柔和背景色
+                    borderColor: 'rgba(153, 102, 255, 1)', // 邊框顏色
+                    borderWidth: 2,
+                    borderRadius: 5, // 圓角
+                    hoverBackgroundColor: 'rgba(153, 102, 255, 0.8)', // 懸停背景色
+                    hoverBorderColor: 'rgba(153, 102, 255, 1)', // 懸停邊框顏色
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.3)', // 網格顏色
+                        },
+                        title: {
+                            display: true,
+                            text: '訂位數量',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false // 隱藏圖例
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.dataset.label + ': ' + tooltipItem.raw; // 自定義顯示數據標籤
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+
 
 
 

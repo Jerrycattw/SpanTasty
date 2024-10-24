@@ -209,18 +209,6 @@ public class StarCupsStoreController {
 		return "starcups/store/checkOut";
 	}
 
-//	@PostMapping("/ecpayCheckout")
-//	public String ecpayCheckout() {
-//		String aioCheckOutALLForm = shoppingOrderService.ecpayCheckout();
-//
-//		return aioCheckOutALLForm;
-//	}
-
-//	@PostMapping("/ecpayCheckout")
-//	public String ecpayCheckout(HttpServletRequest request) {
-//	    return shoppingOrderService.ecpayCheckout(request);
-//	}
-	
 	@GetMapping("/findItem")
 	@ResponseBody
 	public List<ShoppingItem> findItemAjax(@RequestParam Integer shoppingId) {
@@ -246,7 +234,7 @@ public class StarCupsStoreController {
 	}
 
 	
-	@GetMapping("/OrderConfirm")
+	@GetMapping("/orderConfirm")
 //	public String checkOutFinish(@RequestParam Map<String, String>map, Model model) {
 		public String checkOutFinish(Model model) {
 		
@@ -254,7 +242,6 @@ public class StarCupsStoreController {
 		ShoppingOrder shopping = shoppingOrderService.findShoppingOrderById(shoppingId);
 //		String string = map.get("TradeNo");
 //		System.out.println(map);
-		
 		
 		
 		System.out.println("shoppingId "+shoppingId );
@@ -266,25 +253,11 @@ public class StarCupsStoreController {
 		model.addAttribute("productList", productList);
 		Integer totalAmount = shoppingOrderService.calculateTotalAmount(shoppingId);
 		model.addAttribute("totalAmount", totalAmount);
-//		Member members = memberService.findMemberByShoppingId(shoppingId);
-//		model.addAttribute("members",members);
-		
 	    Integer discountAmount = shopping.getDiscountAmount();
 	    if (discountAmount == null) {
 	        discountAmount = 0;
 	    }
-	    
-////	    // 計算 finalAmount
-//	    Integer shoppingTotal = shopping.getShoppingTotal();
-//	    model.addAttribute("shoppingTotal",shoppingTotal);
-//	    Integer finalAmount = shoppingTotal - discountAmount;
-//	    
 	    model.addAttribute("discountAmount", discountAmount);
-//	    model.addAttribute("finalAmount", finalAmount);
-	    
-		
-//		shopping.setFinalAmount(shopping.getShoppingTotal()-shopping.getDiscountAmount());
-		
 		
 	    shopping.setShoppingStatus(2);
 	    shoppingOrderService.updateShoppingOrder(shopping);
@@ -303,18 +276,12 @@ public class StarCupsStoreController {
 	
 	
 	
-	@GetMapping("/OrderHistory")
-	public String orderHistory () {
-			// 解析 JWT token 取得 claims
-//		Map<String, Object> claims = JwtUtil.parseToken(token);
-//		Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
-//	    List<ShoppingOrder> shoppings = shoppingOrderService.findAllShoppingOrder();
-//	    model.addAttribute("shoppings", shoppings);
-
+	@GetMapping("/orderHistory")
+	public String orderHistory (Model model) {
 	    return "starcups/store/OrderHistory";
 	}
 
-    @GetMapping("/OrderHistoryTurn")
+    @GetMapping("/orderHistoryTurn")
     public ResponseEntity<?> orderHistoryTurn(@RequestHeader("Authorization") String token) {
     	
 	    // 解析 JWT token 取得 claims
@@ -333,5 +300,27 @@ public class StarCupsStoreController {
     	return ResponseEntity.ok(shoppings);
     }
     
-	
+
+    @GetMapping("/orderDetail/{id}")
+    public ResponseEntity<?> orderDetail(@PathVariable Integer id, @RequestHeader("Authorization") String token) {
+        // 解析 JWT token 取得 claims
+        Map<String, Object> claims = JwtUtil.parseToken(token);
+        Integer memberId = (Integer) claims.get("memberId");
+
+        List<ShoppingItem> items = shoppingItemService.findShoppingItemById(id);
+
+        return ResponseEntity.ok(items); // 返回所有商品明細
+    }
+
+    
+    @GetMapping("/recipientInfo/{id}")
+    public ResponseEntity<?> recipientInfo(@PathVariable Integer id, @RequestHeader("Authorization") String token) {
+        Map<String, Object> claims = JwtUtil.parseToken(token);
+        Integer memberId = (Integer) claims.get("memberId");
+
+        Member member = memberService.findMemberById(memberId).orElse(null);
+
+        return ResponseEntity.ok(member);
+    }
+
 }

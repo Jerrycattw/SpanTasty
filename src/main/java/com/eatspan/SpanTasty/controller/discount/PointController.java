@@ -75,6 +75,11 @@ public class PointController {
 		return "redirect:/point/pointSet";
 	}
 	
+	@GetMapping("/pointSet/preview")
+	@ResponseBody
+	public String getPoitTextPreview(@RequestParam String pointText) {
+		return pointSetService.getPointSetText(pointText);
+	}
 //	//Home查詢-------------------------
 //	@GetMapping//  /point在類上
 //	public String findAllPointMembers(Model model) {

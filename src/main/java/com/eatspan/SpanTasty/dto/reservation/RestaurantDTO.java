@@ -1,15 +1,15 @@
 package com.eatspan.SpanTasty.dto.reservation;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class RestaurantDTO {
+	
 	private Integer restaurantId;
 	private String restaurantName;
 	private String restaurantAddress;

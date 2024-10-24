@@ -164,7 +164,7 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 						  <!-- 這裡的文字會顯示在圖片右邊 -->
 						  <div class="ms-3">
 							<h4 class="post-classic-title mb-4">
-								<a href="blog-post.html" th:text="${restaurant.restaurantName}"></a>
+								<a th:href="@{/StarCups/restaurant/{id}(id=${restaurant.restaurantId})}" th:text="${restaurant.restaurantName}"></a>
 							</h4>
 						    <div class="post-classic-time m-3">
 						      <span class="novi-icon icon"><i class=" fa-solid fa-phone"></i> 餐廳電話: </span>
