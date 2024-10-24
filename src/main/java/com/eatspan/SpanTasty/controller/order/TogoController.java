@@ -104,9 +104,9 @@ public class TogoController {
 	
 	@PostMapping("/togo")
 	@ResponseBody
-	public ResponseEntity<List<TogoEntity>> addTogo(@RequestBody TogoEntity newTogo) {
-		togoService.addTogo(newTogo);
-		return ResponseEntity.ok(togoService.getAllTogo());
+	public ResponseEntity<TogoEntity> addTogo(@RequestBody TogoEntity newTogo) {
+		TogoEntity savedTogo = togoService.addTogo(newTogo);
+		return ResponseEntity.ok(togoService.getTogoById(savedTogo.getTogoId()));
 	}
 	
 	//刪除&更新

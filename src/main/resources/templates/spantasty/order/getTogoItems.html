@@ -15,8 +15,8 @@
             <div class="row justify-content-center">
                 <div class="col-11">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    	<button id="addTogoItemBtn" class="btn btn-primary">新增明細</button>
-                	</div>
+                        <button id="addTogoItemBtn" class="btn btn-primary" onclick="showAddTogoItemModal()">新增明細</button>
+                    </div>
                     <div class="table-responsive mt-3">
                         <table id="demoData" class="table table-secondary table-striped table-hover text-center">
                             <thead class="thead-light">
@@ -52,19 +52,60 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="addTogoItemModal" tabindex="-1" role="dialog" aria-labelledby="addTogoItemModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addTogoItemModalLabel">新增品項</h5>
+                    </div>
+                    <div class="modal-body">
+                        <!-- 更新的表單 -->
+                        <form id="addItemForm">
+                            <div class="form-group mb-3">
+                                <label for="memberId">會員編號</label>
+                                <input type="text" class="form-control" id="memberId" placeholder="輸入會員編號">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="tgPhone">訂購人電話</label>
+                                <input type="text" class="form-control" id="tgPhone" placeholder="輸入電話">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="togoStatus">取餐狀態</label>
+                                <select class="form-control" id="togoStatus">
+                                    <option value="" selected>請選擇</option>
+                                    <option value="1">未取餐</option>
+                                    <option value="2">已取餐</option>
+                                    <option value="3">已取消</option>
+                                </select>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            id="cancelChangesBtn">取消</button>
+                        <button type="button" class="btn btn-primary" id="saveChangesBtn">保存修改</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             showSidebar('order');
 
-
         })
-        
-        
+
+        function showAddTogoItemModal() {
+            console.log("成功調用")
+        }
 
 
     </script>
-
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
 </body>
 
 </html>
