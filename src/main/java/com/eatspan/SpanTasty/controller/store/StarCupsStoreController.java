@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eatspan.SpanTasty.dto.discount.PointMemberDTO;
 import com.eatspan.SpanTasty.entity.account.Member;
+import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.store.Product;
 import com.eatspan.SpanTasty.entity.store.ProductType;
 import com.eatspan.SpanTasty.entity.store.ShoppingItem;
@@ -299,5 +300,38 @@ public class StarCupsStoreController {
 	    
 		return "starcups/store/OrderConfirm";
 	}
+	
+	
+	
+	@GetMapping("/OrderHistory")
+	public String orderHistory () {
+			// 解析 JWT token 取得 claims
+//		Map<String, Object> claims = JwtUtil.parseToken(token);
+//		Integer memberId = (Integer) claims.get("memberId"); // 獲取會員 ID
+//	    List<ShoppingOrder> shoppings = shoppingOrderService.findAllShoppingOrder();
+//	    model.addAttribute("shoppings", shoppings);
+
+	    return "starcups/store/OrderHistory";
+	}
+
+    @GetMapping("/OrderHistoryTurn")
+    public ResponseEntity<?> orderHistoryTurn(@RequestHeader("Authorization") String token) {
+    	
+	    // 解析 JWT token 取得 claims
+	    Map<String, Object> claims = JwtUtil.parseToken(token);
+
+	    // 取得會員 ID
+	    Integer memberId = (Integer) claims.get("memberId");
+	    System.out.println(memberId);
+	    if (memberId == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("無法從 Token 中取得會員 ID");
+	    
+	    Member member = memberService.findMemberById(memberId).orElse(null);
+        if (member == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Member not found");
+        
+	    List<ShoppingOrder> shoppings = shoppingOrderService. findOrdersByMemberId(memberId);
+    	
+    	return ResponseEntity.ok(shoppings);
+    }
+    
 	
 }

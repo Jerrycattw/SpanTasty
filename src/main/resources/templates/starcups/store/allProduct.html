@@ -33,7 +33,7 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 .cart-icon {
 	position: fixed;
 	bottom: 90px;
-	right: 30px;
+	right: 45px;
 	z-index: 1000;
 	font-size: 2rem;
 	cursor: pointer;
@@ -43,7 +43,6 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 .ui-to-top.active {
 	transform: 0 !important;
 }
-
 
 </style>
 </head>
@@ -57,7 +56,7 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 
 		<button type="submit" style="border: none; background: none;">
 			<i class="fa-solid fa-cart-plus cart-icon"></i> <span id="cart-count"
-				style="position: absolute; top: -10px; right: -10px; background: red; color: white; border-radius: 50%; padding: 5px 10px;">0</span>
+				style="position: fixed; bottom: 120px; right: 25px; background: #613030; color: white; border-radius: 100%; padding: 5px 10px;">0</span>
 		</button>
 	</form>
 
@@ -85,6 +84,9 @@ html.ie-10 .ie-panel, html.lt-ie-10 .ie-panel {
 						<div class="product-top-panel-title">
 							Showing 1–12 of <span th:text="${totalProducts}"></span> results
 						</div>
+						<form th:action= "@{/StarCups/OrderHistory(shoppingId=${session['shoppingId']})}" method="get" id="checkoutForm">
+          		<button type="submit" class="button button-secondary button-pipaluk" id="checkoutBtn">His</button>
+          	</form>
 						<div class="product-top-panel-select">
 							<select class="form-input select-filter"
 								data-minimum-results-for-search="Infinity"

@@ -22,6 +22,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.context.annotation.SessionScope;
 
 import com.eatspan.SpanTasty.config.MailConfig;
+import com.eatspan.SpanTasty.entity.account.Member;
 import com.eatspan.SpanTasty.entity.reservation.Reserve;
 import com.eatspan.SpanTasty.entity.store.Product;
 import com.eatspan.SpanTasty.entity.store.ShoppingItem;
@@ -224,6 +225,7 @@ public class ShoppingOrderService {
 	public List<ShoppingOrder> findOrdersByMemberId(Integer memberId) {
 	    return shoppingOrderRepo.findByMemberId(memberId);
 	}
+	
 
 	// 按照購物日期排序，搜尋最近的一筆訂單
 	@Transactional
@@ -277,17 +279,7 @@ public class ShoppingOrderService {
         
         
         
-//        ShoppingOrder shopping =  findShoppingOrderById(shoppingId);
-//        Integer discountAmount = shopping.getDiscountAmount();
-//	    if (discountAmount == null) {
-//	        discountAmount = 0;
-//	    }
-	    
-	    // 計算 finalAmount
-//	    Integer shoppingTotal = shopping.getShoppingTotal();
-//	    Integer finalAmount = shoppingTotal - discountAmount;
-	    
-//        ShoppingOrder shopping = new ShoppingOrder();
+        ShoppingOrder shopping =  findShoppingOrderById(shoppingId);
         
         // 设置 ECPay 结账信息
         AllInOne all = new AllInOne("");
@@ -295,8 +287,8 @@ public class ShoppingOrderService {
         obj.setMerchantTradeNo(String.valueOf(shoppingId)); 
 //        obj.setMerchantTradeNo("SC" + System.currentTimeMillis()); 
         obj.setMerchantTradeDate(currentDateTime);
-        obj.setTotalAmount(String.valueOf(totalAmount)); 
-//        obj.setTotalAmount(String.valueOf(shopping.getFinalAmount())); 
+//        obj.setTotalAmount(String.valueOf(totalAmount)); 
+        obj.setTotalAmount(String.valueOf(shopping.getFinalTotal())); 
 //        obj.setTotalAmount(String.valueOf(finalAmount)); 
 
         // 獲取所有商品名稱和金額資訊
