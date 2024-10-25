@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員中心</title>
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <style>
+    .user-avatar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 275px;
+      height: 275px;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .personal-info-table {
+      width: 100%;
+      margin: 20px auto;
+      font-size: 18px;
+    }
+
+    .personal-info-table th,
+    .personal-info-table td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .personal-info-table th {
+      width: 40%;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .button-custom {
+      border: none;
+      color: white;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      width: 80%;
+      margin-bottom: 10px;
+      background-color: #efc4a3;
+    }
+
+    .button-custom:hover {
+      background-color: #efc4a3;
+      transform: scale(1.05);
+    }
+
+    .button-custom:active {
+      background-color: #b3876a;
+      transform: scale(0.98);
+    }
+
+    .button-red {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .button-red:hover {
+      background-color: #c82333;
+      transform: scale(1.05);
+    }
+
+    .button-red:active {
+      background-color: #bd2130;
+      transform: scale(0.98);
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      /* 按鈕兩端對齊，並在中間留出空間 */
+      width: 100%;
+    }
+
+
+
+    .mleft10 {
+      margin-left: 10px;
+    }
+
+    .mb10 {
+      margin-bottom: 10px;
+    }
+
+    .post-sidebar-item {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .list-categories li {
+      list-style: none;
+      margin-bottom: 8px;
+    }
+
+    .list-categories a {
+      color: #007bff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .list-categories a:hover {
+      color: #0056b3;
+    }
+
+    .bcf7 {
+      background-color: #F7F7F7;
+    }
+
+    #edit-member-name,
+    #edit-birthday,
+    #edit-memberPhone,
+    #edit-memberAddress,
+    #edit-member-email {
+      width: 120%;
+      /* 設置輸入框寬度為父元素的 100% */
+      max-width: 600px;
+      /* 設置一個合理的最大寬度 */
+    }
+  </style>
+  <style>
+    .box-sportlight-badge {
+      top: 0 !important;
+      font-size: 15px !important;
+    }
+    .button-md {
+	    min-width: 100px !important;
+	}
+  </style>
+</head>
+
+<body>
+  <div th:replace="~{/starcups/display/navbar}"></div>
+	
+  <!-- 記得修改 -->
+  <section class="section breadcrumbs-custom-inset">
+    <div class="breadcrumbs-custom context-dark">
+      <div class="container">
+        <h2 class="breadcrumbs-custom-title">會員中心</h2>
+        <ul class="breadcrumbs-custom-path">
+          <li><a href="/SpanTasty/StarCups">Home</a></li>
+          <li><a href="/SpanTasty/StarCups/memberCenter">會員中心</a></li>
+          <li class="active">帳戶管理</li>
+        </ul>
+      </div>
+      <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+    </div>
+  </section>
+
+  <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+    <div class="container">
+      <div class="row row-50 justify-content-md-center">
+      	
+      	<!-- 左側區域 -->
+        <div th:replace="~{/starcups/display/memberCenterSidebar}"></div>
+        
+
+        <!-- 右側區域 -->
+        <div class="col-md-9">
+		<!-- 資料表格請放裡面 -->
+		 <div class="row row-70 justify-content-center">
+        <div class="col-12">
+          <!-- Quote Creative-->
+          <article class="quote-creative"><a class="quote-creative-figure" href="#"><img class="img-circles"
+                src="/SpanTasty/starcups/images/point/pointlogo.jpg" alt="" width="87" height="87" /></a>
+            <div class="quote-creative-text">
+              <form class="rd-form rd-mailform rd-form-inline rd-form-coupon quote-creative-cite">
+                <div class="form-wrap">
+                  <input class="form-input form-input-inverse" id="coupon-code" type="text" name="email">
+                  <label class="form-label" for="coupon-code">輸入優惠代碼</label>
+                </div>
+                <div class="form-button">
+                  <button class="button button-secondary button-pipaluk" type="submit" id="addCoupon">新增優惠券</button>
+                </div>
+              </form>
+            </div>
+          </article>
+          <!-- table -->
+          <div class="col-12 mt-5">
+            <!-- Bootstrap tabs-->
+            <div class="tabs-custom tabs-horizontal tabs-corporate" id="tabs-3">
+              <!-- Nav tabs-->
+              <ul class="nav nav-tabs">
+                <li class="nav-item" role="presentation"><a class="nav-link active" href="#tabs-3-1"
+                    data-bs-toggle="tab" id="tabsAll">全部(0)</a></li>
+                <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-2" data-bs-toggle="tab"
+                    id="tabsShop">商城(0)</a></li>
+                <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-3" data-bs-toggle="tab"
+                    id="tabsTogo">訂餐(0)</a></li>
+              </ul>
+              <!-- Tab panes-->
+              <div class="tab-content">
+                <!-- 1 -->
+                <div class="tab-pane fade show active" id="tabs-3-1">
+                  <div class="row" id="couponAllDiv">
+
+                  </div>
+                </div>
+                <!-- 2 -->
+                <div class="tab-pane fade" id="tabs-3-2">
+                  <div class="row" id="couponShopDiv">
+
+                  </div>
+                </div>
+                <!-- 3 -->
+                <div class="tab-pane fade" id="tabs-3-3">
+                  <div class="row" id="couponTogoDiv">
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>        
+        <!--  -->
+        </div>
+        <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <button type="button" class="btn-close mt-3 me-3 ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body">
+          <div>
+            <div class="row">
+              <div class="col-3">
+                <img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt="">
+              </div>
+              <div class="col-9 d-flex align-items-center">
+                <div>
+                  <span class="h4 quote-creative-cite" id="couponDescription"><!-- 歡慶三周年折抵$10元 --></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="divider divider-35"></div>
+          <ul class="box-pricing-list" id="couponDetail">
+            <!-- <li class="active">有效期限 : 2024/10/16 00:00 - 2024/10/31 23:59</li>
+                  <li class="active">優惠代碼 : ANNIV03CAKE</li>
+                  <li class="active">優惠內容 : 歡慶三周年折抵$10元</li>
+                  <li class="active">優惠條件 : 滿$100元折抵$10元</li>
+                  <li>商城 : 適用於所有商品</li>
+                  <li>訂餐 : 不適用</li> -->
+          </ul>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="button button-md button-secondary button-pipaluk  w-100"
+            data-bs-dismiss="modal">OK</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!--  -->
+        
+        
+      </div>
+    </div>
+  </section>
+
+  <div th:replace="~{starcups/display/footer}"></div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+	<script>
+    let memberId;
+    document.addEventListener('DOMContentLoaded', (e) => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Notoken found')
+        alert('需要登入才能繼續')
+        window.location.href = '/SpanTasty/StarCups/loginRegister'
+        return;
+      }
+
+      //第一次axios
+      axios.get('/SpanTasty/member/profile', {
+        headers: {
+          'Authorization': `${token}`
+        }
+      })
+        .then(response => {
+          if (response.data.success) {
+            const memberData = response.data.data
+            memberId = memberData.memberId
+            console.log('會員資訊:', memberData);
+
+            //第二次axios
+            return axios.get('/SpanTasty/StarCups/coupon/show', {
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              params: {
+                memberId: memberData.memberId
+              }
+            })
+          } else {
+            throw new Error('無法獲取會員資訊')
+          }
+        })
+        .then(couponResponse => {
+          console.log(couponResponse.data);
+          htmlMaker(couponResponse.data.all, 'couponAllDiv', 'tabsAll','all')
+          htmlMaker(couponResponse.data.shop, 'couponShopDiv', 'tabsShop','shop')
+          htmlMaker(couponResponse.data.togo, 'couponTogoDiv', 'tabsTogo','togo')
+        })
+        .catch(err => {
+          console.error('發生錯誤', err)
+        })
+
+        document.getElementById('addCoupon').addEventListener('click',function(){
+          const couponCode = document.getElementById('coupon-code').value
+          console.log('memberId',memberId);
+          console.log('couponId',couponCode);
+          
+          //新增優惠券
+          axios.post('/SpanTasty/StarCups/coupon/add',{           
+              memberId:memberId,
+              couponCode:couponCode
+          })
+          .then(res=>{
+                console.log(res.data);
+                alert(res.data)
+                //刷新優惠券DIV
+                axios.get('/SpanTasty/StarCups/coupon/show', {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  params: {
+                    memberId:memberId
+                  }
+                })
+                .then(couponResponse => {
+                  console.log(couponResponse.data);
+                  htmlMaker(couponResponse.data.all, 'couponAllDiv', 'tabsAll','all')
+                  htmlMaker(couponResponse.data.shop, 'couponShopDiv', 'tabsShop','shop')
+                  htmlMaker(couponResponse.data.togo, 'couponTogoDiv', 'tabsTogo','togo')
+                })
+                .catch(err => {
+                  console.error('發生錯誤', err)
+                })
+        
+          })
+          .catch(err=>{
+            console.log(err.response.data);
+            alert(err.response.data)
+          })
+        })
+
+
+
+
+
+
+       document.addEventListener('click', function (event) {
+        //去逛逛
+        if (event.target.classList.contains('goshopping')) {
+          switch (event.target.dataset.type) {
+            case 'all':
+              window.location.href = '/SpanTasty/StarCups';            
+              break;
+            case 'shop':
+            window.location.href = '/SpanTasty/StarCups/allProduct';    
+            break;
+            case 'togo':
+              window.location.href = '/SpanTasty/StarCups/order';    
+              break;    
+          }
+        }
+        //使用規則
+        if (event.target.classList.contains('rule')) {
+          event.preventDefault();
+          const couponId = event.target.dataset.couponid
+          axios.post(`/SpanTasty/coupon/${couponId}/show`, {
+            headers: {
+              'Content-Type': 'text/plain'
+            },
+            body: couponId
+          })
+            .then(res => {
+              console.log(res.data);
+              const data = res.data
+              document.getElementById('couponDescription').textContent = data.coupon.couponDescription
+              const couponDetail = document.getElementById('couponDetail')
+              couponDetail.innerHTML = `
+                <li class="active">有效期限 : ${data.coupon.couponStartDate} 00:00 - ${data.coupon.couponEndDate} 23:59</li>
+                <li class="active">優惠代碼 : ${data.coupon.couponCode}</li>
+                <li class="active">優惠條件 : ${data.coupon.rulesDescription}</li>
+                <li class="${data.coupon.minOrderDiscount ? 'active' : ''}">低消 : $${data.coupon.minOrderDiscount ? data.coupon.minOrderDiscount : '不適用'}</li>
+                <li class="${data.couponperMaxCoupon ? 'active' : ''}">最高折抵 : $${data.coupon.perMaxCoupon ? data.coupon.perMaxCoupon : '不適用'}</li>
+                ${getTagTextFinal(data)}`
+
+              var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+              myModal.show();
+
+            })
+            .then(err => {
+              console.error
+            })
+        }
+      });
+
+
+
+
+
+    })
+    function getTagTextFinal(data){
+      if(getTagsText(data,'product')==="沒有適用的商品" && getTagsText(data,'togo')==="沒有適用的商品" ){
+        return`
+        <li class="active">商城 : 適用於 全部商品</li>
+        <li class="active">訂餐 : 適用於 全部商品</li>
+        `
+      }else {
+        return `
+         <li class="${getTagsText(data,'product')==="沒有適用的商品" ? '' : 'active'}">商城 : ${getTagsText(data,'product')}</li>
+         <li class="${getTagsText(data,'togo')==="沒有適用的商品" ? '' : 'active'}">訂餐 : ${getTagsText(data,'togo')}</li>
+        `
+      }
+    }
+
+
+    function getTagsText(data,type) {
+      const productTags = data.coupon.tags
+        .filter(tag => tag.tagType === type)
+        .map(tag => tag.tagName);
+
+      if (productTags.length === 0) {
+        return "沒有適用的商品";
+      }
+
+      const uniqueTags = [...new Set(productTags)];
+      return `適用於 ${uniqueTags.join('、')} `;
+    }
+
+    function htmlMaker(coupons, area, tab,tagtype) {
+      const couponDiv = document.getElementById(area)
+      console.log(coupons);
+      console.log(tagtype);
+      
+      
+      if(coupons.length===0){
+        couponDiv.innerHTML=`
+          <div class="d-flex justify-content-center">
+            <span class="h6 quote-creative-cite">目前沒有可用的優惠券。</span>
+          </div>  `
+        return
+      }
+
+      
+
+      let count = 0;
+      couponDiv.innerHTML = ''
+      coupons.forEach(coupon => {
+        couponDiv.innerHTML += `
+            <div class="col-6 d-flex mb-3">
+              <div class="d-flex" style="background-color: rgb(232, 208, 192);"><img src="/SpanTasty/starcups/images/coupon/couponhead.png" width="87" height="87" alt=""></div>
+              <div class="border w-100 d-flex justify-content-between">
+                <div class="ms-1 mt-1">                                                        
+                  <ul class="">
+                    <li><span>${coupon.coupon.rulesDescription}</span><span></span></li>
+                    <li><span>低消 </span><span>$${coupon.coupon.minOrderDiscount != null ? coupon.coupon.minOrderDiscount : '-'}</span></li>
+                    <li><span>最多折抵 </span><span>$${coupon.coupon.maxDiscount != null ? coupon.coupon.maxDiscount : '-'}</span></li>
+                    <li><span>有效日期: </span><span>${coupon.coupon.couponEndDate}</span></li>
+                    <li><a href="#" class="rule" data-couponid=${coupon.coupon.couponId}>使用規則</a></li>
+                  </ul>
+                </div>                                                           
+                <div class="d-flex align-items-center me-3">
+                  <button class="button button-md button-secondary button-pipaluk goshopping" data-type=${tagtype}>去逛逛</button>
+                </div>
+                ${coupon.usageAmount > 1 ? `<div class="box-sportlight-badge box-sportlight-sale mb-3">x ${coupon.usageAmount}</div>` : ''}               
+              </div>
+            </div>`
+        count++;
+      });
+
+      switch (tab) {
+        case 'tabsAll':
+          document.getElementById(tab).innerHTML = `全部(${count})`
+          break;
+        case 'tabsShop':
+          document.getElementById(tab).innerHTML = `商城(${count})`
+          break;
+        case 'tabsTogo':
+          document.getElementById(tab).innerHTML = `訂餐(${count})`
+          break;
+      }
+
+      
+    }
+  </script>
+</body>
+
+</html>

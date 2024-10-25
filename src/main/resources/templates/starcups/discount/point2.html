@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員中心</title>
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/bootstrap.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/fonts.css">
+  <link rel="stylesheet" href="/SpanTasty/starcups/css/style.css">
+  <style>
+    .user-avatar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 275px;
+      height: 275px;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .personal-info-table {
+      width: 100%;
+      margin: 20px auto;
+      font-size: 18px;
+    }
+
+    .personal-info-table th,
+    .personal-info-table td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .personal-info-table th {
+      width: 40%;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .button-custom {
+      border: none;
+      color: white;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      width: 80%;
+      margin-bottom: 10px;
+      background-color: #efc4a3;
+    }
+
+    .button-custom:hover {
+      background-color: #efc4a3;
+      transform: scale(1.05);
+    }
+
+    .button-custom:active {
+      background-color: #b3876a;
+      transform: scale(0.98);
+    }
+
+    .button-red {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .button-red:hover {
+      background-color: #c82333;
+      transform: scale(1.05);
+    }
+
+    .button-red:active {
+      background-color: #bd2130;
+      transform: scale(0.98);
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      /* 按鈕兩端對齊，並在中間留出空間 */
+      width: 100%;
+    }
+
+
+
+    .mleft10 {
+      margin-left: 10px;
+    }
+
+    .mb10 {
+      margin-bottom: 10px;
+    }
+
+    .post-sidebar-item {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .list-categories li {
+      list-style: none;
+      margin-bottom: 8px;
+    }
+
+    .list-categories a {
+      color: #007bff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .list-categories a:hover {
+      color: #0056b3;
+    }
+
+    .bcf7 {
+      background-color: #F7F7F7;
+    }
+
+    #edit-member-name,
+    #edit-birthday,
+    #edit-memberPhone,
+    #edit-memberAddress,
+    #edit-member-email {
+      width: 120%;
+      /* 設置輸入框寬度為父元素的 100% */
+      max-width: 600px;
+      /* 設置一個合理的最大寬度 */
+    }
+  </style>
+</head>
+
+<body>
+  <div th:replace="~{/starcups/display/navbar}"></div>
+	
+  <!-- 記得修改 -->
+  <section class="section breadcrumbs-custom-inset">
+    <div class="breadcrumbs-custom context-dark">
+      <div class="container">
+        <h2 class="breadcrumbs-custom-title">會員中心</h2>
+        <ul class="breadcrumbs-custom-path">
+          <li><a href="/SpanTasty/StarCups">Home</a></li>
+          <li><a href="/SpanTasty/StarCups/memberCenter">會員中心</a></li>
+          <li class="active">帳戶管理</li>
+        </ul>
+      </div>
+      <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
+    </div>
+  </section>
+
+  <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
+    <div class="container">
+      <div class="row row-50 justify-content-md-center">
+      	
+      	<!-- 左側區域 -->
+        <div th:replace="~{/starcups/display/memberCenterSidebar}"></div>
+        
+
+        <!-- 右側區域 -->
+        <div class="col-md-9">
+		<!-- 資料表格請放裡面 -->
+                  <div class="row row-70 justify-content-center">
+            <div class="col-12">
+              <!-- Quote Creative-->
+              <article class="quote-creative"><a class="quote-creative-figure" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/pointlogo.jpg" alt="" width="87" height="87"/></a>
+                <div class="quote-creative-text" id="totalPointDiv">
+                  <span>需要登入才能繼續</span>
+                  <!-- <span class="h3 quote-creative-cite">500</span><span>點 可用點數</span></div></br>
+                  <span>125 點 到期日 2023/01/01</span> -->
+                </div>
+              </article>
+              <!-- table -->
+              <div class="col-12 mt-3">
+                <!-- Bootstrap tabs-->
+                <div class="tabs-custom tabs-horizontal tabs-corporate" id="tabs-3">
+                  <!-- Nav tabs-->
+                  <ul class="nav nav-tabs">
+                    <li class="nav-item" role="presentation"><a class="nav-link active" href="#tabs-3-1" data-bs-toggle="tab" id="tabAll">所有紀錄</a></li>
+                    <!-- <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-2" data-bs-toggle="tab" id="tabGet">已獲得</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-3-3" data-bs-toggle="tab" id="tabUse">已使用</a></li> -->
+                  </ul>
+                  <!-- Tab panes-->
+                  <div class="tab-content">
+                    <!-- 1 -->
+                    <div class="tab-pane fade show active" id="tabs-3-1">
+                        <!-- row -->
+                      <!-- <div class="row">
+                        <div class="col-2">
+                          <a class="" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/coinget.jpg" alt="" width="87" height="87"/></a>
+                        </div>
+                        <div class="col-4 me-auto">
+                          <ul class="">
+                            <li><span>商城</span><span></span></li>
+                            <li><span>2023/01/01</span><span></span></li>
+                            <li><span>到期日:</span><span>2024/01/01</span></li>
+                          </ul>
+                        </div>
+                        <div class="col-2 d-flex align-items-center">
+                          <h4>+100</h4>
+                        </div>
+                      </div> -->
+                      <!-- row -->
+                      <!-- <div class="row">
+                        <div class="col-2">
+                          <a class="" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/coinuse.jpg" alt="" width="87" height="87"/></a>
+                        </div>
+                        <div class="col-4 me-auto">
+                          <ul class="">
+                            <li><span>商城</span><span></span></li>
+                            <li><span>2023/01/01</span><span></span></li>
+                            <li><span>到期日:</span><span>2024/01/01</span></li>
+                          </ul>
+                        </div>
+                        <div class="col-2 d-flex lign-items-center">
+                          <h4>-100</h4>
+                        </div>
+                      </div> -->
+                      <!-- row -->
+                    </div>
+                    <!-- 2 -->
+                    <div class="tab-pane fade" id="tabs-3-2">
+                      <!-- row -->
+                      <!-- <div class="row">
+                        <div class="col-2">
+                          <a class="" href="#"><img class="img-circles" src="/SpanTasty/starcups/images/point/coinuse.jpg" alt="" width="87" height="87"/></a>
+                        </div>
+                        <div class="col-4 me-auto">
+                          <ul class="">
+                            <li><span>商城</span><span></span></li>
+                            <li><span>2023/01/01</span><span></span></li>
+                            <li><span>到期日:</span><span>2024/01/01</span></li>
+                          </ul>
+                        </div>
+                        <div class="col-2 align-items-center">
+                          <h4>-100</h4>
+                        </div>
+                      </div>                 -->
+                    </div>  
+                    <!-- 3 -->
+                    <!-- <div class="tab-pane fade" id="tabs-3-3">
+                      <p>We use only trusted, verified content, so you can believe every word we are saying. We are always happy to greet the new visitors on our site. Our blog and social media accounts are available to encourage communication and connection between clients and personnel and tell you more about us in the informal environments where we can have a dialogue instead of just a narrative like that.</p>
+                    </div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+		<!--  -->        
+        </div>
+        <div class="pagination-wrap" >
+          <!-- Bootstrap Pagination-->
+          <nav aria-label="Page navigation" id="pointPagination">
+            <ul class="pagination">
+              <li class="page-item page-item-control disabled"><a class="page-link" href="#" aria-label="Previous"><span class="icon" aria-hidden="true"></span></a></li>
+              <li class="page-item active"><span class="page-link">1</span></li>
+              <!-- <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">4</a></li> -->
+              <li class="page-item page-item-control"><a class="page-link" href="#" aria-label="Next"><span class="icon" aria-hidden="true"></span></a></li>
+            </ul>
+          </nav>
+        </div>
+        
+        
+      </div>
+    </div>
+  </section>
+
+  <div th:replace="~{starcups/display/footer}"></div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="/SpanTasty/starcups/js/core.min.js"></script>
+  <script src="/SpanTasty/starcups/js/script.js"></script>
+  <script>
+      let pageData;
+      let memberId;
+      document.addEventListener('DOMContentLoaded',(e)=>{
+        const token = localStorage.getItem('token');
+        if(!token){
+          console.error('Notoken found')
+          alert('需要登入才能繼續')
+          window.location.href='/SpanTasty/StarCups/loginRegister'
+          return;
+        }
+
+        //第一次axios
+        axios.get('/SpanTasty/member/profile',{
+          headers:{
+            'Authorization':`${token}`
+          }
+        })
+        .then(response=>{
+          if(response.data.success){
+            const memberData = response.data.data
+            memberId = memberData.memberId
+            console.log('會員資訊:',memberData);
+
+            //第二次axios
+            return axios.get('/SpanTasty/StarCups/point/show',{
+              headers:{
+                'Content-Type':'application/json'
+              },
+              params:{
+                memberId:memberData.memberId
+              }
+            })
+          } else{
+            throw new Error('無法獲取會員資訊')
+          }
+        })
+        .then(pointsResponse=>{
+          console.log(pointsResponse.data);
+          HtmlMaker(pointsResponse.data)
+          pageData=pointsResponse.data.pointsById
+        })
+        .catch(err=>{
+          console.err('發生錯誤',error)
+        })
+      })
+
+      const getCoinURL ='/SpanTasty/starcups/images/point/coinget.jpg'
+      const useCoinURL =`/SpanTasty/starcups/images/point/coinuse.jpg`   
+      function HtmlMaker(data){
+        if(data.pointMember==null){
+          document.getElementById('totalPointDiv').innerHTML=`
+            <div class="d-flex justify-content-center">
+              <span class="h6 quote-creative-cite">目前沒有可用點數。</span>
+            </div>
+          `
+          return
+        }
+
+
+        //點數總攬
+        document.getElementById('totalPointDiv').innerHTML=`
+          <span class="h3 quote-creative-cite">${data.pointMemberTotalPoint}</span><span>點 可用點數</span></div></br>
+          <span>${data.pointMember.expiringPoints} 點 到期日 ${data.pointMember.expiryDate?data.pointMember.expiryDate:'-/-/-' }</span>`
+        //點數紀錄
+        pointHtmlMaker(data.pointsById)
+        //點數page
+        paginationHtmlMaker(data.pointsById)
+        
+        
+      }      
+      function pointHtmlMaker(data){
+        const pointDiv = document.getElementById('tabs-3-1')
+        const points = data.content
+        pointDiv.innerHTML=''
+        points.forEach(point => {
+          pointDiv.innerHTML +=`
+            <div class="row">
+              <div class="col-2">
+                <a class="" href="#"><img class="img-circles" src=${point.pointChange>0 ? getCoinURL : useCoinURL} alt="" width="87" height="87"/></a>
+              </div>
+              <div class="col-4 me-auto">
+                <ul class="">
+                  <li><span>${point.transactionType}</span><span></span></li>
+                  <li><span>${point.createDate}</span><span></span></li>
+                  ${point.expiryDate? `<li><span>到期日:</span><span>${point.expiryDate}</span></li>` : ''}
+                </ul>
+              </div>
+              <div class="col-2 d-flex align-items-center justify-content-center">
+                <h4 style="${point.pointChange>0? 'color: #976f55;':''}">${point.pointChange}</h4>
+              </div>
+            </div>`
+        });
+        
+      }
+      function paginationHtmlMaker(data){
+        const pagination = document.getElementById('pointPagination')
+        pagination.innerHTML=`
+          <ul class="pagination">
+            <li class="page-item page-item-control ${data.first ? 'disabled' : ''}"><a class="page-link pagePrevious" href="#" aria-label="Previous"><span class="icon" aria-hidden="true"></span></a></li>
+            ${paginationLi(data)}
+            <li class="page-item page-item-control ${data.last ? 'disabled' : ''}"><a class="page-link pageNext" href="#" aria-label="Next"><span class="icon" aria-hidden="true"></span></a></li>
+          </ul>`
+
+        pagination.removeEventListener('click',paginationClickHandler)                       
+        pagination.addEventListener('click',paginationClickHandler)
+      }
+      function paginationLi(data){
+        const pages = data.totalPages
+        let paginationLi='';
+        for (let index = 0; index < pages; index++) {
+          paginationLi += `<li class="page-item ${index === data.number  ? 'active' : ''}"><a class="page-link pageBtn" data-page=${index} href="#">${index+1}</a></li>`    
+        }
+        
+        return paginationLi
+      }
+      function paginationClickHandler(){
+        event.preventDefault();
+        const pageItem = event.target.closest('a')
+          if (!pageItem) return;
+          console.log('pageData',pageData);
+          
+          let newPage;
+          
+          if(pageItem.classList.contains('pageBtn')){
+            // url=`/SpanTasty/StarCups/point/showPage?p=${pageItem.dataset.page}`
+            newPage=pageItem.dataset.page
+          }
+          if(pageItem.classList.contains('pagePrevious') && !pageData.first){
+              console.log("previous");
+              newPage=pageData.number-1//1 2 3 4  0 1 2 3  //  2 3 4 5   1 2 3 4  
+
+          }
+          if(pageItem.classList.contains('pageNext') && !pageData.last){
+              console.log("next");
+              newPage=pageData.number+1 //0 1 2 3  1 2 3 4   //1 2 3 4  2 3 4 5        
+
+          }
+
+          axios.get(`/SpanTasty/StarCups/point/showPage?p=${newPage}`,{
+            headers:{
+                'Content-Type':'application/json'
+              },
+              params:{
+                memberId:memberId
+              }
+          })
+          .then(res=>{
+            console.log(res.data)
+
+            pointHtmlMaker(res.data)           
+            paginationHtmlMaker(res.data);            
+            pageData=res.data
+            })
+            .catch(err=>{
+              console.log("err :" + err);
+            })  
+       }
+  </script>
+</body>
+
+</html>

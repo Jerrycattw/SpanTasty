@@ -35,15 +35,20 @@ public class StarCupsPointController {
 	//導向頁面
 	@GetMapping("/point")
 	public String goToPoint() {
-		return "/starcups/discount/point";
+		return "/starcups/discount/point2";
+	}
+	
+	@GetMapping("/pointSet")
+	public String goPointSet(Model model) {
+		return "starcups/discount/pointSet";
 	}
 	
 	
-	
-	@GetMapping("/pointSet")
+	@GetMapping("/pointSet/show")
+	@ResponseBody
 	public String getPointSetText() {
 		String content = pointSetService.findAllPointSet().getSetDescription();
-		return "starcups/discount/pointSet";
+		return pointSetService.getPointSetText(content);
 	}
 	
 	//
