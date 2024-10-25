@@ -31,6 +31,9 @@
     html.lt-ie-10 .ie-panel {
       display: block;
     }
+    .button-md {
+	    min-width: 100px !important;
+	}
   </style>
 </head>
 <body>
@@ -40,10 +43,10 @@
   <section class="section breadcrumbs-custom-inset">
     <div class="breadcrumbs-custom context-dark">
       <div class="container">
-        <h2 class="breadcrumbs-custom-title">Coupon</h2>
+        <h2 class="breadcrumbs-custom-title">Points Notice</h2>
         <ul class="breadcrumbs-custom-path">
-          <li><a href="index.html">Home</a></li>
-          <li class="active">Coupon</li>
+          <li><a href="/SpanTasty/StarCups">Home</a></li>
+          <li class="active">Points Notice</li>
         </ul>
       </div>
       <div class="box-position novi-bg novi-bg-img" style="background-image: url(images/bg-breadcrumbs.jpg);"></div>
@@ -51,21 +54,35 @@
   </section>
   <!--  -->
   <section class="section novi-bg novi-bg-img section-xl bg-default text-md-start">
-    <div class="container">
+    <div class="container d-flex justify-content-center">
     
     
    <!-- Quote Modern-->
-              <article class="quote-modern">
-                <div class="quote-modern-text">
-                  <p class="q">Peritus elevatus sed mire quaestios bulla est. Eposs messis! Zeluss sunt cottas de raptus planeta. Burguss mori in audax palatium! Cum acipenser mori, omnes uriaes tractare.</p>
-                </div>
-              </article>
-            </div>
+      <article class="quote-creative w-50"><a class="quote-creative-figure" href="#"><img class="img-circles"
+            src="/SpanTasty/starcups/images/point/pointlogo.jpg" alt="" width="87" height="87" /></a>
+        <div class="quote-creative-text ">
+        	<p class="h4 quote-creative-cite ">點數公告</p>
+			<P id="pointSetText"></P>
+        </div>
+      </article>             
   	</div>
+  	<div class="d-flex justify-content-center mt-3">
+        <button class="button button-md button-secondary button-pipaluk " onclick="window.history.back()">BACK</button>  	
+  	</div>
+  	</section>
    <!-- footer  th:replace=-->
   <div th:replace="~{starcups/display/footer}"></div>
   <!-- Javascript-->
   <script src="/SpanTasty/starcups/js/core.min.js"></script>
   <script src="/SpanTasty/starcups/js/script.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded',function(){
+  	axios.get('/SpanTasty/StarCups/pointSet/show')
+  	.then(res=>{
+  		document.getElementById('pointSetText').innerHTML=res.data
+  		
+  	})
+  })
+  </script>
 </body>
 </html>

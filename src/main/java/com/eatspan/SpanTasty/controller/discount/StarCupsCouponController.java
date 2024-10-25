@@ -48,7 +48,7 @@ public class StarCupsCouponController {
 	
 	@GetMapping("/coupon")
 	public String showCoupon() {
-		return "/starcups/discount/coupon";
+		return "/starcups/discount/coupon2";
 	}
 	
 	@GetMapping("/coupon/show")
